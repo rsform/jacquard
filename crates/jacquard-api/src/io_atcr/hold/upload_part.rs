@@ -54,11 +54,11 @@ pub struct UploadPartOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UploadPartError<'a> {
     #[serde(rename = "InvalidUploadId")]
-    InvalidUploadId(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidUploadId(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidPartNumber")]
-    InvalidPartNumber(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidPartNumber(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "UploadFailed")]
-    UploadFailed(std::option::Option<jacquard_common::CowStr<'a>>),
+    UploadFailed(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for UploadPartError<'_> {

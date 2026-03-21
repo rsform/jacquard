@@ -24,9 +24,9 @@ pub struct UpdateLivestream<'a> {
     #[serde(borrow)]
     pub streamer: jacquard_common::types::string::Did<'a>,
     ///New title for the livestream.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -66,16 +66,16 @@ pub struct UpdateLivestreamOutput<'a> {
 pub enum UpdateLivestreamError<'a> {
     /// The request lacks valid authentication credentials.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The caller does not have permission to update livestream metadata for this streamer.
     #[serde(rename = "Forbidden")]
-    Forbidden(std::option::Option<jacquard_common::CowStr<'a>>),
+    Forbidden(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The streamer's OAuth session could not be found or is invalid.
     #[serde(rename = "SessionNotFound")]
-    SessionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    SessionNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The specified livestream record does not exist.
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RecordNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateLivestreamError<'_> {
@@ -289,7 +289,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

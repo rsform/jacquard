@@ -28,8 +28,8 @@ pub struct LinkedAccount<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Sort order for displaying linked accounts (lower numbers appear first). Defaults to 999 if not specified.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub order: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub order: core::option::Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -44,9 +44,9 @@ pub struct LinkedAccount<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinkedAccountGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -93,19 +93,19 @@ impl jacquard_common::types::collection::Collection for LinkedAccountRecord {
     type Record = LinkedAccountRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkedAccount<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LinkedAccount<'a> {
     fn nsid() -> &'static str {
         "io.whiteside.linkedAccount"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_whiteside_linkedAccount()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -120,51 +120,51 @@ pub mod linked_account_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Link;
-        type Icon;
         type Name;
+        type Icon;
+        type Link;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Link = Unset;
-        type Icon = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
-        type Link = Set<members::link>;
-        type Icon = S::Icon;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `icon` field to Set
-    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIcon<S> {}
-    impl<S: State> State for SetIcon<S> {
-        type Link = S::Link;
-        type Icon = Set<members::icon>;
-        type Name = S::Name;
+        type Icon = Unset;
+        type Link = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Link = S::Link;
-        type Icon = S::Icon;
         type Name = Set<members::name>;
+        type Icon = S::Icon;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `icon` field to Set
+    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIcon<S> {}
+    impl<S: State> State for SetIcon<S> {
+        type Name = S::Name;
+        type Icon = Set<members::icon>;
+        type Link = S::Link;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLink<S> {}
+    impl<S: State> State for SetLink<S> {
+        type Name = S::Name;
+        type Icon = S::Icon;
+        type Link = Set<members::link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `link` field
-        pub struct link(());
-        ///Marker type for the `icon` field
-        pub struct icon(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `icon` field
+        pub struct icon(());
+        ///Marker type for the `link` field
+        pub struct link(());
     }
 }
 
@@ -271,9 +271,9 @@ impl<'a, S: linked_account_state::State> LinkedAccountBuilder<'a, S> {
 impl<'a, S> LinkedAccountBuilder<'a, S>
 where
     S: linked_account_state::State,
-    S::Link: linked_account_state::IsSet,
-    S::Icon: linked_account_state::IsSet,
     S::Name: linked_account_state::IsSet,
+    S::Icon: linked_account_state::IsSet,
+    S::Link: linked_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LinkedAccount<'a> {
@@ -288,7 +288,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -303,7 +303,7 @@ where
     }
 }
 
-fn lexicon_doc_io_whiteside_linkedAccount() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_io_whiteside_linkedAccount() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

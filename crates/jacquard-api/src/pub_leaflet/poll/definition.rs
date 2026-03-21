@@ -18,8 +18,8 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Definition<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub end_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub end_date: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -38,9 +38,9 @@ pub struct Definition<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefinitionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -60,9 +60,9 @@ pub struct DefinitionGetRecordOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefinitionOption<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Definition<'a> {
@@ -105,19 +105,19 @@ impl jacquard_common::types::collection::Collection for DefinitionRecord {
     type Record = DefinitionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.poll.definition"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_poll_definition()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -154,19 +154,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionOption<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DefinitionOption<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.poll.definition"
     }
     fn def_name() -> &'static str {
         "option"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_poll_definition()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.text {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
@@ -211,37 +211,37 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Options;
         type Name;
+        type Options;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Options = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `options` field to Set
-    pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOptions<S> {}
-    impl<S: State> State for SetOptions<S> {
-        type Options = Set<members::options>;
-        type Name = S::Name;
+        type Options = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Options = S::Options;
         type Name = Set<members::name>;
+        type Options = S::Options;
+    }
+    ///State transition - sets the `options` field to Set
+    pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOptions<S> {}
+    impl<S: State> State for SetOptions<S> {
+        type Name = S::Name;
+        type Options = Set<members::options>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `options` field
-        pub struct options(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `options` field
+        pub struct options(());
     }
 }
 
@@ -336,8 +336,8 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::Options: definition_state::IsSet,
     S::Name: definition_state::IsSet,
+    S::Options: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {
@@ -351,7 +351,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -365,7 +365,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_leaflet_poll_definition() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_pub_leaflet_poll_definition() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

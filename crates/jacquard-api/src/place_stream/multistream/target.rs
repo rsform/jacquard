@@ -23,9 +23,9 @@ pub struct Target<'a> {
     ///When this target was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///A user-friendly name for this target.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The rtmp:// or rtmps:// url of the target server.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
@@ -43,9 +43,9 @@ pub struct Target<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TargetGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -92,19 +92,19 @@ impl jacquard_common::types::collection::Collection for TargetRecord {
     type Record = TargetRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Target<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Target<'a> {
     fn nsid() -> &'static str {
         "place.stream.multistream.target"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_multistream_target()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -131,51 +131,51 @@ pub mod target_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Active;
         type Url;
         type CreatedAt;
+        type Active;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Active = Unset;
         type Url = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActive<S> {}
-    impl<S: State> State for SetActive<S> {
-        type Active = Set<members::active>;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
+        type Active = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Active = S::Active;
         type Url = Set<members::url>;
         type CreatedAt = S::CreatedAt;
+        type Active = S::Active;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Active = S::Active;
         type Url = S::Url;
         type CreatedAt = Set<members::created_at>;
+        type Active = S::Active;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActive<S> {}
+    impl<S: State> State for SetActive<S> {
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+        type Active = Set<members::active>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `active` field
-        pub struct active(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `active` field
+        pub struct active(());
     }
 }
 
@@ -285,9 +285,9 @@ where
 impl<'a, S> TargetBuilder<'a, S>
 where
     S: target_state::State,
-    S::Active: target_state::IsSet,
     S::Url: target_state::IsSet,
     S::CreatedAt: target_state::IsSet,
+    S::Active: target_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Target<'a> {
@@ -302,7 +302,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -317,7 +317,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_multistream_target() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_multistream_target() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

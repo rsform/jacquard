@@ -42,19 +42,19 @@ pub struct Domains<'a> {
     pub values: Vec<crate::zone_stratos::boundary::Domain<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Domain<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Domain<'a> {
     fn nsid() -> &'static str {
         "zone.stratos.boundary.defs"
     }
     fn def_name() -> &'static str {
         "Domain"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_zone_stratos_boundary_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.value;
             #[allow(unused_comparisons)]
@@ -72,19 +72,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Domain<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Domains<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Domains<'a> {
     fn nsid() -> &'static str {
         "zone.stratos.boundary.defs"
     }
     fn def_name() -> &'static str {
         "Domains"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_zone_stratos_boundary_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.values;
             #[allow(unused_comparisons)]
@@ -102,7 +102,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Domains<'a> {
     }
 }
 
-fn lexicon_doc_zone_stratos_boundary_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_zone_stratos_boundary_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -291,7 +291,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

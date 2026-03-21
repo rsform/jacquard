@@ -79,7 +79,7 @@ pub struct GetEventOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetEventError<'a> {
     #[serde(rename = "NotFound")]
-    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetEventError<'_> {
@@ -97,19 +97,19 @@ impl core::fmt::Display for GetEventError<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EventView<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.getEvent"
     }
     fn def_name() -> &'static str {
         "eventView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_calendar_getEvent()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -150,67 +150,67 @@ pub mod event_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CountInterested;
         type CountGoing;
-        type Url;
+        type CountInterested;
         type CountNotGoing;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CountInterested = Unset;
         type CountGoing = Unset;
-        type Url = Unset;
+        type CountInterested = Unset;
         type CountNotGoing = Unset;
-    }
-    ///State transition - sets the `count_interested` field to Set
-    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
-    impl<S: State> State for SetCountInterested<S> {
-        type CountInterested = Set<members::count_interested>;
-        type CountGoing = S::CountGoing;
-        type Url = S::Url;
-        type CountNotGoing = S::CountNotGoing;
+        type Url = Unset;
     }
     ///State transition - sets the `count_going` field to Set
     pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountGoing<S> {}
     impl<S: State> State for SetCountGoing<S> {
-        type CountInterested = S::CountInterested;
         type CountGoing = Set<members::count_going>;
-        type Url = S::Url;
-        type CountNotGoing = S::CountNotGoing;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
         type CountInterested = S::CountInterested;
-        type CountGoing = S::CountGoing;
-        type Url = Set<members::url>;
         type CountNotGoing = S::CountNotGoing;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `count_interested` field to Set
+    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
+    impl<S: State> State for SetCountInterested<S> {
+        type CountGoing = S::CountGoing;
+        type CountInterested = Set<members::count_interested>;
+        type CountNotGoing = S::CountNotGoing;
+        type Url = S::Url;
     }
     ///State transition - sets the `count_not_going` field to Set
     pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
     impl<S: State> State for SetCountNotGoing<S> {
-        type CountInterested = S::CountInterested;
         type CountGoing = S::CountGoing;
-        type Url = S::Url;
+        type CountInterested = S::CountInterested;
         type CountNotGoing = Set<members::count_not_going>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type CountGoing = S::CountGoing;
+        type CountInterested = S::CountInterested;
+        type CountNotGoing = S::CountNotGoing;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count_interested` field
-        pub struct count_interested(());
         ///Marker type for the `count_going` field
         pub struct count_going(());
-        ///Marker type for the `url` field
-        pub struct url(());
+        ///Marker type for the `count_interested` field
+        pub struct count_interested(());
         ///Marker type for the `count_not_going` field
         pub struct count_not_going(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -323,10 +323,10 @@ where
 impl<'a, S> EventViewBuilder<'a, S>
 where
     S: event_view_state::State,
-    S::CountInterested: event_view_state::IsSet,
     S::CountGoing: event_view_state::IsSet,
-    S::Url: event_view_state::IsSet,
+    S::CountInterested: event_view_state::IsSet,
     S::CountNotGoing: event_view_state::IsSet,
+    S::Url: event_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EventView<'a> {
@@ -341,7 +341,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -356,7 +356,7 @@ where
     }
 }
 
-fn lexicon_doc_community_lexicon_calendar_getEvent() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_community_lexicon_calendar_getEvent() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

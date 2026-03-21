@@ -82,9 +82,9 @@ pub struct ByteSlice<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CodeBlock<'a> {
     ///Programming language for syntax highlighting.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lang: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub lang: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Facet feature for inline code.
@@ -115,13 +115,13 @@ pub struct CodeInline<'a> {}
 #[serde(rename_all = "camelCase")]
 pub struct ExternalEmbed<'a> {
     ///Description or summary.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Thumbnail image for the link card.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumb: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub thumb: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Title of the external content.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -163,9 +163,9 @@ pub struct ImageItem<'a> {
     ///Alt text for accessibility.
     #[serde(borrow)]
     pub alt: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<
+    pub aspect_ratio: core::option::Option<
         crate::app_protoimsg::chat::message::AspectRatio<'a>,
     >,
     ///Image blob reference.
@@ -223,19 +223,19 @@ pub struct Message<'a> {
     ///Timestamp of message creation.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Embedded media or link card.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<MessageEmbed<'a>>,
+    pub embed: core::option::Option<MessageEmbed<'a>>,
     ///Rich text annotations (mentions, links, tags, formatting). Extends the Bluesky facet convention with additional formatting features.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<
+    pub facets: core::option::Option<
         Vec<crate::app_protoimsg::chat::message::RichTextFacet<'a>>,
     >,
     ///Structured reply reference for threading.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply: std::option::Option<crate::app_protoimsg::chat::message::ReplyRef<'a>>,
+    pub reply: core::option::Option<crate::app_protoimsg::chat::message::ReplyRef<'a>>,
     ///Message text content.
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
@@ -274,9 +274,9 @@ pub enum MessageEmbed<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -419,18 +419,18 @@ pub struct Tag<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct VideoEmbed<'a> {
     ///Alt text for accessibility.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<
+    pub aspect_ratio: core::option::Option<
         crate::app_protoimsg::chat::message::AspectRatio<'a>,
     >,
     ///Video thumbnail image.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub thumbnail: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Video blob reference.
     #[serde(borrow)]
     pub video: jacquard_common::types::blob::BlobRef<'a>,
@@ -449,19 +449,19 @@ impl<'a> Message<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "aspectRatio"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.height;
             if *value < 1i64 {
@@ -490,53 +490,53 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blockquote<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Blockquote<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "blockquote"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bold<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Bold<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "bold"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "byteSlice"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.byte_end;
             if *value < 0i64 {
@@ -565,19 +565,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "codeBlock"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.lang {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -594,36 +594,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeInline<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeInline<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "codeInline"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalEmbed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ExternalEmbed<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "externalEmbed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -697,19 +697,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalEmbed<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageEmbed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageEmbed<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "imageEmbed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.images;
             #[allow(unused_comparisons)]
@@ -727,19 +727,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageEmbed<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageItem<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "imageItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.alt;
             #[allow(unused_comparisons)]
@@ -809,36 +809,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageItem<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Italic<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Italic<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "italic"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Link<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "link"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -870,19 +870,19 @@ impl jacquard_common::types::collection::Collection for MessageRecord {
     type Record = MessageRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Message<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -919,87 +919,87 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Message<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mention<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Mention<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "mention"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "replyRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RichTextFacet<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RichTextFacet<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "richTextFacet"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Strikethrough<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Strikethrough<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "strikethrough"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "tag"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.tag;
             #[allow(unused_comparisons)]
@@ -1036,19 +1036,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VideoEmbed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for VideoEmbed<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
     fn def_name() -> &'static str {
         "videoEmbed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_message()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -1165,37 +1165,37 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Height;
+        type Width;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Height = S::Height;
+        type Width = Unset;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeight<S> {}
     impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
         type Height = Set<members::height>;
+        type Width = S::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Height = S::Height;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
     }
 }
 
@@ -1265,8 +1265,8 @@ where
 impl<'a, S> AspectRatioBuilder<'a, S>
 where
     S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsSet,
     S::Height: aspect_ratio_state::IsSet,
+    S::Width: aspect_ratio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
@@ -1279,7 +1279,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1292,7 +1292,7 @@ where
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_message() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_protoimsg_chat_message() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -2290,7 +2290,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2313,37 +2313,37 @@ pub mod external_embed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Title;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Title = S::Title;
+        type Uri = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Uri = S::Uri;
         type Title = Set<members::title>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Title = S::Title;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -2456,8 +2456,8 @@ where
 impl<'a, S> ExternalEmbedBuilder<'a, S>
 where
     S: external_embed_state::State,
-    S::Uri: external_embed_state::IsSet,
     S::Title: external_embed_state::IsSet,
+    S::Uri: external_embed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ExternalEmbed<'a> {
@@ -2472,7 +2472,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2580,7 +2580,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2602,37 +2602,37 @@ pub mod image_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
         type Alt;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
         type Alt = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Image = Set<members::image>;
-        type Alt = S::Alt;
+        type Image = Unset;
     }
     ///State transition - sets the `alt` field to Set
     pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlt<S> {}
     impl<S: State> State for SetAlt<S> {
-        type Image = S::Image;
         type Alt = Set<members::alt>;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type Alt = S::Alt;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `alt` field
         pub struct alt(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
@@ -2725,8 +2725,8 @@ where
 impl<'a, S> ImageItemBuilder<'a, S>
 where
     S: image_item_state::State,
-    S::Image: image_item_state::IsSet,
     S::Alt: image_item_state::IsSet,
+    S::Image: image_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ImageItem<'a> {
@@ -2740,7 +2740,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2847,7 +2847,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2869,51 +2869,51 @@ pub mod message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Channel;
         type Text;
         type CreatedAt;
+        type Channel;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Channel = Unset;
         type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `channel` field to Set
-    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannel<S> {}
-    impl<S: State> State for SetChannel<S> {
-        type Channel = Set<members::channel>;
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
+        type Channel = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Channel = S::Channel;
         type Text = Set<members::text>;
         type CreatedAt = S::CreatedAt;
+        type Channel = S::Channel;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Channel = S::Channel;
         type Text = S::Text;
         type CreatedAt = Set<members::created_at>;
+        type Channel = S::Channel;
+    }
+    ///State transition - sets the `channel` field to Set
+    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChannel<S> {}
+    impl<S: State> State for SetChannel<S> {
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+        type Channel = Set<members::channel>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `channel` field
-        pub struct channel(());
         ///Marker type for the `text` field
         pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `channel` field
+        pub struct channel(());
     }
 }
 
@@ -3064,9 +3064,9 @@ where
 impl<'a, S> MessageBuilder<'a, S>
 where
     S: message_state::State,
-    S::Channel: message_state::IsSet,
     S::Text: message_state::IsSet,
     S::CreatedAt: message_state::IsSet,
+    S::Channel: message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Message<'a> {
@@ -3083,7 +3083,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3193,7 +3193,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3215,37 +3215,37 @@ pub mod reply_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Parent;
         type Root;
+        type Parent;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Parent = Unset;
         type Root = Unset;
-    }
-    ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Parent = Set<members::parent>;
-        type Root = S::Root;
+        type Parent = Unset;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
-        type Parent = S::Parent;
         type Root = Set<members::root>;
+        type Parent = S::Parent;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Root = S::Root;
+        type Parent = Set<members::parent>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `parent` field
-        pub struct parent(());
         ///Marker type for the `root` field
         pub struct root(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
     }
 }
 
@@ -3318,8 +3318,8 @@ where
 impl<'a, S> ReplyRefBuilder<'a, S>
 where
     S: reply_ref_state::State,
-    S::Parent: reply_ref_state::IsSet,
     S::Root: reply_ref_state::IsSet,
+    S::Parent: reply_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReplyRef<'a> {
@@ -3332,7 +3332,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3355,37 +3355,37 @@ pub mod rich_text_facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Features;
         type Index;
+        type Features;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Features = Unset;
         type Index = Unset;
-    }
-    ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeatures<S> {}
-    impl<S: State> State for SetFeatures<S> {
-        type Features = Set<members::features>;
-        type Index = S::Index;
+        type Features = Unset;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndex<S> {}
     impl<S: State> State for SetIndex<S> {
-        type Features = S::Features;
         type Index = Set<members::index>;
+        type Features = S::Features;
+    }
+    ///State transition - sets the `features` field to Set
+    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeatures<S> {}
+    impl<S: State> State for SetFeatures<S> {
+        type Index = S::Index;
+        type Features = Set<members::features>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `features` field
-        pub struct features(());
         ///Marker type for the `index` field
         pub struct index(());
+        ///Marker type for the `features` field
+        pub struct features(());
     }
 }
 
@@ -3458,8 +3458,8 @@ where
 impl<'a, S> RichTextFacetBuilder<'a, S>
 where
     S: rich_text_facet_state::State,
-    S::Features: rich_text_facet_state::IsSet,
     S::Index: rich_text_facet_state::IsSet,
+    S::Features: rich_text_facet_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RichTextFacet<'a> {
@@ -3472,7 +3472,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3635,7 +3635,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

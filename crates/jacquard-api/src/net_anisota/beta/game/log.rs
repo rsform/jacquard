@@ -20,30 +20,30 @@
 #[serde(rename_all = "camelCase")]
 pub struct CollectionData<'a> {
     ///Catch probability for specimens (decimal string between 0.0 and 1.0)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub catch_probability: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub catch_probability: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URI of the created inventory record
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub inventory_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub inventory_record_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///How the item was obtained
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub method: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub method: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URI of the created specimen record
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub specimen_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub specimen_record_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether collection was successful
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub success: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub success: core::option::Option<bool>,
     ///Milliseconds between card generation and collection
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub time_since_generation: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub time_since_generation: core::option::Option<i64>,
     ///Milliseconds between card being viewed and collected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub time_since_viewed: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub time_since_viewed: core::option::Option<i64>,
 }
 
 /// Details about daily rewards claim
@@ -60,20 +60,20 @@ pub struct CollectionData<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DailyRewardsData<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reward_items: std::option::Option<
+    pub reward_items: core::option::Option<
         Vec<crate::net_anisota::beta::game::log::RewardItem<'a>>,
     >,
     ///Number of rewards claimed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rewards_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rewards_count: core::option::Option<i64>,
     ///Current daily reward streak
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub streak: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub streak: core::option::Option<i64>,
     ///Milliseconds since last claim
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub time_since_last_claim: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub time_since_last_claim: core::option::Option<i64>,
 }
 
 /// Context about the feed when event occurred
@@ -91,18 +91,18 @@ pub struct DailyRewardsData<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct FeedContext<'a> {
     ///URI of the feed being viewed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub feed_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Number of game cards injected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub game_card_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub game_card_count: core::option::Option<i64>,
     ///Number of posts in the feed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub post_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub post_count: core::option::Option<i64>,
     ///User's scroll position or card index
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub scroll_position: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub scroll_position: core::option::Option<i64>,
 }
 
 /// Details about game cards generated or interacted with
@@ -120,31 +120,31 @@ pub struct FeedContext<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GameCardData<'a> {
     ///Type of game card
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Unique identifier for the game card
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Random seed used for generation (for verification)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub generation_seed: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub generation_seed: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Position where card was injected in feed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub injection_position: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub injection_position: core::option::Option<i64>,
     ///ID of the item/specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub item_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Quantity of items
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quantity: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quantity: core::option::Option<i64>,
     ///Rarity of the item/specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rarity: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Details about item usage
@@ -162,23 +162,23 @@ pub struct GameCardData<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ItemUsageData<'a> {
     ///Effect that was applied
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub effect_applied: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub effect_applied: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URI of the modified inventory record
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub inventory_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub inventory_record_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///ID of the item used
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub item_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Quantity of the item used
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quantity_used: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quantity_used: core::option::Option<i64>,
     ///Remaining quantity after use
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub remaining_quantity: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub remaining_quantity: core::option::Option<i64>,
 }
 
 /// A log record for tracking game events and user actions for provenance and anti-bot analysis
@@ -194,59 +194,61 @@ pub struct ItemUsageData<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Log<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collection_data: std::option::Option<
+    pub collection_data: core::option::Option<
         crate::net_anisota::beta::game::log::CollectionData<'a>,
     >,
     ///When the log record was created
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub daily_rewards_data: std::option::Option<
+    pub daily_rewards_data: core::option::Option<
         crate::net_anisota::beta::game::log::DailyRewardsData<'a>,
     >,
     ///Type of event being logged
     #[serde(borrow)]
     pub event_type: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_context: std::option::Option<
+    pub feed_context: core::option::Option<
         crate::net_anisota::beta::game::log::FeedContext<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub game_card_data: std::option::Option<
+    pub game_card_data: core::option::Option<
         crate::net_anisota::beta::game::log::GameCardData<'a>,
     >,
     ///Unique ID of the game card this event relates to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub game_card_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub game_card_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_usage_data: std::option::Option<
+    pub item_usage_data: core::option::Option<
         crate::net_anisota::beta::game::log::ItemUsageData<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<crate::net_anisota::beta::game::log::Metadata<'a>>,
+    pub metadata: core::option::Option<
+        crate::net_anisota::beta::game::log::Metadata<'a>,
+    >,
     ///URI of the parent log record that triggered this event
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_log_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub parent_log_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URI of the root log record in this event chain
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub root_log_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub root_log_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Unique session identifier to group related events
     #[serde(borrow)]
     pub session_id: jacquard_common::CowStr<'a>,
     ///URI of the session record this event belongs to (at://did/collection/rkey)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub session_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub session_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When the event occurred (ISO 8601)
     pub timestamp: jacquard_common::types::string::Datetime,
 }
@@ -263,9 +265,9 @@ pub struct Log<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -287,22 +289,22 @@ pub struct LogGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
     ///Version of the client application
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub client_version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub client_version: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Network latency in milliseconds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub network_latency: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub network_latency: core::option::Option<i64>,
     ///Performance timing data
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub performance_timings: std::option::Option<
+    pub performance_timings: core::option::Option<
         jacquard_common::types::value::Data<'a>,
     >,
     ///Platform (web, mobile, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub platform: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Item received as a reward
@@ -319,14 +321,14 @@ pub struct Metadata<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RewardItem<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quantity: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub item_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quantity: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rarity: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Log<'a> {
@@ -342,19 +344,19 @@ impl<'a> Log<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionData<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionData<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "collectionData"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.time_since_generation {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -381,19 +383,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionData<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "dailyRewardsData"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.rewards_count {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -431,19 +433,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DailyRewardsData<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "feedContext"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.game_card_count {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -481,19 +483,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedContext<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameCardData<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GameCardData<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "gameCardData"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.injection_position {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -520,19 +522,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameCardData<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemUsageData<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ItemUsageData<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "itemUsageData"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.quantity_used {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -586,19 +588,19 @@ impl jacquard_common::types::collection::Collection for LogRecord {
     type Record = LogRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Log<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.session_id;
             #[allow(unused_comparisons)]
@@ -616,19 +618,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "metadata"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.network_latency {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -644,19 +646,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewardItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RewardItem<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
     fn def_name() -> &'static str {
         "rewardItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.quantity {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -672,7 +674,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewardItem<'a> {
     }
 }
 
-fn lexicon_doc_net_anisota_beta_game_log() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_net_anisota_beta_game_log() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -2039,7 +2041,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

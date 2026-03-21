@@ -33,9 +33,9 @@ pub struct GetTrackShouts<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetTrackShoutsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub shouts: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub shouts: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
 }
 
 /// Response type for

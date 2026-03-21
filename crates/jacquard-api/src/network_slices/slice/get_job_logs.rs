@@ -22,9 +22,9 @@ pub struct LogEntry<'a> {
     ///Log entry ID
     pub id: i64,
     ///UUID of related job if applicable
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub job_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub job_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Log level
     #[serde(borrow)]
     pub level: jacquard_common::CowStr<'a>,
@@ -35,17 +35,17 @@ pub struct LogEntry<'a> {
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
     ///Additional metadata associated with the log entry
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub metadata: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///AT-URI of related slice if applicable
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slice_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub slice_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///DID of related user if applicable
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub user_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub user_did: core::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 #[derive(
@@ -63,8 +63,8 @@ pub struct GetJobLogs<'a> {
     pub job_id: jacquard_common::CowStr<'a>,
     ///Defaults to `100`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -83,19 +83,19 @@ pub struct GetJobLogsOutput<'a> {
     pub logs: Vec<crate::network_slices::slice::get_job_logs::LogEntry<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogEntry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogEntry<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.getJobLogs"
     }
     fn def_name() -> &'static str {
         "logEntry"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_getJobLogs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -136,85 +136,85 @@ pub mod log_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
-        type Message;
+        type LogType;
         type Id;
         type CreatedAt;
-        type LogType;
+        type Message;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
-        type Message = Unset;
+        type LogType = Unset;
         type Id = Unset;
         type CreatedAt = Unset;
-        type LogType = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type Message = S::Message;
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type LogType = S::LogType;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Level = S::Level;
-        type Message = Set<members::message>;
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type LogType = S::LogType;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Level = S::Level;
-        type Message = S::Message;
-        type Id = Set<members::id>;
-        type CreatedAt = S::CreatedAt;
-        type LogType = S::LogType;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Level = S::Level;
-        type Message = S::Message;
-        type Id = S::Id;
-        type CreatedAt = Set<members::created_at>;
-        type LogType = S::LogType;
+        type Message = Unset;
+        type Level = Unset;
     }
     ///State transition - sets the `log_type` field to Set
     pub struct SetLogType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLogType<S> {}
     impl<S: State> State for SetLogType<S> {
-        type Level = S::Level;
-        type Message = S::Message;
+        type LogType = Set<members::log_type>;
         type Id = S::Id;
         type CreatedAt = S::CreatedAt;
-        type LogType = Set<members::log_type>;
+        type Message = S::Message;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type LogType = S::LogType;
+        type Id = Set<members::id>;
+        type CreatedAt = S::CreatedAt;
+        type Message = S::Message;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type LogType = S::LogType;
+        type Id = S::Id;
+        type CreatedAt = Set<members::created_at>;
+        type Message = S::Message;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type LogType = S::LogType;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Message = Set<members::message>;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type LogType = S::LogType;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Message = S::Message;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
-        ///Marker type for the `message` field
-        pub struct message(());
+        ///Marker type for the `log_type` field
+        pub struct log_type(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `log_type` field
-        pub struct log_type(());
+        ///Marker type for the `message` field
+        pub struct message(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
@@ -434,11 +434,11 @@ impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
 impl<'a, S> LogEntryBuilder<'a, S>
 where
     S: log_entry_state::State,
-    S::Level: log_entry_state::IsSet,
-    S::Message: log_entry_state::IsSet,
+    S::LogType: log_entry_state::IsSet,
     S::Id: log_entry_state::IsSet,
     S::CreatedAt: log_entry_state::IsSet,
-    S::LogType: log_entry_state::IsSet,
+    S::Message: log_entry_state::IsSet,
+    S::Level: log_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogEntry<'a> {
@@ -458,7 +458,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -478,7 +478,7 @@ where
     }
 }
 
-fn lexicon_doc_network_slices_slice_getJobLogs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_network_slices_slice_getJobLogs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -735,7 +735,7 @@ fn lexicon_doc_network_slices_slice_getJobLogs() -> ::jacquard_lexicon::lexicon:
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(100i64)
 }
 

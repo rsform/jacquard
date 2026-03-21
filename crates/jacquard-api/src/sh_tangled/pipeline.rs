@@ -55,9 +55,9 @@ pub struct Pipeline<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PipelineGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -77,9 +77,9 @@ pub struct PipelineGetRecordOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ManualTriggerData<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub inputs: std::option::Option<Vec<crate::sh_tangled::pipeline::Pair<'a>>>,
+    pub inputs: core::option::Option<Vec<crate::sh_tangled::pipeline::Pair<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -159,17 +159,17 @@ pub struct PushTriggerData<'a> {
 pub struct TriggerMetadata<'a> {
     #[serde(borrow)]
     pub kind: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub manual: std::option::Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub manual: core::option::Option<crate::sh_tangled::pipeline::ManualTriggerData<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pull_request: std::option::Option<
+    pub pull_request: core::option::Option<
         crate::sh_tangled::pipeline::PullRequestTriggerData<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub push: std::option::Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
+    pub push: core::option::Option<crate::sh_tangled::pipeline::PushTriggerData<'a>>,
     #[serde(borrow)]
     pub repo: crate::sh_tangled::pipeline::TriggerRepo<'a>,
 }
@@ -231,19 +231,19 @@ impl<'a> Pipeline<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CloneOpts<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CloneOpts<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "cloneOpts"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -275,70 +275,70 @@ impl jacquard_common::types::collection::Collection for PipelineRecord {
     type Record = PipelineRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pipeline<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Pipeline<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManualTriggerData<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ManualTriggerData<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "manualTriggerData"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pair<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Pair<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "pair"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "pullRequestTriggerData"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.source_sha;
             #[allow(unused_comparisons)]
@@ -369,19 +369,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PullRequestTriggerData<'a
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "pushTriggerData"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.new_sha;
             #[allow(unused_comparisons)]
@@ -438,53 +438,53 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PushTriggerData<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerMetadata<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TriggerMetadata<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "triggerMetadata"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TriggerRepo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TriggerRepo<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "triggerRepo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Workflow<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Workflow<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline"
     }
     fn def_name() -> &'static str {
         "workflow"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_pipeline()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -499,49 +499,49 @@ pub mod clone_opts_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Submodules;
         type Skip;
+        type Submodules;
         type Depth;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Submodules = Unset;
         type Skip = Unset;
+        type Submodules = Unset;
         type Depth = Unset;
-    }
-    ///State transition - sets the `submodules` field to Set
-    pub struct SetSubmodules<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubmodules<S> {}
-    impl<S: State> State for SetSubmodules<S> {
-        type Submodules = Set<members::submodules>;
-        type Skip = S::Skip;
-        type Depth = S::Depth;
     }
     ///State transition - sets the `skip` field to Set
     pub struct SetSkip<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSkip<S> {}
     impl<S: State> State for SetSkip<S> {
-        type Submodules = S::Submodules;
         type Skip = Set<members::skip>;
+        type Submodules = S::Submodules;
+        type Depth = S::Depth;
+    }
+    ///State transition - sets the `submodules` field to Set
+    pub struct SetSubmodules<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubmodules<S> {}
+    impl<S: State> State for SetSubmodules<S> {
+        type Skip = S::Skip;
+        type Submodules = Set<members::submodules>;
         type Depth = S::Depth;
     }
     ///State transition - sets the `depth` field to Set
     pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDepth<S> {}
     impl<S: State> State for SetDepth<S> {
-        type Submodules = S::Submodules;
         type Skip = S::Skip;
+        type Submodules = S::Submodules;
         type Depth = Set<members::depth>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `submodules` field
-        pub struct submodules(());
         ///Marker type for the `skip` field
         pub struct skip(());
+        ///Marker type for the `submodules` field
+        pub struct submodules(());
         ///Marker type for the `depth` field
         pub struct depth(());
     }
@@ -636,8 +636,8 @@ where
 impl<'a, S> CloneOptsBuilder<'a, S>
 where
     S: clone_opts_state::State,
-    S::Submodules: clone_opts_state::IsSet,
     S::Skip: clone_opts_state::IsSet,
+    S::Submodules: clone_opts_state::IsSet,
     S::Depth: clone_opts_state::IsSet,
 {
     /// Build the final struct
@@ -652,7 +652,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -666,9 +666,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_pipeline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_tangled_pipeline() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.tangled.pipeline"),
@@ -1399,7 +1397,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1422,37 +1420,37 @@ pub mod trigger_metadata_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Kind;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Kind = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Kind = S::Kind;
+        type Repo = Unset;
     }
     ///State transition - sets the `kind` field to Set
     pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKind<S> {}
     impl<S: State> State for SetKind<S> {
-        type Repo = S::Repo;
         type Kind = Set<members::kind>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Kind = S::Kind;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `kind` field
         pub struct kind(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -1585,8 +1583,8 @@ where
 impl<'a, S> TriggerMetadataBuilder<'a, S>
 where
     S: trigger_metadata_state::State,
-    S::Repo: trigger_metadata_state::IsSet,
     S::Kind: trigger_metadata_state::IsSet,
+    S::Repo: trigger_metadata_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TriggerMetadata<'a> {
@@ -1602,7 +1600,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1628,67 +1626,67 @@ pub mod trigger_repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type DefaultBranch;
         type Repo;
         type Did;
         type Knot;
-        type DefaultBranch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type DefaultBranch = Unset;
         type Repo = Unset;
         type Did = Unset;
         type Knot = Unset;
-        type DefaultBranch = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Did = S::Did;
-        type Knot = S::Knot;
-        type DefaultBranch = S::DefaultBranch;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Repo = S::Repo;
-        type Did = Set<members::did>;
-        type Knot = S::Knot;
-        type DefaultBranch = S::DefaultBranch;
-    }
-    ///State transition - sets the `knot` field to Set
-    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKnot<S> {}
-    impl<S: State> State for SetKnot<S> {
-        type Repo = S::Repo;
-        type Did = S::Did;
-        type Knot = Set<members::knot>;
-        type DefaultBranch = S::DefaultBranch;
     }
     ///State transition - sets the `default_branch` field to Set
     pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
     impl<S: State> State for SetDefaultBranch<S> {
+        type DefaultBranch = Set<members::default_branch>;
         type Repo = S::Repo;
         type Did = S::Did;
         type Knot = S::Knot;
-        type DefaultBranch = Set<members::default_branch>;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type DefaultBranch = S::DefaultBranch;
+        type Repo = Set<members::repo>;
+        type Did = S::Did;
+        type Knot = S::Knot;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type DefaultBranch = S::DefaultBranch;
+        type Repo = S::Repo;
+        type Did = Set<members::did>;
+        type Knot = S::Knot;
+    }
+    ///State transition - sets the `knot` field to Set
+    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKnot<S> {}
+    impl<S: State> State for SetKnot<S> {
+        type DefaultBranch = S::DefaultBranch;
+        type Repo = S::Repo;
+        type Did = S::Did;
+        type Knot = Set<members::knot>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `default_branch` field
+        pub struct default_branch(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `knot` field
         pub struct knot(());
-        ///Marker type for the `default_branch` field
-        pub struct default_branch(());
     }
 }
 
@@ -1801,10 +1799,10 @@ where
 impl<'a, S> TriggerRepoBuilder<'a, S>
 where
     S: trigger_repo_state::State,
+    S::DefaultBranch: trigger_repo_state::IsSet,
     S::Repo: trigger_repo_state::IsSet,
     S::Did: trigger_repo_state::IsSet,
     S::Knot: trigger_repo_state::IsSet,
-    S::DefaultBranch: trigger_repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TriggerRepo<'a> {
@@ -1819,7 +1817,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1844,67 +1842,67 @@ pub mod workflow_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Engine;
         type Raw;
         type Clone;
+        type Name;
+        type Engine;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Engine = Unset;
         type Raw = Unset;
         type Clone = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Engine = S::Engine;
-        type Raw = S::Raw;
-        type Clone = S::Clone;
-    }
-    ///State transition - sets the `engine` field to Set
-    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEngine<S> {}
-    impl<S: State> State for SetEngine<S> {
-        type Name = S::Name;
-        type Engine = Set<members::engine>;
-        type Raw = S::Raw;
-        type Clone = S::Clone;
+        type Name = Unset;
+        type Engine = Unset;
     }
     ///State transition - sets the `raw` field to Set
     pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRaw<S> {}
     impl<S: State> State for SetRaw<S> {
-        type Name = S::Name;
-        type Engine = S::Engine;
         type Raw = Set<members::raw>;
         type Clone = S::Clone;
+        type Name = S::Name;
+        type Engine = S::Engine;
     }
     ///State transition - sets the `clone` field to Set
     pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClone<S> {}
     impl<S: State> State for SetClone<S> {
-        type Name = S::Name;
-        type Engine = S::Engine;
         type Raw = S::Raw;
         type Clone = Set<members::clone>;
+        type Name = S::Name;
+        type Engine = S::Engine;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Raw = S::Raw;
+        type Clone = S::Clone;
+        type Name = Set<members::name>;
+        type Engine = S::Engine;
+    }
+    ///State transition - sets the `engine` field to Set
+    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEngine<S> {}
+    impl<S: State> State for SetEngine<S> {
+        type Raw = S::Raw;
+        type Clone = S::Clone;
+        type Name = S::Name;
+        type Engine = Set<members::engine>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `engine` field
-        pub struct engine(());
         ///Marker type for the `raw` field
         pub struct raw(());
         ///Marker type for the `clone` field
         pub struct clone(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `engine` field
+        pub struct engine(());
     }
 }
 
@@ -2017,10 +2015,10 @@ where
 impl<'a, S> WorkflowBuilder<'a, S>
 where
     S: workflow_state::State,
-    S::Name: workflow_state::IsSet,
-    S::Engine: workflow_state::IsSet,
     S::Raw: workflow_state::IsSet,
     S::Clone: workflow_state::IsSet,
+    S::Name: workflow_state::IsSet,
+    S::Engine: workflow_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workflow<'a> {
@@ -2035,7 +2033,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

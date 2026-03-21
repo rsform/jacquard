@@ -33,19 +33,19 @@ pub struct SyncStatus<'a> {
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SyncStatus<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SyncStatus<'a> {
     fn nsid() -> &'static str {
         "blue.2048.defs"
     }
     fn def_name() -> &'static str {
         "syncStatus"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_2048_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -64,65 +64,65 @@ pub mod sync_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Hash;
         type CreatedAt;
         type SyncedWithAtRepo;
-        type Hash;
         type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Hash = Unset;
         type CreatedAt = Unset;
         type SyncedWithAtRepo = Unset;
-        type Hash = Unset;
         type UpdatedAt = Unset;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type Hash = Set<members::hash>;
+        type CreatedAt = S::CreatedAt;
+        type SyncedWithAtRepo = S::SyncedWithAtRepo;
+        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type Hash = S::Hash;
         type CreatedAt = Set<members::created_at>;
         type SyncedWithAtRepo = S::SyncedWithAtRepo;
-        type Hash = S::Hash;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `synced_with_at_repo` field to Set
     pub struct SetSyncedWithAtRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSyncedWithAtRepo<S> {}
     impl<S: State> State for SetSyncedWithAtRepo<S> {
+        type Hash = S::Hash;
         type CreatedAt = S::CreatedAt;
         type SyncedWithAtRepo = Set<members::synced_with_at_repo>;
-        type Hash = S::Hash;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `hash` field to Set
-    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHash<S> {}
-    impl<S: State> State for SetHash<S> {
-        type CreatedAt = S::CreatedAt;
-        type SyncedWithAtRepo = S::SyncedWithAtRepo;
-        type Hash = Set<members::hash>;
         type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
+        type Hash = S::Hash;
         type CreatedAt = S::CreatedAt;
         type SyncedWithAtRepo = S::SyncedWithAtRepo;
-        type Hash = S::Hash;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `hash` field
+        pub struct hash(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `synced_with_at_repo` field
         pub struct synced_with_at_repo(());
-        ///Marker type for the `hash` field
-        pub struct hash(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
     }
@@ -237,9 +237,9 @@ where
 impl<'a, S> SyncStatusBuilder<'a, S>
 where
     S: sync_status_state::State,
+    S::Hash: sync_status_state::IsSet,
     S::CreatedAt: sync_status_state::IsSet,
     S::SyncedWithAtRepo: sync_status_state::IsSet,
-    S::Hash: sync_status_state::IsSet,
     S::UpdatedAt: sync_status_state::IsSet,
 {
     /// Build the final struct
@@ -255,7 +255,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -270,7 +270,7 @@ where
     }
 }
 
-fn lexicon_doc_blue_2048_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_blue_2048_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blue.2048.defs"),

@@ -12,6 +12,10 @@ pub struct LexFetchArgs {
     #[arg(long)]
     pub no_codegen: bool,
 
+    /// Emit fully-qualified paths (for proc-macro consumers). Default is pretty mode.
+    #[arg(long = "macro")]
+    pub macro_mode: bool,
+
     /// Verbose output
     #[arg(short = 'v', long)]
     pub verbose: bool,
@@ -27,6 +31,10 @@ pub struct CodegenArgs {
     /// Output directory for generated Rust code
     #[arg(short = 'o', long)]
     pub output: PathBuf,
+
+    /// Emit fully-qualified paths (for proc-macro consumers). Default is pretty mode.
+    #[arg(long = "macro")]
+    pub macro_mode: bool,
     // TODO: root_module causes issues when set to anything other than "crate", needs rework
     // /// Root module name (default: "crate")
     // #[arg(short = 'r', long, default_value = "crate")]

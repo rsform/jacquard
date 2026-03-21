@@ -42,18 +42,18 @@ pub struct EventView<'a> {
 pub struct SearchEvents<'a> {
     ///Defaults to `10`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<Vec<jacquard_common::types::string::Cid<'a>>>,
+    pub location: core::option::Option<Vec<jacquard_common::types::string::Cid<'a>>>,
     ///(max length: 150)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub query: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub query: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub repository: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub repository: core::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -88,11 +88,11 @@ pub struct SearchEventsOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SearchEventsError<'a> {
     #[serde(rename = "InvalidRepository")]
-    InvalidRepository(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRepository(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "SearchUnavailable")]
-    SearchUnavailable(std::option::Option<jacquard_common::CowStr<'a>>),
+    SearchUnavailable(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "SearchError")]
-    SearchError(std::option::Option<jacquard_common::CowStr<'a>>),
+    SearchError(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for SearchEventsError<'_> {
@@ -124,19 +124,19 @@ impl core::fmt::Display for SearchEventsError<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EventView<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.searchEvents"
     }
     fn def_name() -> &'static str {
         "eventView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_calendar_searchEvents()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -178,66 +178,66 @@ pub mod event_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CountNotGoing;
-        type Url;
-        type CountInterested;
         type CountGoing;
+        type CountInterested;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CountNotGoing = Unset;
-        type Url = Unset;
-        type CountInterested = Unset;
         type CountGoing = Unset;
+        type CountInterested = Unset;
+        type Url = Unset;
     }
     ///State transition - sets the `count_not_going` field to Set
     pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
     impl<S: State> State for SetCountNotGoing<S> {
         type CountNotGoing = Set<members::count_not_going>;
-        type Url = S::Url;
+        type CountGoing = S::CountGoing;
         type CountInterested = S::CountInterested;
-        type CountGoing = S::CountGoing;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type CountNotGoing = S::CountNotGoing;
-        type Url = Set<members::url>;
-        type CountInterested = S::CountInterested;
-        type CountGoing = S::CountGoing;
-    }
-    ///State transition - sets the `count_interested` field to Set
-    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
-    impl<S: State> State for SetCountInterested<S> {
-        type CountNotGoing = S::CountNotGoing;
         type Url = S::Url;
-        type CountInterested = Set<members::count_interested>;
-        type CountGoing = S::CountGoing;
     }
     ///State transition - sets the `count_going` field to Set
     pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountGoing<S> {}
     impl<S: State> State for SetCountGoing<S> {
         type CountNotGoing = S::CountNotGoing;
-        type Url = S::Url;
-        type CountInterested = S::CountInterested;
         type CountGoing = Set<members::count_going>;
+        type CountInterested = S::CountInterested;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `count_interested` field to Set
+    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
+    impl<S: State> State for SetCountInterested<S> {
+        type CountNotGoing = S::CountNotGoing;
+        type CountGoing = S::CountGoing;
+        type CountInterested = Set<members::count_interested>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type CountNotGoing = S::CountNotGoing;
+        type CountGoing = S::CountGoing;
+        type CountInterested = S::CountInterested;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `count_not_going` field
         pub struct count_not_going(());
-        ///Marker type for the `url` field
-        pub struct url(());
-        ///Marker type for the `count_interested` field
-        pub struct count_interested(());
         ///Marker type for the `count_going` field
         pub struct count_going(());
+        ///Marker type for the `count_interested` field
+        pub struct count_interested(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -351,9 +351,9 @@ impl<'a, S> EventViewBuilder<'a, S>
 where
     S: event_view_state::State,
     S::CountNotGoing: event_view_state::IsSet,
-    S::Url: event_view_state::IsSet,
-    S::CountInterested: event_view_state::IsSet,
     S::CountGoing: event_view_state::IsSet,
+    S::CountInterested: event_view_state::IsSet,
+    S::Url: event_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EventView<'a> {
@@ -368,7 +368,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -383,7 +383,7 @@ where
     }
 }
 
-fn lexicon_doc_community_lexicon_calendar_searchEvents() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_community_lexicon_calendar_searchEvents() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -586,7 +586,7 @@ fn lexicon_doc_community_lexicon_calendar_searchEvents() -> ::jacquard_lexicon::
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(10i64)
 }
 

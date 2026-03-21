@@ -19,19 +19,19 @@
 #[serde(rename_all = "camelCase")]
 pub struct Page<'a> {
     ///Client-declared timestamp when this was originally created.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub entry_list: Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ///The notebook this page belongs to.
     #[serde(borrow)]
     pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tags: core::option::Option<crate::sh_weaver::notebook::Tags<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<crate::sh_weaver::notebook::Title<'a>>,
+    pub title: core::option::Option<crate::sh_weaver::notebook::Title<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -46,9 +46,9 @@ pub struct Page<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PageGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -95,19 +95,19 @@ impl jacquard_common::types::collection::Collection for PageRecord {
     type Record = PageRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Page<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.page"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_page()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -122,51 +122,51 @@ pub mod page_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Authors;
         type Notebook;
         type EntryList;
+        type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Authors = Unset;
         type Notebook = Unset;
         type EntryList = Unset;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Authors = Set<members::authors>;
-        type Notebook = S::Notebook;
-        type EntryList = S::EntryList;
+        type Authors = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type Authors = S::Authors;
         type Notebook = Set<members::notebook>;
         type EntryList = S::EntryList;
+        type Authors = S::Authors;
     }
     ///State transition - sets the `entry_list` field to Set
     pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntryList<S> {}
     impl<S: State> State for SetEntryList<S> {
-        type Authors = S::Authors;
         type Notebook = S::Notebook;
         type EntryList = Set<members::entry_list>;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type Notebook = S::Notebook;
+        type EntryList = S::EntryList;
+        type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `authors` field
-        pub struct authors(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
         ///Marker type for the `entry_list` field
         pub struct entry_list(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
     }
 }
 
@@ -299,9 +299,9 @@ impl<'a, S: page_state::State> PageBuilder<'a, S> {
 impl<'a, S> PageBuilder<'a, S>
 where
     S: page_state::State,
-    S::Authors: page_state::IsSet,
     S::Notebook: page_state::IsSet,
     S::EntryList: page_state::IsSet,
+    S::Authors: page_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Page<'a> {
@@ -317,7 +317,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -333,7 +333,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_page() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_notebook_page() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

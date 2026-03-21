@@ -137,21 +137,21 @@ pub struct ViewRecord<'a> {
     pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embeds: std::option::Option<Vec<ViewRecordEmbedsItem<'a>>>,
+    pub embeds: core::option::Option<Vec<ViewRecordEmbedsItem<'a>>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quote_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reply_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub repost_count: std::option::Option<i64>,
+    pub labels: core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub like_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quote_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reply_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub repost_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     ///The record data itself.
@@ -184,104 +184,104 @@ pub enum ViewRecordEmbedsItem<'a> {
     RecordWithMediaView(Box<crate::app_bsky::embed::record_with_media::View<'a>>),
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Record<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Record<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.record"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_record()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for View<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.record"
     }
     fn def_name() -> &'static str {
         "view"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_record()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewBlocked<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewBlocked<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.record"
     }
     fn def_name() -> &'static str {
         "viewBlocked"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_record()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewDetached<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewDetached<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.record"
     }
     fn def_name() -> &'static str {
         "viewDetached"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_record()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewNotFound<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewNotFound<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.record"
     }
     fn def_name() -> &'static str {
         "viewNotFound"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_record()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewRecord<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewRecord<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.record"
     }
     fn def_name() -> &'static str {
         "viewRecord"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_record()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -379,7 +379,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -391,7 +391,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_embed_record() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_embed_record() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -900,7 +900,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1075,7 +1075,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1099,37 +1099,37 @@ pub mod view_detached_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Detached;
         type Uri;
+        type Detached;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Detached = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `detached` field to Set
-    pub struct SetDetached<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDetached<S> {}
-    impl<S: State> State for SetDetached<S> {
-        type Detached = Set<members::detached>;
-        type Uri = S::Uri;
+        type Detached = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Detached = S::Detached;
         type Uri = Set<members::uri>;
+        type Detached = S::Detached;
+    }
+    ///State transition - sets the `detached` field to Set
+    pub struct SetDetached<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDetached<S> {}
+    impl<S: State> State for SetDetached<S> {
+        type Uri = S::Uri;
+        type Detached = Set<members::detached>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `detached` field
-        pub struct detached(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `detached` field
+        pub struct detached(());
     }
 }
 
@@ -1202,8 +1202,8 @@ where
 impl<'a, S> ViewDetachedBuilder<'a, S>
 where
     S: view_detached_state::State,
-    S::Detached: view_detached_state::IsSet,
     S::Uri: view_detached_state::IsSet,
+    S::Detached: view_detached_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewDetached<'a> {
@@ -1216,7 +1216,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1356,7 +1356,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1379,83 +1379,83 @@ pub mod view_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IndexedAt;
         type Uri;
-        type Value;
+        type IndexedAt;
         type Cid;
+        type Value;
         type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IndexedAt = Unset;
         type Uri = Unset;
-        type Value = Unset;
+        type IndexedAt = Unset;
         type Cid = Unset;
+        type Value = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Uri = S::Uri;
-        type Value = S::Value;
-        type Cid = S::Cid;
-        type Author = S::Author;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IndexedAt = S::IndexedAt;
         type Uri = Set<members::uri>;
-        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
+        type Value = S::Value;
         type Author = S::Author;
     }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type IndexedAt = S::IndexedAt;
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
         type Uri = S::Uri;
-        type Value = Set<members::value>;
+        type IndexedAt = Set<members::indexed_at>;
         type Cid = S::Cid;
+        type Value = S::Value;
         type Author = S::Author;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
-        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
         type Cid = Set<members::cid>;
+        type Value = S::Value;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Value = Set<members::value>;
         type Author = S::Author;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type IndexedAt = S::IndexedAt;
         type Uri = S::Uri;
-        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
+        type Value = S::Value;
         type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `value` field
-        pub struct value(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `author` field
         pub struct author(());
     }
@@ -1695,10 +1695,10 @@ where
 impl<'a, S> ViewRecordBuilder<'a, S>
 where
     S: view_record_state::State,
-    S::IndexedAt: view_record_state::IsSet,
     S::Uri: view_record_state::IsSet,
-    S::Value: view_record_state::IsSet,
+    S::IndexedAt: view_record_state::IsSet,
     S::Cid: view_record_state::IsSet,
+    S::Value: view_record_state::IsSet,
     S::Author: view_record_state::IsSet,
 {
     /// Build the final struct
@@ -1721,7 +1721,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

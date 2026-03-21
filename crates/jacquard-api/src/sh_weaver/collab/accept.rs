@@ -39,9 +39,9 @@ pub struct Accept<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AcceptGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -88,19 +88,19 @@ impl jacquard_common::types::collection::Collection for AcceptRecord {
     type Record = AcceptRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Accept<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Accept<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.accept"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_accept()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -115,49 +115,49 @@ pub mod accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Resource;
         type Invite;
+        type Resource;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Resource = Unset;
         type Invite = Unset;
+        type Resource = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Resource = Set<members::resource>;
-        type Invite = S::Invite;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `invite` field to Set
     pub struct SetInvite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInvite<S> {}
     impl<S: State> State for SetInvite<S> {
-        type Resource = S::Resource;
         type Invite = Set<members::invite>;
+        type Resource = S::Resource;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type Invite = S::Invite;
+        type Resource = Set<members::resource>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Resource = S::Resource;
         type Invite = S::Invite;
+        type Resource = S::Resource;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `resource` field
-        pub struct resource(());
         ///Marker type for the `invite` field
         pub struct invite(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -252,8 +252,8 @@ where
 impl<'a, S> AcceptBuilder<'a, S>
 where
     S: accept_state::State,
-    S::Resource: accept_state::IsSet,
     S::Invite: accept_state::IsSet,
+    S::Resource: accept_state::IsSet,
     S::CreatedAt: accept_state::IsSet,
 {
     /// Build the final struct
@@ -268,7 +268,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -282,7 +282,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_collab_accept() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_collab_accept() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

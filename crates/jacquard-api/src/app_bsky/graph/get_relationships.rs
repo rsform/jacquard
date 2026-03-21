@@ -18,9 +18,9 @@
 pub struct GetRelationships<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub others: std::option::Option<
+    pub others: core::option::Option<
         Vec<jacquard_common::types::ident::AtIdentifier<'a>>,
     >,
 }
@@ -37,9 +37,9 @@ pub struct GetRelationships<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetRelationshipsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub actor: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub actor: core::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
     pub relationships: Vec<GetRelationshipsOutputRelationshipsItem<'a>>,
 }
@@ -80,7 +80,7 @@ pub enum GetRelationshipsOutputRelationshipsItem<'a> {
 pub enum GetRelationshipsError<'a> {
     /// the primary actor at-identifier could not be resolved
     #[serde(rename = "ActorNotFound")]
-    ActorNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    ActorNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetRelationshipsError<'_> {

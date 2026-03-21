@@ -18,8 +18,8 @@
 pub struct GetSuggestedNotebooks {
     ///Defaults to `20`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -59,8 +59,8 @@ pub struct SuggestedNotebook<'a> {
         'a,
     >,
     ///Appview-computed relevance score.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub score: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub score: core::option::Option<i64>,
 }
 
 /// Why this notebook was suggested.
@@ -78,25 +78,25 @@ pub struct SuggestedNotebook<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SuggestionReason<'a> {
     ///If followed-author, the author.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_author: std::option::Option<
+    pub related_author: core::option::Option<
         crate::sh_weaver::actor::ProfileViewBasic<'a>,
     >,
     ///If from-list, the list it's from.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_list: std::option::Option<crate::sh_weaver::graph::ListView<'a>>,
+    pub related_list: core::option::Option<crate::sh_weaver::graph::ListView<'a>>,
     ///If similar-to-X, the notebook it's similar to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_notebook: std::option::Option<
+    pub related_notebook: core::option::Option<
         crate::sh_weaver::notebook::NotebookView<'a>,
     >,
     ///Tags that matched.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub related_tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(borrow)]
     pub r#type: SuggestionReasonType<'a>,
 }
@@ -242,41 +242,41 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedNotebooksRequest {
     type Response = GetSuggestedNotebooksResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SuggestedNotebook<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SuggestedNotebook<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getSuggestedNotebooks"
     }
     fn def_name() -> &'static str {
         "suggestedNotebook"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SuggestionReason<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SuggestionReason<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getSuggestedNotebooks"
     }
     fn def_name() -> &'static str {
         "suggestionReason"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(20i64)
 }
 
@@ -493,7 +493,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -507,7 +507,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_notebook_getSuggestedNotebooks() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

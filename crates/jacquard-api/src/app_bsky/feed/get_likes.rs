@@ -34,16 +34,16 @@ pub struct Like<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLikes<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -60,31 +60,31 @@ pub struct GetLikes<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLikesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub likes: Vec<crate::app_bsky::feed::get_likes::Like<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Like<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Like<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.getLikes"
     }
     fn def_name() -> &'static str {
         "like"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_getLikes()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -125,51 +125,51 @@ pub mod like_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type IndexedAt;
         type CreatedAt;
         type Actor;
-        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type IndexedAt = Unset;
         type CreatedAt = Unset;
         type Actor = Unset;
-        type IndexedAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Actor = S::Actor;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type CreatedAt = S::CreatedAt;
-        type Actor = Set<members::actor>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
+        type IndexedAt = Set<members::indexed_at>;
         type CreatedAt = S::CreatedAt;
         type Actor = S::Actor;
-        type IndexedAt = Set<members::indexed_at>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type IndexedAt = S::IndexedAt;
+        type CreatedAt = Set<members::created_at>;
+        type Actor = S::Actor;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type IndexedAt = S::IndexedAt;
+        type CreatedAt = S::CreatedAt;
+        type Actor = Set<members::actor>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `actor` field
         pub struct actor(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
     }
 }
 
@@ -262,9 +262,9 @@ where
 impl<'a, S> LikeBuilder<'a, S>
 where
     S: like_state::State,
+    S::IndexedAt: like_state::IsSet,
     S::CreatedAt: like_state::IsSet,
     S::Actor: like_state::IsSet,
-    S::IndexedAt: like_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Like<'a> {
@@ -278,7 +278,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -292,7 +292,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_feed_getLikes() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_feed_getLikes() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -474,7 +474,7 @@ fn lexicon_doc_app_bsky_feed_getLikes() -> ::jacquard_lexicon::lexicon::LexiconD
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 

@@ -16,11 +16,11 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetGroups<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -36,9 +36,9 @@ pub struct GetGroups<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetGroupsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub groups: std::option::Option<
+    pub groups: core::option::Option<
         Vec<crate::app_blebbit::authr::group::GroupView<'a>>,
     >,
 }

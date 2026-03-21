@@ -18,33 +18,33 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetConfigOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub appview: std::option::Option<
+    pub appview: core::option::Option<
         crate::tools_ozone::server::get_config::ServiceConfig<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub blob_divert: std::option::Option<
+    pub blob_divert: core::option::Option<
         crate::tools_ozone::server::get_config::ServiceConfig<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub chat: std::option::Option<
+    pub chat: core::option::Option<
         crate::tools_ozone::server::get_config::ServiceConfig<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pds: std::option::Option<
+    pub pds: core::option::Option<
         crate::tools_ozone::server::get_config::ServiceConfig<'a>,
     >,
     ///The did of the verifier used for verification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub verifier_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub verifier_did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<
+    pub viewer: core::option::Option<
         crate::tools_ozone::server::get_config::ViewerConfig<'a>,
     >,
 }
@@ -62,9 +62,9 @@ pub struct GetConfigOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceConfig<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -80,9 +80,9 @@ pub struct ServiceConfig<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewerConfig<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub role: std::option::Option<ViewerConfigRole<'a>>,
+    pub role: core::option::Option<ViewerConfigRole<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -183,16 +183,16 @@ impl jacquard_common::IntoStatic for ViewerConfigRole<'_> {
     }
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct GetConfig;
 /// Response type for
@@ -221,41 +221,41 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {
     type Response = GetConfigResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ServiceConfig<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ServiceConfig<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.server.getConfig"
     }
     fn def_name() -> &'static str {
         "serviceConfig"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_server_getConfig()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerConfig<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewerConfig<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.server.getConfig"
     }
     fn def_name() -> &'static str {
         "viewerConfig"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_server_getConfig()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_tools_ozone_server_getConfig() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tools_ozone_server_getConfig() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -22,39 +22,39 @@ pub struct HiveBook<'a> {
     #[serde(borrow)]
     pub authors: jacquard_common::CowStr<'a>,
     ///URL to full-size cover image
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cover: core::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///Book description/summary
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The book's hive id, used to correlate user's books with the hive
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///External identifiers for the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identifiers: std::option::Option<crate::buzz_bookhive::BookIdentifiers<'a>>,
+    pub identifiers: core::option::Option<crate::buzz_bookhive::BookIdentifiers<'a>>,
     ///Average rating (0-1000)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rating: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rating: core::option::Option<i64>,
     ///Number of ratings
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ratings_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ratings_count: core::option::Option<i64>,
     ///The source service name (e.g. Goodreads)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source: core::option::Option<jacquard_common::CowStr<'a>>,
     ///ID of the book in the source service
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URL to the book on the source service
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source_url: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URL to thumbnail image
     #[serde(borrow)]
     pub thumbnail: jacquard_common::CowStr<'a>,
@@ -76,9 +76,9 @@ pub struct HiveBook<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HiveBookGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -125,19 +125,19 @@ impl jacquard_common::types::collection::Collection for HiveBookRecord {
     type Record = HiveBookRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for HiveBook<'a> {
     fn nsid() -> &'static str {
         "buzz.bookhive.hiveBook"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_buzz_bookhive_hiveBook()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.authors;
             #[allow(unused_comparisons)]
@@ -238,105 +238,105 @@ pub mod hive_book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type CreatedAt;
-        type Thumbnail;
-        type Title;
         type Id;
+        type Title;
         type Authors;
+        type CreatedAt;
+        type UpdatedAt;
+        type Thumbnail;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
-        type CreatedAt = Unset;
-        type Thumbnail = Unset;
-        type Title = Unset;
         type Id = Unset;
+        type Title = Unset;
         type Authors = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type CreatedAt = S::CreatedAt;
-        type Thumbnail = S::Thumbnail;
-        type Title = S::Title;
-        type Id = S::Id;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type CreatedAt = Set<members::created_at>;
-        type Thumbnail = S::Thumbnail;
-        type Title = S::Title;
-        type Id = S::Id;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `thumbnail` field to Set
-    pub struct SetThumbnail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumbnail<S> {}
-    impl<S: State> State for SetThumbnail<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type CreatedAt = S::CreatedAt;
-        type Thumbnail = Set<members::thumbnail>;
-        type Title = S::Title;
-        type Id = S::Id;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type CreatedAt = S::CreatedAt;
-        type Thumbnail = S::Thumbnail;
-        type Title = Set<members::title>;
-        type Id = S::Id;
-        type Authors = S::Authors;
+        type CreatedAt = Unset;
+        type UpdatedAt = Unset;
+        type Thumbnail = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type CreatedAt = S::CreatedAt;
-        type Thumbnail = S::Thumbnail;
-        type Title = S::Title;
         type Id = Set<members::id>;
+        type Title = S::Title;
         type Authors = S::Authors;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+        type Thumbnail = S::Thumbnail;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Id = S::Id;
+        type Title = Set<members::title>;
+        type Authors = S::Authors;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+        type Thumbnail = S::Thumbnail;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type CreatedAt = S::CreatedAt;
-        type Thumbnail = S::Thumbnail;
-        type Title = S::Title;
         type Id = S::Id;
+        type Title = S::Title;
         type Authors = Set<members::authors>;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+        type Thumbnail = S::Thumbnail;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Id = S::Id;
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = S::UpdatedAt;
+        type Thumbnail = S::Thumbnail;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Id = S::Id;
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = Set<members::updated_at>;
+        type Thumbnail = S::Thumbnail;
+    }
+    ///State transition - sets the `thumbnail` field to Set
+    pub struct SetThumbnail<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumbnail<S> {}
+    impl<S: State> State for SetThumbnail<S> {
+        type Id = S::Id;
+        type Title = S::Title;
+        type Authors = S::Authors;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+        type Thumbnail = Set<members::thumbnail>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `thumbnail` field
-        pub struct thumbnail(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `thumbnail` field
+        pub struct thumbnail(());
     }
 }
 
@@ -646,12 +646,12 @@ where
 impl<'a, S> HiveBookBuilder<'a, S>
 where
     S: hive_book_state::State,
-    S::UpdatedAt: hive_book_state::IsSet,
-    S::CreatedAt: hive_book_state::IsSet,
-    S::Thumbnail: hive_book_state::IsSet,
-    S::Title: hive_book_state::IsSet,
     S::Id: hive_book_state::IsSet,
+    S::Title: hive_book_state::IsSet,
     S::Authors: hive_book_state::IsSet,
+    S::CreatedAt: hive_book_state::IsSet,
+    S::UpdatedAt: hive_book_state::IsSet,
+    S::Thumbnail: hive_book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> HiveBook<'a> {
@@ -676,7 +676,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -701,7 +701,7 @@ where
     }
 }
 
-fn lexicon_doc_buzz_bookhive_hiveBook() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_buzz_bookhive_hiveBook() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

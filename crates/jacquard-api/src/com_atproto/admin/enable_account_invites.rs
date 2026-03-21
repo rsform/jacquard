@@ -20,9 +20,9 @@ pub struct EnableAccountInvites<'a> {
     #[serde(borrow)]
     pub account: jacquard_common::types::string::Did<'a>,
     ///Optional reason for enabled invites.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for
@@ -169,7 +169,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

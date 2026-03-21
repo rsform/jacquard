@@ -23,25 +23,25 @@ pub struct Address<'a> {
     #[serde(borrow)]
     pub country: jacquard_common::CowStr<'a>,
     ///The locality (city, town, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locality: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub locality: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the location
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The postal code
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub postal_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub postal_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The administrative region (state, province, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub region: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub region: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The street address
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub street: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub street: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Image attachment with thumbnail and full-size versions
@@ -58,9 +58,9 @@ pub struct Address<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CheckinImage<'a> {
     ///Alt text for accessibility
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Full-size version (max 2000px width, ~2MB)
     #[serde(borrow)]
     pub fullsize: jacquard_common::types::blob::BlobRef<'a>,
@@ -87,17 +87,17 @@ pub struct FsqPlace<'a> {
     #[serde(borrow)]
     pub fsq_place_id: jacquard_common::CowStr<'a>,
     ///Latitude in decimal degrees
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub latitude: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub latitude: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Longitude in decimal degrees
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub longitude: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub longitude: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the location
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Geographic coordinates in WGS84 (based on community.lexicon.location.geo)
@@ -115,9 +115,9 @@ pub struct FsqPlace<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Geo<'a> {
     ///Altitude in meters
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub altitude: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub altitude: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Latitude in decimal degrees (range: -90 to 90)
     #[serde(borrow)]
     pub latitude: jacquard_common::CowStr<'a>,
@@ -125,9 +125,9 @@ pub struct Geo<'a> {
     #[serde(borrow)]
     pub longitude: jacquard_common::CowStr<'a>,
     ///Name of the location
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// A location check-in record for the Anchor app
@@ -147,30 +147,30 @@ pub struct Checkin<'a> {
     #[serde(borrow)]
     pub address: crate::app_dropanchor::checkin::Address<'a>,
     ///Place category (e.g., cafe, restaurant)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Category group for organization
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub category_group: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub category_group: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Emoji icon for the category
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub category_icon: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub category_icon: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When the check-in was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional Foursquare venue data (based on community.lexicon.location.fsq)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub fsq: std::option::Option<crate::app_dropanchor::checkin::FsqPlace<'a>>,
+    pub fsq: core::option::Option<crate::app_dropanchor::checkin::FsqPlace<'a>>,
     ///Geographic coordinates of the check-in (based on community.lexicon.location.geo)
     #[serde(borrow)]
     pub geo: crate::app_dropanchor::checkin::Geo<'a>,
     ///Optional image attachment for the check-in
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<crate::app_dropanchor::checkin::CheckinImage<'a>>,
+    pub image: core::option::Option<crate::app_dropanchor::checkin::CheckinImage<'a>>,
     ///The check-in message or note
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
@@ -188,9 +188,9 @@ pub struct Checkin<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CheckinGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -210,19 +210,19 @@ impl<'a> Checkin<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Address<'a> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
     fn def_name() -> &'static str {
         "address"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_dropanchor_checkin()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.country;
             #[allow(unused_comparisons)]
@@ -313,19 +313,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CheckinImage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CheckinImage<'a> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
     fn def_name() -> &'static str {
         "checkinImage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_dropanchor_checkin()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -436,19 +436,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CheckinImage<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FsqPlace<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FsqPlace<'a> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
     fn def_name() -> &'static str {
         "fsqPlace"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_dropanchor_checkin()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.fsq_place_id;
             #[allow(unused_comparisons)]
@@ -502,19 +502,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FsqPlace<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Geo<'a> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
     fn def_name() -> &'static str {
         "geo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_dropanchor_checkin()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.altitude {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
@@ -596,19 +596,19 @@ impl jacquard_common::types::collection::Collection for CheckinRecord {
     type Record = CheckinRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checkin<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Checkin<'a> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_dropanchor_checkin()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.category {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -662,7 +662,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checkin<'a> {
     }
 }
 
-fn lexicon_doc_app_dropanchor_checkin() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_dropanchor_checkin() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1275,37 +1275,37 @@ pub mod checkin_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thumb;
         type Fullsize;
+        type Thumb;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thumb = Unset;
         type Fullsize = Unset;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumb<S> {}
-    impl<S: State> State for SetThumb<S> {
-        type Thumb = Set<members::thumb>;
-        type Fullsize = S::Fullsize;
+        type Thumb = Unset;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFullsize<S> {}
     impl<S: State> State for SetFullsize<S> {
-        type Thumb = S::Thumb;
         type Fullsize = Set<members::fullsize>;
+        type Thumb = S::Thumb;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Fullsize = S::Fullsize;
+        type Thumb = Set<members::thumb>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
     }
 }
 
@@ -1392,8 +1392,8 @@ where
 impl<'a, S> CheckinImageBuilder<'a, S>
 where
     S: checkin_image_state::State,
-    S::Thumb: checkin_image_state::IsSet,
     S::Fullsize: checkin_image_state::IsSet,
+    S::Thumb: checkin_image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CheckinImage<'a> {
@@ -1407,7 +1407,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1431,67 +1431,67 @@ pub mod checkin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Address;
-        type Text;
         type Geo;
+        type Text;
+        type Address;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Address = Unset;
-        type Text = Unset;
         type Geo = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Address = S::Address;
-        type Text = S::Text;
-        type Geo = S::Geo;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
-        type CreatedAt = S::CreatedAt;
-        type Address = Set<members::address>;
-        type Text = S::Text;
-        type Geo = S::Geo;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type CreatedAt = S::CreatedAt;
-        type Address = S::Address;
-        type Text = Set<members::text>;
-        type Geo = S::Geo;
+        type Text = Unset;
+        type Address = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `geo` field to Set
     pub struct SetGeo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGeo<S> {}
     impl<S: State> State for SetGeo<S> {
-        type CreatedAt = S::CreatedAt;
-        type Address = S::Address;
-        type Text = S::Text;
         type Geo = Set<members::geo>;
+        type Text = S::Text;
+        type Address = S::Address;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Geo = S::Geo;
+        type Text = Set<members::text>;
+        type Address = S::Address;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type Geo = S::Geo;
+        type Text = S::Text;
+        type Address = Set<members::address>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Geo = S::Geo;
+        type Text = S::Text;
+        type Address = S::Address;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `address` field
-        pub struct address(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `geo` field
         pub struct geo(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `address` field
+        pub struct address(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1711,10 +1711,10 @@ where
 impl<'a, S> CheckinBuilder<'a, S>
 where
     S: checkin_state::State,
-    S::CreatedAt: checkin_state::IsSet,
-    S::Address: checkin_state::IsSet,
-    S::Text: checkin_state::IsSet,
     S::Geo: checkin_state::IsSet,
+    S::Text: checkin_state::IsSet,
+    S::Address: checkin_state::IsSet,
+    S::CreatedAt: checkin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Checkin<'a> {
@@ -1734,7 +1734,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

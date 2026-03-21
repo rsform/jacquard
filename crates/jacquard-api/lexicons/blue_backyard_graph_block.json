@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "blue.backyard.graph.block",
+  "description": "Record declaring a 'block' relationship on Backyard.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a block of another account.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "string",
+            "description": "DID of the account being blocked.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

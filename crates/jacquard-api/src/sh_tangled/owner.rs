@@ -38,7 +38,7 @@ pub struct OwnerOutput<'a> {
 pub enum OwnerError<'a> {
     /// Owner is not set for this service
     #[serde(rename = "OwnerNotFound")]
-    OwnerNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    OwnerNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for OwnerError<'_> {
@@ -56,16 +56,16 @@ impl core::fmt::Display for OwnerError<'_> {
     }
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct Owner;
 /// Response type for

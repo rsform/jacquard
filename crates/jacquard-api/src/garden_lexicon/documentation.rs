@@ -20,18 +20,18 @@
 #[serde(rename_all = "camelCase")]
 pub struct DefinitionDoc<'a> {
     ///Localized descriptions for this definition.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<
+    pub description: core::option::Option<
         Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
     >,
     ///The name of the definition being documented (e.g., 'main', 'replyRef').
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Documentation for properties within this definition.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub properties: std::option::Option<
+    pub properties: core::option::Option<
         Vec<crate::garden_lexicon::documentation::PropertyDoc<'a>>,
     >,
 }
@@ -72,15 +72,15 @@ pub struct Documentation<'a> {
     ///Timestamp when this documentation was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Documentation for specific definitions within the lexicon (e.g., main, replyRef).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub definitions: std::option::Option<
+    pub definitions: core::option::Option<
         Vec<crate::garden_lexicon::documentation::DefinitionDoc<'a>>,
     >,
     ///Localized descriptions for the lexicon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<
+    pub description: core::option::Option<
         Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
     >,
     ///The NSID of the lexicon being documented.
@@ -100,9 +100,9 @@ pub struct Documentation<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DocumentationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -124,9 +124,9 @@ pub struct DocumentationGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct PropertyDoc<'a> {
     ///Localized descriptions for this property.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<
+    pub description: core::option::Option<
         Vec<crate::garden_lexicon::documentation::LocalizedString<'a>>,
     >,
     ///The property name being documented.
@@ -147,19 +147,19 @@ impl<'a> Documentation<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionDoc<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DefinitionDoc<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
     fn def_name() -> &'static str {
         "definitionDoc"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_documentation()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -177,19 +177,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefinitionDoc<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocalizedString<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LocalizedString<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
     fn def_name() -> &'static str {
         "localizedString"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_documentation()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.value;
             #[allow(unused_comparisons)]
@@ -234,36 +234,36 @@ impl jacquard_common::types::collection::Collection for DocumentationRecord {
     type Record = DocumentationRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Documentation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Documentation<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_documentation()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PropertyDoc<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PropertyDoc<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
     fn def_name() -> &'static str {
         "propertyDoc"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_documentation()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -281,7 +281,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PropertyDoc<'a> {
     }
 }
 
-fn lexicon_doc_garden_lexicon_documentation() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_garden_lexicon_documentation() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -745,7 +745,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -768,37 +768,37 @@ pub mod documentation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lexicon;
         type CreatedAt;
+        type Lexicon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lexicon = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLexicon<S> {}
-    impl<S: State> State for SetLexicon<S> {
-        type Lexicon = Set<members::lexicon>;
-        type CreatedAt = S::CreatedAt;
+        type Lexicon = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Lexicon = S::Lexicon;
         type CreatedAt = Set<members::created_at>;
+        type Lexicon = S::Lexicon;
+    }
+    ///State transition - sets the `lexicon` field to Set
+    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLexicon<S> {}
+    impl<S: State> State for SetLexicon<S> {
+        type CreatedAt = S::CreatedAt;
+        type Lexicon = Set<members::lexicon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lexicon` field
-        pub struct lexicon(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `lexicon` field
+        pub struct lexicon(());
     }
 }
 
@@ -919,8 +919,8 @@ where
 impl<'a, S> DocumentationBuilder<'a, S>
 where
     S: documentation_state::State,
-    S::Lexicon: documentation_state::IsSet,
     S::CreatedAt: documentation_state::IsSet,
+    S::Lexicon: documentation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Documentation<'a> {
@@ -935,7 +935,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

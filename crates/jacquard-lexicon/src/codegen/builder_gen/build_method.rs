@@ -84,7 +84,7 @@ pub fn generate_build_method(
                 /// Build the final struct with custom extra_data
                 pub fn build_with_data(
                     self,
-                    extra_data: std::collections::BTreeMap<
+                    extra_data: alloc::collections::BTreeMap<
                         jacquard_common::deps::smol_str::SmolStr,
                         jacquard_common::types::value::Data #lifetime_generic
                     >,

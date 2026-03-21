@@ -19,23 +19,23 @@
 #[serde(rename_all = "camelCase")]
 pub struct Quiz<'a> {
     ///A short description about the quiz, and what to expect from it
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///This quiz includes questions with audio, eg. a music round Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_quiz_has_audio")]
-    pub has_audio: std::option::Option<bool>,
+    pub has_audio: core::option::Option<bool>,
     ///This quiz includes questions with visuals, eg. a picture round Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_quiz_has_visuals")]
-    pub has_visuals: std::option::Option<bool>,
+    pub has_visuals: core::option::Option<bool>,
     ///Dominant language(s) of the quiz
     pub locales: Vec<jacquard_common::types::string::Language>,
     ///If this is an edit or revision of a previous quiz, link that previous version here.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub revision_of: std::option::Option<
+    pub revision_of: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Ordered list of rounds in this quiz
@@ -60,9 +60,9 @@ pub struct Quiz<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuizGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -83,13 +83,13 @@ pub struct QuizGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct QuestionRef<'a> {
     ///A custom name for this question, as opposed to its number
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Points awarded for complete correctness Defaults to `1`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_question_ref_points")]
-    pub points: std::option::Option<i64>,
+    pub points: core::option::Option<i64>,
     #[serde(borrow)]
     pub question: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
@@ -111,9 +111,9 @@ pub struct Round<'a> {
     #[serde(borrow)]
     pub questions: Vec<crate::pub_quizzy::quiz::QuestionRef<'a>>,
     ///Optional title for this round (requires locale if set)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Quiz<'a> {
@@ -156,19 +156,19 @@ impl jacquard_common::types::collection::Collection for QuizRecord {
     type Record = QuizRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.quiz"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_quiz()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
@@ -255,19 +255,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quiz<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuestionRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for QuestionRef<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.quiz"
     }
     fn def_name() -> &'static str {
         "questionRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_quiz()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 16usize {
@@ -313,19 +313,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuestionRef<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Round<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Round<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.quiz"
     }
     fn def_name() -> &'static str {
         "round"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_quiz()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.questions;
             #[allow(unused_comparisons)]
@@ -386,11 +386,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Round<'a> {
     }
 }
 
-fn _default_quiz_has_audio() -> std::option::Option<bool> {
+fn _default_quiz_has_audio() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_quiz_has_visuals() -> std::option::Option<bool> {
+fn _default_quiz_has_visuals() -> core::option::Option<bool> {
     Some(false)
 }
 
@@ -404,67 +404,67 @@ pub mod quiz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Rounds;
         type Timestamp;
         type Locales;
+        type Title;
+        type Rounds;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Rounds = Unset;
         type Timestamp = Unset;
         type Locales = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Rounds = S::Rounds;
-        type Timestamp = S::Timestamp;
-        type Locales = S::Locales;
-    }
-    ///State transition - sets the `rounds` field to Set
-    pub struct SetRounds<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRounds<S> {}
-    impl<S: State> State for SetRounds<S> {
-        type Title = S::Title;
-        type Rounds = Set<members::rounds>;
-        type Timestamp = S::Timestamp;
-        type Locales = S::Locales;
+        type Title = Unset;
+        type Rounds = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type Title = S::Title;
-        type Rounds = S::Rounds;
         type Timestamp = Set<members::timestamp>;
         type Locales = S::Locales;
+        type Title = S::Title;
+        type Rounds = S::Rounds;
     }
     ///State transition - sets the `locales` field to Set
     pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocales<S> {}
     impl<S: State> State for SetLocales<S> {
-        type Title = S::Title;
-        type Rounds = S::Rounds;
         type Timestamp = S::Timestamp;
         type Locales = Set<members::locales>;
+        type Title = S::Title;
+        type Rounds = S::Rounds;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Timestamp = S::Timestamp;
+        type Locales = S::Locales;
+        type Title = Set<members::title>;
+        type Rounds = S::Rounds;
+    }
+    ///State transition - sets the `rounds` field to Set
+    pub struct SetRounds<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRounds<S> {}
+    impl<S: State> State for SetRounds<S> {
+        type Timestamp = S::Timestamp;
+        type Locales = S::Locales;
+        type Title = S::Title;
+        type Rounds = Set<members::rounds>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `rounds` field
-        pub struct rounds(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
         ///Marker type for the `locales` field
         pub struct locales(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `rounds` field
+        pub struct rounds(());
     }
 }
 
@@ -645,10 +645,10 @@ where
 impl<'a, S> QuizBuilder<'a, S>
 where
     S: quiz_state::State,
-    S::Title: quiz_state::IsSet,
-    S::Rounds: quiz_state::IsSet,
     S::Timestamp: quiz_state::IsSet,
     S::Locales: quiz_state::IsSet,
+    S::Title: quiz_state::IsSet,
+    S::Rounds: quiz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quiz<'a> {
@@ -667,7 +667,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -686,7 +686,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_pub_quizzy_quiz() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pub.quizzy.quiz"),
@@ -993,7 +993,7 @@ fn lexicon_doc_pub_quizzy_quiz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'sta
     }
 }
 
-fn _default_question_ref_points() -> std::option::Option<i64> {
+fn _default_question_ref_points() -> core::option::Option<i64> {
     Some(1i64)
 }
 
@@ -1123,7 +1123,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1248,7 +1248,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

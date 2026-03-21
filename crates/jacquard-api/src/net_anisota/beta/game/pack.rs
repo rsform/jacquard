@@ -21,17 +21,17 @@ pub struct Pack<'a> {
     ///When the record was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///When the record was last modified
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_modified: core::option::Option<jacquard_common::types::string::Datetime>,
     ///When daily pack was last opened
     pub last_open_time: jacquard_common::types::string::Datetime,
     ///Longest daily pack opening streak achieved
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub longest_streak: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub longest_streak: core::option::Option<i64>,
     ///History of the last few pack openings
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pack_history: std::option::Option<
+    pub pack_history: core::option::Option<
         Vec<crate::net_anisota::beta::game::pack::PackHistoryEntry<'a>>,
     >,
     ///Current daily pack opening streak count
@@ -52,9 +52,9 @@ pub struct Pack<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PackGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -76,17 +76,17 @@ pub struct PackGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct PackHistoryEntry<'a> {
     ///Items received from this pack
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub items_received: std::option::Option<
+    pub items_received: core::option::Option<
         Vec<crate::net_anisota::beta::game::pack::ReceivedItem<'a>>,
     >,
     ///When this pack was opened
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub open_time: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub open_time: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Streak count at time of opening
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub streak_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub streak_count: core::option::Option<i64>,
 }
 
 /// An item received from a pack opening
@@ -104,16 +104,16 @@ pub struct PackHistoryEntry<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ReceivedItem<'a> {
     ///ID of the item received
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub item_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Quantity received
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quantity: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quantity: core::option::Option<i64>,
     ///Rarity of the item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rarity: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Pack<'a> {
@@ -156,19 +156,19 @@ impl jacquard_common::types::collection::Collection for PackRecord {
     type Record = PackRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.pack"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_pack()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.longest_streak {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -220,36 +220,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pack<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PackHistoryEntry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PackHistoryEntry<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.pack"
     }
     fn def_name() -> &'static str {
         "packHistoryEntry"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_pack()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReceivedItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReceivedItem<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.pack"
     }
     fn def_name() -> &'static str {
         "receivedItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_pack()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -264,67 +264,67 @@ pub mod pack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Streak;
+        type LastOpenTime;
         type CreatedAt;
         type TotalOpens;
-        type LastOpenTime;
-        type Streak;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Streak = Unset;
+        type LastOpenTime = Unset;
         type CreatedAt = Unset;
         type TotalOpens = Unset;
-        type LastOpenTime = Unset;
-        type Streak = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type TotalOpens = S::TotalOpens;
-        type LastOpenTime = S::LastOpenTime;
-        type Streak = S::Streak;
-    }
-    ///State transition - sets the `total_opens` field to Set
-    pub struct SetTotalOpens<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalOpens<S> {}
-    impl<S: State> State for SetTotalOpens<S> {
-        type CreatedAt = S::CreatedAt;
-        type TotalOpens = Set<members::total_opens>;
-        type LastOpenTime = S::LastOpenTime;
-        type Streak = S::Streak;
-    }
-    ///State transition - sets the `last_open_time` field to Set
-    pub struct SetLastOpenTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastOpenTime<S> {}
-    impl<S: State> State for SetLastOpenTime<S> {
-        type CreatedAt = S::CreatedAt;
-        type TotalOpens = S::TotalOpens;
-        type LastOpenTime = Set<members::last_open_time>;
-        type Streak = S::Streak;
     }
     ///State transition - sets the `streak` field to Set
     pub struct SetStreak<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreak<S> {}
     impl<S: State> State for SetStreak<S> {
+        type Streak = Set<members::streak>;
+        type LastOpenTime = S::LastOpenTime;
         type CreatedAt = S::CreatedAt;
         type TotalOpens = S::TotalOpens;
+    }
+    ///State transition - sets the `last_open_time` field to Set
+    pub struct SetLastOpenTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastOpenTime<S> {}
+    impl<S: State> State for SetLastOpenTime<S> {
+        type Streak = S::Streak;
+        type LastOpenTime = Set<members::last_open_time>;
+        type CreatedAt = S::CreatedAt;
+        type TotalOpens = S::TotalOpens;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Streak = S::Streak;
         type LastOpenTime = S::LastOpenTime;
-        type Streak = Set<members::streak>;
+        type CreatedAt = Set<members::created_at>;
+        type TotalOpens = S::TotalOpens;
+    }
+    ///State transition - sets the `total_opens` field to Set
+    pub struct SetTotalOpens<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalOpens<S> {}
+    impl<S: State> State for SetTotalOpens<S> {
+        type Streak = S::Streak;
+        type LastOpenTime = S::LastOpenTime;
+        type CreatedAt = S::CreatedAt;
+        type TotalOpens = Set<members::total_opens>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `streak` field
+        pub struct streak(());
+        ///Marker type for the `last_open_time` field
+        pub struct last_open_time(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `total_opens` field
         pub struct total_opens(());
-        ///Marker type for the `last_open_time` field
-        pub struct last_open_time(());
-        ///Marker type for the `streak` field
-        pub struct streak(());
     }
 }
 
@@ -495,10 +495,10 @@ where
 impl<'a, S> PackBuilder<'a, S>
 where
     S: pack_state::State,
+    S::Streak: pack_state::IsSet,
+    S::LastOpenTime: pack_state::IsSet,
     S::CreatedAt: pack_state::IsSet,
     S::TotalOpens: pack_state::IsSet,
-    S::LastOpenTime: pack_state::IsSet,
-    S::Streak: pack_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pack<'a> {
@@ -516,7 +516,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -534,7 +534,7 @@ where
     }
 }
 
-fn lexicon_doc_net_anisota_beta_game_pack() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_net_anisota_beta_game_pack() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

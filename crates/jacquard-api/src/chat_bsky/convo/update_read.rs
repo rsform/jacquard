@@ -20,9 +20,9 @@
 pub struct UpdateRead<'a> {
     #[serde(borrow)]
     pub convo_id: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message_id: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]

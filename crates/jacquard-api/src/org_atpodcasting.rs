@@ -806,9 +806,9 @@ pub struct EpisodeRef<'a> {
     #[serde(borrow)]
     pub feed_item_guid: jacquard_common::CowStr<'a>,
     ///URL of the podcast's RSS feed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub feed_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Podcasting 2.0 UUIDv5 GUID of the parent podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.
     #[serde(borrow)]
     pub podcast_guid: jacquard_common::CowStr<'a>,
@@ -829,44 +829,44 @@ pub struct EpisodeRef<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct PodcastRef<'a> {
     ///URL of the podcast's RSS feed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub feed_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Podcasting 2.0 UUIDv5 GUID of the podcast. If the feed does not include a <podcast:guid> tag, derive it as specified in https://github.com/Podcastindex-org/podcast-namespace/blob/main/docs/tags/guid.md.
     #[serde(borrow)]
     pub podcast_guid: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppleCategory<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AppleCategory<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }
     fn def_name() -> &'static str {
         "appleCategory"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EpisodeRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EpisodeRef<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }
     fn def_name() -> &'static str {
         "episodeRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.feed_item_guid;
             #[allow(unused_comparisons)]
@@ -897,19 +897,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EpisodeRef<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PodcastRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PodcastRef<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }
     fn def_name() -> &'static str {
         "podcastRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.podcast_guid;
             #[allow(unused_comparisons)]
@@ -927,7 +927,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PodcastRef<'a> {
     }
 }
 
-fn lexicon_doc_org_atpodcasting_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_atpodcasting_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

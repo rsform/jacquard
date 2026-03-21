@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct CreateApikey<'a> {
     ///A description for the API key.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the API key.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,

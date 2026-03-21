@@ -35,9 +35,9 @@ pub struct GetLocationBooksOutput<'a> {
     #[serde(borrow)]
     pub books: Vec<crate::org_passingreads::book::StatefulBook<'a>>,
     ///Human-readable name of the requested location
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub location_name: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for

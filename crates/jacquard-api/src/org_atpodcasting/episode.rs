@@ -40,44 +40,46 @@ pub struct ChaptersRef<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Episode<'a> {
     ///Alternate versions of the episode media (e.g. different formats or audio-only versions of video episodes).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alternate_media: std::option::Option<
+    pub alternate_media: core::option::Option<
         Vec<crate::org_atpodcasting::episode::MediaRef<'a>>,
     >,
     ///Episode-specific artwork. Overrides the podcast artwork when set. Recommended: 1400x1400 to 3000x3000 pixels, square, no alpha channel.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artwork: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub artwork: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Reference to an externally hosted chapters file.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub chapters: std::option::Option<crate::org_atpodcasting::episode::ChaptersRef<'a>>,
+    pub chapters: core::option::Option<
+        crate::org_atpodcasting::episode::ChaptersRef<'a>,
+    >,
     ///When the episode record was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///A description or show notes for the episode.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Duration of the episode in seconds.
     pub duration: i64,
     ///Episode number within its season or the overall series.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub episode_number: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub episode_number: core::option::Option<i64>,
     ///The type of episode. Defaults to full.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub episode_type: std::option::Option<EpisodeEpisodeType<'a>>,
+    pub episode_type: core::option::Option<EpisodeEpisodeType<'a>>,
     ///Whether the episode contains explicit content. Overrides the podcast-level setting when set.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub explicit: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub explicit: core::option::Option<bool>,
     ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item. The record key (rkey) is derived from this value as uuid5(<podcast:guid>, feedItemGuid).
     #[serde(borrow)]
     pub feed_item_guid: jacquard_common::CowStr<'a>,
     ///URL of a companion webpage or show notes page for the episode.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The primary media file for the episode.
     #[serde(borrow)]
     pub media: crate::org_atpodcasting::episode::MediaRef<'a>,
@@ -87,15 +89,15 @@ pub struct Episode<'a> {
     ///When the episode was published.
     pub published_at: jacquard_common::types::string::Datetime,
     ///Season number of the episode.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub season_number: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub season_number: core::option::Option<i64>,
     ///The title of the episode.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///References to externally hosted transcript files (e.g. VTT, SRT, JSON). Multiple entries allow providing transcripts in different formats.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub transcript: std::option::Option<
+    pub transcript: core::option::Option<
         Vec<crate::org_atpodcasting::episode::TranscriptRef<'a>>,
     >,
 }
@@ -206,9 +208,9 @@ impl jacquard_common::IntoStatic for EpisodeEpisodeType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EpisodeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -250,8 +252,8 @@ pub struct MediaRef<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct TranscriptRef<'a> {
     ///Language of the transcript (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub language: std::option::Option<jacquard_common::types::string::Language>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub language: core::option::Option<jacquard_common::types::string::Language>,
     ///MIME type of the transcript file (e.g. text/vtt, application/x-subrip, application/json).
     #[serde(borrow)]
     pub mime_type: jacquard_common::CowStr<'a>,
@@ -273,19 +275,19 @@ impl<'a> Episode<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChaptersRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ChaptersRef<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.episode"
     }
     fn def_name() -> &'static str {
         "chaptersRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_episode()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -317,19 +319,19 @@ impl jacquard_common::types::collection::Collection for EpisodeRecord {
     type Record = EpisodeRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.episode"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_episode()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alternate_media {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
@@ -474,36 +476,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MediaRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MediaRef<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.episode"
     }
     fn def_name() -> &'static str {
         "mediaRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_episode()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TranscriptRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TranscriptRef<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.episode"
     }
     fn def_name() -> &'static str {
         "transcriptRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_episode()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -635,7 +637,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -648,7 +650,7 @@ where
     }
 }
 
-fn lexicon_doc_org_atpodcasting_episode() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_atpodcasting_episode() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1204,127 +1206,127 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Podcast;
-        type PublishedAt;
-        type Duration;
         type Title;
         type Media;
+        type Duration;
         type FeedItemGuid;
+        type Podcast;
+        type PublishedAt;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Podcast = Unset;
-        type PublishedAt = Unset;
-        type Duration = Unset;
         type Title = Unset;
         type Media = Unset;
+        type Duration = Unset;
         type FeedItemGuid = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Podcast = S::Podcast;
-        type PublishedAt = S::PublishedAt;
-        type Duration = S::Duration;
-        type Title = S::Title;
-        type Media = S::Media;
-        type FeedItemGuid = S::FeedItemGuid;
-    }
-    ///State transition - sets the `podcast` field to Set
-    pub struct SetPodcast<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPodcast<S> {}
-    impl<S: State> State for SetPodcast<S> {
-        type CreatedAt = S::CreatedAt;
-        type Podcast = Set<members::podcast>;
-        type PublishedAt = S::PublishedAt;
-        type Duration = S::Duration;
-        type Title = S::Title;
-        type Media = S::Media;
-        type FeedItemGuid = S::FeedItemGuid;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type Podcast = S::Podcast;
-        type PublishedAt = Set<members::published_at>;
-        type Duration = S::Duration;
-        type Title = S::Title;
-        type Media = S::Media;
-        type FeedItemGuid = S::FeedItemGuid;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type CreatedAt = S::CreatedAt;
-        type Podcast = S::Podcast;
-        type PublishedAt = S::PublishedAt;
-        type Duration = Set<members::duration>;
-        type Title = S::Title;
-        type Media = S::Media;
-        type FeedItemGuid = S::FeedItemGuid;
+        type Podcast = Unset;
+        type PublishedAt = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Podcast = S::Podcast;
-        type PublishedAt = S::PublishedAt;
-        type Duration = S::Duration;
         type Title = Set<members::title>;
         type Media = S::Media;
+        type Duration = S::Duration;
         type FeedItemGuid = S::FeedItemGuid;
+        type Podcast = S::Podcast;
+        type PublishedAt = S::PublishedAt;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `media` field to Set
     pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMedia<S> {}
     impl<S: State> State for SetMedia<S> {
-        type CreatedAt = S::CreatedAt;
-        type Podcast = S::Podcast;
-        type PublishedAt = S::PublishedAt;
-        type Duration = S::Duration;
         type Title = S::Title;
         type Media = Set<members::media>;
+        type Duration = S::Duration;
         type FeedItemGuid = S::FeedItemGuid;
+        type Podcast = S::Podcast;
+        type PublishedAt = S::PublishedAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type Title = S::Title;
+        type Media = S::Media;
+        type Duration = Set<members::duration>;
+        type FeedItemGuid = S::FeedItemGuid;
+        type Podcast = S::Podcast;
+        type PublishedAt = S::PublishedAt;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `feed_item_guid` field to Set
     pub struct SetFeedItemGuid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeedItemGuid<S> {}
     impl<S: State> State for SetFeedItemGuid<S> {
-        type CreatedAt = S::CreatedAt;
-        type Podcast = S::Podcast;
-        type PublishedAt = S::PublishedAt;
-        type Duration = S::Duration;
         type Title = S::Title;
         type Media = S::Media;
+        type Duration = S::Duration;
         type FeedItemGuid = Set<members::feed_item_guid>;
+        type Podcast = S::Podcast;
+        type PublishedAt = S::PublishedAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `podcast` field to Set
+    pub struct SetPodcast<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPodcast<S> {}
+    impl<S: State> State for SetPodcast<S> {
+        type Title = S::Title;
+        type Media = S::Media;
+        type Duration = S::Duration;
+        type FeedItemGuid = S::FeedItemGuid;
+        type Podcast = Set<members::podcast>;
+        type PublishedAt = S::PublishedAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
+    impl<S: State> State for SetPublishedAt<S> {
+        type Title = S::Title;
+        type Media = S::Media;
+        type Duration = S::Duration;
+        type FeedItemGuid = S::FeedItemGuid;
+        type Podcast = S::Podcast;
+        type PublishedAt = Set<members::published_at>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Media = S::Media;
+        type Duration = S::Duration;
+        type FeedItemGuid = S::FeedItemGuid;
+        type Podcast = S::Podcast;
+        type PublishedAt = S::PublishedAt;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `podcast` field
-        pub struct podcast(());
-        ///Marker type for the `published_at` field
-        pub struct published_at(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `media` field
         pub struct media(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
         ///Marker type for the `feed_item_guid` field
         pub struct feed_item_guid(());
+        ///Marker type for the `podcast` field
+        pub struct podcast(());
+        ///Marker type for the `published_at` field
+        pub struct published_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1696,13 +1698,13 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
-    S::CreatedAt: episode_state::IsSet,
-    S::Podcast: episode_state::IsSet,
-    S::PublishedAt: episode_state::IsSet,
-    S::Duration: episode_state::IsSet,
     S::Title: episode_state::IsSet,
     S::Media: episode_state::IsSet,
+    S::Duration: episode_state::IsSet,
     S::FeedItemGuid: episode_state::IsSet,
+    S::Podcast: episode_state::IsSet,
+    S::PublishedAt: episode_state::IsSet,
+    S::CreatedAt: episode_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {
@@ -1730,7 +1732,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1768,37 +1770,37 @@ pub mod media_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MimeType;
         type Url;
+        type MimeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MimeType = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `mime_type` field to Set
-    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMimeType<S> {}
-    impl<S: State> State for SetMimeType<S> {
-        type MimeType = Set<members::mime_type>;
-        type Url = S::Url;
+        type MimeType = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type MimeType = S::MimeType;
         type Url = Set<members::url>;
+        type MimeType = S::MimeType;
+    }
+    ///State transition - sets the `mime_type` field to Set
+    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMimeType<S> {}
+    impl<S: State> State for SetMimeType<S> {
+        type Url = S::Url;
+        type MimeType = Set<members::mime_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mime_type` field
-        pub struct mime_type(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `mime_type` field
+        pub struct mime_type(());
     }
 }
 
@@ -1871,8 +1873,8 @@ where
 impl<'a, S> MediaRefBuilder<'a, S>
 where
     S: media_ref_state::State,
-    S::MimeType: media_ref_state::IsSet,
     S::Url: media_ref_state::IsSet,
+    S::MimeType: media_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MediaRef<'a> {
@@ -1885,7 +1887,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1908,37 +1910,37 @@ pub mod transcript_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MimeType;
         type Url;
+        type MimeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MimeType = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `mime_type` field to Set
-    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMimeType<S> {}
-    impl<S: State> State for SetMimeType<S> {
-        type MimeType = Set<members::mime_type>;
-        type Url = S::Url;
+        type MimeType = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type MimeType = S::MimeType;
         type Url = Set<members::url>;
+        type MimeType = S::MimeType;
+    }
+    ///State transition - sets the `mime_type` field to Set
+    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMimeType<S> {}
+    impl<S: State> State for SetMimeType<S> {
+        type Url = S::Url;
+        type MimeType = Set<members::mime_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mime_type` field
-        pub struct mime_type(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `mime_type` field
+        pub struct mime_type(());
     }
 }
 
@@ -2031,8 +2033,8 @@ where
 impl<'a, S> TranscriptRefBuilder<'a, S>
 where
     S: transcript_ref_state::State,
-    S::MimeType: transcript_ref_state::IsSet,
     S::Url: transcript_ref_state::IsSet,
+    S::MimeType: transcript_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TranscriptRef<'a> {
@@ -2046,7 +2048,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

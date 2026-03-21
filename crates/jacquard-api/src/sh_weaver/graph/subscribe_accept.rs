@@ -36,9 +36,9 @@ pub struct SubscribeAccept<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeAcceptGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -85,19 +85,19 @@ impl jacquard_common::types::collection::Collection for SubscribeAcceptRecord {
     type Record = SubscribeAcceptRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubscribeAccept<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SubscribeAccept<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.subscribeAccept"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_graph_subscribeAccept()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -112,37 +112,37 @@ pub mod subscribe_accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subscribe;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subscribe = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subscribe = S::Subscribe;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subscribe` field to Set
     pub struct SetSubscribe<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubscribe<S> {}
     impl<S: State> State for SetSubscribe<S> {
-        type CreatedAt = S::CreatedAt;
         type Subscribe = Set<members::subscribe>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subscribe = S::Subscribe;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subscribe` field
         pub struct subscribe(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -215,8 +215,8 @@ where
 impl<'a, S> SubscribeAcceptBuilder<'a, S>
 where
     S: subscribe_accept_state::State,
-    S::CreatedAt: subscribe_accept_state::IsSet,
     S::Subscribe: subscribe_accept_state::IsSet,
+    S::CreatedAt: subscribe_accept_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubscribeAccept<'a> {
@@ -229,7 +229,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -242,7 +242,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_graph_subscribeAccept() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_graph_subscribeAccept() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

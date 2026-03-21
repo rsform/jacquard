@@ -22,11 +22,11 @@ pub struct Photo<'a> {
     ///Alt text description of the image, for accessibility.
     #[serde(borrow)]
     pub alt: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<crate::social_grain::AspectRatio<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub aspect_ratio: core::option::Option<crate::social_grain::AspectRatio<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub photo: jacquard_common::types::blob::BlobRef<'a>,
 }
@@ -43,9 +43,9 @@ pub struct Photo<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PhotoGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -64,44 +64,44 @@ pub struct PhotoGetRecordOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExifView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub date_time_original: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub date_time_original: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub exposure_time: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub exposure_time: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub f_number: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub f_number: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub flash: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub flash: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub focal_length_in35mm_format: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub i_so: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub focal_length_in35mm_format: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub i_so: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lens_make: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub lens_make: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lens_model: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub lens_model: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub make: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub make: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub model: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub model: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub photo: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -119,15 +119,15 @@ pub struct PhotoView<'a> {
     ///Alt text description of the image, for accessibility.
     #[serde(borrow)]
     pub alt: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<crate::social_grain::AspectRatio<'a>>,
+    pub aspect_ratio: core::option::Option<crate::social_grain::AspectRatio<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     ///EXIF metadata for the photo, if available.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub exif: std::option::Option<crate::social_grain::photo::ExifView<'a>>,
+    pub exif: core::option::Option<crate::social_grain::photo::ExifView<'a>>,
     ///Fully-qualified URL where a large version of the image can be fetched. May or may not be the exact original blob. For example, CDN location provided by the App View.
     #[serde(borrow)]
     pub fullsize: jacquard_common::types::string::UriValue<'a>,
@@ -178,19 +178,19 @@ impl jacquard_common::types::collection::Collection for PhotoRecord {
     type Record = PhotoRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Photo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Photo<'a> {
     fn nsid() -> &'static str {
         "social.grain.photo"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_grain_photo()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.photo;
             {
@@ -239,36 +239,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Photo<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExifView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ExifView<'a> {
     fn nsid() -> &'static str {
         "social.grain.photo.defs"
     }
     fn def_name() -> &'static str {
         "exifView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_grain_photo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PhotoView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PhotoView<'a> {
     fn nsid() -> &'static str {
         "social.grain.photo.defs"
     }
     fn def_name() -> &'static str {
         "photoView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_grain_photo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -283,37 +283,37 @@ pub mod photo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Alt;
         type Photo;
+        type Alt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Alt = Unset;
         type Photo = Unset;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Alt = Set<members::alt>;
-        type Photo = S::Photo;
+        type Alt = Unset;
     }
     ///State transition - sets the `photo` field to Set
     pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPhoto<S> {}
     impl<S: State> State for SetPhoto<S> {
-        type Alt = S::Alt;
         type Photo = Set<members::photo>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Photo = S::Photo;
+        type Alt = Set<members::alt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `alt` field
-        pub struct alt(());
         ///Marker type for the `photo` field
         pub struct photo(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
     }
 }
 
@@ -426,8 +426,8 @@ where
 impl<'a, S> PhotoBuilder<'a, S>
 where
     S: photo_state::State,
-    S::Alt: photo_state::IsSet,
     S::Photo: photo_state::IsSet,
+    S::Alt: photo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Photo<'a> {
@@ -442,7 +442,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -457,7 +457,7 @@ where
     }
 }
 
-fn lexicon_doc_social_grain_photo() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_social_grain_photo() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.grain.photo"),
@@ -929,7 +929,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -954,7 +954,7 @@ where
     }
 }
 
-fn lexicon_doc_social_grain_photo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_grain_photo_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1387,85 +1387,85 @@ pub mod photo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Fullsize;
-        type Uri;
-        type Thumb;
         type Alt;
+        type Uri;
+        type Cid;
+        type Thumb;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Fullsize = Unset;
-        type Uri = Unset;
-        type Thumb = Unset;
         type Alt = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Fullsize = S::Fullsize;
-        type Uri = S::Uri;
-        type Thumb = S::Thumb;
-        type Alt = S::Alt;
+        type Uri = Unset;
+        type Cid = Unset;
+        type Thumb = Unset;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFullsize<S> {}
     impl<S: State> State for SetFullsize<S> {
-        type Cid = S::Cid;
         type Fullsize = Set<members::fullsize>;
+        type Alt = S::Alt;
         type Uri = S::Uri;
-        type Thumb = S::Thumb;
-        type Alt = S::Alt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
         type Cid = S::Cid;
-        type Fullsize = S::Fullsize;
-        type Uri = Set<members::uri>;
         type Thumb = S::Thumb;
-        type Alt = S::Alt;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumb<S> {}
-    impl<S: State> State for SetThumb<S> {
-        type Cid = S::Cid;
-        type Fullsize = S::Fullsize;
-        type Uri = S::Uri;
-        type Thumb = Set<members::thumb>;
-        type Alt = S::Alt;
     }
     ///State transition - sets the `alt` field to Set
     pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAlt<S> {}
     impl<S: State> State for SetAlt<S> {
-        type Cid = S::Cid;
         type Fullsize = S::Fullsize;
-        type Uri = S::Uri;
-        type Thumb = S::Thumb;
         type Alt = Set<members::alt>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Thumb = S::Thumb;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Thumb = S::Thumb;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Thumb = S::Thumb;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Thumb = Set<members::thumb>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
         ///Marker type for the `alt` field
         pub struct alt(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
     }
 }
 
@@ -1638,11 +1638,11 @@ where
 impl<'a, S> PhotoViewBuilder<'a, S>
 where
     S: photo_view_state::State,
-    S::Cid: photo_view_state::IsSet,
     S::Fullsize: photo_view_state::IsSet,
-    S::Uri: photo_view_state::IsSet,
-    S::Thumb: photo_view_state::IsSet,
     S::Alt: photo_view_state::IsSet,
+    S::Uri: photo_view_state::IsSet,
+    S::Cid: photo_view_state::IsSet,
+    S::Thumb: photo_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PhotoView<'a> {
@@ -1660,7 +1660,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

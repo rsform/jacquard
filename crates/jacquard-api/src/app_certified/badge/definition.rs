@@ -19,18 +19,18 @@
 #[serde(rename_all = "camelCase")]
 pub struct Definition<'a> {
     ///Optional allowlist of DIDs allowed to issue this badge. If omitted, anyone may issue it.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub allowed_issuers: std::option::Option<Vec<crate::app_certified::Did<'a>>>,
+    pub allowed_issuers: core::option::Option<Vec<crate::app_certified::Did<'a>>>,
     ///Category of the badge (e.g. endorsement, participation, affiliation).
     #[serde(borrow)]
     pub badge_type: jacquard_common::CowStr<'a>,
     ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional short statement describing what the badge represents.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Icon representing the badge, stored as a blob for compact visual display.
     #[serde(borrow)]
     pub icon: jacquard_common::types::blob::BlobRef<'a>,
@@ -51,9 +51,9 @@ pub struct Definition<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefinitionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -100,19 +100,19 @@ impl jacquard_common::types::collection::Collection for DefinitionRecord {
     type Record = DefinitionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Definition<'a> {
     fn nsid() -> &'static str {
         "app.certified.badge.definition"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_certified_badge_definition()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.allowed_issuers {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
@@ -247,67 +247,67 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Icon;
-        type CreatedAt;
-        type BadgeType;
         type Title;
+        type Icon;
+        type BadgeType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Icon = Unset;
-        type CreatedAt = Unset;
-        type BadgeType = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `icon` field to Set
-    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIcon<S> {}
-    impl<S: State> State for SetIcon<S> {
-        type Icon = Set<members::icon>;
-        type CreatedAt = S::CreatedAt;
-        type BadgeType = S::BadgeType;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Icon = S::Icon;
-        type CreatedAt = Set<members::created_at>;
-        type BadgeType = S::BadgeType;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `badge_type` field to Set
-    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
-    impl<S: State> State for SetBadgeType<S> {
-        type Icon = S::Icon;
-        type CreatedAt = S::CreatedAt;
-        type BadgeType = Set<members::badge_type>;
-        type Title = S::Title;
+        type Icon = Unset;
+        type BadgeType = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Icon = S::Icon;
-        type CreatedAt = S::CreatedAt;
-        type BadgeType = S::BadgeType;
         type Title = Set<members::title>;
+        type Icon = S::Icon;
+        type BadgeType = S::BadgeType;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `icon` field to Set
+    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIcon<S> {}
+    impl<S: State> State for SetIcon<S> {
+        type Title = S::Title;
+        type Icon = Set<members::icon>;
+        type BadgeType = S::BadgeType;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `badge_type` field to Set
+    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
+    impl<S: State> State for SetBadgeType<S> {
+        type Title = S::Title;
+        type Icon = S::Icon;
+        type BadgeType = Set<members::badge_type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Icon = S::Icon;
+        type BadgeType = S::BadgeType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `icon` field
-        pub struct icon(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `badge_type` field
-        pub struct badge_type(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `icon` field
+        pub struct icon(());
+        ///Marker type for the `badge_type` field
+        pub struct badge_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -460,10 +460,10 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::Icon: definition_state::IsSet,
-    S::CreatedAt: definition_state::IsSet,
-    S::BadgeType: definition_state::IsSet,
     S::Title: definition_state::IsSet,
+    S::Icon: definition_state::IsSet,
+    S::BadgeType: definition_state::IsSet,
+    S::CreatedAt: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {
@@ -480,7 +480,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -497,7 +497,7 @@ where
     }
 }
 
-fn lexicon_doc_app_certified_badge_definition() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_certified_badge_definition() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

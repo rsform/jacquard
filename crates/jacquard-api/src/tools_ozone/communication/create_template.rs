@@ -22,12 +22,12 @@ pub struct CreateTemplate<'a> {
     #[serde(borrow)]
     pub content_markdown: jacquard_common::CowStr<'a>,
     ///DID of the user who is creating the template.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub created_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub created_by: core::option::Option<jacquard_common::types::string::Did<'a>>,
     ///Message language.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lang: std::option::Option<jacquard_common::types::string::Language>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub lang: core::option::Option<jacquard_common::types::string::Language>,
     ///Name of the template.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -69,7 +69,7 @@ pub struct CreateTemplateOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateTemplateError<'a> {
     #[serde(rename = "DuplicateTemplateName")]
-    DuplicateTemplateName(std::option::Option<jacquard_common::CowStr<'a>>),
+    DuplicateTemplateName(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateTemplateError<'_> {

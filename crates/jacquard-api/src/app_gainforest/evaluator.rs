@@ -25,21 +25,21 @@ pub struct CandidateTaxon<'a> {
     ///Confidence score (0-1000, where 1000 = 100.0%).
     pub confidence: i64,
     ///Family of the candidate taxon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub family: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub family: core::option::Option<jacquard_common::CowStr<'a>>,
     ///GBIF backbone taxonomy key for the candidate.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub gbif_taxon_key: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub gbif_taxon_key: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Genus of the candidate taxon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genus: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub genus: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Kingdom of the candidate taxon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub kingdom: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub kingdom: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Rank position among candidates (1 = best match).
     pub rank: i64,
     ///Full scientific name of the candidate taxon.
@@ -65,9 +65,9 @@ pub struct ClassificationResult<'a> {
     #[serde(borrow)]
     pub category: jacquard_common::CowStr<'a>,
     ///Additional notes about the classification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub remarks: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The assigned classification value (e.g., 'critical', 'tropical-rainforest').
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
@@ -87,15 +87,15 @@ pub struct ClassificationResult<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DataQualityResult<'a> {
     ///Overall completeness score (0-1000, where 1000 = 100.0%).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub completeness_score: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub completeness_score: core::option::Option<i64>,
     ///List of quality issues found in the record.
     #[serde(borrow)]
     pub flags: Vec<crate::app_gainforest::evaluator::QualityFlag<'a>>,
     ///Additional notes about the quality assessment.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub remarks: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// A single measurement derived by an evaluator from source data.
@@ -113,16 +113,16 @@ pub struct DataQualityResult<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DerivedMeasurement<'a> {
     ///Description of the method used to obtain the measurement.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub measurement_method: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub measurement_method: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The nature of the measurement (e.g., 'canopy cover', 'NDVI', 'tree height').
     #[serde(borrow)]
     pub measurement_type: jacquard_common::CowStr<'a>,
     ///The units for the measurement value (e.g., '%', 'm', 'kg').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub measurement_unit: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub measurement_unit: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The value of the measurement.
     #[serde(borrow)]
     pub measurement_value: jacquard_common::CowStr<'a>,
@@ -145,9 +145,9 @@ pub struct MeasurementResult<'a> {
     #[serde(borrow)]
     pub measurements: Vec<crate::app_gainforest::evaluator::DerivedMeasurement<'a>>,
     ///Additional notes about the measurements.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub remarks: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Provenance metadata describing the method used to produce an evaluation.
@@ -165,22 +165,22 @@ pub struct MeasurementResult<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct MethodInfo<'a> {
     ///Identifier for the specific model checkpoint used (e.g., date or hash).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub model_checkpoint: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub model_checkpoint: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Human-readable name of the method or model (e.g., 'GainForest BioClassifier').
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///URIs to papers, documentation, or repositories describing this method.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub references: std::option::Option<
+    pub references: core::option::Option<
         Vec<jacquard_common::types::string::UriValue<'a>>,
     >,
     ///Version string of the method or model (e.g., '2.1.0').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub version: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// A single data quality flag indicating an issue with a specific field.
@@ -204,9 +204,9 @@ pub struct QualityFlag<'a> {
     #[serde(borrow)]
     pub issue: jacquard_common::CowStr<'a>,
     ///Severity level of the quality issue.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub severity: std::option::Option<QualityFlagSeverity<'a>>,
+    pub severity: core::option::Option<QualityFlagSeverity<'a>>,
 }
 
 /// Severity level of the quality issue.
@@ -320,13 +320,13 @@ pub struct SpeciesIdResult<'a> {
     #[serde(borrow)]
     pub candidates: Vec<crate::app_gainforest::evaluator::CandidateTaxon<'a>>,
     ///Which feature of the subject record was used as input (e.g., 'mediaEvidence').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub input_feature: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub input_feature: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Additional notes about the species identification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub remarks: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Reference to a target record that is being evaluated.
@@ -343,9 +343,9 @@ pub struct SpeciesIdResult<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SubjectRef<'a> {
     ///CID pinning the exact version of the target record.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///AT-URI of the target record.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
@@ -366,24 +366,24 @@ pub struct SubjectRef<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct VerificationResult<'a> {
     ///Notes about the verification decision.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub remarks: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Verification status: confirmed, rejected, or uncertain.
     #[serde(borrow)]
     pub status: VerificationResultStatus<'a>,
     ///Suggested corrections if the original identification was rejected or uncertain.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub suggested_corrections: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub suggested_corrections: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Name of the person who performed the verification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub verified_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub verified_by: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Persistent identifier (e.g., ORCID) of the verifier.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub verified_by_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub verified_by_id: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Verification status: confirmed, rejected, or uncertain.
@@ -482,19 +482,19 @@ impl jacquard_common::IntoStatic for VerificationResultStatus<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CandidateTaxon<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CandidateTaxon<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
     fn def_name() -> &'static str {
         "candidateTaxon"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.confidence;
             if *value > 1000i64 {
@@ -626,19 +626,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CandidateTaxon<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ClassificationResult<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ClassificationResult<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
     fn def_name() -> &'static str {
         "classificationResult"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.category;
             {
@@ -699,19 +699,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ClassificationResult<'a> 
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DataQualityResult<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DataQualityResult<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
     fn def_name() -> &'static str {
         "dataQualityResult"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.completeness_score {
             if *value > 1000i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -769,19 +769,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DataQualityResult<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DerivedMeasurement<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DerivedMeasurement<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
     fn def_name() -> &'static str {
         "derivedMeasurement"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.measurement_method {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -860,19 +860,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DerivedMeasurement<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MeasurementResult<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MeasurementResult<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
     fn def_name() -> &'static str {
         "measurementResult"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.measurements;
             #[allow(unused_comparisons)]
@@ -908,19 +908,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MeasurementResult<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MethodInfo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MethodInfo<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
     fn def_name() -> &'static str {
         "methodInfo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.model_checkpoint {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -992,19 +992,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MethodInfo<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QualityFlag<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for QualityFlag<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
     fn def_name() -> &'static str {
         "qualityFlag"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.field;
             {
@@ -1065,19 +1065,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QualityFlag<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpeciesIdResult<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SpeciesIdResult<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
     fn def_name() -> &'static str {
         "speciesIdResult"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.candidates;
             #[allow(unused_comparisons)]
@@ -1131,36 +1131,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpeciesIdResult<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SubjectRef<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
     fn def_name() -> &'static str {
         "subjectRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationResult<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for VerificationResult<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.defs"
     }
     fn def_name() -> &'static str {
         "verificationResult"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.remarks {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -1266,51 +1266,51 @@ pub mod candidate_taxon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ScientificName;
         type Rank;
         type Confidence;
-        type ScientificName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ScientificName = Unset;
         type Rank = Unset;
         type Confidence = Unset;
-        type ScientificName = Unset;
-    }
-    ///State transition - sets the `rank` field to Set
-    pub struct SetRank<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRank<S> {}
-    impl<S: State> State for SetRank<S> {
-        type Rank = Set<members::rank>;
-        type Confidence = S::Confidence;
-        type ScientificName = S::ScientificName;
-    }
-    ///State transition - sets the `confidence` field to Set
-    pub struct SetConfidence<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConfidence<S> {}
-    impl<S: State> State for SetConfidence<S> {
-        type Rank = S::Rank;
-        type Confidence = Set<members::confidence>;
-        type ScientificName = S::ScientificName;
     }
     ///State transition - sets the `scientific_name` field to Set
     pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScientificName<S> {}
     impl<S: State> State for SetScientificName<S> {
+        type ScientificName = Set<members::scientific_name>;
         type Rank = S::Rank;
         type Confidence = S::Confidence;
-        type ScientificName = Set<members::scientific_name>;
+    }
+    ///State transition - sets the `rank` field to Set
+    pub struct SetRank<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRank<S> {}
+    impl<S: State> State for SetRank<S> {
+        type ScientificName = S::ScientificName;
+        type Rank = Set<members::rank>;
+        type Confidence = S::Confidence;
+    }
+    ///State transition - sets the `confidence` field to Set
+    pub struct SetConfidence<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConfidence<S> {}
+    impl<S: State> State for SetConfidence<S> {
+        type ScientificName = S::ScientificName;
+        type Rank = S::Rank;
+        type Confidence = Set<members::confidence>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `scientific_name` field
+        pub struct scientific_name(());
         ///Marker type for the `rank` field
         pub struct rank(());
         ///Marker type for the `confidence` field
         pub struct confidence(());
-        ///Marker type for the `scientific_name` field
-        pub struct scientific_name(());
     }
 }
 
@@ -1474,9 +1474,9 @@ where
 impl<'a, S> CandidateTaxonBuilder<'a, S>
 where
     S: candidate_taxon_state::State,
+    S::ScientificName: candidate_taxon_state::IsSet,
     S::Rank: candidate_taxon_state::IsSet,
     S::Confidence: candidate_taxon_state::IsSet,
-    S::ScientificName: candidate_taxon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CandidateTaxon<'a> {
@@ -1494,7 +1494,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1512,7 +1512,7 @@ where
     }
 }
 
-fn lexicon_doc_app_gainforest_evaluator_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_gainforest_evaluator_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -2618,7 +2618,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2745,7 +2745,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2892,7 +2892,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3020,7 +3020,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

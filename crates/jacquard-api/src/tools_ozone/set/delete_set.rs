@@ -53,7 +53,7 @@ pub struct DeleteSetOutput<'a> {}
 pub enum DeleteSetError<'a> {
     /// set with the given name does not exist
     #[serde(rename = "SetNotFound")]
-    SetNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    SetNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteSetError<'_> {

@@ -30,18 +30,18 @@ pub struct CollectionLink<'a> {
     #[serde(borrow)]
     pub collection: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     ///Timestamp when this link record was created (usually set by PDS).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Strong reference to the original card record (may be in another library).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub original_card: std::option::Option<
+    pub original_card: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Optional provenance information for this link.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub provenance: std::option::Option<crate::network_cosmik::Provenance<'a>>,
+    pub provenance: core::option::Option<crate::network_cosmik::Provenance<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -56,9 +56,9 @@ pub struct CollectionLink<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionLinkGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -105,19 +105,19 @@ impl jacquard_common::types::collection::Collection for CollectionLinkRecord {
     type Record = CollectionLinkRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionLink<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionLink<'a> {
     fn nsid() -> &'static str {
         "network.cosmik.collectionLink"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_cosmik_collectionLink()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -133,8 +133,8 @@ pub mod collection_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Card;
-        type AddedBy;
         type AddedAt;
+        type AddedBy;
         type Collection;
     }
     /// Empty state - all required fields are unset
@@ -142,8 +142,8 @@ pub mod collection_link_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Card = Unset;
-        type AddedBy = Unset;
         type AddedAt = Unset;
+        type AddedBy = Unset;
         type Collection = Unset;
     }
     ///State transition - sets the `card` field to Set
@@ -151,17 +151,8 @@ pub mod collection_link_state {
     impl<S: State> sealed::Sealed for SetCard<S> {}
     impl<S: State> State for SetCard<S> {
         type Card = Set<members::card>;
+        type AddedAt = S::AddedAt;
         type AddedBy = S::AddedBy;
-        type AddedAt = S::AddedAt;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `added_by` field to Set
-    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
-    impl<S: State> State for SetAddedBy<S> {
-        type Card = S::Card;
-        type AddedBy = Set<members::added_by>;
-        type AddedAt = S::AddedAt;
         type Collection = S::Collection;
     }
     ///State transition - sets the `added_at` field to Set
@@ -169,8 +160,17 @@ pub mod collection_link_state {
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
         type Card = S::Card;
-        type AddedBy = S::AddedBy;
         type AddedAt = Set<members::added_at>;
+        type AddedBy = S::AddedBy;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `added_by` field to Set
+    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
+    impl<S: State> State for SetAddedBy<S> {
+        type Card = S::Card;
+        type AddedAt = S::AddedAt;
+        type AddedBy = Set<members::added_by>;
         type Collection = S::Collection;
     }
     ///State transition - sets the `collection` field to Set
@@ -178,8 +178,8 @@ pub mod collection_link_state {
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type Card = S::Card;
-        type AddedBy = S::AddedBy;
         type AddedAt = S::AddedAt;
+        type AddedBy = S::AddedBy;
         type Collection = Set<members::collection>;
     }
     /// Marker types for field names
@@ -187,10 +187,10 @@ pub mod collection_link_state {
     pub mod members {
         ///Marker type for the `card` field
         pub struct card(());
-        ///Marker type for the `added_by` field
-        pub struct added_by(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `added_by` field
+        pub struct added_by(());
         ///Marker type for the `collection` field
         pub struct collection(());
     }
@@ -366,8 +366,8 @@ impl<'a, S> CollectionLinkBuilder<'a, S>
 where
     S: collection_link_state::State,
     S::Card: collection_link_state::IsSet,
-    S::AddedBy: collection_link_state::IsSet,
     S::AddedAt: collection_link_state::IsSet,
+    S::AddedBy: collection_link_state::IsSet,
     S::Collection: collection_link_state::IsSet,
 {
     /// Build the final struct
@@ -386,7 +386,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -404,7 +404,7 @@ where
     }
 }
 
-fn lexicon_doc_network_cosmik_collectionLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_network_cosmik_collectionLink() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

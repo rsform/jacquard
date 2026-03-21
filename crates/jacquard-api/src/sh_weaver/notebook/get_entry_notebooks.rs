@@ -51,12 +51,12 @@ pub struct GetEntryNotebooksOutput<'a> {
 pub struct NotebookRef<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub owner: std::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub owner: core::option::Option<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -87,19 +87,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetEntryNotebooksRequest {
     type Response = GetEntryNotebooksResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getEntryNotebooks"
     }
     fn def_name() -> &'static str {
         "notebookRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_getEntryNotebooks()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -361,7 +361,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -376,7 +376,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_getEntryNotebooks() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_notebook_getEntryNotebooks() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

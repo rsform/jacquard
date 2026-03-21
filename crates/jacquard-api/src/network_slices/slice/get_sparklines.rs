@@ -18,15 +18,15 @@
 #[serde(rename_all = "camelCase")]
 pub struct GetSparklines<'a> {
     ///Time range to fetch data for Defaults to `"24h"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_get_sparklines_duration")]
     #[serde(borrow)]
-    pub duration: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub duration: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Time interval for data points Defaults to `"hour"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_get_sparklines_interval")]
     #[serde(borrow)]
-    pub interval: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub interval: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Array of slice AT-URIs to get sparkline data for
     #[serde(borrow)]
     pub slices: Vec<jacquard_common::CowStr<'a>>,
@@ -101,30 +101,30 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSparklinesRequest {
     type Response = GetSparklinesResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklineEntry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SparklineEntry<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.getSparklines"
     }
     fn def_name() -> &'static str {
         "sparklineEntry"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_getSparklines()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_get_sparklines_duration() -> std::option::Option<
+fn _default_get_sparklines_duration() -> core::option::Option<
     jacquard_common::CowStr<'static>,
 > {
     Some(jacquard_common::CowStr::from("24h"))
 }
 
-fn _default_get_sparklines_interval() -> std::option::Option<
+fn _default_get_sparklines_interval() -> core::option::Option<
     jacquard_common::CowStr<'static>,
 > {
     Some(jacquard_common::CowStr::from("hour"))
@@ -265,7 +265,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -295,37 +295,37 @@ pub mod sparkline_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SliceUri;
         type Points;
+        type SliceUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SliceUri = Unset;
         type Points = Unset;
-    }
-    ///State transition - sets the `slice_uri` field to Set
-    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
-    impl<S: State> State for SetSliceUri<S> {
-        type SliceUri = Set<members::slice_uri>;
-        type Points = S::Points;
+        type SliceUri = Unset;
     }
     ///State transition - sets the `points` field to Set
     pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPoints<S> {}
     impl<S: State> State for SetPoints<S> {
-        type SliceUri = S::SliceUri;
         type Points = Set<members::points>;
+        type SliceUri = S::SliceUri;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
+    impl<S: State> State for SetSliceUri<S> {
+        type Points = S::Points;
+        type SliceUri = Set<members::slice_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice_uri` field
-        pub struct slice_uri(());
         ///Marker type for the `points` field
         pub struct points(());
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
     }
 }
 
@@ -398,8 +398,8 @@ where
 impl<'a, S> SparklineEntryBuilder<'a, S>
 where
     S: sparkline_entry_state::State,
-    S::SliceUri: sparkline_entry_state::IsSet,
     S::Points: sparkline_entry_state::IsSet,
+    S::SliceUri: sparkline_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SparklineEntry<'a> {
@@ -412,7 +412,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -425,7 +425,7 @@ where
     }
 }
 
-fn lexicon_doc_network_slices_slice_getSparklines() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_network_slices_slice_getSparklines() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

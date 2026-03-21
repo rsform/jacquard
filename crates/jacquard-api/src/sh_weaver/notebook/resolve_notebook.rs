@@ -18,13 +18,13 @@
 pub struct ResolveNotebook<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_entry_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub entry_limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub entry_limit: core::option::Option<i64>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
@@ -43,9 +43,9 @@ pub struct ResolveNotebook<'a> {
 pub struct ResolveNotebookOutput<'a> {
     #[serde(borrow)]
     pub entries: Vec<crate::sh_weaver::notebook::BookEntryView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
 }
@@ -66,7 +66,7 @@ pub struct ResolveNotebookOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResolveNotebookError<'a> {
     #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotebookNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveNotebookError<'_> {
@@ -110,7 +110,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveNotebookRequest {
     type Response = ResolveNotebookResponse;
 }
 
-fn _default_entry_limit() -> std::option::Option<i64> {
+fn _default_entry_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
@@ -124,37 +124,37 @@ pub mod resolve_notebook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Actor;
         type Name;
+        type Actor;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Actor = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Actor = Set<members::actor>;
-        type Name = S::Name;
+        type Actor = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Actor = S::Actor;
         type Name = Set<members::name>;
+        type Actor = S::Actor;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Name = S::Name;
+        type Actor = Set<members::actor>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `actor` field
-        pub struct actor(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `actor` field
+        pub struct actor(());
     }
 }
 
@@ -261,8 +261,8 @@ where
 impl<'a, S> ResolveNotebookBuilder<'a, S>
 where
     S: resolve_notebook_state::State,
-    S::Actor: resolve_notebook_state::IsSet,
     S::Name: resolve_notebook_state::IsSet,
+    S::Actor: resolve_notebook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveNotebook<'a> {

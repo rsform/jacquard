@@ -20,13 +20,13 @@
 pub struct FollowGate<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///If true, previously auto-accepted follows are invalidated when requireApproval is enabled. Appview should treat followAccept records created before this gate's createdAt as invalid. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_follow_gate_invalidate_prior")]
-    pub invalidate_prior: std::option::Option<bool>,
+    pub invalidate_prior: core::option::Option<bool>,
     ///If true, follows require manual acceptance. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_follow_gate_require_approval")]
-    pub require_approval: std::option::Option<bool>,
+    pub require_approval: core::option::Option<bool>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -41,9 +41,9 @@ pub struct FollowGate<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FollowGateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -90,28 +90,28 @@ impl jacquard_common::types::collection::Collection for FollowGateRecord {
     type Record = FollowGateRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowGate<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FollowGate<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.followGate"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_graph_followGate()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_follow_gate_invalidate_prior() -> std::option::Option<bool> {
+fn _default_follow_gate_invalidate_prior() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_follow_gate_require_approval() -> std::option::Option<bool> {
+fn _default_follow_gate_require_approval() -> core::option::Option<bool> {
     Some(false)
 }
 
@@ -238,7 +238,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -252,7 +252,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_graph_followGate() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_graph_followGate() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

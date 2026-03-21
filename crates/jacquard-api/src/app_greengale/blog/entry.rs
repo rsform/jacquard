@@ -18,35 +18,35 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub blobs: std::option::Option<Vec<crate::app_greengale::blog::BlobMetadata<'a>>>,
+    pub blobs: core::option::Option<Vec<crate::app_greengale::blog::BlobMetadata<'a>>>,
     ///Markdown content of the blog post
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Legacy field for LaTeX math rendering. LaTeX is now always enabled for GreenGale posts; this field is kept for backward compatibility. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_entry_latex")]
-    pub latex: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub latex: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp: std::option::Option<crate::app_greengale::blog::Ogp<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ogp: core::option::Option<crate::app_greengale::blog::Ogp<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subtitle: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subtitle: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: std::option::Option<crate::app_greengale::blog::Theme<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub theme: core::option::Option<crate::app_greengale::blog::Theme<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Controls who can view this entry Defaults to `"public"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_entry_visibility")]
     #[serde(borrow)]
-    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub visibility: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -61,9 +61,9 @@ pub struct Entry<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -110,19 +110,19 @@ impl jacquard_common::types::collection::Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     fn nsid() -> &'static str {
         "app.greengale.blog.entry"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_blog_entry()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
@@ -176,11 +176,13 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     }
 }
 
-fn _default_entry_latex() -> std::option::Option<bool> {
+fn _default_entry_latex() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_entry_visibility() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_entry_visibility() -> core::option::Option<
+    jacquard_common::CowStr<'static>,
+> {
     Some(jacquard_common::CowStr::from("public"))
 }
 
@@ -446,7 +448,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -469,7 +471,7 @@ where
     }
 }
 
-fn lexicon_doc_app_greengale_blog_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_greengale_blog_entry() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

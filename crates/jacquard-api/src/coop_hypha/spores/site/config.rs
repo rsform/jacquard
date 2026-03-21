@@ -19,29 +19,29 @@
 #[serde(rename_all = "camelCase")]
 pub struct Config<'a> {
     ///Body font ID
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub body_font: std::option::Option<ConfigBodyFont<'a>>,
+    pub body_font: core::option::Option<ConfigBodyFont<'a>>,
     ///Deprecated legacy key for body font ID
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub font_body: std::option::Option<ConfigFontBody<'a>>,
+    pub font_body: core::option::Option<ConfigFontBody<'a>>,
     ///Deprecated legacy key for heading font ID
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub font_heading: std::option::Option<ConfigFontHeading<'a>>,
+    pub font_heading: core::option::Option<ConfigFontHeading<'a>>,
     ///Heading font ID
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub heading_font: std::option::Option<ConfigHeadingFont<'a>>,
+    pub heading_font: core::option::Option<ConfigHeadingFont<'a>>,
     ///Site subtitle
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subtitle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subtitle: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Site title
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Body font ID
@@ -452,9 +452,9 @@ impl jacquard_common::IntoStatic for ConfigHeadingFont<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConfigGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -501,19 +501,19 @@ impl jacquard_common::types::collection::Collection for ConfigRecord {
     type Record = ConfigRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Config<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Config<'a> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.site.config"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_coop_hypha_spores_site_config()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.body_font {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -786,7 +786,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -803,7 +803,7 @@ where
     }
 }
 
-fn lexicon_doc_coop_hypha_spores_site_config() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_coop_hypha_spores_site_config() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

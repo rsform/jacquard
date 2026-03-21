@@ -43,19 +43,19 @@ pub enum ListItemContentItem<'a> {
     OrderedList(Box<crate::blog_pckt::block::ordered_list::OrderedList<'a>>),
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.block.listItem"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_block_listItem()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -151,7 +151,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -163,7 +163,7 @@ where
     }
 }
 
-fn lexicon_doc_blog_pckt_block_listItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blog_pckt_block_listItem() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

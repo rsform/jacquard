@@ -23,16 +23,16 @@ pub struct CollectionItem<'a> {
     pub collection: jacquard_common::types::string::AtUri<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///Remarks on the collection item.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Reference(s) to a material or set of materials (`org.okazu-diary.material.external`) to be included in the collection.
     #[serde(borrow)]
     pub subjects: Vec<jacquard_common::types::string::AtUri<'a>>,
     ///Reference to an `org.okazu-diary.feed.entry` record or an `org.okazu-diary.material.collectionItem` of another collection from which this collection item is derived.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub via: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub via: core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -47,9 +47,9 @@ pub struct CollectionItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionItemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -96,19 +96,19 @@ impl jacquard_common::types::collection::Collection for CollectionItemRecord {
     type Record = CollectionItemRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
     fn nsid() -> &'static str {
         "org.okazu-diary.material.collectionItem"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_okazu_diary_material_collectionItem()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.note {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
@@ -179,51 +179,51 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
-        type CreatedAt;
         type Subjects;
+        type CreatedAt;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
-        type CreatedAt = Unset;
         type Subjects = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type CreatedAt = S::CreatedAt;
-        type Subjects = S::Subjects;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Collection = S::Collection;
-        type CreatedAt = Set<members::created_at>;
-        type Subjects = S::Subjects;
+        type CreatedAt = Unset;
+        type Collection = Unset;
     }
     ///State transition - sets the `subjects` field to Set
     pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjects<S> {}
     impl<S: State> State for SetSubjects<S> {
-        type Collection = S::Collection;
-        type CreatedAt = S::CreatedAt;
         type Subjects = Set<members::subjects>;
+        type CreatedAt = S::CreatedAt;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subjects = S::Subjects;
+        type CreatedAt = Set<members::created_at>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Subjects = S::Subjects;
+        type CreatedAt = S::CreatedAt;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subjects` field
         pub struct subjects(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -353,9 +353,9 @@ impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
 impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
-    S::Collection: collection_item_state::IsSet,
-    S::CreatedAt: collection_item_state::IsSet,
     S::Subjects: collection_item_state::IsSet,
+    S::CreatedAt: collection_item_state::IsSet,
+    S::Collection: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {
@@ -371,7 +371,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -387,7 +387,7 @@ where
     }
 }
 
-fn lexicon_doc_org_okazu_diary_material_collectionItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_okazu_diary_material_collectionItem() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

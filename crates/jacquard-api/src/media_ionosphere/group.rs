@@ -18,31 +18,31 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Group<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genres: std::option::Option<Vec<crate::media_ionosphere::Genre<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub genres: core::option::Option<Vec<crate::media_ionosphere::Genre<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub icon: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Version identifier
     #[serde(borrow)]
     pub ionosphere: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keywords: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub keywords: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Type of group, see Table 30 of DAB SPI for idea
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub kind: std::option::Option<GroupKind<'a>>,
+    pub kind: core::option::Option<GroupKind<'a>>,
     ///The language of the string values in this record. NOT the language of the content
     pub language: jacquard_common::types::string::Language,
     ///A list of groups this record is a member of
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub member_of: std::option::Option<Vec<crate::media_ionosphere::Membership<'a>>>,
+    pub member_of: core::option::Option<Vec<crate::media_ionosphere::Membership<'a>>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
@@ -173,9 +173,9 @@ impl jacquard_common::IntoStatic for GroupKind<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GroupGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -222,19 +222,19 @@ impl jacquard_common::types::collection::Collection for GroupRecord {
     type Record = GroupRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Group<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Group<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.group"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_group()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
@@ -333,51 +333,51 @@ pub mod group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Language;
         type Name;
         type Ionosphere;
-        type Language;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Language = Unset;
         type Name = Unset;
         type Ionosphere = Unset;
-        type Language = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Ionosphere = S::Ionosphere;
-        type Language = S::Language;
-    }
-    ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
-    impl<S: State> State for SetIonosphere<S> {
-        type Name = S::Name;
-        type Ionosphere = Set<members::ionosphere>;
-        type Language = S::Language;
     }
     ///State transition - sets the `language` field to Set
     pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLanguage<S> {}
     impl<S: State> State for SetLanguage<S> {
+        type Language = Set<members::language>;
         type Name = S::Name;
         type Ionosphere = S::Ionosphere;
-        type Language = Set<members::language>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Language = S::Language;
+        type Name = Set<members::name>;
+        type Ionosphere = S::Ionosphere;
+    }
+    ///State transition - sets the `ionosphere` field to Set
+    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
+    impl<S: State> State for SetIonosphere<S> {
+        type Language = S::Language;
+        type Name = S::Name;
+        type Ionosphere = Set<members::ionosphere>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `language` field
+        pub struct language(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
-        ///Marker type for the `language` field
-        pub struct language(());
     }
 }
 
@@ -594,9 +594,9 @@ where
 impl<'a, S> GroupBuilder<'a, S>
 where
     S: group_state::State,
+    S::Language: group_state::IsSet,
     S::Name: group_state::IsSet,
     S::Ionosphere: group_state::IsSet,
-    S::Language: group_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Group<'a> {
@@ -616,7 +616,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -636,7 +636,7 @@ where
     }
 }
 
-fn lexicon_doc_media_ionosphere_group() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_media_ionosphere_group() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

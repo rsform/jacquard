@@ -35,9 +35,11 @@ pub struct GetFollowingUser<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetFollowingUserOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub follow: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub follow: core::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
 }
 
 /// Response type for

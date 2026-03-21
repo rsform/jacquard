@@ -38,9 +38,9 @@ pub struct Announcement<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AnnouncementGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -87,19 +87,19 @@ impl jacquard_common::types::collection::Collection for AnnouncementRecord {
     type Record = AnnouncementRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Announcement<'a> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.forum.announcement"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.body;
             #[allow(unused_comparisons)]
@@ -166,67 +166,67 @@ pub mod announcement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type ExpiresAt;
-        type Body;
         type Title;
+        type CreatedAt;
+        type Body;
+        type ExpiresAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type ExpiresAt = Unset;
-        type Body = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ExpiresAt = S::ExpiresAt;
-        type Body = S::Body;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `expires_at` field to Set
-    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
-    impl<S: State> State for SetExpiresAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type ExpiresAt = Set<members::expires_at>;
-        type Body = S::Body;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type CreatedAt = S::CreatedAt;
-        type ExpiresAt = S::ExpiresAt;
-        type Body = Set<members::body>;
-        type Title = S::Title;
+        type CreatedAt = Unset;
+        type Body = Unset;
+        type ExpiresAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type ExpiresAt = S::ExpiresAt;
-        type Body = S::Body;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type Body = S::Body;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
+        type Body = S::Body;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Body = Set<members::body>;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `expires_at` field to Set
+    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
+    impl<S: State> State for SetExpiresAt<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Body = S::Body;
+        type ExpiresAt = Set<members::expires_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `expires_at` field
-        pub struct expires_at(());
-        ///Marker type for the `body` field
-        pub struct body(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `body` field
+        pub struct body(());
+        ///Marker type for the `expires_at` field
+        pub struct expires_at(());
     }
 }
 
@@ -339,10 +339,10 @@ where
 impl<'a, S> AnnouncementBuilder<'a, S>
 where
     S: announcement_state::State,
-    S::CreatedAt: announcement_state::IsSet,
-    S::ExpiresAt: announcement_state::IsSet,
-    S::Body: announcement_state::IsSet,
     S::Title: announcement_state::IsSet,
+    S::CreatedAt: announcement_state::IsSet,
+    S::Body: announcement_state::IsSet,
+    S::ExpiresAt: announcement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Announcement<'a> {
@@ -357,7 +357,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -372,7 +372,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -121,24 +121,24 @@ impl jacquard_common::IntoStatic for ItemRef<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Item<'a> {
     fn nsid() -> &'static str {
         "my.skylights.defs"
     }
     fn def_name() -> &'static str {
         "item"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_my_skylights_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_my_skylights_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_my_skylights_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("my.skylights.defs"),

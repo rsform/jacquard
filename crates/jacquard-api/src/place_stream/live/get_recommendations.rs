@@ -58,24 +58,24 @@ pub struct GetRecommendationsOutput<'a> {
         crate::place_stream::live::get_recommendations::LivestreamRecommendation<'a>,
     >,
     ///The user DID this recommendation is for
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub user_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub user_did: core::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LivestreamRecommendation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LivestreamRecommendation<'a> {
     fn nsid() -> &'static str {
         "place.stream.live.getRecommendations"
     }
     fn def_name() -> &'static str {
         "livestreamRecommendation"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_live_getRecommendations()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -116,37 +116,37 @@ pub mod livestream_recommendation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Source;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Source = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Source = S::Source;
+        type Did = Unset;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type Did = S::Did;
         type Source = Set<members::source>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Source = S::Source;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -231,8 +231,8 @@ where
 impl<'a, S> LivestreamRecommendationBuilder<'a, S>
 where
     S: livestream_recommendation_state::State,
-    S::Did: livestream_recommendation_state::IsSet,
     S::Source: livestream_recommendation_state::IsSet,
+    S::Did: livestream_recommendation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LivestreamRecommendation<'a> {
@@ -245,7 +245,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -258,7 +258,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_live_getRecommendations() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_live_getRecommendations() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -21,22 +21,22 @@ pub struct Organization<'a> {
     ///Client-declared timestamp when this record was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///When the organization was established. Stored as datetime per ATProto conventions (no date-only format exists). Clients should use midnight UTC (e.g., '2005-01-01T00:00:00.000Z'); consumers should treat only the date portion as canonical.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub founded_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub founded_date: core::option::Option<jacquard_common::types::string::Datetime>,
     ///A strong reference to the location where the organization is based. The record referenced must conform with the lexicon app.certified.location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<
+    pub location: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Legal or operational structures of the organization (e.g. 'nonprofit', 'ngo', 'government', 'social-enterprise', 'cooperative').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub organization_type: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub organization_type: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Additional reference URLs (social media profiles, contact pages, donation links, etc.) with a display label for each URL.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub urls: std::option::Option<
+    pub urls: core::option::Option<
         Vec<crate::app_certified::actor::organization::UrlItem<'a>>,
     >,
 }
@@ -53,9 +53,9 @@ pub struct Organization<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OrganizationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -76,9 +76,9 @@ pub struct OrganizationGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct UrlItem<'a> {
     ///Optional human-readable label for this URL (e.g. 'Support page', 'Donation page').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub label: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub label: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URL.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
@@ -124,19 +124,19 @@ impl jacquard_common::types::collection::Collection for OrganizationRecord {
     type Record = OrganizationRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Organization<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Organization<'a> {
     fn nsid() -> &'static str {
         "app.certified.actor.organization"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_certified_actor_organization()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.organization_type {
             #[allow(unused_comparisons)]
             if value.len() > 10usize {
@@ -153,19 +153,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Organization<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for UrlItem<'a> {
     fn nsid() -> &'static str {
         "app.certified.actor.organization"
     }
     fn def_name() -> &'static str {
         "urlItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_certified_actor_organization()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.label {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
@@ -413,7 +413,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -429,7 +429,7 @@ where
     }
 }
 
-fn lexicon_doc_app_certified_actor_organization() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_certified_actor_organization() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -742,7 +742,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

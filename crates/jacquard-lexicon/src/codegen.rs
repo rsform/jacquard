@@ -70,6 +70,18 @@ impl<'c> CodeGenerator<'c> {
         utils::generate_doc_comment(desc)
     }
 
+    /// Create a ResolvedImports instance for this generator's mode with no collisions.
+    /// Used during code generation when a specific per-file resolution isn't yet available.
+    /// In Macro mode, this produces fully-qualified paths for all types.
+    /// In Pretty mode, this produces short names (but should normally use per-file ResolvedImports from Phase 2).
+    pub(crate) fn default_resolved_imports(&self) -> prettify::ResolvedImports {
+        prettify::ResolvedImports::resolve(
+            &prettify::ImportSet::default(),
+            &std::collections::HashSet::new(),
+            self.mode,
+        )
+    }
+
     /// Track namespace dependency when a ref crosses namespace boundaries
     pub(crate) fn track_ref_namespace_dep(&self, current_nsid: &str, ref_str: &str) {
         use nsid_utils::NsidPath;
@@ -91,14 +103,15 @@ impl<'c> CodeGenerator<'c> {
         }
     }
 
-    /// Generate or reference the shared lexicon_doc function for this NSID
-    /// Returns (optional shared function, trait impl tokens)
+    /// Generate or reference the shared lexicon_doc function for this NSID.
+    /// Returns (optional shared function, trait impl tokens).
     pub(crate) fn generate_schema_impl_with_shared(
         &self,
         type_name: &str,
         nsid: &str,
         def_name: &str,
         has_lifetime: bool,
+        resolved: &prettify::ResolvedImports,
     ) -> (Option<TokenStream>, TokenStream) {
         let lex_doc = self.corpus.get(nsid).expect("nsid exists in corpus");
 
@@ -115,8 +128,9 @@ impl<'c> CodeGenerator<'c> {
                 lex_doc,
                 &std::collections::BTreeMap::new(),
             );
+            let lexicon_doc_path = resolved.external_type_tokens(&prettify::ExternalImport::LexiconDoc);
             Some(quote! {
-                fn #shared_fn_ident() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+                fn #shared_fn_ident() -> #lexicon_doc_path<'static> {
                     #doc_literal
                 }
             })
@@ -137,8 +151,12 @@ impl<'c> CodeGenerator<'c> {
         let validation_code =
             crate::derive_impl::doc_to_tokens::validations_to_tokens(&validation_checks);
 
+        let schema_path = resolved.external_type_tokens(&prettify::ExternalImport::LexiconSchema);
+        let lexicon_doc_path = resolved.external_type_tokens(&prettify::ExternalImport::LexiconDoc);
+        let constraint_error_path = resolved.external_type_tokens(&prettify::ExternalImport::ConstraintError);
+
         let trait_impl = quote! {
-            impl #impl_generics ::jacquard_lexicon::schema::LexiconSchema for #type_ident #type_generics {
+            impl #impl_generics #schema_path for #type_ident #type_generics {
                 fn nsid() -> &'static str {
                     #nsid
                 }
@@ -147,11 +165,11 @@ impl<'c> CodeGenerator<'c> {
                     #def_name
                 }
 
-                fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+                fn lexicon_doc() -> #lexicon_doc_path<'static> {
                     #shared_fn_ident()
                 }
 
-                fn validate(&self) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+                fn validate(&self) -> ::core::result::Result<(), #constraint_error_path> {
                     #validation_code
                 }
             }
@@ -166,12 +184,13 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         def: &LexUserType<'static>,
+        resolved: &prettify::ResolvedImports,
     ) -> Result<GeneratedCode> {
         match def {
-            LexUserType::Record(record) => self.generate_record(nsid, def_name, record),
-            LexUserType::Object(obj) => self.generate_object(nsid, def_name, obj),
-            LexUserType::XrpcQuery(query) => self.generate_query(nsid, def_name, query),
-            LexUserType::XrpcProcedure(proc) => self.generate_procedure(nsid, def_name, proc),
+            LexUserType::Record(record) => self.generate_record(nsid, def_name, record, resolved),
+            LexUserType::Object(obj) => self.generate_object(nsid, def_name, obj, resolved),
+            LexUserType::XrpcQuery(query) => self.generate_query(nsid, def_name, query, resolved),
+            LexUserType::XrpcProcedure(proc) => self.generate_procedure(nsid, def_name, proc, resolved),
             LexUserType::Token(token) => {
                 // Token types are marker structs that can be used as union refs
                 let type_name = self.def_to_type_name(nsid, def_name);
@@ -181,13 +200,14 @@ impl<'c> CodeGenerator<'c> {
                 // Token name for Display impl (just the def name, not the full ref)
                 let token_name = def_name;
 
+                let derive_attr = resolved.derive_standard_with(quote! { Hash });
                 let tokens = quote! {
                     #doc
-                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, Hash, jacquard_derive::IntoStatic)]
+                    #derive_attr
                     pub struct #ident;
 
-                    impl std::fmt::Display for #ident {
-                        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    impl core::fmt::Display for #ident {
+                        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
                             write!(f, #token_name)
                         }
                     }
@@ -195,13 +215,13 @@ impl<'c> CodeGenerator<'c> {
                 Ok(GeneratedCode::type_only(tokens))
             }
             LexUserType::String(s) if s.known_values.is_some() => {
-                self.generate_known_values_enum(nsid, def_name, s)
+                self.generate_known_values_enum(nsid, def_name, s, resolved)
             }
             LexUserType::String(s) => {
                 // Plain string type alias
                 let type_name = self.def_to_type_name(nsid, def_name);
                 let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
-                let rust_type = self.string_to_rust_type(s);
+                let rust_type = self.string_to_rust_type(s, resolved);
                 let doc = self.generate_doc_comment(s.description.as_ref());
                 let tokens = quote! {
                     #doc
@@ -223,7 +243,7 @@ impl<'c> CodeGenerator<'c> {
                 if let LexArrayItem::Union(union) = &array.items {
                     let union_name = format!("{}Item", type_name);
                     let refs: Vec<_> = union.refs.iter().cloned().collect();
-                    let union_generated = self.generate_union(nsid, &union_name, &refs, None, union.closed)?;
+                    let union_generated = self.generate_union(nsid, &union_name, &refs, None, union.closed, resolved)?;
 
                     let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
                     let union_tokens = union_generated.into_tokens();
@@ -247,7 +267,7 @@ impl<'c> CodeGenerator<'c> {
                     Ok(GeneratedCode::type_only(type_defs))
                 } else {
                     // Regular array item type
-                    let item_type = self.array_item_to_rust_type(nsid, &array.items)?;
+                    let item_type = self.array_item_to_rust_type(nsid, &array.items, resolved)?;
                     let tokens = if needs_lifetime {
                         quote! {
                             #doc
@@ -274,13 +294,13 @@ impl<'c> CodeGenerator<'c> {
                     LexUserType::Boolean(_) => (quote! { bool }, false),
                     LexUserType::Integer(_) => (quote! { i64 }, false),
                     LexUserType::Bytes(_) => {
-                        (quote! { jacquard_common::deps::bytes::Bytes }, false)
+                        (resolved.external_type_tokens(&prettify::ExternalImport::Bytes), false)
                     }
                     LexUserType::CidLink(_) => {
-                        (quote! { jacquard_common::types::cid::CidLink<'a> }, true)
+                        (resolved.type_tokens(&prettify::CommonType::CidLink), true)
                     }
                     LexUserType::Unknown(_) => {
-                        (quote! { jacquard_common::types::value::Data<'a> }, true)
+                        (resolved.type_tokens(&prettify::CommonType::Data), true)
                     }
                     _ => unreachable!(),
                 };
@@ -304,7 +324,7 @@ impl<'c> CodeGenerator<'c> {
                 // Track this file as containing a subscription
                 let file_path = self.nsid_to_file_path(nsid);
                 self.subscription_files.borrow_mut().insert(file_path);
-                self.generate_subscription(nsid, def_name, sub)
+                self.generate_subscription(nsid, def_name, sub, resolved)
             }
             LexUserType::Union(union) => {
                 // Top-level union generates an enum
@@ -317,6 +337,7 @@ impl<'c> CodeGenerator<'c> {
                     &refs,
                     union.description.as_ref().map(|d| d.as_ref()),
                     union.closed,
+                    resolved,
                 )
             }
         }
@@ -336,8 +357,9 @@ mod tests {
         let doc = corpus.get("app.bsky.feed.post").expect("get post");
         let def = doc.defs.get("main").expect("get main def");
 
+        let resolved = codegen.default_resolved_imports();
         let generated = codegen
-            .generate_def("app.bsky.feed.post", "main", def)
+            .generate_def("app.bsky.feed.post", "main", def, &resolved)
             .expect("generate");
         let tokens = generated.into_tokens();
 
@@ -365,6 +387,7 @@ mod tests {
             "app.bsky.embed.external".into(),
         ];
 
+        let resolved = codegen.default_resolved_imports();
         let generated = codegen
             .generate_union(
                 "app.bsky.feed.post",
@@ -372,6 +395,7 @@ mod tests {
                 &refs,
                 Some("Post embed union"),
                 None,
+                &resolved,
             )
             .expect("generate union");
         let tokens = generated.into_tokens();
@@ -400,8 +424,9 @@ mod tests {
             .expect("get getAuthorFeed");
         let def = doc.defs.get("main").expect("get main def");
 
+        let resolved = codegen.default_resolved_imports();
         let generated = codegen
-            .generate_def("app.bsky.feed.getAuthorFeed", "main", def)
+            .generate_def("app.bsky.feed.getAuthorFeed", "main", def, &resolved)
             .expect("generate");
         let tokens = generated.into_tokens();
 
@@ -431,9 +456,10 @@ mod tests {
             .get("com.atproto.label.defs")
             .expect("get label defs");
         let def = doc.defs.get("labelValue").expect("get labelValue def");
+        let resolved = codegen.default_resolved_imports();
 
         let generated = codegen
-            .generate_def("com.atproto.label.defs", "labelValue", def)
+            .generate_def("com.atproto.label.defs", "labelValue", def, &resolved)
             .expect("generate");
         let tokens = generated.into_tokens();
 
@@ -518,9 +544,10 @@ mod tests {
             .get("com.atproto.repo.createRecord")
             .expect("get createRecord");
         let def = doc.defs.get("main").expect("get main def");
+        let resolved = codegen.default_resolved_imports();
 
         let generated = codegen
-            .generate_def("com.atproto.repo.createRecord", "main", def)
+            .generate_def("com.atproto.repo.createRecord", "main", def, &resolved)
             .expect("generate");
         let tokens = generated.into_tokens();
 
@@ -554,9 +581,10 @@ mod tests {
             .get("com.atproto.sync.subscribeRepos")
             .expect("get subscribeRepos");
         let def = doc.defs.get("main").expect("get main def");
+        let resolved = codegen.default_resolved_imports();
 
         let generated = codegen
-            .generate_def("com.atproto.sync.subscribeRepos", "main", def)
+            .generate_def("com.atproto.sync.subscribeRepos", "main", def, &resolved)
             .expect("generate");
         let tokens = generated.into_tokens();
 
@@ -583,7 +611,7 @@ mod tests {
     //     let def = doc.defs.get("viewImage").expect("get viewImage def");
 
     //     let tokens = codegen
-    //         .generate_def("app.bsky.embed.images", "viewImage", def)
+    //         .generate_def("app.bsky.embed.images", "viewImage", def, &resolved)
     //         .expect("generate");
 
     //     let file: syn::File = syn::parse2(tokens).expect("parse tokens");
@@ -604,9 +632,10 @@ mod tests {
 
         let doc = corpus.get("test.array.types").expect("get array types");
         let def = doc.defs.get("main").expect("get main def");
+        let resolved = codegen.default_resolved_imports();
 
         let generated = codegen
-            .generate_def("test.array.types", "main", def)
+            .generate_def("test.array.types", "main", def, &resolved)
             .expect("generate");
 
         let tokens = generated.into_tokens();
@@ -634,9 +663,10 @@ mod tests {
 
         let doc = corpus.get("test.binary.types").expect("get binary types");
         let def = doc.defs.get("main").expect("get main def");
+        let resolved = codegen.default_resolved_imports();
 
         let generated = codegen
-            .generate_def("test.binary.types", "main", def)
+            .generate_def("test.binary.types", "main", def, &resolved)
             .expect("generate");
 
         let tokens = generated.into_tokens();
@@ -662,9 +692,10 @@ mod tests {
 
         let doc = corpus.get("test.empty.object").expect("get empty object");
         let def = doc.defs.get("emptyDef").expect("get emptyDef");
+        let resolved = codegen.default_resolved_imports();
 
         let generated = codegen
-            .generate_def("test.empty.object", "emptyDef", def)
+            .generate_def("test.empty.object", "emptyDef", def, &resolved)
             .expect("generate");
 
         let tokens = generated.into_tokens();
@@ -689,8 +720,9 @@ mod tests {
 
         // Test main def
         let main_def = doc.defs.get("main").expect("get main def");
+        let resolved = codegen.default_resolved_imports();
         let main_generated = codegen
-            .generate_def("pub.leaflet.poll.definition", "main", main_def)
+            .generate_def("pub.leaflet.poll.definition", "main", main_def, &resolved)
             .expect("generate main");
         let main_tokens = main_generated.into_tokens();
         let main_file: syn::File = syn::parse2(main_tokens).expect("parse main tokens");
@@ -703,7 +735,7 @@ mod tests {
         // Test option fragment
         let option_def = doc.defs.get("option").expect("get option def");
         let option_generated = codegen
-            .generate_def("pub.leaflet.poll.definition", "option", option_def)
+            .generate_def("pub.leaflet.poll.definition", "option", option_def, &resolved)
             .expect("generate option");
         let option_tokens = option_generated.into_tokens();
         let option_file: syn::File = syn::parse2(option_tokens).expect("parse option tokens");
@@ -715,7 +747,7 @@ mod tests {
         // Test vote fragment
         let vote_def = doc.defs.get("vote").expect("get vote def");
         let vote_generated = codegen
-            .generate_def("pub.leaflet.poll.definition", "vote", vote_def)
+            .generate_def("pub.leaflet.poll.definition", "vote", vote_def, &resolved)
             .expect("generate vote");
         let vote_tokens = vote_generated.into_tokens();
         let vote_file: syn::File = syn::parse2(vote_tokens).expect("parse vote tokens");
@@ -739,9 +771,10 @@ mod tests {
             .get("test.constraints.validation")
             .expect("get constraints");
         let def = doc.defs.get("main").expect("get main def");
+        let resolved = codegen.default_resolved_imports();
 
         let generated = codegen
-            .generate_def("test.constraints.validation", "main", def)
+            .generate_def("test.constraints.validation", "main", def, &resolved)
             .expect("generate");
 
         let tokens = generated.into_tokens();
@@ -772,9 +805,10 @@ mod tests {
             .get("pub.leaflet.poll.definition")
             .expect("get poll definition");
         let def = doc.defs.get("main").expect("get main def");
+        let resolved = codegen.default_resolved_imports();
 
         let generated = codegen
-            .generate_def("pub.leaflet.poll.definition", "main", def)
+            .generate_def("pub.leaflet.poll.definition", "main", def, &resolved)
             .expect("generate");
 
         let tokens = generated.into_tokens();
@@ -799,9 +833,10 @@ mod tests {
 
         let doc = corpus.get("test.binary.types").expect("get binary types");
         let def = doc.defs.get("main").expect("get main def");
+        let resolved = codegen.default_resolved_imports();
 
         let generated = codegen
-            .generate_def("test.binary.types", "main", def)
+            .generate_def("test.binary.types", "main", def, &resolved)
             .expect("generate");
 
         let tokens = generated.into_tokens();

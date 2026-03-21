@@ -19,17 +19,17 @@
 #[serde(rename_all = "camelCase")]
 pub struct Poll<'a> {
     ///Whether voters can select multiple options. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_poll_allow_multiple")]
-    pub allow_multiple: std::option::Option<bool>,
+    pub allow_multiple: core::option::Option<bool>,
     ///AT-URI of the channel this poll belongs to.
     #[serde(borrow)]
     pub channel: jacquard_common::types::string::AtUri<'a>,
     ///Timestamp of poll creation.
     pub created_at: jacquard_common::types::string::Datetime,
     ///When the poll closes. Omit for no expiry.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Poll answer options.
     #[serde(borrow)]
     pub options: Vec<jacquard_common::CowStr<'a>>,
@@ -50,9 +50,9 @@ pub struct Poll<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PollGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -99,19 +99,19 @@ impl jacquard_common::types::collection::Collection for PollRecord {
     type Record = PollRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.poll"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_poll()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.options;
             #[allow(unused_comparisons)]
@@ -155,7 +155,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Poll<'a> {
     }
 }
 
-fn _default_poll_allow_multiple() -> std::option::Option<bool> {
+fn _default_poll_allow_multiple() -> core::option::Option<bool> {
     Some(false)
 }
 
@@ -169,67 +169,67 @@ pub mod poll_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Channel;
         type Question;
         type Options;
+        type Channel;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Channel = Unset;
         type Question = Unset;
         type Options = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Channel = S::Channel;
-        type Question = S::Question;
-        type Options = S::Options;
-    }
-    ///State transition - sets the `channel` field to Set
-    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannel<S> {}
-    impl<S: State> State for SetChannel<S> {
-        type CreatedAt = S::CreatedAt;
-        type Channel = Set<members::channel>;
-        type Question = S::Question;
-        type Options = S::Options;
+        type Channel = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `question` field to Set
     pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuestion<S> {}
     impl<S: State> State for SetQuestion<S> {
-        type CreatedAt = S::CreatedAt;
-        type Channel = S::Channel;
         type Question = Set<members::question>;
         type Options = S::Options;
+        type Channel = S::Channel;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `options` field to Set
     pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOptions<S> {}
     impl<S: State> State for SetOptions<S> {
-        type CreatedAt = S::CreatedAt;
-        type Channel = S::Channel;
         type Question = S::Question;
         type Options = Set<members::options>;
+        type Channel = S::Channel;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `channel` field to Set
+    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChannel<S> {}
+    impl<S: State> State for SetChannel<S> {
+        type Question = S::Question;
+        type Options = S::Options;
+        type Channel = Set<members::channel>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Question = S::Question;
+        type Options = S::Options;
+        type Channel = S::Channel;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `channel` field
-        pub struct channel(());
         ///Marker type for the `question` field
         pub struct question(());
         ///Marker type for the `options` field
         pub struct options(());
+        ///Marker type for the `channel` field
+        pub struct channel(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -376,10 +376,10 @@ where
 impl<'a, S> PollBuilder<'a, S>
 where
     S: poll_state::State,
-    S::CreatedAt: poll_state::IsSet,
-    S::Channel: poll_state::IsSet,
     S::Question: poll_state::IsSet,
     S::Options: poll_state::IsSet,
+    S::Channel: poll_state::IsSet,
+    S::CreatedAt: poll_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Poll<'a> {
@@ -396,7 +396,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -413,7 +413,7 @@ where
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_poll() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_protoimsg_chat_poll() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

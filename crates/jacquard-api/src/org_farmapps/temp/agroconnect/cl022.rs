@@ -19,15 +19,15 @@
 #[serde(rename_all = "camelCase")]
 pub struct Cl022<'a> {
     ///Date when added to the list
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub added: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub added: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Comment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Denominator used for all fertilizer content properties
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub denominator: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub denominator: core::option::Option<i64>,
     ///Description / name of the fertilizer
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
@@ -35,25 +35,25 @@ pub struct Cl022<'a> {
     #[serde(borrow)]
     pub id: crate::org_farmapps::temp::ecrop::CodeType<'a>,
     ///<unit> Potassium oxide content of this fertilizer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub k2o: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub k2o: core::option::Option<i64>,
     ///<unit> Nitrogen content of this fertilizer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub n: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub n: core::option::Option<i64>,
     ///<unit> Phosphate content of this fertilizer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub p2o5: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub p2o5: core::option::Option<i64>,
     ///Fertlizer type
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Unit
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub unit: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub unit: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Date when updated
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -68,9 +68,9 @@ pub struct Cl022<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Cl022GetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -117,19 +117,19 @@ impl jacquard_common::types::collection::Collection for Cl022Record {
     type Record = Cl022Record;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cl022<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Cl022<'a> {
     fn nsid() -> &'static str {
         "org.farmapps.temp.agroconnect.cl022"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_farmapps_temp_agroconnect_cl022()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.denominator {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -473,7 +473,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -495,7 +495,7 @@ where
     }
 }
 
-fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_farmapps_temp_agroconnect_cl022() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

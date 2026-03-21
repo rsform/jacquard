@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct LikeSong<'a> {
     ///The unique identifier of the song to like
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]

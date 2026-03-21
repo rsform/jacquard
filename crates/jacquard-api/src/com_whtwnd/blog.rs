@@ -25,9 +25,9 @@ pub mod notify_of_new_entry;
 pub struct BlobMetadata<'a> {
     #[serde(borrow)]
     pub blobref: jacquard_common::types::blob::BlobRef<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -45,8 +45,8 @@ pub struct BlobMetadata<'a> {
 pub struct BlogEntry<'a> {
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::lexicon]
@@ -79,27 +79,27 @@ pub struct Comment<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Ogp<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub height: core::option::Option<i64>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub width: core::option::Option<i64>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobMetadata<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobMetadata<'a> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
     }
     fn def_name() -> &'static str {
         "blobMetadata"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_whtwnd_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.blobref;
             {
@@ -133,19 +133,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobMetadata<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlogEntry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BlogEntry<'a> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
     }
     fn def_name() -> &'static str {
         "blogEntry"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_whtwnd_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
@@ -163,19 +163,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlogEntry<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
     }
     fn def_name() -> &'static str {
         "comment"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_whtwnd_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
@@ -193,19 +193,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ogp<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Ogp<'a> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.defs"
     }
     fn def_name() -> &'static str {
         "ogp"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_whtwnd_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -321,7 +321,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -334,9 +334,7 @@ where
     }
 }
 
-fn lexicon_doc_com_whtwnd_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_whtwnd_blog_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.whtwnd.blog.defs"),
@@ -572,37 +570,37 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EntryUri;
         type Content;
+        type EntryUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EntryUri = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `entry_uri` field to Set
-    pub struct SetEntryUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntryUri<S> {}
-    impl<S: State> State for SetEntryUri<S> {
-        type EntryUri = Set<members::entry_uri>;
-        type Content = S::Content;
+        type EntryUri = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type EntryUri = S::EntryUri;
         type Content = Set<members::content>;
+        type EntryUri = S::EntryUri;
+    }
+    ///State transition - sets the `entry_uri` field to Set
+    pub struct SetEntryUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntryUri<S> {}
+    impl<S: State> State for SetEntryUri<S> {
+        type Content = S::Content;
+        type EntryUri = Set<members::entry_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entry_uri` field
-        pub struct entry_uri(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `entry_uri` field
+        pub struct entry_uri(());
     }
 }
 
@@ -675,8 +673,8 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::EntryUri: comment_state::IsSet,
     S::Content: comment_state::IsSet,
+    S::EntryUri: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
@@ -689,7 +687,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -825,7 +823,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

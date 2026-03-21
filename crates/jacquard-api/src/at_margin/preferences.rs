@@ -158,24 +158,24 @@ pub struct LabelerSubscription<'a> {
 pub struct Preferences<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///If true, do not show the confirmation modal when opening external links.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disable_external_link_warning: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disable_external_link_warning: core::option::Option<bool>,
     ///List of hostnames to skip the external link warning modal for.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_link_skipped_hostnames: std::option::Option<
+    pub external_link_skipped_hostnames: core::option::Option<
         Vec<jacquard_common::CowStr<'a>>,
     >,
     ///Per-label visibility preferences for subscribed labelers.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub label_preferences: std::option::Option<
+    pub label_preferences: core::option::Option<
         Vec<crate::at_margin::preferences::LabelPreference<'a>>,
     >,
     ///List of labeler services the user subscribes to for content moderation.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subscribed_labelers: std::option::Option<
+    pub subscribed_labelers: core::option::Option<
         Vec<crate::at_margin::preferences::LabelerSubscription<'a>>,
     >,
 }
@@ -192,9 +192,9 @@ pub struct Preferences<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PreferencesGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -214,36 +214,36 @@ impl<'a> Preferences<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelPreference<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LabelPreference<'a> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
     fn def_name() -> &'static str {
         "labelPreference"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_margin_preferences()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerSubscription<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LabelerSubscription<'a> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
     fn def_name() -> &'static str {
         "labelerSubscription"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_margin_preferences()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -275,19 +275,19 @@ impl jacquard_common::types::collection::Collection for PreferencesRecord {
     type Record = PreferencesRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_margin_preferences()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.external_link_skipped_hostnames {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
@@ -328,7 +328,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
     }
 }
 
-fn lexicon_doc_at_margin_preferences() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_at_margin_preferences() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -765,7 +765,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

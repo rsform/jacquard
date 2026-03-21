@@ -19,29 +19,29 @@
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     ///Image to be displayed on profile page. AKA, 'profile picture'
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///Free-form profile description text.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Annotations of text (mentions, URLs, hashtags, etc)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
+    pub description_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     #[serde(borrow)]
     pub display_name: jacquard_common::CowStr<'a>,
     ///Free-form pronouns text.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pronouns: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub websites: std::option::Option<
+    pub websites: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
     >,
 }
@@ -58,9 +58,9 @@ pub struct Profile<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -107,19 +107,19 @@ impl jacquard_common::types::collection::Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.actor.profile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_actor_profile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -434,7 +434,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -452,7 +452,7 @@ where
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_actor_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_games_gamesgamesgamesgames_actor_profile() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

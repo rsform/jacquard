@@ -19,21 +19,21 @@
 #[serde(rename_all = "camelCase")]
 pub struct Contribution<'a> {
     ///Description of what the contribution concretely involved.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contribution_description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub contribution_description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Client-declared timestamp when this record was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///When this contribution finished. Should fall within the parent hypercert's timeframe.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub end_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub end_date: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Role or title of the contributor.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub role: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub role: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When this contribution started. Should fall within the parent hypercert's timeframe.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub start_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub start_date: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -48,9 +48,9 @@ pub struct Contribution<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContributionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -97,19 +97,19 @@ impl jacquard_common::types::collection::Collection for ContributionRecord {
     type Record = ContributionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contribution<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Contribution<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.contribution"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_claim_contribution()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.contribution_description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
@@ -330,7 +330,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -346,7 +346,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_claim_contribution() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hypercerts_claim_contribution() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

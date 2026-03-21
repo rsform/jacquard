@@ -53,13 +53,13 @@ pub struct GetLatestCommitOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetLatestCommitError<'a> {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoTakendown(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoSuspended(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoDeactivated(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetLatestCommitError<'_> {

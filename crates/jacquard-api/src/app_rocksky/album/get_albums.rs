@@ -16,15 +16,15 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetAlbums<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genre: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub genre: core::option::Option<jacquard_common::CowStr<'a>>,
     ///(min: 1)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///(min: 0)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offset: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -40,9 +40,9 @@ pub struct GetAlbums<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetAlbumsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub albums: std::option::Option<Vec<crate::app_rocksky::album::AlbumViewBasic<'a>>>,
+    pub albums: core::option::Option<Vec<crate::app_rocksky::album::AlbumViewBasic<'a>>>,
 }
 
 /// Response type for

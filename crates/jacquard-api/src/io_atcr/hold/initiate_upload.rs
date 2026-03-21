@@ -57,7 +57,7 @@ pub struct InitiateUploadOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum InitiateUploadError<'a> {
     #[serde(rename = "InvalidDigest")]
-    InvalidDigest(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDigest(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for InitiateUploadError<'_> {

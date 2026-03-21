@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "tech.lenooby09.didgit.ref",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A did-git ref stored in an AT Protocol repository. Each record maps a repository name and ref name (e.g. refs/heads/main) to the hex SHA-256 object ID it points to.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "repo",
+          "refName",
+          "objectId"
+        ],
+        "properties": {
+          "objectId": {
+            "type": "string",
+            "description": "The hex SHA-256 object ID this ref points to.",
+            "maxLength": 64
+          },
+          "refName": {
+            "type": "string",
+            "description": "The full ref name, e.g. refs/heads/main.",
+            "maxLength": 512
+          },
+          "repo": {
+            "type": "string",
+            "description": "The repository name (path) on this DID account.",
+            "maxLength": 512
+          }
+        }
+      }
+    }
+  }
+}

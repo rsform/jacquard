@@ -18,8 +18,8 @@
 pub struct GetBookEntry<'a> {
     ///Defaults to `0`. Min: 0.
     #[serde(default = "_default_index")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub index: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub index: core::option::Option<i64>,
     #[serde(borrow)]
     pub notebook: jacquard_common::types::string::AtUri<'a>,
 }
@@ -57,9 +57,9 @@ pub struct GetBookEntryOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetBookEntryError<'a> {
     #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotebookNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    EntryNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetBookEntryError<'_> {
@@ -110,7 +110,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBookEntryRequest {
     type Response = GetBookEntryResponse;
 }
 
-fn _default_index() -> std::option::Option<i64> {
+fn _default_index() -> core::option::Option<i64> {
     Some(0i64)
 }
 

@@ -35,19 +35,19 @@ pub struct Caption<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Video<'a> {
     ///Alt text description of the video, for accessibility.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub aspect_ratio: core::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub captions: std::option::Option<Vec<crate::app_bsky::embed::video::Caption<'a>>>,
+    pub captions: core::option::Option<Vec<crate::app_bsky::embed::video::Caption<'a>>>,
     ///A hint to the client about how to present the video.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub presentation: std::option::Option<VideoPresentation<'a>>,
+    pub presentation: core::option::Option<VideoPresentation<'a>>,
     ///The mp4 video file. May be up to 100mb, formerly limited to 50mb.
     #[serde(borrow)]
     pub video: jacquard_common::types::blob::BlobRef<'a>,
@@ -154,23 +154,23 @@ impl jacquard_common::IntoStatic for VideoPresentation<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct View<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
+    pub aspect_ratio: core::option::Option<crate::app_bsky::embed::AspectRatio<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(borrow)]
     pub playlist: jacquard_common::types::string::UriValue<'a>,
     ///A hint to the client about how to present the video.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub presentation: std::option::Option<ViewPresentation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub presentation: core::option::Option<ViewPresentation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub thumbnail: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 /// A hint to the client about how to present the video.
@@ -262,19 +262,19 @@ impl jacquard_common::IntoStatic for ViewPresentation<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Caption<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Caption<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.video"
     }
     fn def_name() -> &'static str {
         "caption"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_video()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.file;
             {
@@ -323,19 +323,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Caption<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Video<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.video"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_video()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
@@ -426,19 +426,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for View<'a> {
     fn nsid() -> &'static str {
         "app.bsky.embed.video"
     }
     fn def_name() -> &'static str {
         "view"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_embed_video()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
@@ -600,7 +600,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -613,9 +613,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_embed_video() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_bsky_embed_video() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.embed.video"),
@@ -1061,7 +1059,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1279,7 +1277,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

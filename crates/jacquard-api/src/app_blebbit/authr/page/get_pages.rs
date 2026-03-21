@@ -16,11 +16,11 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPages<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -36,9 +36,9 @@ pub struct GetPages<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPagesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pages: std::option::Option<Vec<crate::app_blebbit::authr::page::PageView<'a>>>,
+    pub pages: core::option::Option<Vec<crate::app_blebbit::authr::page::PageView<'a>>>,
 }
 
 /// Response type for

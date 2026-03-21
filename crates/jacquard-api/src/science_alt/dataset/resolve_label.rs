@@ -21,9 +21,9 @@ pub struct ResolveLabel<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///(max length: 50)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub version: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -66,7 +66,7 @@ pub struct ResolveLabelOutput<'a> {
 pub enum ResolveLabelError<'a> {
     /// No label found with the given name
     #[serde(rename = "LabelNotFound")]
-    LabelNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    LabelNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveLabelError<'_> {

@@ -16,13 +16,13 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetValues<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `100`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
@@ -39,9 +39,9 @@ pub struct GetValues<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetValuesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub set: crate::tools_ozone::set::SetView<'a>,
     #[serde(borrow)]
@@ -65,7 +65,7 @@ pub struct GetValuesOutput<'a> {
 pub enum GetValuesError<'a> {
     /// set with the given name does not exist
     #[serde(rename = "SetNotFound")]
-    SetNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    SetNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetValuesError<'_> {
@@ -109,7 +109,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetValuesRequest {
     type Response = GetValuesResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(100i64)
 }
 

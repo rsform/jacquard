@@ -98,9 +98,9 @@ pub struct DidMention<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Footnote<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_facets: std::option::Option<
+    pub content_facets: core::option::Option<
         Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>,
     >,
     #[serde(borrow)]
@@ -137,9 +137,9 @@ pub struct Highlight<'a> {}
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Id<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Facet feature for italic text
@@ -258,53 +258,53 @@ pub struct Strikethrough<'a> {}
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Underline<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AtMention<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AtMention<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "atMention"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bold<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Bold<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "bold"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "byteSlice"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.byte_end;
             if *value < 0i64 {
@@ -333,172 +333,172 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ByteSlice<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Code<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Code<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "code"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DidMention<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DidMention<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "didMention"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Footnote<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Footnote<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "footnote"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Highlight<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Highlight<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "highlight"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Id<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Id<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "id"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Italic<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Italic<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "italic"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Link<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "link"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Facet<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Strikethrough<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Strikethrough<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "strikethrough"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Underline<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Underline<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.richtext.facet"
     }
     fn def_name() -> &'static str {
         "underline"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_richtext_facet()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -596,7 +596,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -608,7 +608,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_leaflet_richtext_facet() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_pub_leaflet_richtext_facet() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1175,7 +1175,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1281,7 +1281,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1420,7 +1420,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -40,19 +40,19 @@ pub struct Rgba<'a> {
     pub r: i64,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgb<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Rgb<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.theme.color"
     }
     fn def_name() -> &'static str {
         "rgb"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_theme_color()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.b;
             if *value > 255i64 {
@@ -129,19 +129,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgb<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rgba<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Rgba<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.theme.color"
     }
     fn def_name() -> &'static str {
         "rgba"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_theme_color()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.a;
             if *value > 100i64 {
@@ -396,7 +396,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -410,7 +410,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_leaflet_theme_color() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_pub_leaflet_theme_color() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -551,8 +551,8 @@ pub mod rgba_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type G;
         type R;
+        type G;
         type B;
         type A;
     }
@@ -560,26 +560,26 @@ pub mod rgba_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type G = Unset;
         type R = Unset;
+        type G = Unset;
         type B = Unset;
         type A = Unset;
-    }
-    ///State transition - sets the `g` field to Set
-    pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetG<S> {}
-    impl<S: State> State for SetG<S> {
-        type G = Set<members::g>;
-        type R = S::R;
-        type B = S::B;
-        type A = S::A;
     }
     ///State transition - sets the `r` field to Set
     pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetR<S> {}
     impl<S: State> State for SetR<S> {
-        type G = S::G;
         type R = Set<members::r>;
+        type G = S::G;
+        type B = S::B;
+        type A = S::A;
+    }
+    ///State transition - sets the `g` field to Set
+    pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetG<S> {}
+    impl<S: State> State for SetG<S> {
+        type R = S::R;
+        type G = Set<members::g>;
         type B = S::B;
         type A = S::A;
     }
@@ -587,8 +587,8 @@ pub mod rgba_state {
     pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetB<S> {}
     impl<S: State> State for SetB<S> {
-        type G = S::G;
         type R = S::R;
+        type G = S::G;
         type B = Set<members::b>;
         type A = S::A;
     }
@@ -596,18 +596,18 @@ pub mod rgba_state {
     pub struct SetA<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetA<S> {}
     impl<S: State> State for SetA<S> {
-        type G = S::G;
         type R = S::R;
+        type G = S::G;
         type B = S::B;
         type A = Set<members::a>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `g` field
-        pub struct g(());
         ///Marker type for the `r` field
         pub struct r(());
+        ///Marker type for the `g` field
+        pub struct g(());
         ///Marker type for the `b` field
         pub struct b(());
         ///Marker type for the `a` field
@@ -712,8 +712,8 @@ where
 impl<'a, S> RgbaBuilder<'a, S>
 where
     S: rgba_state::State,
-    S::G: rgba_state::IsSet,
     S::R: rgba_state::IsSet,
+    S::G: rgba_state::IsSet,
     S::B: rgba_state::IsSet,
     S::A: rgba_state::IsSet,
 {
@@ -730,7 +730,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

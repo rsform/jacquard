@@ -20,25 +20,25 @@ pub struct Fact<'a> {
     #[serde(borrow)]
     pub args: Vec<jacquard_common::CowStr<'a>>,
     ///0.0-1.0 as string (Soufflé compat)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub confidence: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub confidence: core::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub predicate: jacquard_common::CowStr<'a>,
     ///CID of source record
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source: core::option::Option<jacquard_common::CowStr<'a>>,
     ///CID of superseded fact
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub supersedes: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub supersedes: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -53,9 +53,9 @@ pub struct Fact<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FactGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -102,19 +102,19 @@ impl jacquard_common::types::collection::Collection for FactRecord {
     type Record = FactRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fact<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Fact<'a> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.fact"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_diy_razorgirl_winter_fact()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.args;
             #[allow(unused_comparisons)]
@@ -422,7 +422,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -441,7 +441,7 @@ where
     }
 }
 
-fn lexicon_doc_diy_razorgirl_winter_fact() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_diy_razorgirl_winter_fact() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

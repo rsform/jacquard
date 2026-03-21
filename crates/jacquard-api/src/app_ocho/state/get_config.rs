@@ -45,9 +45,9 @@ pub struct GetConfigOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetConfigError<'a> {
     #[serde(rename = "InvalidID")]
-    InvalidId(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidId(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidServiceAuth")]
-    InvalidServiceAuth(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidServiceAuth(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetConfigError<'_> {
@@ -72,16 +72,16 @@ impl core::fmt::Display for GetConfigError<'_> {
     }
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct GetConfig;
 /// Response type for

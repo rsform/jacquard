@@ -18,29 +18,29 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Code<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub language: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub language: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub syntax_highlighting_theme: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub syntax_highlighting_theme: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Code<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Code<'a> {
     fn nsid() -> &'static str {
         "fyi.questionable.richtext.code"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fyi_questionable_richtext_code()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.language {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
@@ -129,7 +129,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Code<'a> {
     }
 }
 
-fn lexicon_doc_fyi_questionable_richtext_code() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_fyi_questionable_richtext_code() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

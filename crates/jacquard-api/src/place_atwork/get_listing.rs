@@ -35,9 +35,9 @@ pub struct GetListing<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetListingOutput<'a> {
     ///CID of the listing record
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///AT-URI of the listing
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
@@ -63,13 +63,13 @@ pub struct GetListingOutput<'a> {
 pub enum GetListingError<'a> {
     /// The requested listing does not exist
     #[serde(rename = "ListingNotFound")]
-    ListingNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    ListingNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Failed to parse the listing data
     #[serde(rename = "ListingParseFailed")]
-    ListingParseFailed(std::option::Option<jacquard_common::CowStr<'a>>),
+    ListingParseFailed(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Failed to fetch the listing from storage
     #[serde(rename = "ListingFetchFailed")]
-    ListingFetchFailed(std::option::Option<jacquard_common::CowStr<'a>>),
+    ListingFetchFailed(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetListingError<'_> {
@@ -137,37 +137,37 @@ pub mod get_listing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Rkey;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Rkey = S::Rkey;
+        type Repo = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Repo = S::Repo;
         type Rkey = Set<members::rkey>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Rkey = S::Rkey;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -240,8 +240,8 @@ where
 impl<'a, S> GetListingBuilder<'a, S>
 where
     S: get_listing_state::State,
-    S::Repo: get_listing_state::IsSet,
     S::Rkey: get_listing_state::IsSet,
+    S::Repo: get_listing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetListing<'a> {

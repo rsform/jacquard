@@ -61,9 +61,11 @@ pub struct List<'a> {
     ///Timestamp when the list was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Description of the list.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<crate::com_deckbelcher::richtext::Document<'a>>,
+    pub description: core::option::Option<
+        crate::com_deckbelcher::richtext::Document<'a>,
+    >,
     ///Items in the list.
     #[serde(borrow)]
     pub items: Vec<ListItemsItem<'a>>,
@@ -71,8 +73,8 @@ pub struct List<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Timestamp when the list was last updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::open_union]
@@ -106,9 +108,9 @@ pub enum ListItemsItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -128,36 +130,36 @@ impl<'a> List<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CardItem<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.collection.list"
     }
     fn def_name() -> &'static str {
         "cardItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_collection_list()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeckItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DeckItem<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.collection.list"
     }
     fn def_name() -> &'static str {
         "deckItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_collection_list()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -189,19 +191,19 @@ impl jacquard_common::types::collection::Collection for ListRecord {
     type Record = ListRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for List<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.collection.list"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_collection_list()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -248,37 +250,37 @@ pub mod card_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type AddedAt;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type AddedAt = S::AddedAt;
+        type Ref = Unset;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Ref = S::Ref;
         type AddedAt = Set<members::added_at>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type AddedAt = S::AddedAt;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
@@ -351,8 +353,8 @@ where
 impl<'a, S> CardItemBuilder<'a, S>
 where
     S: card_item_state::State,
-    S::Ref: card_item_state::IsSet,
     S::AddedAt: card_item_state::IsSet,
+    S::Ref: card_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CardItem<'a> {
@@ -365,7 +367,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -378,7 +380,7 @@ where
     }
 }
 
-fn lexicon_doc_com_deckbelcher_collection_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_deckbelcher_collection_list() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -755,7 +757,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -778,51 +780,51 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Items;
         type CreatedAt;
         type Name;
+        type Items;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Items = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `items` field to Set
-    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItems<S> {}
-    impl<S: State> State for SetItems<S> {
-        type Items = Set<members::items>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+        type Items = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Items = S::Items;
         type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
+        type Items = S::Items;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Items = S::Items;
         type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type Items = S::Items;
+    }
+    ///State transition - sets the `items` field to Set
+    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItems<S> {}
+    impl<S: State> State for SetItems<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Items = Set<members::items>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `items` field
-        pub struct items(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `items` field
+        pub struct items(());
     }
 }
 
@@ -955,9 +957,9 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Items: list_state::IsSet,
     S::CreatedAt: list_state::IsSet,
     S::Name: list_state::IsSet,
+    S::Items: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -973,7 +975,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

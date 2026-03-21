@@ -139,9 +139,9 @@ pub struct ConfigRegion<'a> {
     ///The minimum age (as a whole integer) required to use Bluesky in this region.
     pub min_access_age: i64,
     ///The ISO 3166-2 region code this configuration applies to. If omitted, the configuration applies to the entire country.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub region_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub region_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The ordered list of Age Assurance rules that apply to this region. Rules should be applied in order, and the first matching rule determines the access level granted. The rules array should always include a default rule as the last item.
     #[serde(borrow)]
     pub rules: Vec<ConfigRegionRulesItem<'a>>,
@@ -341,34 +341,34 @@ pub struct Event<'a> {
     #[serde(borrow)]
     pub attempt_id: jacquard_common::CowStr<'a>,
     ///The IP address used when completing the Age Assurance flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub complete_ip: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub complete_ip: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The user agent used when completing the Age Assurance flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub complete_ua: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub complete_ua: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The ISO 3166-1 alpha-2 country code provided when beginning the Age Assurance flow.
     #[serde(borrow)]
     pub country_code: jacquard_common::CowStr<'a>,
     ///The date and time of this write operation.
     pub created_at: jacquard_common::types::string::Datetime,
     ///The email used for Age Assurance.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The IP address used when initiating the Age Assurance flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub init_ip: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub init_ip: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The user agent used when initiating the Age Assurance flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub init_ua: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub init_ua: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The ISO 3166-2 region code provided when beginning the Age Assurance flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub region_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub region_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The status of the Age Assurance process.
     #[serde(borrow)]
     pub status: EventStatus<'a>,
@@ -588,8 +588,10 @@ pub struct State<'a> {
     #[serde(borrow)]
     pub access: crate::app_bsky::ageassurance::Access<'a>,
     ///The timestamp when this state was last updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_initiated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_initiated_at: core::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     #[serde(borrow)]
     pub status: crate::app_bsky::ageassurance::Status<'a>,
 }
@@ -609,8 +611,8 @@ pub struct State<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct StateMetadata<'a> {
     ///The account creation timestamp.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub account_created_at: std::option::Option<
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub account_created_at: core::option::Option<
         jacquard_common::types::string::Datetime,
     >,
 }
@@ -708,58 +710,58 @@ impl jacquard_common::IntoStatic for Status<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Config<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Config<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
     fn def_name() -> &'static str {
         "config"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConfigRegion<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ConfigRegion<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
     fn def_name() -> &'static str {
         "configRegion"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConfigRegionRuleDefault<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ConfigRegionRuleDefault<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
     fn def_name() -> &'static str {
         "configRegionRuleDefault"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
+impl<'a> jacquard_lexicon::schema::LexiconSchema
 for ConfigRegionRuleIfAccountNewerThan<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
@@ -767,17 +769,17 @@ for ConfigRegionRuleIfAccountNewerThan<'a> {
     fn def_name() -> &'static str {
         "configRegionRuleIfAccountNewerThan"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
+impl<'a> jacquard_lexicon::schema::LexiconSchema
 for ConfigRegionRuleIfAccountOlderThan<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
@@ -785,17 +787,17 @@ for ConfigRegionRuleIfAccountOlderThan<'a> {
     fn def_name() -> &'static str {
         "configRegionRuleIfAccountOlderThan"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
+impl<'a> jacquard_lexicon::schema::LexiconSchema
 for ConfigRegionRuleIfAssuredOverAge<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
@@ -803,17 +805,17 @@ for ConfigRegionRuleIfAssuredOverAge<'a> {
     fn def_name() -> &'static str {
         "configRegionRuleIfAssuredOverAge"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
+impl<'a> jacquard_lexicon::schema::LexiconSchema
 for ConfigRegionRuleIfAssuredUnderAge<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
@@ -821,17 +823,17 @@ for ConfigRegionRuleIfAssuredUnderAge<'a> {
     fn def_name() -> &'static str {
         "configRegionRuleIfAssuredUnderAge"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
+impl<'a> jacquard_lexicon::schema::LexiconSchema
 for ConfigRegionRuleIfDeclaredOverAge<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
@@ -839,17 +841,17 @@ for ConfigRegionRuleIfDeclaredOverAge<'a> {
     fn def_name() -> &'static str {
         "configRegionRuleIfDeclaredOverAge"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
+impl<'a> jacquard_lexicon::schema::LexiconSchema
 for ConfigRegionRuleIfDeclaredUnderAge<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
@@ -857,63 +859,63 @@ for ConfigRegionRuleIfDeclaredUnderAge<'a> {
     fn def_name() -> &'static str {
         "configRegionRuleIfDeclaredUnderAge"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
     fn def_name() -> &'static str {
         "event"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for State<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for State<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
     fn def_name() -> &'static str {
         "state"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StateMetadata<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for StateMetadata<'a> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
     fn def_name() -> &'static str {
         "stateMetadata"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_ageassurance_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1011,7 +1013,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1023,7 +1025,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_ageassurance_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_ageassurance_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -2109,7 +2111,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2226,7 +2228,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2382,7 +2384,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2539,7 +2541,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2696,7 +2698,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2853,7 +2855,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2876,37 +2878,37 @@ pub mod config_region_rule_if_declared_over_age_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Access;
         type Age;
+        type Access;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Access = Unset;
         type Age = Unset;
-    }
-    ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type Access = Set<members::access>;
-        type Age = S::Age;
+        type Access = Unset;
     }
     ///State transition - sets the `age` field to Set
     pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAge<S> {}
     impl<S: State> State for SetAge<S> {
-        type Access = S::Access;
         type Age = Set<members::age>;
+        type Access = S::Access;
+    }
+    ///State transition - sets the `access` field to Set
+    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccess<S> {}
+    impl<S: State> State for SetAccess<S> {
+        type Age = S::Age;
+        type Access = Set<members::access>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `access` field
-        pub struct access(());
         ///Marker type for the `age` field
         pub struct age(());
+        ///Marker type for the `access` field
+        pub struct access(());
     }
 }
 
@@ -2996,8 +2998,8 @@ where
 impl<'a, S> ConfigRegionRuleIfDeclaredOverAgeBuilder<'a, S>
 where
     S: config_region_rule_if_declared_over_age_state::State,
-    S::Access: config_region_rule_if_declared_over_age_state::IsSet,
     S::Age: config_region_rule_if_declared_over_age_state::IsSet,
+    S::Access: config_region_rule_if_declared_over_age_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfDeclaredOverAge<'a> {
@@ -3010,7 +3012,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3167,7 +3169,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3193,8 +3195,8 @@ pub mod event_state {
         type CountryCode;
         type CreatedAt;
         type Status;
-        type Access;
         type AttemptId;
+        type Access;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -3203,8 +3205,8 @@ pub mod event_state {
         type CountryCode = Unset;
         type CreatedAt = Unset;
         type Status = Unset;
-        type Access = Unset;
         type AttemptId = Unset;
+        type Access = Unset;
     }
     ///State transition - sets the `country_code` field to Set
     pub struct SetCountryCode<S: State = Empty>(PhantomData<fn() -> S>);
@@ -3213,8 +3215,8 @@ pub mod event_state {
         type CountryCode = Set<members::country_code>;
         type CreatedAt = S::CreatedAt;
         type Status = S::Status;
-        type Access = S::Access;
         type AttemptId = S::AttemptId;
+        type Access = S::Access;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -3223,8 +3225,8 @@ pub mod event_state {
         type CountryCode = S::CountryCode;
         type CreatedAt = Set<members::created_at>;
         type Status = S::Status;
-        type Access = S::Access;
         type AttemptId = S::AttemptId;
+        type Access = S::Access;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
@@ -3233,18 +3235,8 @@ pub mod event_state {
         type CountryCode = S::CountryCode;
         type CreatedAt = S::CreatedAt;
         type Status = Set<members::status>;
+        type AttemptId = S::AttemptId;
         type Access = S::Access;
-        type AttemptId = S::AttemptId;
-    }
-    ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type CountryCode = S::CountryCode;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type Access = Set<members::access>;
-        type AttemptId = S::AttemptId;
     }
     ///State transition - sets the `attempt_id` field to Set
     pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
@@ -3253,8 +3245,18 @@ pub mod event_state {
         type CountryCode = S::CountryCode;
         type CreatedAt = S::CreatedAt;
         type Status = S::Status;
-        type Access = S::Access;
         type AttemptId = Set<members::attempt_id>;
+        type Access = S::Access;
+    }
+    ///State transition - sets the `access` field to Set
+    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccess<S> {}
+    impl<S: State> State for SetAccess<S> {
+        type CountryCode = S::CountryCode;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type AttemptId = S::AttemptId;
+        type Access = Set<members::access>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -3265,10 +3267,10 @@ pub mod event_state {
         pub struct created_at(());
         ///Marker type for the `status` field
         pub struct status(());
-        ///Marker type for the `access` field
-        pub struct access(());
         ///Marker type for the `attempt_id` field
         pub struct attempt_id(());
+        ///Marker type for the `access` field
+        pub struct access(());
     }
 }
 
@@ -3527,8 +3529,8 @@ where
     S::CountryCode: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
     S::Status: event_state::IsSet,
-    S::Access: event_state::IsSet,
     S::AttemptId: event_state::IsSet,
+    S::Access: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -3550,7 +3552,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3582,37 +3584,37 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Access;
         type Status;
+        type Access;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Access = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type Access = Set<members::access>;
-        type Status = S::Status;
+        type Access = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Access = S::Access;
         type Status = Set<members::status>;
+        type Access = S::Access;
+    }
+    ///State transition - sets the `access` field to Set
+    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccess<S> {}
+    impl<S: State> State for SetAccess<S> {
+        type Status = S::Status;
+        type Access = Set<members::access>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `access` field
-        pub struct access(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `access` field
+        pub struct access(());
     }
 }
 
@@ -3705,8 +3707,8 @@ where
 impl<'a, S> StateBuilder<'a, S>
 where
     S: state_state::State,
-    S::Access: state_state::IsSet,
     S::Status: state_state::IsSet,
+    S::Access: state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> State<'a> {
@@ -3720,7 +3722,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

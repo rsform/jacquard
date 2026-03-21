@@ -16,26 +16,26 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuerySets<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name_prefix: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name_prefix: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `"name"`.
     #[serde(default = "_default_sort_by")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort_by: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `"asc"`.
     #[serde(default = "_default_sort_direction")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort_direction: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -50,9 +50,9 @@ pub struct QuerySets<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuerySetsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub sets: Vec<crate::tools_ozone::set::SetView<'a>>,
 }
@@ -83,15 +83,15 @@ impl jacquard_common::xrpc::XrpcEndpoint for QuerySetsRequest {
     type Response = QuerySetsResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_by() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_sort_by() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("name"))
 }
 
-fn _default_sort_direction() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_sort_direction() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("asc"))
 }
 

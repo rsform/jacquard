@@ -19,25 +19,25 @@
 #[serde(rename_all = "camelCase")]
 pub struct QueryEvents<'a> {
     ///Cursor for pagination
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Maximum number of results to return Defaults to `50`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_query_events_limit")]
-    pub limit: std::option::Option<i64>,
+    pub limit: core::option::Option<i64>,
     ///Filter by pattern type
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pattern_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub pattern_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Sort direction
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: std::option::Option<QueryEventsSortDirection<'a>>,
+    pub sort_direction: core::option::Option<QueryEventsSortDirection<'a>>,
     ///Filter by specific URLs or domains
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub urls: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub urls: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Sort direction
@@ -144,9 +144,9 @@ impl jacquard_common::IntoStatic for QueryEventsSortDirection<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct QueryEventsOutput<'a> {
     ///Next cursor for pagination. Only present if there are more results.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub events: Vec<crate::tools_ozone::safelink::Event<'a>>,
 }
@@ -181,6 +181,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
     type Response = QueryEventsResponse;
 }
 
-fn _default_query_events_limit() -> std::option::Option<i64> {
+fn _default_query_events_limit() -> core::option::Option<i64> {
     Some(50i64)
 }

@@ -16,13 +16,13 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchActors<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     #[serde(borrow)]
     pub q: jacquard_common::CowStr<'a>,
 }
@@ -41,9 +41,9 @@ pub struct SearchActors<'a> {
 pub struct SearchActorsOutput<'a> {
     #[serde(borrow)]
     pub actors: Vec<crate::sh_weaver::actor::ProfileView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for
@@ -72,7 +72,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsRequest {
     type Response = SearchActorsResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(25i64)
 }
 

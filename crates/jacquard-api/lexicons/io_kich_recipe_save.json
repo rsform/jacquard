@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "io.kich.recipe.save",
+  "description": "Record declaring a saved public recipe reference.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Reference to the saved recipe (io.kich.recipe.recipe).",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "via": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

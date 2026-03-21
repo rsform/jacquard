@@ -19,45 +19,45 @@
 #[serde(rename_all = "camelCase")]
 pub struct Callout<'a> {
     ///Background color (CSS color value)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Emoji icon for the callout Defaults to `"💡"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_callout_emoji")]
     #[serde(borrow)]
-    pub emoji: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub emoji: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Facets for text formatting
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub facets: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
     ///The callout text content
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Callout<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Callout<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.callout"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_callout()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_callout_emoji() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_callout_emoji() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("💡"))
 }
 
-fn lexicon_doc_app_offprint_block_callout() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_offprint_block_callout() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

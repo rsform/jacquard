@@ -16,15 +16,15 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubjectStatus<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub blob: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub blob: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -39,14 +39,14 @@ pub struct GetSubjectStatus<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSubjectStatusOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub deactivated: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub deactivated: core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
     #[serde(borrow)]
     pub subject: GetSubjectStatusOutputSubject<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub takedown: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub takedown: core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
 }
 
 #[jacquard_derive::open_union]

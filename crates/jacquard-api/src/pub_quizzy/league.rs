@@ -41,9 +41,9 @@ pub struct League<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LeagueGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -90,19 +90,19 @@ impl jacquard_common::types::collection::Collection for LeagueRecord {
     type Record = LeagueRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for League<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for League<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.league"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_league()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -189,50 +189,50 @@ pub mod league_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type QuizMasters;
-        type Teams;
         type Name;
+        type Teams;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type QuizMasters = Unset;
-        type Teams = Unset;
         type Name = Unset;
+        type Teams = Unset;
     }
     ///State transition - sets the `quiz_masters` field to Set
     pub struct SetQuizMasters<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuizMasters<S> {}
     impl<S: State> State for SetQuizMasters<S> {
         type QuizMasters = Set<members::quiz_masters>;
+        type Name = S::Name;
         type Teams = S::Teams;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `teams` field to Set
-    pub struct SetTeams<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeams<S> {}
-    impl<S: State> State for SetTeams<S> {
-        type QuizMasters = S::QuizMasters;
-        type Teams = Set<members::teams>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type QuizMasters = S::QuizMasters;
-        type Teams = S::Teams;
         type Name = Set<members::name>;
+        type Teams = S::Teams;
+    }
+    ///State transition - sets the `teams` field to Set
+    pub struct SetTeams<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeams<S> {}
+    impl<S: State> State for SetTeams<S> {
+        type QuizMasters = S::QuizMasters;
+        type Name = S::Name;
+        type Teams = Set<members::teams>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `quiz_masters` field
         pub struct quiz_masters(());
-        ///Marker type for the `teams` field
-        pub struct teams(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `teams` field
+        pub struct teams(());
     }
 }
 
@@ -326,8 +326,8 @@ impl<'a, S> LeagueBuilder<'a, S>
 where
     S: league_state::State,
     S::QuizMasters: league_state::IsSet,
-    S::Teams: league_state::IsSet,
     S::Name: league_state::IsSet,
+    S::Teams: league_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> League<'a> {
@@ -341,7 +341,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -355,7 +355,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_quizzy_league() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_pub_quizzy_league() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pub.quizzy.league"),

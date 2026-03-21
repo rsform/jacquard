@@ -53,7 +53,7 @@ pub struct GetEntryOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetEntryError<'a> {
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    EntryNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetEntryError<'_> {

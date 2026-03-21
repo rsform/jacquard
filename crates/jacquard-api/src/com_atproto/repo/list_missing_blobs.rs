@@ -16,13 +16,13 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListMissingBlobs<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `500`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -39,9 +39,9 @@ pub struct ListMissingBlobs<'a> {
 pub struct ListMissingBlobsOutput<'a> {
     #[serde(borrow)]
     pub blobs: Vec<crate::com_atproto::repo::list_missing_blobs::RecordBlob<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -88,24 +88,24 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListMissingBlobsRequest {
     type Response = ListMissingBlobsResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordBlob<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RecordBlob<'a> {
     fn nsid() -> &'static str {
         "com.atproto.repo.listMissingBlobs"
     }
     fn def_name() -> &'static str {
         "recordBlob"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_repo_listMissingBlobs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(500i64)
 }
 
@@ -208,37 +208,37 @@ pub mod record_blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type RecordUri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type RecordUri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type RecordUri = S::RecordUri;
+        type Cid = Unset;
     }
     ///State transition - sets the `record_uri` field to Set
     pub struct SetRecordUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordUri<S> {}
     impl<S: State> State for SetRecordUri<S> {
-        type Cid = S::Cid;
         type RecordUri = Set<members::record_uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type RecordUri = S::RecordUri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `record_uri` field
         pub struct record_uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -311,8 +311,8 @@ where
 impl<'a, S> RecordBlobBuilder<'a, S>
 where
     S: record_blob_state::State,
-    S::Cid: record_blob_state::IsSet,
     S::RecordUri: record_blob_state::IsSet,
+    S::Cid: record_blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordBlob<'a> {
@@ -325,7 +325,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -338,7 +338,7 @@ where
     }
 }
 
-fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atproto_repo_listMissingBlobs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

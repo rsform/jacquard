@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct Enrollment<'a> {
     ///List of boundaries the user has access to on this Stratos service.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub boundaries: std::option::Option<Vec<crate::zone_stratos::boundary::Domain<'a>>>,
+    pub boundaries: core::option::Option<Vec<crate::zone_stratos::boundary::Domain<'a>>>,
     ///Timestamp when the enrollment was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///The Stratos service endpoint URL where this user's private data is stored.
@@ -41,9 +41,9 @@ pub struct Enrollment<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EnrollmentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -90,19 +90,19 @@ impl jacquard_common::types::collection::Collection for EnrollmentRecord {
     type Record = EnrollmentRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Enrollment<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Enrollment<'a> {
     fn nsid() -> &'static str {
         "zone.stratos.actor.enrollment"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_zone_stratos_actor_enrollment()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.boundaries {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
@@ -267,7 +267,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -281,7 +281,7 @@ where
     }
 }
 
-fn lexicon_doc_zone_stratos_actor_enrollment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_zone_stratos_actor_enrollment() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -55,13 +55,13 @@ pub struct RefreshIdentityOutput<'a> {
 pub enum RefreshIdentityError<'a> {
     /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    HandleNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
-    DidNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    DidNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
-    DidDeactivated(std::option::Option<jacquard_common::CowStr<'a>>),
+    DidDeactivated(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for RefreshIdentityError<'_> {
@@ -216,7 +216,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

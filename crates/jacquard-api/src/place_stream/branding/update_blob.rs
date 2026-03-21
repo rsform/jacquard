@@ -19,15 +19,15 @@
 #[serde(rename_all = "camelCase")]
 pub struct UpdateBlob<'a> {
     ///DID of the broadcaster. If not provided, uses the server's default broadcaster.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub broadcaster: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub broadcaster: core::option::Option<jacquard_common::types::string::Did<'a>>,
     ///Base64-encoded blob data
     #[serde(borrow)]
     pub data: jacquard_common::CowStr<'a>,
     ///Image height in pixels (optional, for images only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub height: core::option::Option<i64>,
     ///Branding asset key (mainLogo, favicon, siteTitle, etc.)
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
@@ -35,8 +35,8 @@ pub struct UpdateBlob<'a> {
     #[serde(borrow)]
     pub mime_type: jacquard_common::CowStr<'a>,
     ///Image width in pixels (optional, for images only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub width: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -71,10 +71,10 @@ pub struct UpdateBlobOutput<'a> {
 pub enum UpdateBlobError<'a> {
     /// The authenticated DID is not authorized to modify branding
     #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The blob exceeds the maximum size limit
     #[serde(rename = "BlobTooLarge")]
-    BlobTooLarge(std::option::Option<jacquard_common::CowStr<'a>>),
+    BlobTooLarge(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateBlobError<'_> {

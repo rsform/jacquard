@@ -16,13 +16,13 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetReviews<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -39,9 +39,9 @@ pub struct GetReviews<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetReviewsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub reviews: Vec<crate::games_gamesgamesgamesgames::get_reviews::PopfeedReview<'a>>,
 }
@@ -58,24 +58,24 @@ pub struct GetReviewsOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PopfeedReview<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub contains_spoilers: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contains_spoilers: core::option::Option<bool>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub facets: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
     pub rating: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -106,19 +106,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetReviewsRequest {
     type Response = GetReviewsResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PopfeedReview<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PopfeedReview<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.getReviews"
     }
     fn def_name() -> &'static str {
         "popfeedReview"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_getReviews()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.rating;
             if *value > 10i64 {
@@ -147,7 +147,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PopfeedReview<'a> {
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(20i64)
 }
 
@@ -285,65 +285,65 @@ pub mod popfeed_review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type CreatedAt;
         type Rating;
+        type CreatedAt;
+        type Uri;
         type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type CreatedAt = Unset;
         type Rating = Unset;
+        type CreatedAt = Unset;
+        type Uri = Unset;
         type Did = Unset;
     }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRating<S> {}
+    impl<S: State> State for SetRating<S> {
+        type Rating = Set<members::rating>;
         type CreatedAt = S::CreatedAt;
-        type Rating = S::Rating;
+        type Uri = S::Uri;
         type Did = S::Did;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
-        type CreatedAt = Set<members::created_at>;
         type Rating = S::Rating;
+        type CreatedAt = Set<members::created_at>;
+        type Uri = S::Uri;
         type Did = S::Did;
     }
-    ///State transition - sets the `rating` field to Set
-    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRating<S> {}
-    impl<S: State> State for SetRating<S> {
-        type Uri = S::Uri;
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Rating = S::Rating;
         type CreatedAt = S::CreatedAt;
-        type Rating = Set<members::rating>;
+        type Uri = Set<members::uri>;
         type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
         type Rating = S::Rating;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
         type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `rating` field
         pub struct rating(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
     }
@@ -556,9 +556,9 @@ where
 impl<'a, S> PopfeedReviewBuilder<'a, S>
 where
     S: popfeed_review_state::State,
-    S::Uri: popfeed_review_state::IsSet,
-    S::CreatedAt: popfeed_review_state::IsSet,
     S::Rating: popfeed_review_state::IsSet,
+    S::CreatedAt: popfeed_review_state::IsSet,
+    S::Uri: popfeed_review_state::IsSet,
     S::Did: popfeed_review_state::IsSet,
 {
     /// Build the final struct
@@ -579,7 +579,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -599,7 +599,7 @@ where
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_games_gamesgamesgamesgames_getReviews() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

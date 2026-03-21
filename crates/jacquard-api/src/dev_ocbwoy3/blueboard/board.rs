@@ -41,9 +41,9 @@ pub struct Board<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BoardGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -90,19 +90,19 @@ impl jacquard_common::types::collection::Collection for BoardRecord {
     type Record = BoardRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Board<'a> {
     fn nsid() -> &'static str {
         "dev.ocbwoy3.blueboard.board"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_ocbwoy3_blueboard_board()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.description;
             {
@@ -149,67 +149,67 @@ pub mod board_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Nsfw;
         type Description;
-        type CreatedAt;
+        type Nsfw;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Nsfw = Unset;
         type Description = Unset;
-        type CreatedAt = Unset;
+        type Nsfw = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `nsfw` field to Set
-    pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNsfw<S> {}
-    impl<S: State> State for SetNsfw<S> {
-        type Nsfw = Set<members::nsfw>;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type Nsfw = S::Nsfw;
         type Description = Set<members::description>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Nsfw = S::Nsfw;
-        type Description = S::Description;
-        type CreatedAt = Set<members::created_at>;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `nsfw` field to Set
+    pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNsfw<S> {}
+    impl<S: State> State for SetNsfw<S> {
+        type Description = S::Description;
+        type Nsfw = Set<members::nsfw>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Nsfw = S::Nsfw;
         type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
+        type Nsfw = S::Nsfw;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Description = S::Description;
+        type Nsfw = S::Nsfw;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `nsfw` field
-        pub struct nsfw(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `nsfw` field
+        pub struct nsfw(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -322,10 +322,10 @@ where
 impl<'a, S> BoardBuilder<'a, S>
 where
     S: board_state::State,
-    S::Nsfw: board_state::IsSet,
     S::Description: board_state::IsSet,
-    S::CreatedAt: board_state::IsSet,
+    S::Nsfw: board_state::IsSet,
     S::Title: board_state::IsSet,
+    S::CreatedAt: board_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Board<'a> {
@@ -340,7 +340,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -355,7 +355,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_ocbwoy3_blueboard_board() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

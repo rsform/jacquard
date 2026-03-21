@@ -22,36 +22,36 @@ pub struct Fsq<'a> {
     ///The unique identifier of a Foursquare POI.
     #[serde(borrow)]
     pub fsq_place_id: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub latitude: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub latitude: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub longitude: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub longitude: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fsq<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Fsq<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.location.fsq"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_location_fsq()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_community_lexicon_location_fsq() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_community_lexicon_location_fsq() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

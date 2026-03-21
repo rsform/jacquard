@@ -33,9 +33,9 @@ pub struct Steps<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StepsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -82,19 +82,19 @@ impl jacquard_common::types::collection::Collection for StepsRecord {
     type Record = StepsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Steps<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Steps<'a> {
     fn nsid() -> &'static str {
         "dev.baileytownsend.health.steps"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_baileytownsend_health_steps()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -109,37 +109,37 @@ pub mod steps_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Steps;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Steps = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Steps = S::Steps;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `steps` field to Set
     pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSteps<S> {}
     impl<S: State> State for SetSteps<S> {
-        type CreatedAt = S::CreatedAt;
         type Steps = Set<members::steps>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Steps = S::Steps;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `steps` field
         pub struct steps(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -212,8 +212,8 @@ where
 impl<'a, S> StepsBuilder<'a, S>
 where
     S: steps_state::State,
-    S::CreatedAt: steps_state::IsSet,
     S::Steps: steps_state::IsSet,
+    S::CreatedAt: steps_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Steps<'a> {
@@ -226,7 +226,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -239,7 +239,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_baileytownsend_health_steps() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_baileytownsend_health_steps() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

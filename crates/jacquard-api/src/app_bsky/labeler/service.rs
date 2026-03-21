@@ -19,27 +19,27 @@
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(borrow)]
     pub policies: crate::app_bsky::labeler::LabelerPolicies<'a>,
     ///The set of report reason 'codes' which are in-scope for this service to review and action. These usually align to policy categories. If not defined (distinct from empty array), all reason types are allowed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason_types: std::option::Option<
+    pub reason_types: core::option::Option<
         Vec<crate::com_atproto::moderation::ReasonType<'a>>,
     >,
     ///Set of record types (collection NSIDs) which can be reported to this service. If not defined (distinct from empty array), default is any record type.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_collections: std::option::Option<
+    pub subject_collections: core::option::Option<
         Vec<jacquard_common::types::string::Nsid<'a>>,
     >,
     ///The set of subject types (account, record, etc) this service accepts reports on.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_types: std::option::Option<
+    pub subject_types: core::option::Option<
         Vec<crate::com_atproto::moderation::SubjectType<'a>>,
     >,
 }
@@ -56,9 +56,9 @@ pub struct Service<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -105,19 +105,19 @@ impl jacquard_common::types::collection::Collection for ServiceRecord {
     type Record = ServiceRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Service<'a> {
     fn nsid() -> &'static str {
         "app.bsky.labeler.service"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_labeler_service()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -333,7 +333,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -350,7 +350,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_labeler_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_labeler_service() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

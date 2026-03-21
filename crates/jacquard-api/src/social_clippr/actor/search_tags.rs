@@ -16,16 +16,16 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchTags<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub actor: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub actor: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     #[serde(borrow)]
     pub q: jacquard_common::CowStr<'a>,
 }
@@ -43,9 +43,9 @@ pub struct SearchTags<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SearchTagsOutput<'a> {
     ///A parameter to paginate results
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A list of tags and their associated details
     #[serde(borrow)]
     pub tags: Vec<crate::social_clippr::feed::TagView<'a>>,
@@ -77,7 +77,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchTagsRequest {
     type Response = SearchTagsResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(25i64)
 }
 

@@ -19,33 +19,33 @@
 #[serde(rename_all = "camelCase")]
 pub struct Contributor<'a> {
     ///Whether to render the contributor image as circular (default true)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub circular_image: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub circular_image: core::option::Option<bool>,
     ///StrongRef to the contributorInformation record
     #[serde(borrow)]
     pub contributor_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     ///Timestamp when the contributor record was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Iframe shown on hover
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_iframe_url: std::option::Option<
+    pub hover_iframe_url: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
     ///Image overlay shown on hover
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_image_url: std::option::Option<
+    pub hover_image_url: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
     ///Link URL for this contributor
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Direct video or Instagram URL
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub video_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub video_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -60,9 +60,9 @@ pub struct Contributor<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ContributorGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -109,19 +109,19 @@ impl jacquard_common::types::collection::Collection for ContributorRecord {
     type Record = ContributorRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contributor<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Contributor<'a> {
     fn nsid() -> &'static str {
         "org.hyperboards.contributor"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hyperboards_contributor()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -136,37 +136,37 @@ pub mod contributor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type ContributorRef;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type ContributorRef = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ContributorRef = S::ContributorRef;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `contributor_ref` field to Set
     pub struct SetContributorRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContributorRef<S> {}
     impl<S: State> State for SetContributorRef<S> {
-        type CreatedAt = S::CreatedAt;
         type ContributorRef = Set<members::contributor_ref>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ContributorRef = S::ContributorRef;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `contributor_ref` field
         pub struct contributor_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -333,8 +333,8 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
 impl<'a, S> ContributorBuilder<'a, S>
 where
     S: contributor_state::State,
-    S::CreatedAt: contributor_state::IsSet,
     S::ContributorRef: contributor_state::IsSet,
+    S::CreatedAt: contributor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Contributor<'a> {
@@ -352,7 +352,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -370,7 +370,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hyperboards_contributor() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hyperboards_contributor() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

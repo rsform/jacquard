@@ -33,9 +33,9 @@ pub struct GetProfile<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<crate::org_passingreads::actor::ProfileView<'a>>,
+    pub profile: core::option::Option<crate::org_passingreads::actor::ProfileView<'a>>,
 }
 
 /// Response type for

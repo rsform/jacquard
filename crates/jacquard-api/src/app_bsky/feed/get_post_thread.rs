@@ -18,12 +18,12 @@
 pub struct GetPostThread<'a> {
     ///Defaults to `6`. Min: 0. Max: 1000.
     #[serde(default = "_default_depth")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub depth: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub depth: core::option::Option<i64>,
     ///Defaults to `80`. Min: 0. Max: 1000.
     #[serde(default = "_default_parent_height")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub parent_height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub parent_height: core::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -42,9 +42,9 @@ pub struct GetPostThread<'a> {
 pub struct GetPostThreadOutput<'a> {
     #[serde(borrow)]
     pub thread: GetPostThreadOutputThread<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub threadgate: std::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
+    pub threadgate: core::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -84,7 +84,7 @@ pub enum GetPostThreadOutputThread<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetPostThreadError<'a> {
     #[serde(rename = "NotFound")]
-    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetPostThreadError<'_> {
@@ -128,11 +128,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadRequest {
     type Response = GetPostThreadResponse;
 }
 
-fn _default_depth() -> std::option::Option<i64> {
+fn _default_depth() -> core::option::Option<i64> {
     Some(6i64)
 }
 
-fn _default_parent_height() -> std::option::Option<i64> {
+fn _default_parent_height() -> core::option::Option<i64> {
     Some(80i64)
 }
 

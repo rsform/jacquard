@@ -36,19 +36,19 @@ pub struct AuthCallback<'a> {
     pub refresh_jwt: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthCallback<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AuthCallback<'a> {
     fn nsid() -> &'static str {
         "app.ocho.auth.defs"
     }
     fn def_name() -> &'static str {
         "authCallback"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_auth_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -64,66 +64,66 @@ pub mod auth_callback_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type RefreshJwt;
-        type Did;
-        type Handle;
         type AccessJwt;
+        type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type RefreshJwt = Unset;
-        type Did = Unset;
-        type Handle = Unset;
         type AccessJwt = Unset;
+        type Handle = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `refresh_jwt` field to Set
     pub struct SetRefreshJwt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRefreshJwt<S> {}
     impl<S: State> State for SetRefreshJwt<S> {
         type RefreshJwt = Set<members::refresh_jwt>;
-        type Did = S::Did;
+        type AccessJwt = S::AccessJwt;
         type Handle = S::Handle;
-        type AccessJwt = S::AccessJwt;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type RefreshJwt = S::RefreshJwt;
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
-        type AccessJwt = S::AccessJwt;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type RefreshJwt = S::RefreshJwt;
         type Did = S::Did;
-        type Handle = Set<members::handle>;
-        type AccessJwt = S::AccessJwt;
     }
     ///State transition - sets the `access_jwt` field to Set
     pub struct SetAccessJwt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccessJwt<S> {}
     impl<S: State> State for SetAccessJwt<S> {
         type RefreshJwt = S::RefreshJwt;
-        type Did = S::Did;
-        type Handle = S::Handle;
         type AccessJwt = Set<members::access_jwt>;
+        type Handle = S::Handle;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type RefreshJwt = S::RefreshJwt;
+        type AccessJwt = S::AccessJwt;
+        type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type RefreshJwt = S::RefreshJwt;
+        type AccessJwt = S::AccessJwt;
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `refresh_jwt` field
         pub struct refresh_jwt(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `access_jwt` field
         pub struct access_jwt(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -237,9 +237,9 @@ impl<'a, S> AuthCallbackBuilder<'a, S>
 where
     S: auth_callback_state::State,
     S::RefreshJwt: auth_callback_state::IsSet,
-    S::Did: auth_callback_state::IsSet,
-    S::Handle: auth_callback_state::IsSet,
     S::AccessJwt: auth_callback_state::IsSet,
+    S::Handle: auth_callback_state::IsSet,
+    S::Did: auth_callback_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AuthCallback<'a> {
@@ -254,7 +254,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -269,7 +269,7 @@ where
     }
 }
 
-fn lexicon_doc_app_ocho_auth_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_ocho_auth_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.ocho.auth.defs"),

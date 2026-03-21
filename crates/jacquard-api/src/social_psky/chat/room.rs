@@ -19,24 +19,24 @@
 #[serde(rename_all = "camelCase")]
 pub struct Room<'a> {
     ///List of users allowed to send messages in the room.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub allowlist: std::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
+    pub allowlist: core::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
     ///List of users disallowed to send messages in the room.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub denylist: std::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub languages: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    pub denylist: core::option::Option<crate::social_psky::chat::room::ModlistRef<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub languages: core::option::Option<Vec<jacquard_common::types::string::Language>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Topic title of the room.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub topic: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub topic: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -51,9 +51,9 @@ pub struct Room<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoomGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -119,19 +119,19 @@ impl jacquard_common::types::collection::Collection for RoomRecord {
     type Record = RoomRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Room<'a> {
     fn nsid() -> &'static str {
         "social.psky.chat.room"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_psky_chat_room()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.languages {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
@@ -222,19 +222,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModlistRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModlistRef<'a> {
     fn nsid() -> &'static str {
         "social.psky.chat.room"
     }
     fn def_name() -> &'static str {
         "modlistRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_psky_chat_room()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -434,7 +434,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -451,7 +451,7 @@ where
     }
 }
 
-fn lexicon_doc_social_psky_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_psky_chat_room() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -776,7 +776,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

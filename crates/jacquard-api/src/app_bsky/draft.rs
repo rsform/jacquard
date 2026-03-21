@@ -24,29 +24,29 @@ pub mod update_draft;
 #[serde(rename_all = "camelCase")]
 pub struct Draft<'a> {
     ///UUIDv4 identifier of the device that created this draft.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub device_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub device_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The device and/or platform on which the draft was created.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub device_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub device_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Indicates human language of posts primary text content.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub langs: core::option::Option<Vec<jacquard_common::types::string::Language>>,
     ///Embedding rules for the postgates to be created when this draft is published.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub postgate_embedding_rules: std::option::Option<
+    pub postgate_embedding_rules: core::option::Option<
         Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
     >,
     ///Array of draft posts that compose this draft.
     #[serde(borrow)]
     pub posts: Vec<crate::app_bsky::draft::DraftPost<'a>>,
     ///Allow-rules for the threadgate to be created when this draft is published.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub threadgate_allow: std::option::Option<Vec<DraftThreadgateAllowItem<'a>>>,
+    pub threadgate_allow: core::option::Option<Vec<DraftThreadgateAllowItem<'a>>>,
 }
 
 #[jacquard_derive::open_union]
@@ -117,9 +117,9 @@ pub struct DraftEmbedExternal<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftEmbedImage<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub local_ref: crate::app_bsky::draft::DraftEmbedLocalRef<'a>,
 }
@@ -170,12 +170,12 @@ pub struct DraftEmbedRecord<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftEmbedVideo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub captions: std::option::Option<
+    pub captions: core::option::Option<
         Vec<crate::app_bsky::draft::DraftEmbedCaption<'a>>,
     >,
     #[serde(borrow)]
@@ -196,30 +196,30 @@ pub struct DraftEmbedVideo<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DraftPost<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed_externals: std::option::Option<
+    pub embed_externals: core::option::Option<
         Vec<crate::app_bsky::draft::DraftEmbedExternal<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed_images: std::option::Option<
+    pub embed_images: core::option::Option<
         Vec<crate::app_bsky::draft::DraftEmbedImage<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed_records: std::option::Option<
+    pub embed_records: core::option::Option<
         Vec<crate::app_bsky::draft::DraftEmbedRecord<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed_videos: std::option::Option<
+    pub embed_videos: core::option::Option<
         Vec<crate::app_bsky::draft::DraftEmbedVideo<'a>>,
     >,
     ///Self-label values for this post. Effectively content warnings.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     ///The primary post content. It has a higher limit than post contents to allow storing a larger text that can later be refined into smaller posts.
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
@@ -267,19 +267,19 @@ pub struct DraftWithId<'a> {
     pub id: jacquard_common::types::string::Tid,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
     fn nsid() -> &'static str {
         "app.bsky.draft.defs"
     }
     fn def_name() -> &'static str {
         "draft"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.device_id {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -370,19 +370,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Draft<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedCaption<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DraftEmbedCaption<'a> {
     fn nsid() -> &'static str {
         "app.bsky.draft.defs"
     }
     fn def_name() -> &'static str {
         "draftEmbedCaption"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
@@ -400,36 +400,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedCaption<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedExternal<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DraftEmbedExternal<'a> {
     fn nsid() -> &'static str {
         "app.bsky.draft.defs"
     }
     fn def_name() -> &'static str {
         "draftEmbedExternal"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedImage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DraftEmbedImage<'a> {
     fn nsid() -> &'static str {
         "app.bsky.draft.defs"
     }
     fn def_name() -> &'static str {
         "draftEmbedImage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -452,19 +452,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedImage<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedLocalRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DraftEmbedLocalRef<'a> {
     fn nsid() -> &'static str {
         "app.bsky.draft.defs"
     }
     fn def_name() -> &'static str {
         "draftEmbedLocalRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.path;
             #[allow(unused_comparisons)]
@@ -495,36 +495,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedLocalRef<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedRecord<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DraftEmbedRecord<'a> {
     fn nsid() -> &'static str {
         "app.bsky.draft.defs"
     }
     fn def_name() -> &'static str {
         "draftEmbedRecord"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedVideo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DraftEmbedVideo<'a> {
     fn nsid() -> &'static str {
         "app.bsky.draft.defs"
     }
     fn def_name() -> &'static str {
         "draftEmbedVideo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -559,19 +559,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftEmbedVideo<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftPost<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DraftPost<'a> {
     fn nsid() -> &'static str {
         "app.bsky.draft.defs"
     }
     fn def_name() -> &'static str {
         "draftPost"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.embed_externals {
             #[allow(unused_comparisons)]
             if value.len() > 1usize {
@@ -656,36 +656,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftPost<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DraftView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.draft.defs"
     }
     fn def_name() -> &'static str {
         "draftView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftWithId<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DraftWithId<'a> {
     fn nsid() -> &'static str {
         "app.bsky.draft.defs"
     }
     fn def_name() -> &'static str {
         "draftWithId"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_draft_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -888,7 +888,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -905,9 +905,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_draft_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_bsky_draft_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.draft.defs"),
@@ -1749,7 +1747,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1855,7 +1853,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1975,7 +1973,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2081,7 +2079,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2222,7 +2220,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2246,67 +2244,67 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type Id;
         type Draft;
+        type UpdatedAt;
         type CreatedAt;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
-        type Id = Unset;
         type Draft = Unset;
+        type UpdatedAt = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Id = S::Id;
-        type Draft = S::Draft;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Id = Set<members::id>;
-        type Draft = S::Draft;
-        type CreatedAt = S::CreatedAt;
+        type Id = Unset;
     }
     ///State transition - sets the `draft` field to Set
     pub struct SetDraft<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDraft<S> {}
     impl<S: State> State for SetDraft<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
         type Draft = Set<members::draft>;
+        type UpdatedAt = S::UpdatedAt;
         type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Draft = S::Draft;
+        type UpdatedAt = Set<members::updated_at>;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Id = S::Id;
         type Draft = S::Draft;
+        type UpdatedAt = S::UpdatedAt;
         type CreatedAt = Set<members::created_at>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Draft = S::Draft;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `draft` field
         pub struct draft(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -2419,10 +2417,10 @@ where
 impl<'a, S> DraftViewBuilder<'a, S>
 where
     S: draft_view_state::State,
-    S::UpdatedAt: draft_view_state::IsSet,
-    S::Id: draft_view_state::IsSet,
     S::Draft: draft_view_state::IsSet,
+    S::UpdatedAt: draft_view_state::IsSet,
     S::CreatedAt: draft_view_state::IsSet,
+    S::Id: draft_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DraftView<'a> {
@@ -2437,7 +2435,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2462,37 +2460,37 @@ pub mod draft_with_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Draft;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Draft = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Draft = S::Draft;
+        type Id = Unset;
     }
     ///State transition - sets the `draft` field to Set
     pub struct SetDraft<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDraft<S> {}
     impl<S: State> State for SetDraft<S> {
-        type Id = S::Id;
         type Draft = Set<members::draft>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Draft = S::Draft;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `draft` field
         pub struct draft(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -2565,8 +2563,8 @@ where
 impl<'a, S> DraftWithIdBuilder<'a, S>
 where
     S: draft_with_id_state::State,
-    S::Id: draft_with_id_state::IsSet,
     S::Draft: draft_with_id_state::IsSet,
+    S::Id: draft_with_id_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DraftWithId<'a> {
@@ -2579,7 +2577,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -19,33 +19,33 @@
 #[serde(rename_all = "camelCase")]
 pub struct Activity<'a> {
     ///The number of active calories burned during the activity.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub calories: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub calories: core::option::Option<i64>,
     ///When the activity was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///The distance covered during the activity, if any. This is a string to allow for float values. pace.social support is in feet and meters.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub distance: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub distance: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The units used for distance measurement.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub distance_units: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub distance_units: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When the activity ended.
     pub ended_at: jacquard_common::types::string::Datetime,
     ///An export of the route taken during the activity, if any. A GPX or TCX file. Reminder, all atproto blobs are public. And is recommended if you do this to trim start and end.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub route: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub route: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Array of splits if any.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub splits: std::option::Option<Vec<crate::social_pace::feed::Split<'a>>>,
+    pub splits: core::option::Option<Vec<crate::social_pace::feed::Split<'a>>>,
     ///When the activity was started.
     pub started_at: jacquard_common::types::string::Datetime,
     ///The number of steps taken during the activity.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub steps: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub steps: core::option::Option<i64>,
     #[serde(borrow)]
     pub r#type: crate::social_pace::feed::ActivityType<'a>,
 }
@@ -62,9 +62,9 @@ pub struct Activity<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -111,19 +111,19 @@ impl jacquard_common::types::collection::Collection for ActivityRecord {
     type Record = ActivityRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
     fn nsid() -> &'static str {
         "social.pace.feed.activity"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_pace_feed_activity()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.distance_units {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
@@ -185,66 +185,66 @@ pub mod activity_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Type;
-        type StartedAt;
-        type EndedAt;
         type CreatedAt;
+        type EndedAt;
+        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Type = Unset;
-        type StartedAt = Unset;
-        type EndedAt = Unset;
         type CreatedAt = Unset;
+        type EndedAt = Unset;
+        type StartedAt = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
         type Type = Set<members::r#type>;
-        type StartedAt = S::StartedAt;
+        type CreatedAt = S::CreatedAt;
         type EndedAt = S::EndedAt;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type Type = S::Type;
-        type StartedAt = Set<members::started_at>;
-        type EndedAt = S::EndedAt;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `ended_at` field to Set
-    pub struct SetEndedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndedAt<S> {}
-    impl<S: State> State for SetEndedAt<S> {
-        type Type = S::Type;
         type StartedAt = S::StartedAt;
-        type EndedAt = Set<members::ended_at>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Type = S::Type;
-        type StartedAt = S::StartedAt;
-        type EndedAt = S::EndedAt;
         type CreatedAt = Set<members::created_at>;
+        type EndedAt = S::EndedAt;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `ended_at` field to Set
+    pub struct SetEndedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndedAt<S> {}
+    impl<S: State> State for SetEndedAt<S> {
+        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
+        type EndedAt = Set<members::ended_at>;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
+        type EndedAt = S::EndedAt;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `ended_at` field
-        pub struct ended_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `ended_at` field
+        pub struct ended_at(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
     }
 }
 
@@ -474,9 +474,9 @@ impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
     S::Type: activity_state::IsSet,
-    S::StartedAt: activity_state::IsSet,
-    S::EndedAt: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
+    S::EndedAt: activity_state::IsSet,
+    S::StartedAt: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -497,7 +497,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -518,7 +518,7 @@ where
     }
 }
 
-fn lexicon_doc_social_pace_feed_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_pace_feed_activity() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

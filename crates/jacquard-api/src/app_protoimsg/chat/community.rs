@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct CommunityGroup<'a> {
     ///Whether this is an inner circle group for presence visibility. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_community_group_is_inner_circle")]
-    pub is_inner_circle: std::option::Option<bool>,
+    pub is_inner_circle: core::option::Option<bool>,
     ///DIDs of group members.
     #[serde(borrow)]
     pub members: Vec<crate::app_protoimsg::chat::community::CommunityMember<'a>>,
@@ -80,9 +80,9 @@ pub struct Community<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommunityGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -102,19 +102,19 @@ impl<'a> Community<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityGroup<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CommunityGroup<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.community"
     }
     fn def_name() -> &'static str {
         "communityGroup"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_community()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.members;
             #[allow(unused_comparisons)]
@@ -145,19 +145,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityGroup<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityMember<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CommunityMember<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.community"
     }
     fn def_name() -> &'static str {
         "communityMember"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_community()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -189,19 +189,19 @@ impl jacquard_common::types::collection::Collection for CommunityRecord {
     type Record = CommunityRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Community<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Community<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.community"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_community()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.groups;
             #[allow(unused_comparisons)]
@@ -219,7 +219,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Community<'a> {
     }
 }
 
-fn _default_community_group_is_inner_circle() -> std::option::Option<bool> {
+fn _default_community_group_is_inner_circle() -> core::option::Option<bool> {
     Some(false)
 }
 
@@ -367,7 +367,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -381,7 +381,7 @@ where
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_community() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_protoimsg_chat_community() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -707,7 +707,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -815,7 +815,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

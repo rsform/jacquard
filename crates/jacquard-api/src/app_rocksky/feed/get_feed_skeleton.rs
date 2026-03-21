@@ -16,17 +16,17 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedSkeleton<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: jacquard_common::types::string::AtUri<'a>,
     ///(min: 1)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///(min: 0)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offset: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -43,12 +43,12 @@ pub struct GetFeedSkeleton<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedSkeletonOutput<'a> {
     ///The pagination cursor for the next set of results.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub scrobbles: std::option::Option<
+    pub scrobbles: core::option::Option<
         Vec<crate::app_rocksky::scrobble::ScrobbleViewBasic<'a>>,
     >,
 }

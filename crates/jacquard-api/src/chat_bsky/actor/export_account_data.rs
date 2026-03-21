@@ -19,16 +19,16 @@ pub struct ExportAccountDataOutput {
     pub body: jacquard_common::deps::bytes::Bytes,
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct ExportAccountData;
 /// Response type for

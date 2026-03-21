@@ -60,9 +60,9 @@ pub struct State<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -84,9 +84,9 @@ pub struct Site<'a> {
     ///Swap out Kris with Susie in the prophecy panel.
     pub susie_prophecy: bool,
     ///TBD
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title_colors: std::option::Option<SiteTitleColors<'a>>,
+    pub title_colors: core::option::Option<SiteTitleColors<'a>>,
 }
 
 /// TBD
@@ -201,19 +201,19 @@ impl<'a> State<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Favorite<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Favorite<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.state"
     }
     fn def_name() -> &'static str {
         "favorite"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_state()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -245,36 +245,36 @@ impl jacquard_common::types::collection::Collection for StateRecord {
     type Record = StateRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for State<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for State<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.state"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_state()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Site<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Site<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.state"
     }
     fn def_name() -> &'static str {
         "site"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_state()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -289,67 +289,67 @@ pub mod favorite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DeltaruneCharacter;
-        type Album;
         type Game;
         type Artist;
+        type Album;
+        type DeltaruneCharacter;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DeltaruneCharacter = Unset;
-        type Album = Unset;
         type Game = Unset;
         type Artist = Unset;
-    }
-    ///State transition - sets the `deltarune_character` field to Set
-    pub struct SetDeltaruneCharacter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDeltaruneCharacter<S> {}
-    impl<S: State> State for SetDeltaruneCharacter<S> {
-        type DeltaruneCharacter = Set<members::deltarune_character>;
-        type Album = S::Album;
-        type Game = S::Game;
-        type Artist = S::Artist;
-    }
-    ///State transition - sets the `album` field to Set
-    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbum<S> {}
-    impl<S: State> State for SetAlbum<S> {
-        type DeltaruneCharacter = S::DeltaruneCharacter;
-        type Album = Set<members::album>;
-        type Game = S::Game;
-        type Artist = S::Artist;
+        type Album = Unset;
+        type DeltaruneCharacter = Unset;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type DeltaruneCharacter = S::DeltaruneCharacter;
-        type Album = S::Album;
         type Game = Set<members::game>;
         type Artist = S::Artist;
+        type Album = S::Album;
+        type DeltaruneCharacter = S::DeltaruneCharacter;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
-        type DeltaruneCharacter = S::DeltaruneCharacter;
-        type Album = S::Album;
         type Game = S::Game;
         type Artist = Set<members::artist>;
+        type Album = S::Album;
+        type DeltaruneCharacter = S::DeltaruneCharacter;
+    }
+    ///State transition - sets the `album` field to Set
+    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlbum<S> {}
+    impl<S: State> State for SetAlbum<S> {
+        type Game = S::Game;
+        type Artist = S::Artist;
+        type Album = Set<members::album>;
+        type DeltaruneCharacter = S::DeltaruneCharacter;
+    }
+    ///State transition - sets the `deltarune_character` field to Set
+    pub struct SetDeltaruneCharacter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDeltaruneCharacter<S> {}
+    impl<S: State> State for SetDeltaruneCharacter<S> {
+        type Game = S::Game;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type DeltaruneCharacter = Set<members::deltarune_character>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `deltarune_character` field
-        pub struct deltarune_character(());
-        ///Marker type for the `album` field
-        pub struct album(());
         ///Marker type for the `game` field
         pub struct game(());
         ///Marker type for the `artist` field
         pub struct artist(());
+        ///Marker type for the `album` field
+        pub struct album(());
+        ///Marker type for the `deltarune_character` field
+        pub struct deltarune_character(());
     }
 }
 
@@ -462,10 +462,10 @@ where
 impl<'a, S> FavoriteBuilder<'a, S>
 where
     S: favorite_state::State,
-    S::DeltaruneCharacter: favorite_state::IsSet,
-    S::Album: favorite_state::IsSet,
     S::Game: favorite_state::IsSet,
     S::Artist: favorite_state::IsSet,
+    S::Album: favorite_state::IsSet,
+    S::DeltaruneCharacter: favorite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Favorite<'a> {
@@ -480,7 +480,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -495,7 +495,7 @@ where
     }
 }
 
-fn lexicon_doc_download_darkworld_state() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_download_darkworld_state() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -730,37 +730,37 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Favorite;
         type Site;
+        type Favorite;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Favorite = Unset;
         type Site = Unset;
-    }
-    ///State transition - sets the `favorite` field to Set
-    pub struct SetFavorite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavorite<S> {}
-    impl<S: State> State for SetFavorite<S> {
-        type Favorite = Set<members::favorite>;
-        type Site = S::Site;
+        type Favorite = Unset;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSite<S> {}
     impl<S: State> State for SetSite<S> {
-        type Favorite = S::Favorite;
         type Site = Set<members::site>;
+        type Favorite = S::Favorite;
+    }
+    ///State transition - sets the `favorite` field to Set
+    pub struct SetFavorite<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFavorite<S> {}
+    impl<S: State> State for SetFavorite<S> {
+        type Site = S::Site;
+        type Favorite = Set<members::favorite>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `favorite` field
-        pub struct favorite(());
         ///Marker type for the `site` field
         pub struct site(());
+        ///Marker type for the `favorite` field
+        pub struct favorite(());
     }
 }
 
@@ -833,8 +833,8 @@ where
 impl<'a, S> StateBuilder<'a, S>
 where
     S: state_state::State,
-    S::Favorite: state_state::IsSet,
     S::Site: state_state::IsSet,
+    S::Favorite: state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> State<'a> {
@@ -847,7 +847,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -971,7 +971,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

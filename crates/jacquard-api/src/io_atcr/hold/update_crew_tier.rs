@@ -59,10 +59,10 @@ pub struct UpdateCrewTierOutput<'a> {
 pub enum UpdateCrewTierError<'a> {
     /// Valid appview token required.
     #[serde(rename = "AuthRequired")]
-    AuthRequired(std::option::Option<jacquard_common::CowStr<'a>>),
+    AuthRequired(core::option::Option<jacquard_common::CowStr<'a>>),
     /// User is not a crew member on this hold.
     #[serde(rename = "UserNotFound")]
-    UserNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    UserNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateCrewTierError<'_> {
@@ -244,7 +244,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -1,0 +1,183 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.git.temp.getTree",
+  "defs": {
+    "lastCommit": {
+      "type": "object",
+      "required": [
+        "hash",
+        "message",
+        "when"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "#signature"
+        },
+        "hash": {
+          "type": "string",
+          "description": "Commit hash"
+        },
+        "message": {
+          "type": "string",
+          "description": "Commit message"
+        },
+        "when": {
+          "type": "string",
+          "description": "Commit timestamp",
+          "format": "datetime"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "ref"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path within the repository tree",
+            "default": ""
+          },
+          "ref": {
+            "type": "string",
+            "description": "Git reference (branch, tag, or commit SHA)"
+          },
+          "repo": {
+            "type": "string",
+            "description": "AT-URI of the repository",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "ref",
+            "files"
+          ],
+          "properties": {
+            "dotdot": {
+              "type": "string",
+              "description": "Parent directory path"
+            },
+            "files": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#treeEntry"
+              }
+            },
+            "lastCommit": {
+              "type": "ref",
+              "ref": "#lastCommit"
+            },
+            "parent": {
+              "type": "string",
+              "description": "The parent path in the tree"
+            },
+            "readme": {
+              "type": "ref",
+              "description": "Readme for this file tree",
+              "ref": "#readme"
+            },
+            "ref": {
+              "type": "string",
+              "description": "The git reference used"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Repository not found or access denied",
+          "name": "RepoNotFound"
+        },
+        {
+          "description": "Git reference not found",
+          "name": "RefNotFound"
+        },
+        {
+          "description": "Path not found in repository tree",
+          "name": "PathNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    },
+    "readme": {
+      "type": "object",
+      "required": [
+        "filename",
+        "contents"
+      ],
+      "properties": {
+        "contents": {
+          "type": "string",
+          "description": "Contents of the readme file"
+        },
+        "filename": {
+          "type": "string",
+          "description": "Name of the readme file"
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "required": [
+        "name",
+        "email",
+        "when"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Author email"
+        },
+        "name": {
+          "type": "string",
+          "description": "Author name"
+        },
+        "when": {
+          "type": "string",
+          "description": "Author timestamp",
+          "format": "datetime"
+        }
+      }
+    },
+    "treeEntry": {
+      "type": "object",
+      "required": [
+        "name",
+        "mode",
+        "size"
+      ],
+      "properties": {
+        "last_commit": {
+          "type": "ref",
+          "ref": "#lastCommit"
+        },
+        "mode": {
+          "type": "string",
+          "description": "File mode"
+        },
+        "name": {
+          "type": "string",
+          "description": "Relative file or directory name"
+        },
+        "size": {
+          "type": "integer",
+          "description": "File size in bytes"
+        }
+      }
+    }
+  }
+}

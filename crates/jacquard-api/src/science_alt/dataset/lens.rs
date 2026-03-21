@@ -20,16 +20,16 @@
 #[serde(rename_all = "camelCase")]
 pub struct CodeReference<'a> {
     ///Optional branch name (for reference, commit hash is authoritative)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub branch: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub branch: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Git commit hash (ensures immutability)
     #[serde(borrow)]
     pub commit: jacquard_common::CowStr<'a>,
     ///Programming language of the code at this reference. Prefer this over the top-level language field for per-function granularity.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub language: std::option::Option<
+    pub language: core::option::Option<
         crate::science_alt::dataset::programming_language::ProgrammingLanguage<'a>,
     >,
     ///Path to function within repository (e.g., 'lenses/vision.py:rgb_to_grayscale')
@@ -70,20 +70,20 @@ pub struct Lens<'a> {
     ///Timestamp when this lens was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///What this transformation does
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Code reference for getter function (Source -> Target)
     #[serde(borrow)]
     pub getter_code: crate::science_alt::dataset::lens::CodeReference<'a>,
     ///(Deprecated: use codeReference.language instead.) Programming language of the lens implementation (e.g., 'python', 'typescript')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub language: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub language: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Arbitrary metadata (author, performance notes, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<
+    pub metadata: core::option::Option<
         crate::science_alt::dataset::lens::LensMetadata<'a>,
     >,
     ///Human-readable lens name
@@ -96,16 +96,16 @@ pub struct Lens<'a> {
     #[serde(borrow)]
     pub source_schema: jacquard_common::types::string::AtUri<'a>,
     ///Semver version or range for source schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_schema_version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source_schema_version: core::option::Option<jacquard_common::CowStr<'a>>,
     ///AT-URI reference to target schema
     #[serde(borrow)]
     pub target_schema: jacquard_common::types::string::AtUri<'a>,
     ///Semver version or range for target schema compatibility (e.g., '1.0.0', '>=1.0.0 <2.0.0')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub target_schema_version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub target_schema_version: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -120,9 +120,9 @@ pub struct Lens<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LensGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -142,19 +142,19 @@ impl<'a> Lens<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lens"
     }
     fn def_name() -> &'static str {
         "codeReference"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_lens()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.branch {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -210,19 +210,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeReference<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LensMetadata<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LensMetadata<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lens"
     }
     fn def_name() -> &'static str {
         "lensMetadata"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_lens()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -254,19 +254,19 @@ impl jacquard_common::types::collection::Collection for LensRecord {
     type Record = LensRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lens"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_lens()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -358,7 +358,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lens<'a> {
     }
 }
 
-fn lexicon_doc_science_alt_dataset_lens() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_science_alt_dataset_lens() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -755,105 +755,105 @@ pub mod lens_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GetterCode;
-        type TargetSchema;
-        type Name;
-        type SourceSchema;
         type PutterCode;
+        type Name;
         type CreatedAt;
+        type SourceSchema;
+        type TargetSchema;
+        type GetterCode;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GetterCode = Unset;
-        type TargetSchema = Unset;
-        type Name = Unset;
-        type SourceSchema = Unset;
         type PutterCode = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `getter_code` field to Set
-    pub struct SetGetterCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGetterCode<S> {}
-    impl<S: State> State for SetGetterCode<S> {
-        type GetterCode = Set<members::getter_code>;
-        type TargetSchema = S::TargetSchema;
-        type Name = S::Name;
-        type SourceSchema = S::SourceSchema;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `target_schema` field to Set
-    pub struct SetTargetSchema<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetSchema<S> {}
-    impl<S: State> State for SetTargetSchema<S> {
-        type GetterCode = S::GetterCode;
-        type TargetSchema = Set<members::target_schema>;
-        type Name = S::Name;
-        type SourceSchema = S::SourceSchema;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type GetterCode = S::GetterCode;
-        type TargetSchema = S::TargetSchema;
-        type Name = Set<members::name>;
-        type SourceSchema = S::SourceSchema;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `source_schema` field to Set
-    pub struct SetSourceSchema<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSourceSchema<S> {}
-    impl<S: State> State for SetSourceSchema<S> {
-        type GetterCode = S::GetterCode;
-        type TargetSchema = S::TargetSchema;
-        type Name = S::Name;
-        type SourceSchema = Set<members::source_schema>;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = S::CreatedAt;
+        type SourceSchema = Unset;
+        type TargetSchema = Unset;
+        type GetterCode = Unset;
     }
     ///State transition - sets the `putter_code` field to Set
     pub struct SetPutterCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPutterCode<S> {}
     impl<S: State> State for SetPutterCode<S> {
-        type GetterCode = S::GetterCode;
-        type TargetSchema = S::TargetSchema;
-        type Name = S::Name;
-        type SourceSchema = S::SourceSchema;
         type PutterCode = Set<members::putter_code>;
+        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
+        type SourceSchema = S::SourceSchema;
+        type TargetSchema = S::TargetSchema;
+        type GetterCode = S::GetterCode;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type PutterCode = S::PutterCode;
+        type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+        type SourceSchema = S::SourceSchema;
+        type TargetSchema = S::TargetSchema;
+        type GetterCode = S::GetterCode;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type GetterCode = S::GetterCode;
-        type TargetSchema = S::TargetSchema;
-        type Name = S::Name;
-        type SourceSchema = S::SourceSchema;
         type PutterCode = S::PutterCode;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type SourceSchema = S::SourceSchema;
+        type TargetSchema = S::TargetSchema;
+        type GetterCode = S::GetterCode;
+    }
+    ///State transition - sets the `source_schema` field to Set
+    pub struct SetSourceSchema<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSourceSchema<S> {}
+    impl<S: State> State for SetSourceSchema<S> {
+        type PutterCode = S::PutterCode;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type SourceSchema = Set<members::source_schema>;
+        type TargetSchema = S::TargetSchema;
+        type GetterCode = S::GetterCode;
+    }
+    ///State transition - sets the `target_schema` field to Set
+    pub struct SetTargetSchema<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetSchema<S> {}
+    impl<S: State> State for SetTargetSchema<S> {
+        type PutterCode = S::PutterCode;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type SourceSchema = S::SourceSchema;
+        type TargetSchema = Set<members::target_schema>;
+        type GetterCode = S::GetterCode;
+    }
+    ///State transition - sets the `getter_code` field to Set
+    pub struct SetGetterCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGetterCode<S> {}
+    impl<S: State> State for SetGetterCode<S> {
+        type PutterCode = S::PutterCode;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type SourceSchema = S::SourceSchema;
+        type TargetSchema = S::TargetSchema;
+        type GetterCode = Set<members::getter_code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `getter_code` field
-        pub struct getter_code(());
-        ///Marker type for the `target_schema` field
-        pub struct target_schema(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `source_schema` field
-        pub struct source_schema(());
         ///Marker type for the `putter_code` field
         pub struct putter_code(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `source_schema` field
+        pub struct source_schema(());
+        ///Marker type for the `target_schema` field
+        pub struct target_schema(());
+        ///Marker type for the `getter_code` field
+        pub struct getter_code(());
     }
 }
 
@@ -1115,12 +1115,12 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
 impl<'a, S> LensBuilder<'a, S>
 where
     S: lens_state::State,
-    S::GetterCode: lens_state::IsSet,
-    S::TargetSchema: lens_state::IsSet,
-    S::Name: lens_state::IsSet,
-    S::SourceSchema: lens_state::IsSet,
     S::PutterCode: lens_state::IsSet,
+    S::Name: lens_state::IsSet,
     S::CreatedAt: lens_state::IsSet,
+    S::SourceSchema: lens_state::IsSet,
+    S::TargetSchema: lens_state::IsSet,
+    S::GetterCode: lens_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lens<'a> {
@@ -1142,7 +1142,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

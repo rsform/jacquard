@@ -18,9 +18,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateAllRead<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<UpdateAllReadStatus<'a>>,
+    pub status: core::option::Option<UpdateAllReadStatus<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

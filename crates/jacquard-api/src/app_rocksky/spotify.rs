@@ -26,48 +26,48 @@ pub mod seek;
 #[serde(rename_all = "camelCase")]
 pub struct SpotifyTrackView<'a> {
     ///The name of the album.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub album: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub artist: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The duration of the track in milliseconds.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration: core::option::Option<i64>,
     ///The unique identifier of the Spotify track.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the track.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A URL to a preview of the track.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub preview_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub preview_url: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpotifyTrackView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SpotifyTrackView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.spotify.defs"
     }
     fn def_name() -> &'static str {
         "spotifyTrackView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_spotify_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_app_rocksky_spotify_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_rocksky_spotify_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

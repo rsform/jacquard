@@ -47,9 +47,9 @@ pub struct Commit<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Info<'a> {
     ///Additional details about the info message.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The type of info message.
     #[serde(borrow)]
     pub name: InfoName<'a>,
@@ -150,14 +150,14 @@ impl jacquard_common::IntoStatic for InfoName<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeRecords<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cursor: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cursor: core::option::Option<i64>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     ///(max length: 253)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub domain: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub domain: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -226,10 +226,10 @@ impl<'a> SubscribeRecordsMessage<'a> {
 pub enum SubscribeRecordsError<'a> {
     /// Cursor is in the future.
     #[serde(rename = "FutureCursor")]
-    FutureCursor(std::option::Option<jacquard_common::CowStr<'a>>),
+    FutureCursor(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Authentication is required.
     #[serde(rename = "AuthRequired")]
-    AuthRequired(std::option::Option<jacquard_common::CowStr<'a>>),
+    AuthRequired(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for SubscribeRecordsError<'_> {
@@ -272,16 +272,16 @@ pub struct RecordOp<'a> {
     #[serde(borrow)]
     pub action: RecordOpAction<'a>,
     ///The CID of the record. Present for create and update operations.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::cid::CidLink<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::cid::CidLink<'a>>,
     ///The record path (collection/rkey).
     #[serde(borrow)]
     pub path: jacquard_common::CowStr<'a>,
     ///The record content. Present for create and update operations.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub record: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub record: core::option::Option<jacquard_common::types::value::Data<'a>>,
 }
 
 /// The type of operation.
@@ -378,36 +378,36 @@ impl jacquard_common::IntoStatic for RecordOpAction<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Commit<'a> {
     fn nsid() -> &'static str {
         "zone.stratos.sync.subscribeRecords"
     }
     fn def_name() -> &'static str {
         "commit"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_zone_stratos_sync_subscribeRecords()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Info<'a> {
     fn nsid() -> &'static str {
         "zone.stratos.sync.subscribeRecords"
     }
     fn def_name() -> &'static str {
         "info"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_zone_stratos_sync_subscribeRecords()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.message {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1024usize {
@@ -461,19 +461,19 @@ impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeRecordsEndpoint {
     type Stream = SubscribeRecordsStream;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordOp<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RecordOp<'a> {
     fn nsid() -> &'static str {
         "zone.stratos.sync.subscribeRecords"
     }
     fn def_name() -> &'static str {
         "recordOp"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_zone_stratos_sync_subscribeRecords()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.action;
             #[allow(unused_comparisons)]
@@ -514,85 +514,85 @@ pub mod commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev;
         type Seq;
-        type Time;
-        type Ops;
         type Did;
+        type Rev;
+        type Ops;
+        type Time;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev = Unset;
         type Seq = Unset;
-        type Time = Unset;
-        type Ops = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Rev = Set<members::rev>;
-        type Seq = S::Seq;
-        type Time = S::Time;
-        type Ops = S::Ops;
-        type Did = S::Did;
+        type Rev = Unset;
+        type Ops = Unset;
+        type Time = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeq<S> {}
     impl<S: State> State for SetSeq<S> {
-        type Rev = S::Rev;
         type Seq = Set<members::seq>;
-        type Time = S::Time;
-        type Ops = S::Ops;
         type Did = S::Did;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
         type Rev = S::Rev;
-        type Seq = S::Seq;
-        type Time = Set<members::time>;
         type Ops = S::Ops;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `ops` field to Set
-    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOps<S> {}
-    impl<S: State> State for SetOps<S> {
-        type Rev = S::Rev;
-        type Seq = S::Seq;
         type Time = S::Time;
-        type Ops = Set<members::ops>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Rev = S::Rev;
         type Seq = S::Seq;
-        type Time = S::Time;
-        type Ops = S::Ops;
         type Did = Set<members::did>;
+        type Rev = S::Rev;
+        type Ops = S::Ops;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Rev = Set<members::rev>;
+        type Ops = S::Ops;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `ops` field to Set
+    pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOps<S> {}
+    impl<S: State> State for SetOps<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Rev = S::Rev;
+        type Ops = Set<members::ops>;
+        type Time = S::Time;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Seq = S::Seq;
+        type Did = S::Did;
+        type Rev = S::Rev;
+        type Ops = S::Ops;
+        type Time = Set<members::time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `seq` field
         pub struct seq(());
-        ///Marker type for the `time` field
-        pub struct time(());
-        ///Marker type for the `ops` field
-        pub struct ops(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `ops` field
+        pub struct ops(());
+        ///Marker type for the `time` field
+        pub struct time(());
     }
 }
 
@@ -727,11 +727,11 @@ where
 impl<'a, S> CommitBuilder<'a, S>
 where
     S: commit_state::State,
-    S::Rev: commit_state::IsSet,
     S::Seq: commit_state::IsSet,
-    S::Time: commit_state::IsSet,
-    S::Ops: commit_state::IsSet,
     S::Did: commit_state::IsSet,
+    S::Rev: commit_state::IsSet,
+    S::Ops: commit_state::IsSet,
+    S::Time: commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Commit<'a> {
@@ -747,7 +747,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -763,7 +763,7 @@ where
     }
 }
 
-fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

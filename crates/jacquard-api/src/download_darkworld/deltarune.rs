@@ -84,12 +84,12 @@ pub struct LocationSchool<'a> {}
 #[serde(rename_all = "camelCase")]
 pub struct Deltarune<'a> {
     pub time: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tool: std::option::Option<DeltaruneTool<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tool: core::option::Option<DeltaruneTool<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#where: std::option::Option<DeltaruneWhere<'a>>,
+    pub r#where: core::option::Option<DeltaruneWhere<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -156,9 +156,9 @@ pub enum DeltaruneWhere<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeltaruneGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -243,87 +243,87 @@ impl<'a> Deltarune<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationElsewhere<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LocationElsewhere<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "locationElsewhere"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationHome<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LocationHome<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "locationHome"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationMathTextbook<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LocationMathTextbook<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "locationMathTextbook"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationOnSkin<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LocationOnSkin<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "locationOnSkin"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationSchool<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LocationSchool<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "locationSchool"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -355,109 +355,109 @@ impl jacquard_common::types::collection::Collection for DeltaruneRecord {
     type Record = DeltaruneRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deltarune<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Deltarune<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolFinger<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ToolFinger<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "toolFinger"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolMarker<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ToolMarker<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "toolMarker"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolOther<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ToolOther<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "toolOther"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolPen<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ToolPen<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "toolPen"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ToolPencil<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ToolPencil<'a> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
     fn def_name() -> &'static str {
         "toolPencil"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_download_darkworld_deltarune()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_download_darkworld_deltarune() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_download_darkworld_deltarune() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -805,7 +805,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

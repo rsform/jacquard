@@ -18,18 +18,18 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LocationObj<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub county: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub county: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locality: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub locality: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub state: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub state: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub zip_prefix: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub zip_prefix: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -46,27 +46,27 @@ pub struct LocationObj<'a> {
 pub struct Listing<'a> {
     #[serde(borrow)]
     pub category: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub condition: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub condition: core::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional external URL for purchasing the item (e.g., Amazon, eBay link)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_url: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_from_friends: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub external_url: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hide_from_friends: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub images: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
+    pub images: core::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
     #[serde(borrow)]
     pub location: crate::app_openmkt::marketplace::listing::LocationObj<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<
+    pub metadata: core::option::Option<
         crate::app_openmkt::marketplace::listing::MetadataObj<'a>,
     >,
     ///String representation
@@ -88,9 +88,9 @@ pub struct Listing<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListingGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -110,9 +110,9 @@ pub struct ListingGetRecordOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MetadataObj<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subcategory: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subcategory: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Listing<'a> {
@@ -128,19 +128,19 @@ impl<'a> Listing<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationObj<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LocationObj<'a> {
     fn nsid() -> &'static str {
         "app.openmkt.marketplace.listing"
     }
     fn def_name() -> &'static str {
         "locationObj"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_openmkt_marketplace_listing()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -172,19 +172,19 @@ impl jacquard_common::types::collection::Collection for ListingRecord {
     type Record = ListingRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
     fn nsid() -> &'static str {
         "app.openmkt.marketplace.listing"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_openmkt_marketplace_listing()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -226,24 +226,24 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MetadataObj<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MetadataObj<'a> {
     fn nsid() -> &'static str {
         "app.openmkt.marketplace.listing"
     }
     fn def_name() -> &'static str {
         "metadataObj"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_openmkt_marketplace_listing()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_app_openmkt_marketplace_listing() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_openmkt_marketplace_listing() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -577,9 +577,9 @@ pub mod listing_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
-        type Category;
         type Location;
         type Price;
+        type Category;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -587,9 +587,9 @@ pub mod listing_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
-        type Category = Unset;
         type Location = Unset;
         type Price = Unset;
+        type Category = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
@@ -597,19 +597,9 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
+        type Location = S::Location;
+        type Price = S::Price;
         type Category = S::Category;
-        type Location = S::Location;
-        type Price = S::Price;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `category` field to Set
-    pub struct SetCategory<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCategory<S> {}
-    impl<S: State> State for SetCategory<S> {
-        type Title = S::Title;
-        type Category = Set<members::category>;
-        type Location = S::Location;
-        type Price = S::Price;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `location` field to Set
@@ -617,9 +607,9 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetLocation<S> {}
     impl<S: State> State for SetLocation<S> {
         type Title = S::Title;
-        type Category = S::Category;
         type Location = Set<members::location>;
         type Price = S::Price;
+        type Category = S::Category;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `price` field to Set
@@ -627,9 +617,19 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetPrice<S> {}
     impl<S: State> State for SetPrice<S> {
         type Title = S::Title;
-        type Category = S::Category;
         type Location = S::Location;
         type Price = Set<members::price>;
+        type Category = S::Category;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `category` field to Set
+    pub struct SetCategory<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCategory<S> {}
+    impl<S: State> State for SetCategory<S> {
+        type Title = S::Title;
+        type Location = S::Location;
+        type Price = S::Price;
+        type Category = Set<members::category>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -637,9 +637,9 @@ pub mod listing_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Title = S::Title;
-        type Category = S::Category;
         type Location = S::Location;
         type Price = S::Price;
+        type Category = S::Category;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -647,12 +647,12 @@ pub mod listing_state {
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `category` field
-        pub struct category(());
         ///Marker type for the `location` field
         pub struct location(());
         ///Marker type for the `price` field
         pub struct price(());
+        ///Marker type for the `category` field
+        pub struct category(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -920,9 +920,9 @@ impl<'a, S> ListingBuilder<'a, S>
 where
     S: listing_state::State,
     S::Title: listing_state::IsSet,
-    S::Category: listing_state::IsSet,
     S::Location: listing_state::IsSet,
     S::Price: listing_state::IsSet,
+    S::Category: listing_state::IsSet,
     S::CreatedAt: listing_state::IsSet,
 {
     /// Build the final struct
@@ -945,7 +945,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -13,12 +13,12 @@
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct AutomatedTest;
-impl std::fmt::Display for AutomatedTest {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for AutomatedTest {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "automatedTest")
     }
 }
@@ -31,12 +31,12 @@ impl std::fmt::Display for AutomatedTest {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct CodeReview;
-impl std::fmt::Display for CodeReview {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for CodeReview {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "codeReview")
     }
 }
@@ -49,12 +49,12 @@ impl std::fmt::Display for CodeReview {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct FormalProof;
-impl std::fmt::Display for FormalProof {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for FormalProof {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "formalProof")
     }
 }
@@ -160,12 +160,12 @@ impl jacquard_common::IntoStatic for VerificationMethod<'_> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct SignedHash;
-impl std::fmt::Display for SignedHash {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for SignedHash {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "signedHash")
     }
 }

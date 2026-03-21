@@ -2467,6 +2467,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "jacquard-codegen-tests"
+version = "0.0.0"
+dependencies = [
+ "jacquard-common",
+ "jacquard-derive",
+ "jacquard-lexicon",
+ "miette",
+ "serde",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "jacquard-common"
 version = "0.10.1"
 dependencies = [

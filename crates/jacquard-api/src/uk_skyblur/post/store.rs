@@ -17,9 +17,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Store<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub additional: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub additional: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
     ///The URI must include the logged-in user's DID in the format at://did...
@@ -41,9 +41,9 @@ pub struct Store<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StoreOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     pub success: bool,
 }
 
@@ -88,50 +88,50 @@ pub mod store_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Text;
-        type Uri;
         type Visibility;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Text = Unset;
-        type Uri = Unset;
         type Visibility = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
         type Text = Set<members::text>;
+        type Visibility = S::Visibility;
         type Uri = S::Uri;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Text = S::Text;
-        type Uri = Set<members::uri>;
-        type Visibility = S::Visibility;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
         type Text = S::Text;
-        type Uri = S::Uri;
         type Visibility = Set<members::visibility>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Text = S::Text;
+        type Visibility = S::Visibility;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -245,8 +245,8 @@ impl<'a, S> StoreBuilder<'a, S>
 where
     S: store_state::State,
     S::Text: store_state::IsSet,
-    S::Uri: store_state::IsSet,
     S::Visibility: store_state::IsSet,
+    S::Uri: store_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Store<'a> {
@@ -261,7 +261,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

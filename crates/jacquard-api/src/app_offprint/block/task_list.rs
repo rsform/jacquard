@@ -37,9 +37,9 @@ pub struct TaskItem<'a> {
     ///Whether the task is completed
     pub checked: bool,
     ///Nested task items
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub children: std::option::Option<
+    pub children: core::option::Option<
         Vec<crate::app_offprint::block::task_list::TaskItem<'a>>,
     >,
     ///Text content of the task item
@@ -47,36 +47,36 @@ pub struct TaskItem<'a> {
     pub content: crate::app_offprint::block::text::Text<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaskList<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TaskList<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.taskList"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_taskList()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaskItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TaskItem<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.taskList"
     }
     fn def_name() -> &'static str {
         "taskItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_taskList()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -174,7 +174,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -186,7 +186,7 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_taskList() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_offprint_block_taskList() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -439,7 +439,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

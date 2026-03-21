@@ -59,19 +59,19 @@ pub enum ContentItemsItem<'a> {
     Website(Box<crate::fyi_questionable::richtext::website::Website<'a>>),
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Content<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Content<'a> {
     fn nsid() -> &'static str {
         "fyi.questionable.richtext.content"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fyi_questionable_richtext_content()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.items;
             #[allow(unused_comparisons)]
@@ -180,7 +180,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -192,7 +192,7 @@ where
     }
 }
 
-fn lexicon_doc_fyi_questionable_richtext_content() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_fyi_questionable_richtext_content() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

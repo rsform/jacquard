@@ -18,23 +18,23 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Diff<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub doc: crate::sh_weaver::edit::DocRef<'a>,
     ///An inline diff for for small edit batches. Either this or snapshot must be present to be valid
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub inline_diff: std::option::Option<jacquard_common::deps::bytes::Bytes>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub inline_diff: core::option::Option<jacquard_common::deps::bytes::Bytes>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub prev: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub prev: core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     #[serde(borrow)]
     pub root: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     ///Diff from previous diff. Either this or inlineDiff must be present to be valid
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub snapshot: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub snapshot: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -49,9 +49,9 @@ pub struct Diff<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DiffGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -98,19 +98,19 @@ impl jacquard_common::types::collection::Collection for DiffRecord {
     type Record = DiffRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Diff<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Diff<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.diff"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_diff()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.snapshot {
             {
                 let size = value.blob().size;
@@ -368,7 +368,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -385,9 +385,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_edit_diff() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_edit_diff() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.edit.diff"),

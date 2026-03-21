@@ -18,9 +18,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct WikiEntry<'a> {
     ///Alternative names for [[alias]] resolution
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aliases: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub aliases: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
@@ -28,18 +28,18 @@ pub struct WikiEntry<'a> {
     ///URL-safe identifier for [[slug]] linking
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<WikiEntryStatus<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub status: core::option::Option<WikiEntryStatus<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub summary: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub supersedes: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub supersedes: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
@@ -149,9 +149,9 @@ impl jacquard_common::IntoStatic for WikiEntryStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WikiEntryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -198,19 +198,19 @@ impl jacquard_common::types::collection::Collection for WikiEntryRecord {
     type Record = WikiEntryRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WikiEntry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for WikiEntry<'a> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.wikiEntry"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_diy_razorgirl_winter_wikiEntry()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.aliases {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
@@ -301,84 +301,84 @@ pub mod wiki_entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
-        type LastUpdated;
-        type CreatedAt;
         type Slug;
         type Content;
+        type CreatedAt;
+        type LastUpdated;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
-        type LastUpdated = Unset;
-        type CreatedAt = Unset;
         type Slug = Unset;
         type Content = Unset;
+        type CreatedAt = Unset;
+        type LastUpdated = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
-        type LastUpdated = S::LastUpdated;
+        type Slug = S::Slug;
+        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
-        type Slug = S::Slug;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type Title = S::Title;
-        type LastUpdated = Set<members::last_updated>;
-        type CreatedAt = S::CreatedAt;
-        type Slug = S::Slug;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type LastUpdated = S::LastUpdated;
-        type CreatedAt = Set<members::created_at>;
-        type Slug = S::Slug;
-        type Content = S::Content;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
         type Title = S::Title;
-        type LastUpdated = S::LastUpdated;
-        type CreatedAt = S::CreatedAt;
         type Slug = Set<members::slug>;
         type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type LastUpdated = S::LastUpdated;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
         type Title = S::Title;
-        type LastUpdated = S::LastUpdated;
-        type CreatedAt = S::CreatedAt;
         type Slug = S::Slug;
         type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+        type LastUpdated = S::LastUpdated;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Slug = S::Slug;
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
+        type LastUpdated = S::LastUpdated;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
+    impl<S: State> State for SetLastUpdated<S> {
+        type Title = S::Title;
+        type Slug = S::Slug;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+        type LastUpdated = Set<members::last_updated>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `slug` field
         pub struct slug(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
     }
 }
 
@@ -614,10 +614,10 @@ impl<'a, S> WikiEntryBuilder<'a, S>
 where
     S: wiki_entry_state::State,
     S::Title: wiki_entry_state::IsSet,
-    S::LastUpdated: wiki_entry_state::IsSet,
-    S::CreatedAt: wiki_entry_state::IsSet,
     S::Slug: wiki_entry_state::IsSet,
     S::Content: wiki_entry_state::IsSet,
+    S::CreatedAt: wiki_entry_state::IsSet,
+    S::LastUpdated: wiki_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WikiEntry<'a> {
@@ -638,7 +638,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -659,7 +659,7 @@ where
     }
 }
 
-fn lexicon_doc_diy_razorgirl_winter_wikiEntry() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_diy_razorgirl_winter_wikiEntry() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

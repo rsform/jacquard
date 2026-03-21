@@ -23,15 +23,15 @@ pub struct EvaluationTypeDefinition<'a> {
     #[serde(borrow)]
     pub identifier: jacquard_common::CowStr<'a>,
     ///Human-readable names and descriptions in various languages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locales: std::option::Option<
+    pub locales: core::option::Option<
         Vec<crate::app_gainforest::evaluator::service::EvaluationTypeLocale<'a>>,
     >,
     ///Default method info for this evaluation type (can be overridden per-evaluation).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub method: std::option::Option<crate::app_gainforest::evaluator::MethodInfo<'a>>,
+    pub method: core::option::Option<crate::app_gainforest::evaluator::MethodInfo<'a>>,
     ///The lexicon reference for the result type (e.g., 'app.gainforest.evaluator.defs#speciesIdResult').
     #[serde(borrow)]
     pub result_type: jacquard_common::CowStr<'a>,
@@ -76,22 +76,22 @@ pub struct EvaluationTypeLocale<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct EvaluatorPolicies<'a> {
     ///Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub access_model: std::option::Option<EvaluatorPoliciesAccessModel<'a>>,
+    pub access_model: core::option::Option<EvaluatorPoliciesAccessModel<'a>>,
     ///Detailed definitions for each evaluation type, including human-readable descriptions.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub evaluation_type_definitions: std::option::Option<
+    pub evaluation_type_definitions: core::option::Option<
         Vec<crate::app_gainforest::evaluator::service::EvaluationTypeDefinition<'a>>,
     >,
     ///List of evaluation type identifiers this evaluator produces (e.g., 'species-id', 'data-quality').
     #[serde(borrow)]
     pub evaluation_types: Vec<jacquard_common::CowStr<'a>>,
     ///NSIDs of record collections this evaluator can evaluate (e.g., 'app.gainforest.dwc.occurrence').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_collections: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub subject_collections: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
@@ -219,9 +219,9 @@ pub struct Service<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -241,19 +241,19 @@ impl<'a> Service<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeDefinition<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EvaluationTypeDefinition<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
     fn def_name() -> &'static str {
         "evaluationTypeDefinition"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_service()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.identifier;
             {
@@ -308,19 +308,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeDefinition<
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeLocale<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EvaluationTypeLocale<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
     fn def_name() -> &'static str {
         "evaluationTypeLocale"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_service()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.description;
             {
@@ -382,19 +382,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluationTypeLocale<'a> 
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EvaluatorPolicies<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EvaluatorPolicies<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
     fn def_name() -> &'static str {
         "evaluatorPolicies"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_service()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.access_model {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -481,24 +481,24 @@ impl jacquard_common::types::collection::Collection for ServiceRecord {
     type Record = ServiceRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Service<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_service()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_app_gainforest_evaluator_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_gainforest_evaluator_service() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1042,7 +1042,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1188,7 +1188,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

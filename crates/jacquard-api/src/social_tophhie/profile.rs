@@ -45,8 +45,8 @@ pub struct Profile<'a> {
     #[serde(borrow)]
     pub pds_preferences: crate::social_tophhie::profile::PdsPreferences<'a>,
     ///ISO 8601 timestamp when this profile record was updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -61,9 +61,9 @@ pub struct Profile<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -102,19 +102,19 @@ impl<'a> Profile<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunicationPreferences<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CommunicationPreferences<'a> {
     fn nsid() -> &'static str {
         "social.tophhie.profile"
     }
     fn def_name() -> &'static str {
         "communicationPreferences"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_tophhie_profile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -146,36 +146,36 @@ impl jacquard_common::types::collection::Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "social.tophhie.profile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_tophhie_profile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PdsPreferences<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PdsPreferences<'a> {
     fn nsid() -> &'static str {
         "social.tophhie.profile"
     }
     fn def_name() -> &'static str {
         "pdsPreferences"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_tophhie_profile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -280,7 +280,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -292,7 +292,7 @@ where
     }
 }
 
-fn lexicon_doc_social_tophhie_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_tophhie_profile() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -487,51 +487,51 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type CommunicationPreferences;
         type PdsPreferences;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type CommunicationPreferences = Unset;
         type PdsPreferences = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type CommunicationPreferences = S::CommunicationPreferences;
-        type PdsPreferences = S::PdsPreferences;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `communication_preferences` field to Set
     pub struct SetCommunicationPreferences<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommunicationPreferences<S> {}
     impl<S: State> State for SetCommunicationPreferences<S> {
-        type CreatedAt = S::CreatedAt;
         type CommunicationPreferences = Set<members::communication_preferences>;
         type PdsPreferences = S::PdsPreferences;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `pds_preferences` field to Set
     pub struct SetPdsPreferences<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPdsPreferences<S> {}
     impl<S: State> State for SetPdsPreferences<S> {
-        type CreatedAt = S::CreatedAt;
         type CommunicationPreferences = S::CommunicationPreferences;
         type PdsPreferences = Set<members::pds_preferences>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CommunicationPreferences = S::CommunicationPreferences;
+        type PdsPreferences = S::PdsPreferences;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `communication_preferences` field
         pub struct communication_preferences(());
         ///Marker type for the `pds_preferences` field
         pub struct pds_preferences(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -646,9 +646,9 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::CreatedAt: profile_state::IsSet,
     S::CommunicationPreferences: profile_state::IsSet,
     S::PdsPreferences: profile_state::IsSet,
+    S::CreatedAt: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
@@ -663,7 +663,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -802,7 +802,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

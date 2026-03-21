@@ -18,26 +18,26 @@
 #[serde(rename_all = "camelCase")]
 pub struct ListScheduledActions<'a> {
     ///Cursor for pagination
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Filter actions scheduled to execute before this time
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ends_before: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ends_before: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Maximum number of results to return Defaults to `50`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_list_scheduled_actions_limit")]
-    pub limit: std::option::Option<i64>,
+    pub limit: core::option::Option<i64>,
     ///Filter actions scheduled to execute after this time
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starts_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub starts_after: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Filter actions by status
     #[serde(borrow)]
     pub statuses: Vec<jacquard_common::CowStr<'a>>,
     ///Filter actions for specific DID subjects
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subjects: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub subjects: core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -55,9 +55,9 @@ pub struct ListScheduledActionsOutput<'a> {
     #[serde(borrow)]
     pub actions: Vec<crate::tools_ozone::moderation::ScheduledActionView<'a>>,
     ///Cursor for next page of results
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for
@@ -90,7 +90,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListScheduledActionsRequest {
     type Response = ListScheduledActionsResponse;
 }
 
-fn _default_list_scheduled_actions_limit() -> std::option::Option<i64> {
+fn _default_list_scheduled_actions_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
@@ -286,7 +286,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

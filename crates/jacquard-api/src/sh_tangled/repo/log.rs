@@ -16,18 +16,18 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Log<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///Defaults to `""`.
     #[serde(default = "_default_path")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub path: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -65,16 +65,16 @@ pub struct LogOutput {
 pub enum LogError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RefNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Path not found in repository
     #[serde(rename = "PathNotFound")]
-    PathNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    PathNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for LogError<'_> {
@@ -154,11 +154,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for LogRequest {
     type Response = LogResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
-fn _default_path() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_path() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from(""))
 }
 
@@ -172,37 +172,37 @@ pub mod log_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Ref;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Ref = S::Ref;
+        type Repo = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Repo = S::Repo;
         type Ref = Set<members::r#ref>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Ref = S::Ref;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -323,8 +323,8 @@ where
 impl<'a, S> LogBuilder<'a, S>
 where
     S: log_state::State,
-    S::Repo: log_state::IsSet,
     S::Ref: log_state::IsSet,
+    S::Repo: log_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Log<'a> {

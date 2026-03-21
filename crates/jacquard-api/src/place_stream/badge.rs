@@ -29,9 +29,9 @@ pub struct BadgeView<'a> {
     #[serde(borrow)]
     pub recipient: jacquard_common::types::string::Did<'a>,
     ///TODO: Cryptographic signature of the badge (of a place.stream.key).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub signature: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub signature: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -130,12 +130,12 @@ impl jacquard_common::IntoStatic for BadgeViewBadgeType<'_> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Mod;
-impl std::fmt::Display for Mod {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Mod {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "mod")
     }
 }
@@ -148,12 +148,12 @@ impl std::fmt::Display for Mod {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Streamer;
-impl std::fmt::Display for Streamer {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Streamer {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "streamer")
     }
 }
@@ -166,29 +166,29 @@ impl std::fmt::Display for Streamer {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Vip;
-impl std::fmt::Display for Vip {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Vip {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "vip")
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BadgeView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BadgeView<'a> {
     fn nsid() -> &'static str {
         "place.stream.badge.defs"
     }
     fn def_name() -> &'static str {
         "badgeView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_badge_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -203,51 +203,51 @@ pub mod badge_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type BadgeType;
         type Recipient;
         type Issuer;
-        type BadgeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type BadgeType = Unset;
         type Recipient = Unset;
         type Issuer = Unset;
-        type BadgeType = Unset;
-    }
-    ///State transition - sets the `recipient` field to Set
-    pub struct SetRecipient<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecipient<S> {}
-    impl<S: State> State for SetRecipient<S> {
-        type Recipient = Set<members::recipient>;
-        type Issuer = S::Issuer;
-        type BadgeType = S::BadgeType;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssuer<S> {}
-    impl<S: State> State for SetIssuer<S> {
-        type Recipient = S::Recipient;
-        type Issuer = Set<members::issuer>;
-        type BadgeType = S::BadgeType;
     }
     ///State transition - sets the `badge_type` field to Set
     pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBadgeType<S> {}
     impl<S: State> State for SetBadgeType<S> {
+        type BadgeType = Set<members::badge_type>;
         type Recipient = S::Recipient;
         type Issuer = S::Issuer;
-        type BadgeType = Set<members::badge_type>;
+    }
+    ///State transition - sets the `recipient` field to Set
+    pub struct SetRecipient<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecipient<S> {}
+    impl<S: State> State for SetRecipient<S> {
+        type BadgeType = S::BadgeType;
+        type Recipient = Set<members::recipient>;
+        type Issuer = S::Issuer;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssuer<S> {}
+    impl<S: State> State for SetIssuer<S> {
+        type BadgeType = S::BadgeType;
+        type Recipient = S::Recipient;
+        type Issuer = Set<members::issuer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `badge_type` field
+        pub struct badge_type(());
         ///Marker type for the `recipient` field
         pub struct recipient(());
         ///Marker type for the `issuer` field
         pub struct issuer(());
-        ///Marker type for the `badge_type` field
-        pub struct badge_type(());
     }
 }
 
@@ -360,9 +360,9 @@ impl<'a, S: badge_view_state::State> BadgeViewBuilder<'a, S> {
 impl<'a, S> BadgeViewBuilder<'a, S>
 where
     S: badge_view_state::State,
+    S::BadgeType: badge_view_state::IsSet,
     S::Recipient: badge_view_state::IsSet,
     S::Issuer: badge_view_state::IsSet,
-    S::BadgeType: badge_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BadgeView<'a> {
@@ -377,7 +377,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -392,7 +392,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_badge_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_badge_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

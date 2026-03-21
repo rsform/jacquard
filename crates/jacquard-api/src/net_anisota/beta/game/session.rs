@@ -20,26 +20,26 @@
 #[serde(rename_all = "camelCase")]
 pub struct ActivitySummary<'a> {
     ///Player's current level at the time of this session update
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub current_level: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub current_level: core::option::Option<i64>,
     ///Player's total XP at the time of this session update
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub current_xp: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub current_xp: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub game_actions: std::option::Option<
+    pub game_actions: core::option::Option<
         crate::net_anisota::beta::game::session::GameActions<'a>,
     >,
     ///List of unique pages/routes visited
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pages_visited: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub pages_visited: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Total number of events logged in this session
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_events: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub total_events: core::option::Option<i64>,
     ///Total XP gained during this specific session
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub xp_gained_this_session: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub xp_gained_this_session: core::option::Option<i64>,
 }
 
 /// Game-specific actions performed
@@ -56,18 +56,18 @@ pub struct ActivitySummary<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GameActions<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub daily_rewards_claimed: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub feeds_loaded: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub items_collected: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub level_ups: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_viewed: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub specimens_collected: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub daily_rewards_claimed: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub feeds_loaded: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub items_collected: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub level_ups: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub posts_viewed: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub specimens_collected: core::option::Option<i64>,
 }
 
 /// A game session record tracking a continuous period of user engagement with the application
@@ -83,57 +83,57 @@ pub struct GameActions<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Session<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub activity_summary: std::option::Option<
+    pub activity_summary: core::option::Option<
         crate::net_anisota::beta::game::session::ActivitySummary<'a>,
     >,
     ///Version of the client application
     #[serde(borrow)]
     pub client_version: jacquard_common::CowStr<'a>,
     ///When the session record was created
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Total session duration in milliseconds (calculated when session ends)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration: core::option::Option<i64>,
     ///Why the session ended
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub end_reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub end_reason: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When the session ended (ISO 8601)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ended_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ended_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Timestamp of the last recorded activity in this session
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_activity_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_activity_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<
+    pub metadata: core::option::Option<
         crate::net_anisota::beta::game::session::Metadata<'a>,
     >,
     ///URI of the previous session if this is a continuation (e.g., after brief inactivity)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_session_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub parent_session_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Platform where the session occurred
     #[serde(borrow)]
     pub platform: jacquard_common::CowStr<'a>,
     ///URIs of log records that occurred during this session
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_log_uris: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub related_log_uris: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///URIs of progress records created during this session
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_progress_uris: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub related_progress_uris: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///URIs of related sessions (e.g., same day, same device)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_session_uris: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub related_session_uris: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub session_context: std::option::Option<
+    pub session_context: core::option::Option<
         crate::net_anisota::beta::game::session::SessionContext<'a>,
     >,
     ///When the session began (ISO 8601)
@@ -142,8 +142,8 @@ pub struct Session<'a> {
     #[serde(borrow)]
     pub status: jacquard_common::CowStr<'a>,
     ///When the session record was last updated
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -158,9 +158,9 @@ pub struct Session<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SessionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -182,16 +182,16 @@ pub struct SessionGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
     ///List of features used during the session
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub features: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub features: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Network condition during session
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub network_condition: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub network_condition: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub performance_metrics: std::option::Option<
+    pub performance_metrics: core::option::Option<
         crate::net_anisota::beta::game::session::PerformanceMetrics<'a>,
     >,
 }
@@ -211,11 +211,11 @@ pub struct Metadata<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct PerformanceMetrics<'a> {
     ///Average API response time in milliseconds (rounded to nearest integer)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub average_response_time: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub average_response_time: core::option::Option<i64>,
     ///Number of errors encountered
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub error_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub error_count: core::option::Option<i64>,
 }
 
 /// Context about how the session started
@@ -233,20 +233,20 @@ pub struct PerformanceMetrics<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SessionContext<'a> {
     ///How the user was authenticated
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub authentication_method: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub authentication_method: core::option::Option<jacquard_common::CowStr<'a>>,
     ///How the user entered the app
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub entry_point: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_point: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether this was a new user's first session
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_new_user: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_new_user: core::option::Option<bool>,
     ///Referrer URL if applicable
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub referrer: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub referrer: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Session<'a> {
@@ -262,19 +262,19 @@ impl<'a> Session<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySummary<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ActivitySummary<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
     fn def_name() -> &'static str {
         "activitySummary"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.current_level {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -323,19 +323,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySummary<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameActions<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GameActions<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
     fn def_name() -> &'static str {
         "gameActions"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.daily_rewards_claimed {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -433,19 +433,19 @@ impl jacquard_common::types::collection::Collection for SessionRecord {
     type Record = SessionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Session<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Session<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.duration {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -461,36 +461,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Session<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
     fn def_name() -> &'static str {
         "metadata"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PerformanceMetrics<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PerformanceMetrics<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
     fn def_name() -> &'static str {
         "performanceMetrics"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.average_response_time {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -517,24 +517,24 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PerformanceMetrics<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SessionContext<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SessionContext<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
     fn def_name() -> &'static str {
         "sessionContext"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_session()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_net_anisota_beta_game_session() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_net_anisota_beta_game_session() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1338,67 +1338,67 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartedAt;
-        type Status;
         type Platform;
+        type Status;
         type ClientVersion;
+        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartedAt = Unset;
-        type Status = Unset;
         type Platform = Unset;
+        type Status = Unset;
         type ClientVersion = Unset;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type StartedAt = Set<members::started_at>;
-        type Status = S::Status;
-        type Platform = S::Platform;
-        type ClientVersion = S::ClientVersion;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type StartedAt = S::StartedAt;
-        type Status = Set<members::status>;
-        type Platform = S::Platform;
-        type ClientVersion = S::ClientVersion;
+        type StartedAt = Unset;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
-        type StartedAt = S::StartedAt;
-        type Status = S::Status;
         type Platform = Set<members::platform>;
+        type Status = S::Status;
         type ClientVersion = S::ClientVersion;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Platform = S::Platform;
+        type Status = Set<members::status>;
+        type ClientVersion = S::ClientVersion;
+        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `client_version` field to Set
     pub struct SetClientVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClientVersion<S> {}
     impl<S: State> State for SetClientVersion<S> {
-        type StartedAt = S::StartedAt;
-        type Status = S::Status;
         type Platform = S::Platform;
+        type Status = S::Status;
         type ClientVersion = Set<members::client_version>;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Platform = S::Platform;
+        type Status = S::Status;
+        type ClientVersion = S::ClientVersion;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `platform` field
         pub struct platform(());
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `client_version` field
         pub struct client_version(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
     }
 }
 
@@ -1791,10 +1791,10 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S> SessionBuilder<'a, S>
 where
     S: session_state::State,
-    S::StartedAt: session_state::IsSet,
-    S::Status: session_state::IsSet,
     S::Platform: session_state::IsSet,
+    S::Status: session_state::IsSet,
     S::ClientVersion: session_state::IsSet,
+    S::StartedAt: session_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Session<'a> {
@@ -1822,7 +1822,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

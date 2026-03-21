@@ -33,9 +33,9 @@ pub struct GetArtistAlbums<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetArtistAlbumsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub albums: std::option::Option<Vec<crate::app_rocksky::album::AlbumViewBasic<'a>>>,
+    pub albums: core::option::Option<Vec<crate::app_rocksky::album::AlbumViewBasic<'a>>>,
 }
 
 /// Response type for

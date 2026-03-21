@@ -22,8 +22,8 @@ pub struct AppPassword<'a> {
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub password: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub privileged: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub privileged: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -43,8 +43,8 @@ pub struct CreateAppPassword<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///If an app password has 'privileged' access to possibly sensitive account state. Meant for use with trusted clients.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub privileged: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub privileged: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -80,7 +80,7 @@ pub struct CreateAppPasswordOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateAppPasswordError<'a> {
     #[serde(rename = "AccountTakedown")]
-    AccountTakedown(std::option::Option<jacquard_common::CowStr<'a>>),
+    AccountTakedown(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateAppPasswordError<'_> {
@@ -98,19 +98,19 @@ impl core::fmt::Display for CreateAppPasswordError<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppPassword<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AppPassword<'a> {
     fn nsid() -> &'static str {
         "com.atproto.server.createAppPassword"
     }
     fn def_name() -> &'static str {
         "appPassword"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_server_createAppPassword()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -155,51 +155,51 @@ pub mod app_password_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Name;
         type Password;
+        type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Name = Unset;
         type Password = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Password = S::Password;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type Password = S::Password;
+        type Name = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `password` field to Set
     pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPassword<S> {}
     impl<S: State> State for SetPassword<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
         type Password = Set<members::password>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Password = S::Password;
+        type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Password = S::Password;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `password` field
         pub struct password(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -306,9 +306,9 @@ impl<'a, S: app_password_state::State> AppPasswordBuilder<'a, S> {
 impl<'a, S> AppPasswordBuilder<'a, S>
 where
     S: app_password_state::State,
-    S::CreatedAt: app_password_state::IsSet,
-    S::Name: app_password_state::IsSet,
     S::Password: app_password_state::IsSet,
+    S::Name: app_password_state::IsSet,
+    S::CreatedAt: app_password_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AppPassword<'a> {
@@ -323,7 +323,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -338,7 +338,7 @@ where
     }
 }
 
-fn lexicon_doc_com_atproto_server_createAppPassword() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atproto_server_createAppPassword() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -13,12 +13,12 @@
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Cancelled;
-impl std::fmt::Display for Cancelled {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Cancelled {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "cancelled")
     }
 }
@@ -31,12 +31,12 @@ impl std::fmt::Display for Cancelled {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Hybrid;
-impl std::fmt::Display for Hybrid {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Hybrid {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "hybrid")
     }
 }
@@ -49,12 +49,12 @@ impl std::fmt::Display for Hybrid {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Inperson;
-impl std::fmt::Display for Inperson {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Inperson {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "inperson")
     }
 }
@@ -75,36 +75,36 @@ pub struct Event<'a> {
     ///Client-declared timestamp when the event was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///The description of the event.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Client-declared timestamp when the event ends.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ends_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ends_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The locations where the event takes place.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: std::option::Option<Vec<EventLocationsItem<'a>>>,
+    pub locations: core::option::Option<Vec<EventLocationsItem<'a>>>,
     ///The attendance mode of the event.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mode: std::option::Option<crate::community_lexicon::calendar::event::Mode<'a>>,
+    pub mode: core::option::Option<crate::community_lexicon::calendar::event::Mode<'a>>,
     ///The name of the event.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Client-declared timestamp when the event starts.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starts_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub starts_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The status of the event.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<
+    pub status: core::option::Option<
         crate::community_lexicon::calendar::event::Status<'a>,
     >,
     ///URIs associated with the event.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uris: std::option::Option<
+    pub uris: core::option::Option<
         Vec<crate::community_lexicon::calendar::event::Uri<'a>>,
     >,
 }
@@ -146,9 +146,9 @@ pub enum EventLocationsItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -275,12 +275,12 @@ impl jacquard_common::IntoStatic for Mode<'_> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Planned;
-impl std::fmt::Display for Planned {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Planned {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "planned")
     }
 }
@@ -293,12 +293,12 @@ impl std::fmt::Display for Planned {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Postponed;
-impl std::fmt::Display for Postponed {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Postponed {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "postponed")
     }
 }
@@ -311,12 +311,12 @@ impl std::fmt::Display for Postponed {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Rescheduled;
-impl std::fmt::Display for Rescheduled {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Rescheduled {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "rescheduled")
     }
 }
@@ -329,12 +329,12 @@ impl std::fmt::Display for Rescheduled {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Scheduled;
-impl std::fmt::Display for Scheduled {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Scheduled {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "scheduled")
     }
 }
@@ -491,9 +491,9 @@ impl jacquard_common::IntoStatic for Status<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct Uri<'a> {
     ///The display name of the URI.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::UriValue<'a>,
 }
@@ -506,12 +506,12 @@ pub struct Uri<'a> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Virtual;
-impl std::fmt::Display for Virtual {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Virtual {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "virtual")
     }
 }
@@ -556,36 +556,36 @@ impl jacquard_common::types::collection::Collection for EventRecord {
     type Record = EventRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.event"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_calendar_event()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.event"
     }
     fn def_name() -> &'static str {
         "uri"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_calendar_event()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -600,37 +600,37 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -853,8 +853,8 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::Name: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
+    S::Name: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -874,7 +874,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -894,7 +894,7 @@ where
     }
 }
 
-fn lexicon_doc_community_lexicon_calendar_event() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_community_lexicon_calendar_event() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1365,7 +1365,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

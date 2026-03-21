@@ -23,19 +23,19 @@ pub struct StorageExternal<'a> {
     pub urls: Vec<jacquard_common::types::string::UriValue<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageExternal<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for StorageExternal<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageExternal"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_storageExternal()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.urls;
             #[allow(unused_comparisons)]
@@ -146,7 +146,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -158,7 +158,7 @@ where
     }
 }
 
-fn lexicon_doc_science_alt_dataset_storageExternal() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_science_alt_dataset_storageExternal() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

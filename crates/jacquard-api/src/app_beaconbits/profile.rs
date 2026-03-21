@@ -19,40 +19,40 @@
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     ///Who can tag this user in beacons
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub allow_tags: std::option::Option<ProfileAllowTags<'a>>,
+    pub allow_tags: core::option::Option<ProfileAllowTags<'a>>,
     ///Timestamp when settings were first created
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Default delayed reveal setting for new beacons
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub default_delayed_reveal: std::option::Option<ProfileDefaultDelayedReveal<'a>>,
+    pub default_delayed_reveal: core::option::Option<ProfileDefaultDelayedReveal<'a>>,
     ///Default visibility for new beacons
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub default_visibility: std::option::Option<ProfileDefaultVisibility<'a>>,
+    pub default_visibility: core::option::Option<ProfileDefaultVisibility<'a>>,
     ///Preferred distance unit
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub distance_unit: std::option::Option<ProfileDistanceUnit<'a>>,
+    pub distance_unit: core::option::Option<ProfileDistanceUnit<'a>>,
     ///Whether to hide past beacons from public view Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_profile_hide_past_beacons")]
-    pub hide_past_beacons: std::option::Option<bool>,
+    pub hide_past_beacons: core::option::Option<bool>,
     ///Preferred language setting
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub language: std::option::Option<ProfileLanguage<'a>>,
+    pub language: core::option::Option<ProfileLanguage<'a>>,
     ///Hex color code for map marker (e.g., #e24630)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub marker_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub marker_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether to include beacon links in Bluesky posts Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_profile_post_beacon_links")]
-    pub post_beacon_links: std::option::Option<bool>,
+    pub post_beacon_links: core::option::Option<bool>,
     ///Timestamp when settings were last updated
     pub updated_at: jacquard_common::types::string::Datetime,
 }
@@ -583,9 +583,9 @@ impl jacquard_common::IntoStatic for ProfileLanguage<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -632,19 +632,19 @@ impl jacquard_common::types::collection::Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "app.beaconbits.profile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_beaconbits_profile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.allow_tags {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -757,11 +757,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
 }
 
-fn _default_profile_hide_past_beacons() -> std::option::Option<bool> {
+fn _default_profile_hide_past_beacons() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_profile_post_beacon_links() -> std::option::Option<bool> {
+fn _default_profile_post_beacon_links() -> core::option::Option<bool> {
     Some(true)
 }
 
@@ -1034,7 +1034,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1055,7 +1055,7 @@ where
     }
 }
 
-fn lexicon_doc_app_beaconbits_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_beaconbits_profile() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -22,9 +22,9 @@ pub struct SyncUserCollections<'a> {
     #[serde(borrow)]
     pub slice: jacquard_common::CowStr<'a>,
     ///Timeout in seconds for the sync operation Defaults to `30`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_sync_user_collections_timeout_seconds")]
-    pub timeout_seconds: std::option::Option<i64>,
+    pub timeout_seconds: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -77,6 +77,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for SyncUserCollectionsRequest {
     type Response = SyncUserCollectionsResponse;
 }
 
-fn _default_sync_user_collections_timeout_seconds() -> std::option::Option<i64> {
+fn _default_sync_user_collections_timeout_seconds() -> core::option::Option<i64> {
     Some(30i64)
 }

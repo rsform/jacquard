@@ -22,37 +22,37 @@ pub struct CodeBlock<'a> {
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
     ///Programming language for syntax highlighting
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub language: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub language: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether to display line numbers Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_code_block_show_line_numbers")]
-    pub show_line_numbers: std::option::Option<bool>,
+    pub show_line_numbers: core::option::Option<bool>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.codeBlock"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_codeBlock()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_code_block_show_line_numbers() -> std::option::Option<bool> {
+fn _default_code_block_show_line_numbers() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn lexicon_doc_app_offprint_block_codeBlock() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_offprint_block_codeBlock() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

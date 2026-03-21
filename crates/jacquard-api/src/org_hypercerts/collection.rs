@@ -21,9 +21,9 @@ pub struct Item<'a> {
     #[serde(borrow)]
     pub item_identifier: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     ///Optional weight for this item (positive numeric value stored as string). Weights do not need to sum to a specific total; normalization can be performed by the consuming application as needed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_weight: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub item_weight: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// A collection/group of items (activities and/or other collections). Collections support recursive nesting.
@@ -40,42 +40,42 @@ pub struct Item<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Collection<'a> {
     ///The collection's avatar/profile image as a URI or image blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<CollectionAvatar<'a>>,
+    pub avatar: core::option::Option<CollectionAvatar<'a>>,
     ///Larger horizontal image to display behind the collection view.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: std::option::Option<CollectionBanner<'a>>,
+    pub banner: core::option::Option<CollectionBanner<'a>>,
     ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Rich-text description, represented as a Leaflet linear document.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<
+    pub description: core::option::Option<
         crate::pub_leaflet::pages::linear_document::LinearDocument<'a>,
     >,
     ///Array of items in this collection with optional weights.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub items: std::option::Option<Vec<crate::org_hypercerts::collection::Item<'a>>>,
+    pub items: core::option::Option<Vec<crate::org_hypercerts::collection::Item<'a>>>,
     ///A strong reference to the location where this collection's activities were performed. The record referenced must conform with the lexicon app.certified.location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<
+    pub location: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Short summary of this collection, suitable for previews and list views
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub short_description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub short_description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Display name for this collection (e.g. 'Q1 2025 Impact Projects')
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///The type of this collection. Possible fields can be 'favorites', 'project', or any other type of collection.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -128,9 +128,9 @@ pub enum CollectionBanner<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -150,19 +150,19 @@ impl<'a> Collection<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Item<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.collection"
     }
     fn def_name() -> &'static str {
         "item"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_collection()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.item_weight {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -206,19 +206,19 @@ impl jacquard_common::types::collection::Collection for CollectionRecord {
     type Record = CollectionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.collection"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_collection()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.items {
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
@@ -423,7 +423,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -436,7 +436,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_collection() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hypercerts_collection() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -959,7 +959,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

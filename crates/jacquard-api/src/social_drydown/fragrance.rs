@@ -27,11 +27,11 @@ pub struct Fragrance<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Timestamp of last update
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Year of release (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub year: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub year: core::option::Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -46,9 +46,9 @@ pub struct Fragrance<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FragranceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -95,19 +95,19 @@ impl jacquard_common::types::collection::Collection for FragranceRecord {
     type Record = FragranceRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fragrance<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Fragrance<'a> {
     fn nsid() -> &'static str {
         "social.drydown.fragrance"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_drydown_fragrance()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -170,51 +170,51 @@ pub mod fragrance_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type House;
         type Name;
         type CreatedAt;
+        type House;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type House = Unset;
         type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `house` field to Set
-    pub struct SetHouse<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHouse<S> {}
-    impl<S: State> State for SetHouse<S> {
-        type House = Set<members::house>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
+        type House = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type House = S::House;
         type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
+        type House = S::House;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type House = S::House;
         type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type House = S::House;
+    }
+    ///State transition - sets the `house` field to Set
+    pub struct SetHouse<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHouse<S> {}
+    impl<S: State> State for SetHouse<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type House = Set<members::house>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `house` field
-        pub struct house(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `house` field
+        pub struct house(());
     }
 }
 
@@ -341,9 +341,9 @@ impl<'a, S: fragrance_state::State> FragranceBuilder<'a, S> {
 impl<'a, S> FragranceBuilder<'a, S>
 where
     S: fragrance_state::State,
-    S::House: fragrance_state::IsSet,
     S::Name: fragrance_state::IsSet,
     S::CreatedAt: fragrance_state::IsSet,
+    S::House: fragrance_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fragrance<'a> {
@@ -359,7 +359,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -375,7 +375,7 @@ where
     }
 }
 
-fn lexicon_doc_social_drydown_fragrance() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_drydown_fragrance() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

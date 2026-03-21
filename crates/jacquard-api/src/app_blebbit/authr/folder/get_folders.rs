@@ -16,11 +16,11 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetFolders<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -36,9 +36,9 @@ pub struct GetFolders<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetFoldersOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub folders: std::option::Option<
+    pub folders: core::option::Option<
         Vec<crate::app_blebbit::authr::folder::FolderView<'a>>,
     >,
 }

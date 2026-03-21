@@ -18,9 +18,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Info<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub name: InfoName<'a>,
 }
@@ -136,8 +136,8 @@ pub struct Labels<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscribeLabels {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cursor: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cursor: core::option::Option<i64>,
 }
 
 #[jacquard_derive::open_union]
@@ -205,7 +205,7 @@ impl<'a> SubscribeLabelsMessage<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SubscribeLabelsError<'a> {
     #[serde(rename = "FutureCursor")]
-    FutureCursor(std::option::Option<jacquard_common::CowStr<'a>>),
+    FutureCursor(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for SubscribeLabelsError<'_> {
@@ -223,36 +223,36 @@ impl core::fmt::Display for SubscribeLabelsError<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Info<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Info<'a> {
     fn nsid() -> &'static str {
         "com.atproto.label.subscribeLabels"
     }
     fn def_name() -> &'static str {
         "info"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_label_subscribeLabels()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Labels<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Labels<'a> {
     fn nsid() -> &'static str {
         "com.atproto.label.subscribeLabels"
     }
     fn def_name() -> &'static str {
         "labels"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_label_subscribeLabels()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -286,7 +286,7 @@ impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeLabelsEndpoint {
     type Stream = SubscribeLabelsStream;
 }
 
-fn lexicon_doc_com_atproto_label_subscribeLabels() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atproto_label_subscribeLabels() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -559,7 +559,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

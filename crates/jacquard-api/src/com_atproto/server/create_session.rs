@@ -19,11 +19,11 @@
 #[serde(rename_all = "camelCase")]
 pub struct CreateSession<'a> {
     ///When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub allow_takendown: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub allow_takendown: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub auth_factor_token: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub auth_factor_token: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Handle or other identifier supported by the server for the authenticating user.
     #[serde(borrow)]
     pub identifier: jacquard_common::CowStr<'a>,
@@ -45,28 +45,28 @@ pub struct CreateSession<'a> {
 pub struct CreateSessionOutput<'a> {
     #[serde(borrow)]
     pub access_jwt: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub active: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub active: core::option::Option<bool>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did_doc: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub did_doc: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub email_auth_factor: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub email_confirmed: std::option::Option<bool>,
+    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub email_auth_factor: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub email_confirmed: core::option::Option<bool>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
     pub refresh_jwt: jacquard_common::CowStr<'a>,
     ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<CreateSessionOutputStatus<'a>>,
+    pub status: core::option::Option<CreateSessionOutputStatus<'a>>,
 }
 
 /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
@@ -183,9 +183,9 @@ impl jacquard_common::IntoStatic for CreateSessionOutputStatus<'_> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateSessionError<'a> {
     #[serde(rename = "AccountTakedown")]
-    AccountTakedown(std::option::Option<jacquard_common::CowStr<'a>>),
+    AccountTakedown(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "AuthFactorTokenRequired")]
-    AuthFactorTokenRequired(std::option::Option<jacquard_common::CowStr<'a>>),
+    AuthFactorTokenRequired(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateSessionError<'_> {

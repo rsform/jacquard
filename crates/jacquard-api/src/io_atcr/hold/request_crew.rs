@@ -19,14 +19,14 @@
 #[serde(rename_all = "camelCase")]
 pub struct RequestCrew<'a> {
     ///Requested permissions (default: ['blob:read', 'blob:write'])
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub permissions: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub permissions: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Requested role (default: 'member') Defaults to `"member"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_request_crew_role")]
     #[serde(borrow)]
-    pub role: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub role: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -43,20 +43,20 @@ pub struct RequestCrew<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct RequestCrewOutput<'a> {
     ///CID of the crew record
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///Human-readable status message
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Result status
     #[serde(borrow)]
     pub status: RequestCrewOutputStatus<'a>,
     ///AT-URI of the crew record (if created or already exists)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 /// Result status
@@ -168,9 +168,9 @@ impl jacquard_common::IntoStatic for RequestCrewOutputStatus<'_> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RequestCrewError<'a> {
     #[serde(rename = "AuthRequired")]
-    AuthRequired(std::option::Option<jacquard_common::CowStr<'a>>),
+    AuthRequired(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "RegistrationDisabled")]
-    RegistrationDisabled(std::option::Option<jacquard_common::CowStr<'a>>),
+    RegistrationDisabled(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for RequestCrewError<'_> {
@@ -225,7 +225,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RequestCrewRequest {
     type Response = RequestCrewResponse;
 }
 
-fn _default_request_crew_role() -> std::option::Option<
+fn _default_request_crew_role() -> core::option::Option<
     jacquard_common::CowStr<'static>,
 > {
     Some(jacquard_common::CowStr::from("member"))

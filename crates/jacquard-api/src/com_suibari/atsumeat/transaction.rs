@@ -20,39 +20,39 @@
 pub struct Transaction<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Flag to indicate if this is an Easy Exchange (random partner).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_easy_exchange: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_easy_exchange: core::option::Option<bool>,
     ///Optional message attached to the exchange offer or completion.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The DID of the exchange partner.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub partner: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub partner: core::option::Option<jacquard_common::types::string::Did<'a>>,
     ///URI of the partner's profile, used for Constellation backlinking during the offer stage.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ref_partner: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub ref_partner: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///URI of the referencing transaction (e.g., the original Offer) when completing or rejecting.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ref_transaction: std::option::Option<
+    pub ref_transaction: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
     ///The current status of the transaction.
     #[serde(borrow)]
     pub status: TransactionStatus<'a>,
     ///URIs of the stickers received in this exchange (if completed).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sticker_in: std::option::Option<
+    pub sticker_in: core::option::Option<
         Vec<jacquard_common::types::string::UriValue<'a>>,
     >,
     ///URIs of the stickers given in this exchange.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sticker_out: std::option::Option<
+    pub sticker_out: core::option::Option<
         Vec<jacquard_common::types::string::UriValue<'a>>,
     >,
 }
@@ -163,9 +163,9 @@ impl jacquard_common::IntoStatic for TransactionStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -212,19 +212,19 @@ impl jacquard_common::types::collection::Collection for TransactionRecord {
     type Record = TransactionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Transaction<'a> {
     fn nsid() -> &'static str {
         "com.suibari.atsumeat.transaction"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_suibari_atsumeat_transaction()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.message {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 6400usize {
@@ -282,37 +282,37 @@ pub mod transaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type CreatedAt;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type CreatedAt = S::CreatedAt;
+        type Status = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
         type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -526,8 +526,8 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S> TransactionBuilder<'a, S>
 where
     S: transaction_state::State,
-    S::Status: transaction_state::IsSet,
     S::CreatedAt: transaction_state::IsSet,
+    S::Status: transaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Transaction<'a> {
@@ -547,7 +547,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -567,7 +567,7 @@ where
     }
 }
 
-fn lexicon_doc_com_suibari_atsumeat_transaction() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_suibari_atsumeat_transaction() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

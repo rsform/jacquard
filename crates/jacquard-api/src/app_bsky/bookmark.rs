@@ -39,8 +39,8 @@ pub struct Bookmark<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BookmarkView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub item: BookmarkViewItem<'a>,
     ///A strong ref to the bookmarked record.
@@ -69,36 +69,36 @@ pub enum BookmarkViewItem<'a> {
     PostView(Box<crate::app_bsky::feed::PostView<'a>>),
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
     fn nsid() -> &'static str {
         "app.bsky.bookmark.defs"
     }
     fn def_name() -> &'static str {
         "bookmark"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_bookmark_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookmarkView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BookmarkView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.bookmark.defs"
     }
     fn def_name() -> &'static str {
         "bookmarkView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_bookmark_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -196,7 +196,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -208,7 +208,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_bookmark_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_bookmark_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -327,37 +327,37 @@ pub mod bookmark_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Item;
         type Subject;
+        type Item;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Item = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type Item = Set<members::item>;
-        type Subject = S::Subject;
+        type Item = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Item = S::Item;
         type Subject = Set<members::subject>;
+        type Item = S::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type Subject = S::Subject;
+        type Item = Set<members::item>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `item` field
-        pub struct item(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `item` field
+        pub struct item(());
     }
 }
 
@@ -450,8 +450,8 @@ where
 impl<'a, S> BookmarkViewBuilder<'a, S>
 where
     S: bookmark_view_state::State,
-    S::Item: bookmark_view_state::IsSet,
     S::Subject: bookmark_view_state::IsSet,
+    S::Item: bookmark_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BookmarkView<'a> {
@@ -465,7 +465,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

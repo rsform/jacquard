@@ -20,44 +20,44 @@
 #[serde(rename_all = "camelCase")]
 pub struct BoardConfig<'a> {
     ///Display aspect ratio of the board.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<BoardConfigAspectRatio<'a>>,
+    pub aspect_ratio: core::option::Option<BoardConfigAspectRatio<'a>>,
     ///Background color as a hex string (e.g. '#ffffff').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub background_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether the background is rendered in grayscale. Default: true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub background_grayscale: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub background_grayscale: core::option::Option<bool>,
     ///URI of the background iframe.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_iframe_url: std::option::Option<
+    pub background_iframe_url: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
     ///Background image as a URI or image blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_image: std::option::Option<BoardConfigBackgroundImage<'a>>,
+    pub background_image: core::option::Option<BoardConfigBackgroundImage<'a>>,
     ///Background opacity as a percentage (0–100).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub background_opacity: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub background_opacity: core::option::Option<i64>,
     ///Type of background content.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_type: std::option::Option<BoardConfigBackgroundType<'a>>,
+    pub background_type: core::option::Option<BoardConfigBackgroundType<'a>>,
     ///Border color as a hex string (e.g. '#000000').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub border_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub border_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether contributor images are rendered in grayscale. Default: false.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub grayscale_images: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub grayscale_images: core::option::Option<bool>,
     ///Shape used to crop contributor images on this board.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image_shape: std::option::Option<BoardConfigImageShape<'a>>,
+    pub image_shape: core::option::Option<BoardConfigImageShape<'a>>,
 }
 
 /// Display aspect ratio of the board.
@@ -374,34 +374,34 @@ pub struct ContributorConfig<'a> {
     #[serde(borrow)]
     pub contributor: ContributorConfigContributor<'a>,
     ///Display name for this contributor on this board.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Iframe overlay shown when hovering over this contributor.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_iframe_url: std::option::Option<
+    pub hover_iframe_url: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
     ///Image overlay shown when hovering over this contributor, as a URI or image blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_image: std::option::Option<ContributorConfigHoverImage<'a>>,
+    pub hover_image: core::option::Option<ContributorConfigHoverImage<'a>>,
     ///Avatar or face image for this contributor on this board, as a URI or image blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<ContributorConfigImage<'a>>,
+    pub image: core::option::Option<ContributorConfigImage<'a>>,
     ///When true, these values take precedence over the contributor's own profile and display settings. When false or omitted, they are only used as fallbacks if the contributor has not set their own settings.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub r#override: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub r#override: core::option::Option<bool>,
     ///Click-through link URL for this contributor.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Video for this contributor, as a URI (embed/direct link) or uploaded video blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub video: std::option::Option<ContributorConfigVideo<'a>>,
+    pub video: core::option::Option<ContributorConfigVideo<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -496,13 +496,13 @@ pub enum ContributorConfigVideo<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Board<'a> {
     ///Board-level visual configuration (background, colors, aspect ratio).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub config: std::option::Option<crate::org_hyperboards::board::BoardConfig<'a>>,
+    pub config: core::option::Option<crate::org_hyperboards::board::BoardConfig<'a>>,
     ///Per-contributor configuration entries for this board.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contributor_configs: std::option::Option<
+    pub contributor_configs: core::option::Option<
         Vec<crate::org_hyperboards::board::ContributorConfig<'a>>,
     >,
     ///Client-declared timestamp when this record was originally created.
@@ -524,9 +524,9 @@ pub struct Board<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BoardGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -546,19 +546,19 @@ impl<'a> Board<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
     fn nsid() -> &'static str {
         "org.hyperboards.board"
     }
     fn def_name() -> &'static str {
         "boardConfig"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hyperboards_board()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.aspect_ratio {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
@@ -657,19 +657,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BoardConfig<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorConfig<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ContributorConfig<'a> {
     fn nsid() -> &'static str {
         "org.hyperboards.board"
     }
     fn def_name() -> &'static str {
         "contributorConfig"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hyperboards_board()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.display_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
@@ -755,19 +755,19 @@ impl jacquard_common::types::collection::Collection for BoardRecord {
     type Record = BoardRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Board<'a> {
     fn nsid() -> &'static str {
         "org.hyperboards.board"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hyperboards_board()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.contributor_configs {
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
@@ -784,7 +784,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Board<'a> {
     }
 }
 
-fn lexicon_doc_org_hyperboards_board() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hyperboards_board() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1479,7 +1479,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1671,7 +1671,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

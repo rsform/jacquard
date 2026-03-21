@@ -16,16 +16,16 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedUsersSkeleton<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `25`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub viewer: core::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -43,13 +43,13 @@ pub struct GetSuggestedUsersSkeletonOutput<'a> {
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
     ///DEPRECATED: use recIdStr instead.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rec_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rec_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Snowflake for this recommendation, use when submitting recommendation events.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rec_id_str: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for
@@ -78,7 +78,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedUsersSkeletonRequest {
     type Response = GetSuggestedUsersSkeletonResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(25i64)
 }
 

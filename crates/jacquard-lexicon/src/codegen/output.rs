@@ -48,8 +48,12 @@ impl<'c> CodeGenerator<'c> {
             // Track which NSID this file is for
             file_nsids.insert(file_path.clone(), nsid.to_string());
 
+            // Get the per-file ResolvedImports (built in Step 2)
+            let resolved = file_resolved.get(&file_path)
+                .expect("resolved imports built for every file");
+
             for (_def_name, def) in &doc.defs {
-                let generated = self.generate_def(nsid.as_ref(), _def_name.as_ref(), def)?;
+                let generated = self.generate_def(nsid.as_ref(), _def_name.as_ref(), def, resolved)?;
                 file_contents
                     .entry(file_path.clone())
                     .or_default()
@@ -61,7 +65,9 @@ impl<'c> CodeGenerator<'c> {
         let mut result = BTreeMap::new();
         for (path, generated_vec) in file_contents {
             let nsid = file_nsids.get(&path).cloned();
-            let file_output = FileOutput::combine(generated_vec, nsid);
+            let resolved = file_resolved.get(&path)
+                .expect("resolved imports built for every file");
+            let file_output = FileOutput::combine(generated_vec, nsid, resolved);
             result.insert(path, file_output);
         }
 

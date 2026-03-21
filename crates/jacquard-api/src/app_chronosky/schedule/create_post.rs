@@ -18,21 +18,21 @@
 #[serde(rename_all = "camelCase")]
 pub struct CreatePost<'a> {
     ///Whether to disable quote posts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disable_quote_posts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disable_quote_posts: core::option::Option<bool>,
     ///Chronosky-internal scheduled post ID of the parent post (for scheduling threads or replies). Not an AT Protocol URI or Record Key.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_post_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub parent_post_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Array of posts to schedule (1 element = single post, multiple = thread)
     #[serde(borrow)]
     pub posts: Vec<crate::app_chronosky::schedule::create_post::ThreadPostInput<'a>>,
     ///Scheduled publish time
     pub scheduled_at: jacquard_common::types::string::Datetime,
     ///Thread gate rules to control who can reply
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub threadgate_rules: std::option::Option<Vec<CreatePostThreadgateRulesItem<'a>>>,
+    pub threadgate_rules: core::option::Option<Vec<CreatePostThreadgateRulesItem<'a>>>,
 }
 
 #[jacquard_derive::open_union]
@@ -74,8 +74,8 @@ pub struct CreatePostOutput<'a> {
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///Number of posts created (1 for single post, N for thread)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub post_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub post_count: core::option::Option<i64>,
     pub scheduled_at: jacquard_common::types::string::Datetime,
 }
 
@@ -94,23 +94,23 @@ pub struct CreatePostOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ThreadPostInput<'a> {
     ///Post creation timestamp (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Embedded content (images, external links, records).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<ThreadPostInputEmbed<'a>>,
+    pub embed: core::option::Option<ThreadPostInputEmbed<'a>>,
     ///Rich text facets (mentions, links, tags)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     ///Self-applied content labels for content warnings (AT Protocol standard).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     ///Language codes (ISO 639-1)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub langs: core::option::Option<Vec<jacquard_common::types::string::Language>>,
     ///Post text content
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
@@ -171,19 +171,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreatePostRequest {
     type Response = CreatePostResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadPostInput<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ThreadPostInput<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.createPost"
     }
     fn def_name() -> &'static str {
         "threadPostInput"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_chronosky_schedule_createPost()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.facets {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
@@ -432,7 +432,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -448,7 +448,7 @@ where
     }
 }
 
-fn lexicon_doc_app_chronosky_schedule_createPost() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_chronosky_schedule_createPost() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

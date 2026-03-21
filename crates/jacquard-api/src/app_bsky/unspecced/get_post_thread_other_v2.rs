@@ -85,19 +85,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadOtherV2Request {
     type Response = GetPostThreadOtherV2Response;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ThreadItem<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getPostThreadOtherV2"
     }
     fn def_name() -> &'static str {
         "threadItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -359,7 +359,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -373,7 +373,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_unspecced_getPostThreadOtherV2() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

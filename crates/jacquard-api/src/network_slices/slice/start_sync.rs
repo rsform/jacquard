@@ -19,26 +19,26 @@
 #[serde(rename_all = "camelCase")]
 pub struct StartSync<'a> {
     ///List of collection NSIDs to sync (primary collections matching slice domain)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    pub collections: core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
     ///List of external collection NSIDs to sync (collections outside slice domain)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_collections: std::option::Option<
+    pub external_collections: core::option::Option<
         Vec<jacquard_common::types::string::Nsid<'a>>,
     >,
     ///Maximum number of records to sync per repository
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit_per_repo: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit_per_repo: core::option::Option<i64>,
     ///List of specific repository DIDs to sync from
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub repos: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub repos: core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     ///Skip lexicon validation during sync Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_start_sync_skip_validation")]
-    pub skip_validation: std::option::Option<bool>,
+    pub skip_validation: core::option::Option<bool>,
     ///AT-URI of the slice to sync data into
     #[serde(borrow)]
     pub slice: jacquard_common::CowStr<'a>,
@@ -95,6 +95,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
     type Response = StartSyncResponse;
 }
 
-fn _default_start_sync_skip_validation() -> std::option::Option<bool> {
+fn _default_start_sync_skip_validation() -> core::option::Option<bool> {
     Some(false)
 }

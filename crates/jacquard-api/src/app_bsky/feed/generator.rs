@@ -19,21 +19,21 @@
 #[serde(rename_all = "camelCase")]
 pub struct Generator<'a> {
     ///Declaration that a feed accepts feedback interactions from a client through app.bsky.feed.sendInteractions
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub accepts_interactions: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accepts_interactions: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_mode: std::option::Option<GeneratorContentMode<'a>>,
+    pub content_mode: core::option::Option<GeneratorContentMode<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
+    pub description_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     #[serde(borrow)]
@@ -41,9 +41,9 @@ pub struct Generator<'a> {
     #[serde(borrow)]
     pub display_name: jacquard_common::CowStr<'a>,
     ///Self-label values
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -152,9 +152,9 @@ impl jacquard_common::IntoStatic for GeneratorContentMode<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GeneratorGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -201,19 +201,19 @@ impl jacquard_common::types::collection::Collection for GeneratorRecord {
     type Record = GeneratorRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Generator<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Generator<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.generator"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_generator()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -334,49 +334,49 @@ pub mod generator_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DisplayName;
         type Did;
+        type DisplayName;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DisplayName = Unset;
         type Did = Unset;
+        type DisplayName = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type DisplayName = Set<members::display_name>;
-        type Did = S::Did;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type DisplayName = S::DisplayName;
         type Did = Set<members::did>;
+        type DisplayName = S::DisplayName;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Did = S::Did;
+        type DisplayName = Set<members::display_name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type DisplayName = S::DisplayName;
         type Did = S::Did;
+        type DisplayName = S::DisplayName;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -595,8 +595,8 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
 impl<'a, S> GeneratorBuilder<'a, S>
 where
     S: generator_state::State,
-    S::DisplayName: generator_state::IsSet,
     S::Did: generator_state::IsSet,
+    S::DisplayName: generator_state::IsSet,
     S::CreatedAt: generator_state::IsSet,
 {
     /// Build the final struct
@@ -617,7 +617,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -637,7 +637,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_feed_generator() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_feed_generator() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

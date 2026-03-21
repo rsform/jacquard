@@ -18,36 +18,36 @@
 #[serde(rename_all = "camelCase")]
 pub struct CreateAccount<'a> {
     ///Pre-existing atproto DID, being imported to a new account.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Requested handle for the account.
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub invite_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub invite_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Initial account password. May need to meet instance-specific password strength requirements.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub password: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub password: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A signed DID PLC operation to be submitted as part of importing an existing account to this instance. NOTE: this optional field may be updated when full account migration is implemented.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub plc_op: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub plc_op: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///DID PLC rotation key (aka, recovery key) to be included in PLC creation operation.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub recovery_key: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub recovery_key: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification_code: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub verification_code: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification_phone: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub verification_phone: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -68,9 +68,9 @@ pub struct CreateAccountOutput<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     ///Complete DID document.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did_doc: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub did_doc: core::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     #[serde(borrow)]
@@ -93,19 +93,19 @@ pub struct CreateAccountOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum CreateAccountError<'a> {
     #[serde(rename = "InvalidHandle")]
-    InvalidHandle(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidHandle(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidPassword")]
-    InvalidPassword(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidPassword(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidInviteCode")]
-    InvalidInviteCode(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidInviteCode(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "HandleNotAvailable")]
-    HandleNotAvailable(std::option::Option<jacquard_common::CowStr<'a>>),
+    HandleNotAvailable(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "UnsupportedDomain")]
-    UnsupportedDomain(std::option::Option<jacquard_common::CowStr<'a>>),
+    UnsupportedDomain(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "UnresolvableDid")]
-    UnresolvableDid(std::option::Option<jacquard_common::CowStr<'a>>),
+    UnresolvableDid(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "IncompatibleDidDoc")]
-    IncompatibleDidDoc(std::option::Option<jacquard_common::CowStr<'a>>),
+    IncompatibleDidDoc(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateAccountError<'_> {
@@ -460,7 +460,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

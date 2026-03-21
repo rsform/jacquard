@@ -1,0 +1,75 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.git.temp.getBranch",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Branch name to get information for"
+          },
+          "repo": {
+            "type": "string",
+            "description": "AT-URI of the repository",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "name",
+            "hash",
+            "when"
+          ],
+          "properties": {
+            "author": {
+              "type": "ref",
+              "ref": "sh.tangled.git.temp.defs#signature"
+            },
+            "hash": {
+              "type": "string",
+              "description": "Latest commit hash on this branch"
+            },
+            "message": {
+              "type": "string",
+              "description": "Latest commit message"
+            },
+            "name": {
+              "type": "string",
+              "description": "Branch name"
+            },
+            "when": {
+              "type": "string",
+              "description": "Timestamp of latest commit",
+              "format": "datetime"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Repository not found or access denied",
+          "name": "RepoNotFound"
+        },
+        {
+          "description": "Branch not found",
+          "name": "BranchNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    }
+  }
+}

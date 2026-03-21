@@ -18,17 +18,17 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GridImage<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<
+    pub aspect_ratio: core::option::Option<
         crate::app_offprint::block::image::AspectRatio<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -44,34 +44,34 @@ pub struct GridImage<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ImageGrid<'a> {
     ///Aspect ratio mode
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub aspect_ratio: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Grid caption
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub caption: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub caption: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Number of rows in the grid
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub grid_rows: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub grid_rows: core::option::Option<i64>,
     ///Array of images in the grid (2-6)
     #[serde(borrow)]
     pub images: Vec<crate::app_offprint::block::image_grid::GridImage<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GridImage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GridImage<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.imageGrid"
     }
     fn def_name() -> &'static str {
         "gridImage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_imageGrid()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -136,19 +136,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GridImage<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageGrid<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageGrid<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.imageGrid"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_imageGrid()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.grid_rows {
             if *value > 2i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -201,7 +201,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageGrid<'a> {
     }
 }
 
-fn lexicon_doc_app_offprint_block_imageGrid() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_offprint_block_imageGrid() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -502,7 +502,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -37,13 +37,13 @@ pub struct Blob<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     ///When set, Blob fills its container height. 'cover' crops to fill; 'contain' letterboxes.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub fit: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub fit: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Known aspect ratio for CLS prevention. Reserves space before the image loads.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ratio: std::option::Option<crate::org_atsui::blob::AspectRatio<'a>>,
+    pub ratio: core::option::Option<crate::org_atsui::blob::AspectRatio<'a>>,
     ///Blob ref for the image.
     #[serde(borrow)]
     pub src: jacquard_common::types::value::Data<'a>,
@@ -66,19 +66,19 @@ pub struct BlobOutput<'a> {
     pub value: crate::at_inlay::Response<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
     fn nsid() -> &'static str {
         "org.atsui.Blob"
     }
     fn def_name() -> &'static str {
         "aspectRatio"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_atsui_Blob()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.height;
             if *value < 1i64 {
@@ -261,7 +261,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -274,7 +274,7 @@ where
     }
 }
 
-fn lexicon_doc_org_atsui_Blob() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_atsui_Blob() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.atsui.Blob"),
@@ -587,7 +587,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

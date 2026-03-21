@@ -47,9 +47,9 @@ pub struct RemoveDataOutput<'a> {}
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RemoveDataError<'a> {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDid(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InternalError")]
-    InternalError(std::option::Option<jacquard_common::CowStr<'a>>),
+    InternalError(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for RemoveDataError<'_> {

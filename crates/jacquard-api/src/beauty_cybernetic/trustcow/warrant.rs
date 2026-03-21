@@ -21,23 +21,23 @@ pub struct Warrant<'a> {
     ///When the warrant was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional description explaining the basis for this warrant
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional expiration date for this warrant
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///DID of the identity being warranted for
     #[serde(borrow)]
     pub subject: jacquard_common::CowStr<'a>,
     ///Level of trust being warranted
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub trust_level: std::option::Option<WarrantTrustLevel<'a>>,
+    pub trust_level: core::option::Option<WarrantTrustLevel<'a>>,
     ///Type of warrant being provided
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub warrant_type: std::option::Option<WarrantWarrantType<'a>>,
+    pub warrant_type: core::option::Option<WarrantWarrantType<'a>>,
 }
 
 /// Level of trust being warranted
@@ -255,9 +255,9 @@ impl jacquard_common::IntoStatic for WarrantWarrantType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WarrantGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -304,19 +304,19 @@ impl jacquard_common::types::collection::Collection for WarrantRecord {
     type Record = WarrantRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Warrant<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Warrant<'a> {
     fn nsid() -> &'static str {
         "beauty.cybernetic.trustcow.warrant"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_beauty_cybernetic_trustcow_warrant()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
@@ -538,7 +538,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -555,7 +555,7 @@ where
     }
 }
 
-fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_beauty_cybernetic_trustcow_warrant() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

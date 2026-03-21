@@ -24,13 +24,13 @@ pub struct Show<'a> {
     ///The AT-URI of the haus.opn.mic.artist record.
     #[serde(borrow)]
     pub artist: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_art: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub cover_art: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub schedule: ShowSchedule<'a>,
     #[serde(borrow)]
@@ -152,9 +152,9 @@ impl jacquard_common::IntoStatic for ShowSchedule<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ShowGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -201,19 +201,19 @@ impl jacquard_common::types::collection::Collection for ShowRecord {
     type Record = ShowRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Show<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Show<'a> {
     fn nsid() -> &'static str {
         "haus.opn.mic.show"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_haus_opn_mic_show()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cover_art {
             {
                 let size = value.blob().size;
@@ -295,8 +295,8 @@ pub mod show_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type CreatedAt;
+        type Title;
         type Artist;
         type Schedule;
     }
@@ -304,26 +304,26 @@ pub mod show_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type CreatedAt = Unset;
+        type Title = Unset;
         type Artist = Unset;
         type Schedule = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Artist = S::Artist;
-        type Schedule = S::Schedule;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+        type Artist = S::Artist;
+        type Schedule = S::Schedule;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
         type Artist = S::Artist;
         type Schedule = S::Schedule;
     }
@@ -331,8 +331,8 @@ pub mod show_state {
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
-        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
         type Artist = Set<members::artist>;
         type Schedule = S::Schedule;
     }
@@ -340,18 +340,18 @@ pub mod show_state {
     pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchedule<S> {}
     impl<S: State> State for SetSchedule<S> {
-        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
         type Artist = S::Artist;
         type Schedule = Set<members::schedule>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `artist` field
         pub struct artist(());
         ///Marker type for the `schedule` field
@@ -508,8 +508,8 @@ where
 impl<'a, S> ShowBuilder<'a, S>
 where
     S: show_state::State,
-    S::Title: show_state::IsSet,
     S::CreatedAt: show_state::IsSet,
+    S::Title: show_state::IsSet,
     S::Artist: show_state::IsSet,
     S::Schedule: show_state::IsSet,
 {
@@ -528,7 +528,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -545,7 +545,7 @@ where
     }
 }
 
-fn lexicon_doc_haus_opn_mic_show() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_haus_opn_mic_show() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("haus.opn.mic.show"),

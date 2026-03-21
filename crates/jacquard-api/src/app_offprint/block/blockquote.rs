@@ -41,19 +41,19 @@ pub enum BlockquoteContentItem<'a> {
     Heading(Box<crate::app_offprint::block::heading::Heading<'a>>),
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Blockquote<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Blockquote<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.blockquote"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_blockquote()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -149,7 +149,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -161,7 +161,7 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_blockquote() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_offprint_block_blockquote() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

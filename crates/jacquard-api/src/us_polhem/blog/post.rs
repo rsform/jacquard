@@ -21,27 +21,27 @@ pub struct Post<'a> {
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub excerpt: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub excerpt: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub featured_image: std::option::Option<crate::app_bsky::embed::images::Image<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub featured_image: core::option::Option<crate::app_bsky::embed::images::Image<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub images: std::option::Option<Vec<crate::app_bsky::embed::images::Image<'a>>>,
+    pub images: core::option::Option<Vec<crate::app_bsky::embed::images::Image<'a>>>,
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///Tells the visibility of the article to AppView. Defaults to `"public"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_post_visibility")]
     #[serde(borrow)]
-    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub visibility: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -56,9 +56,9 @@ pub struct Post<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -105,19 +105,19 @@ impl jacquard_common::types::collection::Collection for PostRecord {
     type Record = PostRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     fn nsid() -> &'static str {
         "us.polhem.blog.post"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_us_polhem_blog_post()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
@@ -173,7 +173,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     }
 }
 
-fn _default_post_visibility() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_post_visibility() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("public"))
 }
 
@@ -187,67 +187,67 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type CreatedAt;
-        type Title;
+        type Slug;
         type Content;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type CreatedAt = Unset;
-        type Title = Unset;
+        type Slug = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Content = S::Content;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Slug = S::Slug;
         type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
         type Slug = S::Slug;
-        type CreatedAt = S::CreatedAt;
-        type Title = Set<members::title>;
         type Content = S::Content;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type CreatedAt = S::CreatedAt;
+        type Slug = Set<members::slug>;
+        type Content = S::Content;
+        type Title = S::Title;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Slug = S::Slug;
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type Slug = S::Slug;
         type Content = Set<members::content>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Slug = S::Slug;
+        type Content = S::Content;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -467,10 +467,10 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::Slug: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
-    S::Title: post_state::IsSet,
+    S::Slug: post_state::IsSet,
     S::Content: post_state::IsSet,
+    S::Title: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
@@ -493,7 +493,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -516,9 +516,7 @@ where
     }
 }
 
-fn lexicon_doc_us_polhem_blog_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_us_polhem_blog_post() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("us.polhem.blog.post"),

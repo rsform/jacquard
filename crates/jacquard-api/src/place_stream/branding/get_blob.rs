@@ -16,9 +16,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlob<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub broadcaster: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub broadcaster: core::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
 }
@@ -55,7 +55,7 @@ pub struct GetBlobOutput {
 pub enum GetBlobError<'a> {
     /// The requested branding asset does not exist
     #[serde(rename = "BrandingNotFound")]
-    BrandingNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    BrandingNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetBlobError<'_> {

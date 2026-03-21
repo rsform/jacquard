@@ -16,47 +16,47 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Search<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub age_ratings: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub age_ratings: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub application_types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub application_types: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genres: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub genres: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_cancelled")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub include_cancelled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_cancelled: core::option::Option<bool>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_unrated")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub include_unrated: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_unrated: core::option::Option<bool>,
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub modes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub modes: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub player_perspectives: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub player_perspectives: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(borrow)]
     pub q: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sort: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub themes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub themes: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub types: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -71,14 +71,14 @@ pub struct Search<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub results: Vec<SearchOutputResultsItem<'a>>,
     ///Total number of results matching the query above the relevance threshold.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_results: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub total_results: core::option::Option<i64>,
 }
 
 #[jacquard_derive::open_union]
@@ -134,15 +134,15 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {
     type Response = SearchResponse;
 }
 
-fn _default_include_cancelled() -> std::option::Option<bool> {
+fn _default_include_cancelled() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_include_unrated() -> std::option::Option<bool> {
+fn _default_include_unrated() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(20i64)
 }
 

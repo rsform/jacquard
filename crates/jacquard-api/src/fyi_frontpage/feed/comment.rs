@@ -23,9 +23,11 @@ pub struct Comment<'a> {
     pub blocks: Vec<crate::fyi_frontpage::richtext::block::Block<'a>>,
     ///Client-declared timestamp when this comment was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub parent: core::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
     #[serde(borrow)]
     pub post: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
@@ -42,9 +44,9 @@ pub struct Comment<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -91,19 +93,19 @@ impl jacquard_common::types::collection::Collection for CommentRecord {
     type Record = CommentRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     fn nsid() -> &'static str {
         "fyi.frontpage.feed.comment"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fyi_frontpage_feed_comment()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.blocks;
             #[allow(unused_comparisons)]
@@ -132,50 +134,50 @@ pub mod comment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Post;
         type Blocks;
+        type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Post = Unset;
         type Blocks = Unset;
+        type Post = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Blocks = S::Blocks;
         type Post = S::Post;
-        type Blocks = S::Blocks;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type CreatedAt = S::CreatedAt;
-        type Post = Set<members::post>;
-        type Blocks = S::Blocks;
     }
     ///State transition - sets the `blocks` field to Set
     pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocks<S> {}
     impl<S: State> State for SetBlocks<S> {
         type CreatedAt = S::CreatedAt;
-        type Post = S::Post;
         type Blocks = Set<members::blocks>;
+        type Post = S::Post;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type CreatedAt = S::CreatedAt;
+        type Blocks = S::Blocks;
+        type Post = Set<members::post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `post` field
-        pub struct post(());
         ///Marker type for the `blocks` field
         pub struct blocks(());
+        ///Marker type for the `post` field
+        pub struct post(());
     }
 }
 
@@ -289,8 +291,8 @@ impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
     S::CreatedAt: comment_state::IsSet,
-    S::Post: comment_state::IsSet,
     S::Blocks: comment_state::IsSet,
+    S::Post: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
@@ -305,7 +307,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -320,7 +322,7 @@ where
     }
 }
 
-fn lexicon_doc_fyi_frontpage_feed_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_fyi_frontpage_feed_comment() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

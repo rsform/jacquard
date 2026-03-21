@@ -21,9 +21,9 @@ pub struct Key<'a> {
     ///Client-declared timestamp when this key was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///The name of the client that created this key.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub created_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub created_by: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The did:key signing key for the stream.
     #[serde(borrow)]
     pub signing_key: jacquard_common::CowStr<'a>,
@@ -41,9 +41,9 @@ pub struct Key<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct KeyGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -90,19 +90,19 @@ impl jacquard_common::types::collection::Collection for KeyRecord {
     type Record = KeyRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Key<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Key<'a> {
     fn nsid() -> &'static str {
         "place.stream.key"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_key()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.signing_key;
             #[allow(unused_comparisons)]
@@ -143,37 +143,37 @@ pub mod key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type SigningKey;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type SigningKey = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type SigningKey = S::SigningKey;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `signing_key` field to Set
     pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSigningKey<S> {}
     impl<S: State> State for SetSigningKey<S> {
-        type CreatedAt = S::CreatedAt;
         type SigningKey = Set<members::signing_key>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SigningKey = S::SigningKey;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `signing_key` field
         pub struct signing_key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -266,8 +266,8 @@ where
 impl<'a, S> KeyBuilder<'a, S>
 where
     S: key_state::State,
-    S::CreatedAt: key_state::IsSet,
     S::SigningKey: key_state::IsSet,
+    S::CreatedAt: key_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Key<'a> {
@@ -281,7 +281,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -295,7 +295,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_key() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_key() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.key"),

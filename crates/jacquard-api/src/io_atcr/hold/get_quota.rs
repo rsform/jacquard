@@ -33,12 +33,12 @@ pub struct GetQuota<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetQuotaOutput<'a> {
     ///Storage limit in bytes (absent if unlimited)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///Quota tier name (e.g., 'deckhand', 'bosun', 'quartermaster')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tier: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub tier: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Total size in bytes of unique blobs
     pub total_size: i64,
     ///Number of unique blob digests
@@ -64,7 +64,7 @@ pub struct GetQuotaOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetQuotaError<'a> {
     #[serde(rename = "InvalidUserDid")]
-    InvalidUserDid(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidUserDid(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetQuotaError<'_> {

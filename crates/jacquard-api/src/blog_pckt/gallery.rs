@@ -18,20 +18,20 @@
 #[serde(rename_all = "camelCase")]
 pub struct Gallery<'a> {
     ///Optional caption for the entire gallery
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub caption: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub caption: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Array of image blocks in display order
     #[serde(borrow)]
     pub images: Vec<crate::blog_pckt::block::image::ImageAttrs<'a>>,
     ///Layout style for rendering the gallery (e.g. grid, carousel, masonry, list)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub layout: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub layout: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional title for the gallery
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -46,9 +46,9 @@ pub struct Gallery<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GalleryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -95,19 +95,19 @@ impl jacquard_common::types::collection::Collection for GalleryRecord {
     type Record = GalleryRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.gallery"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_gallery()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.caption {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -339,7 +339,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -354,7 +354,7 @@ where
     }
 }
 
-fn lexicon_doc_blog_pckt_gallery() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_blog_pckt_gallery() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blog.pckt.gallery"),

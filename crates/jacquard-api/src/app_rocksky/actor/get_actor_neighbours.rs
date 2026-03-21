@@ -33,9 +33,9 @@ pub struct GetActorNeighbours<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorNeighboursOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub neighbours: std::option::Option<
+    pub neighbours: core::option::Option<
         Vec<crate::app_rocksky::actor::NeighbourViewBasic<'a>>,
     >,
 }

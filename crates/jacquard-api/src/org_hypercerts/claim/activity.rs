@@ -18,13 +18,13 @@
 #[serde(rename_all = "camelCase")]
 pub struct Contributor<'a> {
     ///Inline contribution role object with a role string via org.hypercerts.claim.activity#contributorRole, or a strong reference to a contribution details record. The record referenced must conform with the lexicon org.hypercerts.claim.contribution.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contribution_details: std::option::Option<ContributorContributionDetails<'a>>,
+    pub contribution_details: core::option::Option<ContributorContributionDetails<'a>>,
     ///The relative weight/importance of this contribution (stored as a string to avoid float precision issues). Must be a positive numeric value. Weights do not need to sum to a specific total; normalization can be performed by the consuming application as needed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contribution_weight: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub contribution_weight: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Inline contributor identity object with an identity string (DID or identifier) via org.hypercerts.claim.activity#contributorIdentity, or a strong reference to a contributor information record. The record referenced must conform with the lexicon org.hypercerts.claim.contributorInformation.
     #[serde(borrow)]
     pub contributor_identity: ContributorContributorIdentity<'a>,
@@ -122,55 +122,57 @@ pub struct ContributorRole<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Activity<'a> {
     ///An array of contributor objects, each containing contributor information, weight, and contribution details.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contributors: std::option::Option<
+    pub contributors: core::option::Option<
         Vec<crate::org_hypercerts::claim::activity::Contributor<'a>>,
     >,
     ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Rich-text description, represented as a Leaflet linear document.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<
+    pub description: core::option::Option<
         crate::pub_leaflet::pages::linear_document::LinearDocument<'a>,
     >,
     ///When the work ended
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub end_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub end_date: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The hypercert visual representation as a URI or image blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<ActivityImage<'a>>,
+    pub image: core::option::Option<ActivityImage<'a>>,
     ///An array of strong references to the location where activity was performed. The record referenced must conform with the lexicon app.certified.location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: std::option::Option<
+    pub locations: core::option::Option<
         Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     >,
     ///A strong reference to the rights that this hypercert has. The record referenced must conform with the lexicon org.hypercerts.claim.rights.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rights: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub rights: core::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
     ///Short summary of this activity claim, suitable for previews and list views. Rich text annotations may be provided via `shortDescriptionFacets`.
     #[serde(borrow)]
     pub short_description: jacquard_common::CowStr<'a>,
     ///Rich text annotations for `shortDescription` (mentions, URLs, hashtags, etc).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub short_description_facets: std::option::Option<
+    pub short_description_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     ///When the work began
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub start_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub start_date: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Display title summarizing the impact work (e.g. 'Reforestation in Amazon Basin 2024')
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///Work scope definition. A CEL expression for structured, machine-evaluable scopes or a free-form string for simple and legacy scopes.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub work_scope: std::option::Option<ActivityWorkScope<'a>>,
+    pub work_scope: core::option::Option<ActivityWorkScope<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -223,9 +225,9 @@ pub enum ActivityWorkScope<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -264,19 +266,19 @@ impl<'a> Activity<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contributor<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Contributor<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.activity"
     }
     fn def_name() -> &'static str {
         "contributor"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_claim_activity()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.contribution_weight {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -293,19 +295,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contributor<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorIdentity<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ContributorIdentity<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.activity"
     }
     fn def_name() -> &'static str {
         "contributorIdentity"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_claim_activity()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.identity;
             #[allow(unused_comparisons)]
@@ -342,19 +344,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorIdentity<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContributorRole<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ContributorRole<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.activity"
     }
     fn def_name() -> &'static str {
         "contributorRole"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_claim_activity()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.role;
             #[allow(unused_comparisons)]
@@ -418,19 +420,19 @@ impl jacquard_common::types::collection::Collection for ActivityRecord {
     type Record = ActivityRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.activity"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_claim_activity()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.contributors {
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
@@ -504,19 +506,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeString<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for WorkScopeString<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.activity"
     }
     fn def_name() -> &'static str {
         "workScopeString"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_claim_activity()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.scope;
             #[allow(unused_comparisons)]
@@ -688,7 +690,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -702,7 +704,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_claim_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hypercerts_claim_activity() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1179,51 +1181,51 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Title;
         type ShortDescription;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Title = Unset;
         type ShortDescription = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type ShortDescription = S::ShortDescription;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
         type ShortDescription = S::ShortDescription;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `short_description` field to Set
     pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShortDescription<S> {}
     impl<S: State> State for SetShortDescription<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type ShortDescription = Set<members::short_description>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type ShortDescription = S::ShortDescription;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `short_description` field
         pub struct short_description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1510,9 +1512,9 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
-    S::CreatedAt: activity_state::IsSet,
     S::Title: activity_state::IsSet,
     S::ShortDescription: activity_state::IsSet,
+    S::CreatedAt: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
@@ -1535,7 +1537,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

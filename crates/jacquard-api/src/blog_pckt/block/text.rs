@@ -19,34 +19,32 @@
 #[serde(rename_all = "camelCase")]
 pub struct Text<'a> {
     ///Facets for text formatting and features
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::blog_pckt::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<Vec<crate::blog_pckt::richtext::facet::Facet<'a>>>,
     ///The plain text content
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Text<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.block.text"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_block_text()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_blog_pckt_block_text() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_blog_pckt_block_text() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blog.pckt.block.text"),

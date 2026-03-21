@@ -19,26 +19,26 @@
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
     ///Preference for fragrance complexity (1=simple, 5=intricate)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub complexity_preference: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub complexity_preference: core::option::Option<i64>,
     ///Timestamp when settings were first created
     pub created_at: jacquard_common::types::string::Datetime,
     ///How important all-day longevity is (1=not important, 5=essential)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub longevity_priority: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub longevity_priority: core::option::Option<i64>,
     ///How the user prefers to be noticed (1=skin scent, 5=bold presence)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub presence_style: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub presence_style: core::option::Option<i64>,
     ///When viewing others' reviews: show their score or recalculate with your preferences
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub score_lens: std::option::Option<SettingsScoreLens<'a>>,
+    pub score_lens: core::option::Option<SettingsScoreLens<'a>>,
     ///How user evaluates fragrances (1=instinct, 5=analytical)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub scoring_approach: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub scoring_approach: core::option::Option<i64>,
     ///Timestamp when settings were last updated
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// When viewing others' reviews: show their score or recalculate with your preferences
@@ -142,9 +142,9 @@ impl jacquard_common::IntoStatic for SettingsScoreLens<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -191,19 +191,19 @@ impl jacquard_common::types::collection::Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     fn nsid() -> &'static str {
         "social.drydown.settings"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_drydown_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.complexity_preference {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -500,7 +500,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -518,7 +518,7 @@ where
     }
 }
 
-fn lexicon_doc_social_drydown_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_drydown_settings() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

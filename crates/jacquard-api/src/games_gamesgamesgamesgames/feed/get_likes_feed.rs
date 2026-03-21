@@ -16,13 +16,15 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLikesFeed<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub did: jacquard_common::CowStr<'a>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -37,9 +39,9 @@ pub struct GetLikesFeed<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLikesFeedOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: Vec<crate::games_gamesgamesgamesgames::GameFeedViewItem<'a>>,
 }
@@ -70,7 +72,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetLikesFeedRequest {
     type Response = GetLikesFeedResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
@@ -83,20 +85,34 @@ pub mod get_likes_feed_state {
         pub trait Sealed {}
     }
     /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {}
+    pub trait State: sealed::Sealed {
+        type Did;
+    }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
-    impl State for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+    }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
-    pub mod members {}
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+    }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetLikesFeedBuilder<'a, S: get_likes_feed_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<i64>,
     ),
@@ -115,7 +131,7 @@ impl<'a> GetLikesFeedBuilder<'a, get_likes_feed_state::Empty> {
     pub fn new() -> Self {
         GetLikesFeedBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
+            __unsafe_private_named: (None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -137,15 +153,34 @@ impl<'a, S: get_likes_feed_state::State> GetLikesFeedBuilder<'a, S> {
     }
 }
 
+impl<'a, S> GetLikesFeedBuilder<'a, S>
+where
+    S: get_likes_feed_state::State,
+    S::Did: get_likes_feed_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::CowStr<'a>>,
+    ) -> GetLikesFeedBuilder<'a, get_likes_feed_state::SetDid<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        GetLikesFeedBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
 impl<'a, S: get_likes_feed_state::State> GetLikesFeedBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self.__unsafe_private_named.2 = value;
         self
     }
 }
@@ -153,12 +188,14 @@ impl<'a, S: get_likes_feed_state::State> GetLikesFeedBuilder<'a, S> {
 impl<'a, S> GetLikesFeedBuilder<'a, S>
 where
     S: get_likes_feed_state::State,
+    S::Did: get_likes_feed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetLikesFeed<'a> {
         GetLikesFeed {
             cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
+            did: self.__unsafe_private_named.1.unwrap(),
+            limit: self.__unsafe_private_named.2,
         }
     }
 }

@@ -24,9 +24,9 @@ pub struct Report<'a> {
     ///Timestamp when the report was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Additional context for the report
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub details: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub details: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Reason for the report
     #[serde(borrow)]
     pub reason: ReportReason<'a>,
@@ -153,9 +153,9 @@ impl jacquard_common::IntoStatic for ReportReason<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReportGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -202,19 +202,19 @@ impl jacquard_common::types::collection::Collection for ReportRecord {
     type Record = ReportRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Report<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Report<'a> {
     fn nsid() -> &'static str {
         "app.beaconbits.report"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_beaconbits_report()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.details {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -266,49 +266,49 @@ pub mod report_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BeaconUri;
         type CreatedAt;
+        type BeaconUri;
         type Reason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BeaconUri = Unset;
         type CreatedAt = Unset;
+        type BeaconUri = Unset;
         type Reason = Unset;
-    }
-    ///State transition - sets the `beacon_uri` field to Set
-    pub struct SetBeaconUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBeaconUri<S> {}
-    impl<S: State> State for SetBeaconUri<S> {
-        type BeaconUri = Set<members::beacon_uri>;
-        type CreatedAt = S::CreatedAt;
-        type Reason = S::Reason;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type BeaconUri = S::BeaconUri;
         type CreatedAt = Set<members::created_at>;
+        type BeaconUri = S::BeaconUri;
+        type Reason = S::Reason;
+    }
+    ///State transition - sets the `beacon_uri` field to Set
+    pub struct SetBeaconUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBeaconUri<S> {}
+    impl<S: State> State for SetBeaconUri<S> {
+        type CreatedAt = S::CreatedAt;
+        type BeaconUri = Set<members::beacon_uri>;
         type Reason = S::Reason;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
-        type BeaconUri = S::BeaconUri;
         type CreatedAt = S::CreatedAt;
+        type BeaconUri = S::BeaconUri;
         type Reason = Set<members::reason>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `beacon_uri` field
-        pub struct beacon_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `beacon_uri` field
+        pub struct beacon_uri(());
         ///Marker type for the `reason` field
         pub struct reason(());
     }
@@ -420,8 +420,8 @@ where
 impl<'a, S> ReportBuilder<'a, S>
 where
     S: report_state::State,
-    S::BeaconUri: report_state::IsSet,
     S::CreatedAt: report_state::IsSet,
+    S::BeaconUri: report_state::IsSet,
     S::Reason: report_state::IsSet,
 {
     /// Build the final struct
@@ -437,7 +437,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -452,7 +452,7 @@ where
     }
 }
 
-fn lexicon_doc_app_beaconbits_report() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_beaconbits_report() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

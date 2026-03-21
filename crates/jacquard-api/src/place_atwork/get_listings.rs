@@ -25,9 +25,9 @@ pub struct ListingRecord<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     ///The full job listing record
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub value: std::option::Option<crate::place_atwork::listing::Listing<'a>>,
+    pub value: core::option::Option<crate::place_atwork::listing::Listing<'a>>,
 }
 
 #[derive(
@@ -41,12 +41,12 @@ pub struct ListingRecord<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetListings<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identity: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub identity: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tag: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub tag: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -65,19 +65,19 @@ pub struct GetListingsOutput<'a> {
     pub listings: Vec<crate::place_atwork::get_listings::ListingRecord<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListingRecord<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ListingRecord<'a> {
     fn nsid() -> &'static str {
         "place.atwork.getListings"
     }
     fn def_name() -> &'static str {
         "listingRecord"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_atwork_getListings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -256,7 +256,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -270,7 +270,7 @@ where
     }
 }
 
-fn lexicon_doc_place_atwork_getListings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_atwork_getListings() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

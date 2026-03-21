@@ -16,9 +16,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfile<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    pub did: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
 }
 
 #[jacquard_derive::lexicon]

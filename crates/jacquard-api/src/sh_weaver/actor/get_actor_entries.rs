@@ -18,17 +18,17 @@
 pub struct GetActorEntries<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_collaborations")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub include_collaborations: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_collaborations: core::option::Option<bool>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -43,9 +43,9 @@ pub struct GetActorEntries<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorEntriesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub entries: Vec<crate::sh_weaver::notebook::EntryView<'a>>,
 }
@@ -76,11 +76,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorEntriesRequest {
     type Response = GetActorEntriesResponse;
 }
 
-fn _default_include_collaborations() -> std::option::Option<bool> {
+fn _default_include_collaborations() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 

@@ -19,9 +19,9 @@
 pub struct FailedScheduling<'a> {
     #[serde(borrow)]
     pub error: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub error_code: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::Did<'a>,
 }
@@ -43,9 +43,9 @@ pub struct ScheduleAction<'a> {
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
     ///This will be propagated to the moderation event when it is applied
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: core::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub scheduling: crate::tools_ozone::moderation::schedule_action::SchedulingConfig<
         'a,
@@ -107,14 +107,14 @@ pub struct ScheduledActionResults<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SchedulingConfig<'a> {
     ///Earliest time to execute the action (for randomized scheduling)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub execute_after: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Exact time to execute the action
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub execute_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Latest time to execute the action (for randomized scheduling)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_until: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub execute_until: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Schedule a takedown action
@@ -132,51 +132,53 @@ pub struct SchedulingConfig<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Takedown<'a> {
     ///If true, all other reports on content authored by this account will be resolved (acknowledged).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub acknowledge_account_subjects: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub acknowledge_account_subjects: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Indicates how long the takedown should be in effect before automatically expiring.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_in_hours: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration_in_hours: core::option::Option<i64>,
     ///Email content to be sent to the user upon takedown.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email_content: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email_content: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Subject of the email to be sent to the user upon takedown.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email_subject: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email_subject: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Names/Keywords of the policies that drove the decision.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub policies: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub severity_level: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub severity_level: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Number of strikes to assign to the user when takedown is applied.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub strike_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub strike_count: core::option::Option<i64>,
     ///When the strike should expire. If not provided, the strike never expires.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub strike_expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub strike_expires_at: core::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FailedScheduling<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FailedScheduling<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
     }
     fn def_name() -> &'static str {
         "failedScheduling"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -211,53 +213,53 @@ impl jacquard_common::xrpc::XrpcEndpoint for ScheduleActionRequest {
     type Response = ScheduleActionResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledActionResults<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledActionResults<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
     }
     fn def_name() -> &'static str {
         "scheduledActionResults"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SchedulingConfig<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SchedulingConfig<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
     }
     fn def_name() -> &'static str {
         "schedulingConfig"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Takedown<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Takedown<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.scheduleAction"
     }
     fn def_name() -> &'static str {
         "takedown"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_scheduleAction()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.policies {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
@@ -422,7 +424,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -436,7 +438,7 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tools_ozone_moderation_scheduleAction() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -981,67 +983,67 @@ pub mod schedule_action_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Scheduling;
-        type CreatedBy;
         type Subjects;
         type Action;
+        type Scheduling;
+        type CreatedBy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Scheduling = Unset;
-        type CreatedBy = Unset;
         type Subjects = Unset;
         type Action = Unset;
-    }
-    ///State transition - sets the `scheduling` field to Set
-    pub struct SetScheduling<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduling<S> {}
-    impl<S: State> State for SetScheduling<S> {
-        type Scheduling = Set<members::scheduling>;
-        type CreatedBy = S::CreatedBy;
-        type Subjects = S::Subjects;
-        type Action = S::Action;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type Scheduling = S::Scheduling;
-        type CreatedBy = Set<members::created_by>;
-        type Subjects = S::Subjects;
-        type Action = S::Action;
+        type Scheduling = Unset;
+        type CreatedBy = Unset;
     }
     ///State transition - sets the `subjects` field to Set
     pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjects<S> {}
     impl<S: State> State for SetSubjects<S> {
-        type Scheduling = S::Scheduling;
-        type CreatedBy = S::CreatedBy;
         type Subjects = Set<members::subjects>;
         type Action = S::Action;
+        type Scheduling = S::Scheduling;
+        type CreatedBy = S::CreatedBy;
     }
     ///State transition - sets the `action` field to Set
     pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAction<S> {}
     impl<S: State> State for SetAction<S> {
-        type Scheduling = S::Scheduling;
-        type CreatedBy = S::CreatedBy;
         type Subjects = S::Subjects;
         type Action = Set<members::action>;
+        type Scheduling = S::Scheduling;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `scheduling` field to Set
+    pub struct SetScheduling<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScheduling<S> {}
+    impl<S: State> State for SetScheduling<S> {
+        type Subjects = S::Subjects;
+        type Action = S::Action;
+        type Scheduling = Set<members::scheduling>;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Subjects = S::Subjects;
+        type Action = S::Action;
+        type Scheduling = S::Scheduling;
+        type CreatedBy = Set<members::created_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scheduling` field
-        pub struct scheduling(());
-        ///Marker type for the `created_by` field
-        pub struct created_by(());
         ///Marker type for the `subjects` field
         pub struct subjects(());
         ///Marker type for the `action` field
         pub struct action(());
+        ///Marker type for the `scheduling` field
+        pub struct scheduling(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
     }
 }
 
@@ -1180,10 +1182,10 @@ where
 impl<'a, S> ScheduleActionBuilder<'a, S>
 where
     S: schedule_action_state::State,
-    S::Scheduling: schedule_action_state::IsSet,
-    S::CreatedBy: schedule_action_state::IsSet,
     S::Subjects: schedule_action_state::IsSet,
     S::Action: schedule_action_state::IsSet,
+    S::Scheduling: schedule_action_state::IsSet,
+    S::CreatedBy: schedule_action_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScheduleAction<'a> {
@@ -1199,7 +1201,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1225,37 +1227,37 @@ pub mod scheduled_action_results_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Failed;
         type Succeeded;
+        type Failed;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Failed = Unset;
         type Succeeded = Unset;
-    }
-    ///State transition - sets the `failed` field to Set
-    pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFailed<S> {}
-    impl<S: State> State for SetFailed<S> {
-        type Failed = Set<members::failed>;
-        type Succeeded = S::Succeeded;
+        type Failed = Unset;
     }
     ///State transition - sets the `succeeded` field to Set
     pub struct SetSucceeded<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSucceeded<S> {}
     impl<S: State> State for SetSucceeded<S> {
-        type Failed = S::Failed;
         type Succeeded = Set<members::succeeded>;
+        type Failed = S::Failed;
+    }
+    ///State transition - sets the `failed` field to Set
+    pub struct SetFailed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFailed<S> {}
+    impl<S: State> State for SetFailed<S> {
+        type Succeeded = S::Succeeded;
+        type Failed = Set<members::failed>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `failed` field
-        pub struct failed(());
         ///Marker type for the `succeeded` field
         pub struct succeeded(());
+        ///Marker type for the `failed` field
+        pub struct failed(());
     }
 }
 
@@ -1341,8 +1343,8 @@ where
 impl<'a, S> ScheduledActionResultsBuilder<'a, S>
 where
     S: scheduled_action_results_state::State,
-    S::Failed: scheduled_action_results_state::IsSet,
     S::Succeeded: scheduled_action_results_state::IsSet,
+    S::Failed: scheduled_action_results_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScheduledActionResults<'a> {
@@ -1355,7 +1357,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

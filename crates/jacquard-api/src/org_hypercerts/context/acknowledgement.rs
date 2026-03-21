@@ -21,13 +21,13 @@ pub struct Acknowledgement<'a> {
     ///Whether the relationship is acknowledged (true) or rejected (false).
     pub acknowledged: bool,
     ///Optional plain-text comment providing additional context or reasoning.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Context for the acknowledgement (e.g. the collection that includes an activity, or the activity that includes a contributor). A URI for a lightweight reference or a strong reference for content-hash verification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub context: std::option::Option<AcknowledgementContext<'a>>,
+    pub context: core::option::Option<AcknowledgementContext<'a>>,
     ///Client-declared timestamp when this record was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///The record being acknowledged (e.g. an activity, a contributor information record, an evaluation).
@@ -66,9 +66,9 @@ pub enum AcknowledgementContext<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AcknowledgementGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -115,19 +115,19 @@ impl jacquard_common::types::collection::Collection for AcknowledgementRecord {
     type Record = AcknowledgementRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Acknowledgement<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Acknowledgement<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.acknowledgement"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_context_acknowledgement()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.comment {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
@@ -173,50 +173,50 @@ pub mod acknowledgement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Subject;
-        type CreatedAt;
         type Acknowledged;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Subject = Unset;
-        type CreatedAt = Unset;
         type Acknowledged = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
         type Subject = Set<members::subject>;
+        type Acknowledged = S::Acknowledged;
         type CreatedAt = S::CreatedAt;
-        type Acknowledged = S::Acknowledged;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type CreatedAt = Set<members::created_at>;
-        type Acknowledged = S::Acknowledged;
     }
     ///State transition - sets the `acknowledged` field to Set
     pub struct SetAcknowledged<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAcknowledged<S> {}
     impl<S: State> State for SetAcknowledged<S> {
         type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
         type Acknowledged = Set<members::acknowledged>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type Acknowledged = S::Acknowledged;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `acknowledged` field
         pub struct acknowledged(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -344,8 +344,8 @@ impl<'a, S> AcknowledgementBuilder<'a, S>
 where
     S: acknowledgement_state::State,
     S::Subject: acknowledgement_state::IsSet,
-    S::CreatedAt: acknowledgement_state::IsSet,
     S::Acknowledged: acknowledgement_state::IsSet,
+    S::CreatedAt: acknowledgement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Acknowledgement<'a> {
@@ -361,7 +361,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -377,7 +377,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_context_acknowledgement() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hypercerts_context_acknowledgement() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -21,40 +21,40 @@ pub mod get_stats;
 #[serde(rename_all = "camelCase")]
 pub struct StatsView<'a> {
     ///The total number of unique albums scrobbled.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub albums: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub albums: core::option::Option<i64>,
     ///The total number of unique artists scrobbled.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub artists: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub artists: core::option::Option<i64>,
     ///The total number of tracks marked as loved.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub loved_tracks: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub loved_tracks: core::option::Option<i64>,
     ///The total number of scrobbles.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub scrobbles: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub scrobbles: core::option::Option<i64>,
     ///The total number of unique tracks scrobbled.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub tracks: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub tracks: core::option::Option<i64>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatsView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for StatsView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.stats.defs"
     }
     fn def_name() -> &'static str {
         "statsView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_stats_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_app_rocksky_stats_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_rocksky_stats_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

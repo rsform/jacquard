@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.claim",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A claim for ownership of game or organization records.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "type",
+          "createdAt"
+        ],
+        "properties": {
+          "contact": {
+            "type": "string",
+            "description": "Contact information for the claimant (filtered from responses unless caller is admin)",
+            "maxGraphemes": 500
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "games": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "message": {
+            "type": "string",
+            "maxGraphemes": 3000
+          },
+          "org": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "type": {
+            "type": "string",
+            "knownValues": [
+              "game",
+              "org"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

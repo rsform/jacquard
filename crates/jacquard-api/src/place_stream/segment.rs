@@ -52,29 +52,29 @@ pub struct Framerate<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Segment<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub audio: std::option::Option<Vec<crate::place_stream::segment::Audio<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub audio: core::option::Option<Vec<crate::place_stream::segment::Audio<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_rights: std::option::Option<
+    pub content_rights: core::option::Option<
         crate::place_stream::metadata::content_rights::ContentRights<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_warnings: std::option::Option<
+    pub content_warnings: core::option::Option<
         crate::place_stream::metadata::content_warnings::ContentWarnings<'a>,
     >,
     #[serde(borrow)]
     pub creator: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub distribution_policy: std::option::Option<
+    pub distribution_policy: core::option::Option<
         crate::place_stream::metadata::distribution_policy::DistributionPolicy<'a>,
     >,
     ///The duration of the segment in nanoseconds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration: core::option::Option<i64>,
     ///Unique identifier for the segment
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
@@ -82,13 +82,13 @@ pub struct Segment<'a> {
     #[serde(borrow)]
     pub signing_key: jacquard_common::CowStr<'a>,
     ///The size of the segment in bytes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub size: core::option::Option<i64>,
     ///When this segment started
     pub start_time: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub video: std::option::Option<Vec<crate::place_stream::segment::Video<'a>>>,
+    pub video: core::option::Option<Vec<crate::place_stream::segment::Video<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -103,9 +103,9 @@ pub struct Segment<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SegmentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -142,13 +142,13 @@ pub struct SegmentView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Video<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bframes: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub bframes: core::option::Option<bool>,
     #[serde(borrow)]
     pub codec: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub framerate: std::option::Option<crate::place_stream::segment::Framerate<'a>>,
+    pub framerate: core::option::Option<crate::place_stream::segment::Framerate<'a>>,
     pub height: i64,
     pub width: i64,
 }
@@ -166,36 +166,36 @@ impl<'a> Segment<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Audio<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Audio<'a> {
     fn nsid() -> &'static str {
         "place.stream.segment"
     }
     fn def_name() -> &'static str {
         "audio"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_segment()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Framerate<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Framerate<'a> {
     fn nsid() -> &'static str {
         "place.stream.segment"
     }
     fn def_name() -> &'static str {
         "framerate"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_segment()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -227,53 +227,53 @@ impl jacquard_common::types::collection::Collection for SegmentRecord {
     type Record = SegmentRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Segment<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Segment<'a> {
     fn nsid() -> &'static str {
         "place.stream.segment"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_segment()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SegmentView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SegmentView<'a> {
     fn nsid() -> &'static str {
         "place.stream.segment"
     }
     fn def_name() -> &'static str {
         "segmentView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_segment()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Video<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Video<'a> {
     fn nsid() -> &'static str {
         "place.stream.segment"
     }
     fn def_name() -> &'static str {
         "video"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_segment()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -288,51 +288,51 @@ pub mod audio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Channels;
         type Codec;
         type Rate;
-        type Channels;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Channels = Unset;
         type Codec = Unset;
         type Rate = Unset;
-        type Channels = Unset;
-    }
-    ///State transition - sets the `codec` field to Set
-    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodec<S> {}
-    impl<S: State> State for SetCodec<S> {
-        type Codec = Set<members::codec>;
-        type Rate = S::Rate;
-        type Channels = S::Channels;
-    }
-    ///State transition - sets the `rate` field to Set
-    pub struct SetRate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRate<S> {}
-    impl<S: State> State for SetRate<S> {
-        type Codec = S::Codec;
-        type Rate = Set<members::rate>;
-        type Channels = S::Channels;
     }
     ///State transition - sets the `channels` field to Set
     pub struct SetChannels<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChannels<S> {}
     impl<S: State> State for SetChannels<S> {
+        type Channels = Set<members::channels>;
         type Codec = S::Codec;
         type Rate = S::Rate;
-        type Channels = Set<members::channels>;
+    }
+    ///State transition - sets the `codec` field to Set
+    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodec<S> {}
+    impl<S: State> State for SetCodec<S> {
+        type Channels = S::Channels;
+        type Codec = Set<members::codec>;
+        type Rate = S::Rate;
+    }
+    ///State transition - sets the `rate` field to Set
+    pub struct SetRate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRate<S> {}
+    impl<S: State> State for SetRate<S> {
+        type Channels = S::Channels;
+        type Codec = S::Codec;
+        type Rate = Set<members::rate>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `channels` field
+        pub struct channels(());
         ///Marker type for the `codec` field
         pub struct codec(());
         ///Marker type for the `rate` field
         pub struct rate(());
-        ///Marker type for the `channels` field
-        pub struct channels(());
     }
 }
 
@@ -425,9 +425,9 @@ where
 impl<'a, S> AudioBuilder<'a, S>
 where
     S: audio_state::State,
+    S::Channels: audio_state::IsSet,
     S::Codec: audio_state::IsSet,
     S::Rate: audio_state::IsSet,
-    S::Channels: audio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Audio<'a> {
@@ -441,7 +441,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -455,9 +455,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_segment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_stream_segment() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.segment"),
@@ -1025,7 +1023,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1048,67 +1046,67 @@ pub mod segment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type SigningKey;
         type Creator;
         type StartTime;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type SigningKey = Unset;
         type Creator = Unset;
         type StartTime = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type SigningKey = S::SigningKey;
-        type Creator = S::Creator;
-        type StartTime = S::StartTime;
+        type Id = Unset;
     }
     ///State transition - sets the `signing_key` field to Set
     pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSigningKey<S> {}
     impl<S: State> State for SetSigningKey<S> {
-        type Id = S::Id;
         type SigningKey = Set<members::signing_key>;
         type Creator = S::Creator;
         type StartTime = S::StartTime;
+        type Id = S::Id;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
-        type Id = S::Id;
         type SigningKey = S::SigningKey;
         type Creator = Set<members::creator>;
         type StartTime = S::StartTime;
+        type Id = S::Id;
     }
     ///State transition - sets the `start_time` field to Set
     pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartTime<S> {}
     impl<S: State> State for SetStartTime<S> {
-        type Id = S::Id;
         type SigningKey = S::SigningKey;
         type Creator = S::Creator;
         type StartTime = Set<members::start_time>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type SigningKey = S::SigningKey;
+        type Creator = S::Creator;
+        type StartTime = S::StartTime;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `signing_key` field
         pub struct signing_key(());
         ///Marker type for the `creator` field
         pub struct creator(());
         ///Marker type for the `start_time` field
         pub struct start_time(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -1381,10 +1379,10 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
 impl<'a, S> SegmentBuilder<'a, S>
 where
     S: segment_state::State,
-    S::Id: segment_state::IsSet,
     S::SigningKey: segment_state::IsSet,
     S::Creator: segment_state::IsSet,
     S::StartTime: segment_state::IsSet,
+    S::Id: segment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Segment<'a> {
@@ -1406,7 +1404,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1438,37 +1436,37 @@ pub mod segment_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Record;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Record = S::Record;
+        type Cid = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Cid = S::Cid;
         type Record = Set<members::record>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Record = S::Record;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -1541,8 +1539,8 @@ where
 impl<'a, S> SegmentViewBuilder<'a, S>
 where
     S: segment_view_state::State,
-    S::Cid: segment_view_state::IsSet,
     S::Record: segment_view_state::IsSet,
+    S::Cid: segment_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SegmentView<'a> {
@@ -1555,7 +1553,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1578,49 +1576,49 @@ pub mod video_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Codec;
         type Width;
+        type Codec;
         type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Codec = Unset;
         type Width = Unset;
+        type Codec = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `codec` field to Set
-    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodec<S> {}
-    impl<S: State> State for SetCodec<S> {
-        type Codec = Set<members::codec>;
-        type Width = S::Width;
-        type Height = S::Height;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWidth<S> {}
     impl<S: State> State for SetWidth<S> {
-        type Codec = S::Codec;
         type Width = Set<members::width>;
+        type Codec = S::Codec;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `codec` field to Set
+    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodec<S> {}
+    impl<S: State> State for SetCodec<S> {
+        type Width = S::Width;
+        type Codec = Set<members::codec>;
         type Height = S::Height;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeight<S> {}
     impl<S: State> State for SetHeight<S> {
-        type Codec = S::Codec;
         type Width = S::Width;
+        type Codec = S::Codec;
         type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `codec` field
-        pub struct codec(());
         ///Marker type for the `width` field
         pub struct width(());
+        ///Marker type for the `codec` field
+        pub struct codec(());
         ///Marker type for the `height` field
         pub struct height(());
     }
@@ -1749,8 +1747,8 @@ where
 impl<'a, S> VideoBuilder<'a, S>
 where
     S: video_state::State,
-    S::Codec: video_state::IsSet,
     S::Width: video_state::IsSet,
+    S::Codec: video_state::IsSet,
     S::Height: video_state::IsSet,
 {
     /// Build the final struct
@@ -1767,7 +1765,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

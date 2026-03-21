@@ -19,33 +19,33 @@
 #[serde(rename_all = "camelCase")]
 pub struct Item<'a> {
     ///Structured address using community lexicon
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub address_details: std::option::Option<
+    pub address_details: core::option::Option<
         crate::community_lexicon::location::address::Address<'a>,
     >,
     ///Timestamp when the bookmark was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Reference to a bookmark folder
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub folder_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub folder_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///Structured location using community lexicon
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<crate::community_lexicon::location::geo::Geo<'a>>,
+    pub location: core::option::Option<crate::community_lexicon::location::geo::Geo<'a>>,
     ///User notes about the bookmark
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Human-readable address
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub venue_address: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub venue_address: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Category classification
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub venue_category: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub venue_category: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Display name of the venue
     #[serde(borrow)]
     pub venue_name: jacquard_common::CowStr<'a>,
@@ -66,9 +66,9 @@ pub struct Item<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ItemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -115,19 +115,19 @@ impl jacquard_common::types::collection::Collection for ItemRecord {
     type Record = ItemRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Item<'a> {
     fn nsid() -> &'static str {
         "app.beaconbits.bookmark.item"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_beaconbits_bookmark_item()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.notes {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -234,51 +234,51 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type VenueUri;
         type CreatedAt;
         type VenueName;
+        type VenueUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type VenueUri = Unset;
         type CreatedAt = Unset;
         type VenueName = Unset;
-    }
-    ///State transition - sets the `venue_uri` field to Set
-    pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueUri<S> {}
-    impl<S: State> State for SetVenueUri<S> {
-        type VenueUri = Set<members::venue_uri>;
-        type CreatedAt = S::CreatedAt;
-        type VenueName = S::VenueName;
+        type VenueUri = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type VenueUri = S::VenueUri;
         type CreatedAt = Set<members::created_at>;
         type VenueName = S::VenueName;
+        type VenueUri = S::VenueUri;
     }
     ///State transition - sets the `venue_name` field to Set
     pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVenueName<S> {}
     impl<S: State> State for SetVenueName<S> {
-        type VenueUri = S::VenueUri;
         type CreatedAt = S::CreatedAt;
         type VenueName = Set<members::venue_name>;
+        type VenueUri = S::VenueUri;
+    }
+    ///State transition - sets the `venue_uri` field to Set
+    pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVenueUri<S> {}
+    impl<S: State> State for SetVenueUri<S> {
+        type CreatedAt = S::CreatedAt;
+        type VenueName = S::VenueName;
+        type VenueUri = Set<members::venue_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `venue_uri` field
-        pub struct venue_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `venue_name` field
         pub struct venue_name(());
+        ///Marker type for the `venue_uri` field
+        pub struct venue_uri(());
     }
 }
 
@@ -500,9 +500,9 @@ where
 impl<'a, S> ItemBuilder<'a, S>
 where
     S: item_state::State,
-    S::VenueUri: item_state::IsSet,
     S::CreatedAt: item_state::IsSet,
     S::VenueName: item_state::IsSet,
+    S::VenueUri: item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Item<'a> {
@@ -522,7 +522,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -542,7 +542,7 @@ where
     }
 }
 
-fn lexicon_doc_app_beaconbits_bookmark_item() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_beaconbits_bookmark_item() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -19,303 +19,303 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Embedded<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accepted_payment_method: std::option::Option<EmbeddedAcceptedPaymentMethod<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accepted_payment_method: core::option::Option<EmbeddedAcceptedPaymentMethod<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub actionable_feedback_policy: std::option::Option<
+    pub actionable_feedback_policy: core::option::Option<
         EmbeddedActionableFeedbackPolicy<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub additional_type: std::option::Option<EmbeddedAdditionalType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub additional_type: core::option::Option<EmbeddedAdditionalType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub address: std::option::Option<EmbeddedAddress<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub address: core::option::Option<EmbeddedAddress<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub agent_interaction_statistic: std::option::Option<
+    pub agent_interaction_statistic: core::option::Option<
         EmbeddedAgentInteractionStatistic<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aggregate_rating: std::option::Option<EmbeddedAggregateRating<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub aggregate_rating: core::option::Option<EmbeddedAggregateRating<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album: std::option::Option<EmbeddedAlbum<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub album: core::option::Option<EmbeddedAlbum<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub albums: std::option::Option<EmbeddedAlbums<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub albums: core::option::Option<EmbeddedAlbums<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alternate_name: std::option::Option<EmbeddedAlternateName<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alternate_name: core::option::Option<EmbeddedAlternateName<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alumni: std::option::Option<EmbeddedAlumni<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alumni: core::option::Option<EmbeddedAlumni<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub area_served: std::option::Option<EmbeddedAreaServed<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub area_served: core::option::Option<EmbeddedAreaServed<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub award: std::option::Option<EmbeddedAward<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub award: core::option::Option<EmbeddedAward<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub awards: std::option::Option<EmbeddedAwards<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub awards: core::option::Option<EmbeddedAwards<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub brand: std::option::Option<EmbeddedBrand<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub brand: core::option::Option<EmbeddedBrand<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub company_registration: std::option::Option<EmbeddedCompanyRegistration<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub company_registration: core::option::Option<EmbeddedCompanyRegistration<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contact_point: std::option::Option<EmbeddedContactPoint<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub contact_point: core::option::Option<EmbeddedContactPoint<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contact_points: std::option::Option<EmbeddedContactPoints<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub contact_points: core::option::Option<EmbeddedContactPoints<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub corrections_policy: std::option::Option<EmbeddedCorrectionsPolicy<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub corrections_policy: core::option::Option<EmbeddedCorrectionsPolicy<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub department: std::option::Option<EmbeddedDepartment<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub department: core::option::Option<EmbeddedDepartment<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<EmbeddedDescription<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<EmbeddedDescription<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub disambiguating_description: std::option::Option<
+    pub disambiguating_description: core::option::Option<
         EmbeddedDisambiguatingDescription<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub dissolution_date: std::option::Option<EmbeddedDissolutionDate<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub dissolution_date: core::option::Option<EmbeddedDissolutionDate<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub diversity_policy: std::option::Option<EmbeddedDiversityPolicy<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub diversity_policy: core::option::Option<EmbeddedDiversityPolicy<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub diversity_staffing_report: std::option::Option<
+    pub diversity_staffing_report: core::option::Option<
         EmbeddedDiversityStaffingReport<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub duns: std::option::Option<EmbeddedDuns<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub duns: core::option::Option<EmbeddedDuns<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: std::option::Option<EmbeddedEmail<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub email: core::option::Option<EmbeddedEmail<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub employee: std::option::Option<EmbeddedEmployee<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub employee: core::option::Option<EmbeddedEmployee<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub employees: std::option::Option<EmbeddedEmployees<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub employees: core::option::Option<EmbeddedEmployees<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ethics_policy: std::option::Option<EmbeddedEthicsPolicy<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ethics_policy: core::option::Option<EmbeddedEthicsPolicy<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub event: std::option::Option<EmbeddedEvent<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub event: core::option::Option<EmbeddedEvent<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub events: std::option::Option<EmbeddedEvents<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub events: core::option::Option<EmbeddedEvents<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub fax_number: std::option::Option<EmbeddedFaxNumber<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub fax_number: core::option::Option<EmbeddedFaxNumber<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub founder: std::option::Option<EmbeddedFounder<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub founder: core::option::Option<EmbeddedFounder<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub founders: std::option::Option<EmbeddedFounders<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub founders: core::option::Option<EmbeddedFounders<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub founding_date: std::option::Option<EmbeddedFoundingDate<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub founding_date: core::option::Option<EmbeddedFoundingDate<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub founding_location: std::option::Option<EmbeddedFoundingLocation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub founding_location: core::option::Option<EmbeddedFoundingLocation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub funder: std::option::Option<EmbeddedFunder<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub funder: core::option::Option<EmbeddedFunder<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub funding: std::option::Option<EmbeddedFunding<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub funding: core::option::Option<EmbeddedFunding<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genre: std::option::Option<EmbeddedGenre<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub genre: core::option::Option<EmbeddedGenre<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub global_location_number: std::option::Option<EmbeddedGlobalLocationNumber<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub global_location_number: core::option::Option<EmbeddedGlobalLocationNumber<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_certification: std::option::Option<EmbeddedHasCertification<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_certification: core::option::Option<EmbeddedHasCertification<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_credential: std::option::Option<EmbeddedHasCredential<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_credential: core::option::Option<EmbeddedHasCredential<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_gs1_digital_link: std::option::Option<EmbeddedHasGs1DigitalLink<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_gs1_digital_link: core::option::Option<EmbeddedHasGs1DigitalLink<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_member_program: std::option::Option<EmbeddedHasMemberProgram<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_member_program: core::option::Option<EmbeddedHasMemberProgram<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_merchant_return_policy: std::option::Option<
+    pub has_merchant_return_policy: core::option::Option<
         EmbeddedHasMerchantReturnPolicy<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_offer_catalog: std::option::Option<EmbeddedHasOfferCatalog<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_offer_catalog: core::option::Option<EmbeddedHasOfferCatalog<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_pos: std::option::Option<EmbeddedHasPos<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_pos: core::option::Option<EmbeddedHasPos<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_product_return_policy: std::option::Option<
+    pub has_product_return_policy: core::option::Option<
         EmbeddedHasProductReturnPolicy<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_shipping_service: std::option::Option<EmbeddedHasShippingService<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_shipping_service: core::option::Option<EmbeddedHasShippingService<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identifier: std::option::Option<EmbeddedIdentifier<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub identifier: core::option::Option<EmbeddedIdentifier<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<EmbeddedImage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub image: core::option::Option<EmbeddedImage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub interaction_statistic: std::option::Option<EmbeddedInteractionStatistic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub interaction_statistic: core::option::Option<EmbeddedInteractionStatistic<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub isic_v4: std::option::Option<EmbeddedIsicV4<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub isic_v4: core::option::Option<EmbeddedIsicV4<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub iso6523_code: std::option::Option<EmbeddedIso6523Code<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub iso6523_code: core::option::Option<EmbeddedIso6523Code<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keywords: std::option::Option<EmbeddedKeywords<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub keywords: core::option::Option<EmbeddedKeywords<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub knows_about: std::option::Option<EmbeddedKnowsAbout<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub knows_about: core::option::Option<EmbeddedKnowsAbout<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub knows_language: std::option::Option<EmbeddedKnowsLanguage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub knows_language: core::option::Option<EmbeddedKnowsLanguage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub legal_address: std::option::Option<EmbeddedLegalAddress<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub legal_address: core::option::Option<EmbeddedLegalAddress<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub legal_name: std::option::Option<EmbeddedLegalName<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub legal_name: core::option::Option<EmbeddedLegalName<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub legal_representative: std::option::Option<EmbeddedLegalRepresentative<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub legal_representative: core::option::Option<EmbeddedLegalRepresentative<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lei_code: std::option::Option<EmbeddedLeiCode<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub lei_code: core::option::Option<EmbeddedLeiCode<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<EmbeddedLocation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub location: core::option::Option<EmbeddedLocation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub logo: std::option::Option<EmbeddedLogo<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub logo: core::option::Option<EmbeddedLogo<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub main_entity_of_page: std::option::Option<EmbeddedMainEntityOfPage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub main_entity_of_page: core::option::Option<EmbeddedMainEntityOfPage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub makes_offer: std::option::Option<EmbeddedMakesOffer<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub makes_offer: core::option::Option<EmbeddedMakesOffer<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub member: std::option::Option<EmbeddedMember<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub member: core::option::Option<EmbeddedMember<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub member_of: std::option::Option<EmbeddedMemberOf<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub member_of: core::option::Option<EmbeddedMemberOf<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub members: std::option::Option<EmbeddedMembers<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub members: core::option::Option<EmbeddedMembers<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub music_group_member: std::option::Option<EmbeddedMusicGroupMember<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub music_group_member: core::option::Option<EmbeddedMusicGroupMember<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub naics: std::option::Option<EmbeddedNaics<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub naics: core::option::Option<EmbeddedNaics<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<EmbeddedName<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub name: core::option::Option<EmbeddedName<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub nonprofit_status: std::option::Option<EmbeddedNonprofitStatus<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub nonprofit_status: core::option::Option<EmbeddedNonprofitStatus<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub number_of_employees: std::option::Option<EmbeddedNumberOfEmployees<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub number_of_employees: core::option::Option<EmbeddedNumberOfEmployees<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ownership_funding_info: std::option::Option<EmbeddedOwnershipFundingInfo<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ownership_funding_info: core::option::Option<EmbeddedOwnershipFundingInfo<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub owns: std::option::Option<EmbeddedOwns<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub owns: core::option::Option<EmbeddedOwns<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_organization: std::option::Option<EmbeddedParentOrganization<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub parent_organization: core::option::Option<EmbeddedParentOrganization<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub potential_action: std::option::Option<EmbeddedPotentialAction<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub potential_action: core::option::Option<EmbeddedPotentialAction<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publishing_principles: std::option::Option<EmbeddedPublishingPrinciples<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub publishing_principles: core::option::Option<EmbeddedPublishingPrinciples<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub review: std::option::Option<EmbeddedReview<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub review: core::option::Option<EmbeddedReview<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reviews: std::option::Option<EmbeddedReviews<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reviews: core::option::Option<EmbeddedReviews<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub same_as: std::option::Option<EmbeddedSameAs<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub same_as: core::option::Option<EmbeddedSameAs<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub seeks: std::option::Option<EmbeddedSeeks<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub seeks: core::option::Option<EmbeddedSeeks<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub service_area: std::option::Option<EmbeddedServiceArea<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub service_area: core::option::Option<EmbeddedServiceArea<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub skills: std::option::Option<EmbeddedSkills<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub skills: core::option::Option<EmbeddedSkills<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slogan: std::option::Option<EmbeddedSlogan<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub slogan: core::option::Option<EmbeddedSlogan<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sponsor: std::option::Option<EmbeddedSponsor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sponsor: core::option::Option<EmbeddedSponsor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sub_organization: std::option::Option<EmbeddedSubOrganization<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sub_organization: core::option::Option<EmbeddedSubOrganization<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_of: std::option::Option<EmbeddedSubjectOf<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subject_of: core::option::Option<EmbeddedSubjectOf<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tax_id: std::option::Option<EmbeddedTaxId<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tax_id: core::option::Option<EmbeddedTaxId<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub telephone: std::option::Option<EmbeddedTelephone<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub telephone: core::option::Option<EmbeddedTelephone<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub track: std::option::Option<EmbeddedTrack<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub track: core::option::Option<EmbeddedTrack<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tracks: std::option::Option<EmbeddedTracks<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tracks: core::option::Option<EmbeddedTracks<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub unnamed_sources_policy: std::option::Option<EmbeddedUnnamedSourcesPolicy<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub unnamed_sources_policy: core::option::Option<EmbeddedUnnamedSourcesPolicy<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<EmbeddedUrl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub url: core::option::Option<EmbeddedUrl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub vat_id: std::option::Option<EmbeddedVatId<'a>>,
+    pub vat_id: core::option::Option<EmbeddedVatId<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -1701,305 +1701,305 @@ pub enum EmbeddedVatId<'a> {}
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MusicGroup<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accepted_payment_method: std::option::Option<
+    pub accepted_payment_method: core::option::Option<
         MusicGroupAcceptedPaymentMethod<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub actionable_feedback_policy: std::option::Option<
+    pub actionable_feedback_policy: core::option::Option<
         MusicGroupActionableFeedbackPolicy<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub additional_type: std::option::Option<MusicGroupAdditionalType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub additional_type: core::option::Option<MusicGroupAdditionalType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub address: std::option::Option<MusicGroupAddress<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub address: core::option::Option<MusicGroupAddress<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub agent_interaction_statistic: std::option::Option<
+    pub agent_interaction_statistic: core::option::Option<
         MusicGroupAgentInteractionStatistic<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aggregate_rating: std::option::Option<MusicGroupAggregateRating<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub aggregate_rating: core::option::Option<MusicGroupAggregateRating<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album: std::option::Option<MusicGroupAlbum<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub album: core::option::Option<MusicGroupAlbum<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub albums: std::option::Option<MusicGroupAlbums<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub albums: core::option::Option<MusicGroupAlbums<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alternate_name: std::option::Option<MusicGroupAlternateName<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alternate_name: core::option::Option<MusicGroupAlternateName<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alumni: std::option::Option<MusicGroupAlumni<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alumni: core::option::Option<MusicGroupAlumni<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub area_served: std::option::Option<MusicGroupAreaServed<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub area_served: core::option::Option<MusicGroupAreaServed<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub award: std::option::Option<MusicGroupAward<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub award: core::option::Option<MusicGroupAward<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub awards: std::option::Option<MusicGroupAwards<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub awards: core::option::Option<MusicGroupAwards<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub brand: std::option::Option<MusicGroupBrand<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub brand: core::option::Option<MusicGroupBrand<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub company_registration: std::option::Option<MusicGroupCompanyRegistration<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub company_registration: core::option::Option<MusicGroupCompanyRegistration<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contact_point: std::option::Option<MusicGroupContactPoint<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub contact_point: core::option::Option<MusicGroupContactPoint<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contact_points: std::option::Option<MusicGroupContactPoints<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub contact_points: core::option::Option<MusicGroupContactPoints<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub corrections_policy: std::option::Option<MusicGroupCorrectionsPolicy<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub corrections_policy: core::option::Option<MusicGroupCorrectionsPolicy<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub department: std::option::Option<MusicGroupDepartment<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub department: core::option::Option<MusicGroupDepartment<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<MusicGroupDescription<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<MusicGroupDescription<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub disambiguating_description: std::option::Option<
+    pub disambiguating_description: core::option::Option<
         MusicGroupDisambiguatingDescription<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub dissolution_date: std::option::Option<MusicGroupDissolutionDate<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub dissolution_date: core::option::Option<MusicGroupDissolutionDate<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub diversity_policy: std::option::Option<MusicGroupDiversityPolicy<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub diversity_policy: core::option::Option<MusicGroupDiversityPolicy<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub diversity_staffing_report: std::option::Option<
+    pub diversity_staffing_report: core::option::Option<
         MusicGroupDiversityStaffingReport<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub duns: std::option::Option<MusicGroupDuns<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub duns: core::option::Option<MusicGroupDuns<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: std::option::Option<MusicGroupEmail<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub email: core::option::Option<MusicGroupEmail<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub employee: std::option::Option<MusicGroupEmployee<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub employee: core::option::Option<MusicGroupEmployee<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub employees: std::option::Option<MusicGroupEmployees<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub employees: core::option::Option<MusicGroupEmployees<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ethics_policy: std::option::Option<MusicGroupEthicsPolicy<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ethics_policy: core::option::Option<MusicGroupEthicsPolicy<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub event: std::option::Option<MusicGroupEvent<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub event: core::option::Option<MusicGroupEvent<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub events: std::option::Option<MusicGroupEvents<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub events: core::option::Option<MusicGroupEvents<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub fax_number: std::option::Option<MusicGroupFaxNumber<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub fax_number: core::option::Option<MusicGroupFaxNumber<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub founder: std::option::Option<MusicGroupFounder<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub founder: core::option::Option<MusicGroupFounder<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub founders: std::option::Option<MusicGroupFounders<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub founders: core::option::Option<MusicGroupFounders<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub founding_date: std::option::Option<MusicGroupFoundingDate<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub founding_date: core::option::Option<MusicGroupFoundingDate<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub founding_location: std::option::Option<MusicGroupFoundingLocation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub founding_location: core::option::Option<MusicGroupFoundingLocation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub funder: std::option::Option<MusicGroupFunder<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub funder: core::option::Option<MusicGroupFunder<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub funding: std::option::Option<MusicGroupFunding<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub funding: core::option::Option<MusicGroupFunding<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genre: std::option::Option<MusicGroupGenre<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub genre: core::option::Option<MusicGroupGenre<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub global_location_number: std::option::Option<MusicGroupGlobalLocationNumber<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub global_location_number: core::option::Option<MusicGroupGlobalLocationNumber<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_certification: std::option::Option<MusicGroupHasCertification<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_certification: core::option::Option<MusicGroupHasCertification<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_credential: std::option::Option<MusicGroupHasCredential<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_credential: core::option::Option<MusicGroupHasCredential<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_gs1_digital_link: std::option::Option<MusicGroupHasGs1DigitalLink<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_gs1_digital_link: core::option::Option<MusicGroupHasGs1DigitalLink<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_member_program: std::option::Option<MusicGroupHasMemberProgram<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_member_program: core::option::Option<MusicGroupHasMemberProgram<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_merchant_return_policy: std::option::Option<
+    pub has_merchant_return_policy: core::option::Option<
         MusicGroupHasMerchantReturnPolicy<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_offer_catalog: std::option::Option<MusicGroupHasOfferCatalog<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_offer_catalog: core::option::Option<MusicGroupHasOfferCatalog<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_pos: std::option::Option<MusicGroupHasPos<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_pos: core::option::Option<MusicGroupHasPos<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_product_return_policy: std::option::Option<
+    pub has_product_return_policy: core::option::Option<
         MusicGroupHasProductReturnPolicy<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_shipping_service: std::option::Option<MusicGroupHasShippingService<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_shipping_service: core::option::Option<MusicGroupHasShippingService<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identifier: std::option::Option<MusicGroupIdentifier<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub identifier: core::option::Option<MusicGroupIdentifier<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<MusicGroupImage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub image: core::option::Option<MusicGroupImage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub interaction_statistic: std::option::Option<MusicGroupInteractionStatistic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub interaction_statistic: core::option::Option<MusicGroupInteractionStatistic<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub isic_v4: std::option::Option<MusicGroupIsicV4<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub isic_v4: core::option::Option<MusicGroupIsicV4<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub iso6523_code: std::option::Option<MusicGroupIso6523Code<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub iso6523_code: core::option::Option<MusicGroupIso6523Code<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keywords: std::option::Option<MusicGroupKeywords<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub keywords: core::option::Option<MusicGroupKeywords<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub knows_about: std::option::Option<MusicGroupKnowsAbout<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub knows_about: core::option::Option<MusicGroupKnowsAbout<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub knows_language: std::option::Option<MusicGroupKnowsLanguage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub knows_language: core::option::Option<MusicGroupKnowsLanguage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub legal_address: std::option::Option<MusicGroupLegalAddress<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub legal_address: core::option::Option<MusicGroupLegalAddress<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub legal_name: std::option::Option<MusicGroupLegalName<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub legal_name: core::option::Option<MusicGroupLegalName<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub legal_representative: std::option::Option<MusicGroupLegalRepresentative<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub legal_representative: core::option::Option<MusicGroupLegalRepresentative<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lei_code: std::option::Option<MusicGroupLeiCode<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub lei_code: core::option::Option<MusicGroupLeiCode<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<MusicGroupLocation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub location: core::option::Option<MusicGroupLocation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub logo: std::option::Option<MusicGroupLogo<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub logo: core::option::Option<MusicGroupLogo<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub main_entity_of_page: std::option::Option<MusicGroupMainEntityOfPage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub main_entity_of_page: core::option::Option<MusicGroupMainEntityOfPage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub makes_offer: std::option::Option<MusicGroupMakesOffer<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub makes_offer: core::option::Option<MusicGroupMakesOffer<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub member: std::option::Option<MusicGroupMember<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub member: core::option::Option<MusicGroupMember<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub member_of: std::option::Option<MusicGroupMemberOf<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub member_of: core::option::Option<MusicGroupMemberOf<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub members: std::option::Option<MusicGroupMembers<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub members: core::option::Option<MusicGroupMembers<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub music_group_member: std::option::Option<MusicGroupMusicGroupMember<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub music_group_member: core::option::Option<MusicGroupMusicGroupMember<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub naics: std::option::Option<MusicGroupNaics<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub naics: core::option::Option<MusicGroupNaics<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<MusicGroupName<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub name: core::option::Option<MusicGroupName<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub nonprofit_status: std::option::Option<MusicGroupNonprofitStatus<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub nonprofit_status: core::option::Option<MusicGroupNonprofitStatus<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub number_of_employees: std::option::Option<MusicGroupNumberOfEmployees<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub number_of_employees: core::option::Option<MusicGroupNumberOfEmployees<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ownership_funding_info: std::option::Option<MusicGroupOwnershipFundingInfo<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ownership_funding_info: core::option::Option<MusicGroupOwnershipFundingInfo<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub owns: std::option::Option<MusicGroupOwns<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub owns: core::option::Option<MusicGroupOwns<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_organization: std::option::Option<MusicGroupParentOrganization<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub parent_organization: core::option::Option<MusicGroupParentOrganization<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub potential_action: std::option::Option<MusicGroupPotentialAction<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub potential_action: core::option::Option<MusicGroupPotentialAction<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publishing_principles: std::option::Option<MusicGroupPublishingPrinciples<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub publishing_principles: core::option::Option<MusicGroupPublishingPrinciples<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub review: std::option::Option<MusicGroupReview<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub review: core::option::Option<MusicGroupReview<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reviews: std::option::Option<MusicGroupReviews<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reviews: core::option::Option<MusicGroupReviews<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub same_as: std::option::Option<MusicGroupSameAs<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub same_as: core::option::Option<MusicGroupSameAs<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub seeks: std::option::Option<MusicGroupSeeks<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub seeks: core::option::Option<MusicGroupSeeks<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub service_area: std::option::Option<MusicGroupServiceArea<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub service_area: core::option::Option<MusicGroupServiceArea<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub skills: std::option::Option<MusicGroupSkills<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub skills: core::option::Option<MusicGroupSkills<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slogan: std::option::Option<MusicGroupSlogan<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub slogan: core::option::Option<MusicGroupSlogan<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sponsor: std::option::Option<MusicGroupSponsor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sponsor: core::option::Option<MusicGroupSponsor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sub_organization: std::option::Option<MusicGroupSubOrganization<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sub_organization: core::option::Option<MusicGroupSubOrganization<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_of: std::option::Option<MusicGroupSubjectOf<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subject_of: core::option::Option<MusicGroupSubjectOf<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tax_id: std::option::Option<MusicGroupTaxId<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tax_id: core::option::Option<MusicGroupTaxId<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub telephone: std::option::Option<MusicGroupTelephone<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub telephone: core::option::Option<MusicGroupTelephone<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub track: std::option::Option<MusicGroupTrack<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub track: core::option::Option<MusicGroupTrack<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tracks: std::option::Option<MusicGroupTracks<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tracks: core::option::Option<MusicGroupTracks<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub unnamed_sources_policy: std::option::Option<MusicGroupUnnamedSourcesPolicy<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub unnamed_sources_policy: core::option::Option<MusicGroupUnnamedSourcesPolicy<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<MusicGroupUrl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub url: core::option::Option<MusicGroupUrl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub vat_id: std::option::Option<MusicGroupVatId<'a>>,
+    pub vat_id: core::option::Option<MusicGroupVatId<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -3385,9 +3385,9 @@ pub enum MusicGroupVatId<'a> {}
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MusicGroupGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -3407,19 +3407,19 @@ impl<'a> MusicGroup<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Embedded<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Embedded<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.MusicGroup"
     }
     fn def_name() -> &'static str {
         "embedded"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_type_MusicGroup()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -3451,24 +3451,24 @@ impl jacquard_common::types::collection::Collection for MusicGroupRecord {
     type Record = MusicGroupRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MusicGroup<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MusicGroup<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.MusicGroup"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_type_MusicGroup()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_social_flockfeeds_lexical_type_MusicGroup() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_flockfeeds_lexical_type_MusicGroup() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -7945,7 +7945,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

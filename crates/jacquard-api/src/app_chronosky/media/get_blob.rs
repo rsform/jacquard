@@ -51,10 +51,10 @@ pub struct GetBlobOutput {
 pub enum GetBlobError<'a> {
     /// The requested blob was not found.
     #[serde(rename = "BlobNotFound")]
-    BlobNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    BlobNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid CID format or missing parameters.
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetBlobError<'_> {

@@ -33,19 +33,19 @@ Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
     pub scryfall_uri: jacquard_common::types::string::UriValue<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CardRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CardRef<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.defs"
     }
     fn def_name() -> &'static str {
         "cardRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -60,37 +60,37 @@ pub mod card_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type OracleUri;
         type ScryfallUri;
+        type OracleUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type OracleUri = Unset;
         type ScryfallUri = Unset;
-    }
-    ///State transition - sets the `oracle_uri` field to Set
-    pub struct SetOracleUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOracleUri<S> {}
-    impl<S: State> State for SetOracleUri<S> {
-        type OracleUri = Set<members::oracle_uri>;
-        type ScryfallUri = S::ScryfallUri;
+        type OracleUri = Unset;
     }
     ///State transition - sets the `scryfall_uri` field to Set
     pub struct SetScryfallUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScryfallUri<S> {}
     impl<S: State> State for SetScryfallUri<S> {
-        type OracleUri = S::OracleUri;
         type ScryfallUri = Set<members::scryfall_uri>;
+        type OracleUri = S::OracleUri;
+    }
+    ///State transition - sets the `oracle_uri` field to Set
+    pub struct SetOracleUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOracleUri<S> {}
+    impl<S: State> State for SetOracleUri<S> {
+        type ScryfallUri = S::ScryfallUri;
+        type OracleUri = Set<members::oracle_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `oracle_uri` field
-        pub struct oracle_uri(());
         ///Marker type for the `scryfall_uri` field
         pub struct scryfall_uri(());
+        ///Marker type for the `oracle_uri` field
+        pub struct oracle_uri(());
     }
 }
 
@@ -163,8 +163,8 @@ where
 impl<'a, S> CardRefBuilder<'a, S>
 where
     S: card_ref_state::State,
-    S::OracleUri: card_ref_state::IsSet,
     S::ScryfallUri: card_ref_state::IsSet,
+    S::OracleUri: card_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CardRef<'a> {
@@ -177,7 +177,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -190,9 +190,7 @@ where
     }
 }
 
-fn lexicon_doc_com_deckbelcher_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_com_deckbelcher_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("com.deckbelcher.defs"),

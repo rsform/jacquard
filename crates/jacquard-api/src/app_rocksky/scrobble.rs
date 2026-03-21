@@ -26,92 +26,94 @@ pub struct Scrobble<'a> {
     #[serde(borrow)]
     pub album: jacquard_common::CowStr<'a>,
     ///The album art of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album_art: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub album_art: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///The URL of the album art of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album_art_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub album_art_url: core::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
     ///The album artist of the song.
     #[serde(borrow)]
     pub album_artist: jacquard_common::CowStr<'a>,
     ///The Apple Music link of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub apple_music_link: std::option::Option<
+    pub apple_music_link: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
     ///The artist of the song.
     #[serde(borrow)]
     pub artist: jacquard_common::CowStr<'a>,
     ///The artists of the song with MusicBrainz IDs.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artists: std::option::Option<Vec<crate::app_rocksky::artist::ArtistMbid<'a>>>,
+    pub artists: core::option::Option<Vec<crate::app_rocksky::artist::ArtistMbid<'a>>>,
     ///The composer of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub composer: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub composer: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The copyright message of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub copyright_message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub copyright_message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The date when the song was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///The disc number of the song in the album.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disc_number: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disc_number: core::option::Option<i64>,
     ///The duration of the song in seconds.
     pub duration: i64,
     ///The genre of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genre: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub genre: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The label of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub label: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub label: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The lyrics of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lyrics: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub lyrics: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The MusicBrainz ID of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mbid: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub mbid: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The release date of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub release_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub release_date: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The Spotify link of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub spotify_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub spotify_link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The tags of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///The Tidal link of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tidal_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub tidal_link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The title of the song.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///The track number of the song in the album.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub track_number: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub track_number: core::option::Option<i64>,
     ///Informations about the song
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub wiki: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub wiki: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The year the song was released.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub year: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub year: core::option::Option<i64>,
     ///The YouTube link of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub youtube_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub youtube_link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -126,9 +128,9 @@ pub struct Scrobble<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScrobbleGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -149,60 +151,60 @@ pub struct ScrobbleGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ScrobbleViewBasic<'a> {
     ///The album of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub album: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URI of the album.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub album_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///The artist of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub artist: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URI of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub artist_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///The album art URL of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub cover: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The timestamp when the scrobble was created.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub date: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The unique identifier of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub liked: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub likes_count: std::option::Option<i64>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub liked: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub likes_count: core::option::Option<i64>,
     ///The SHA256 hash of the scrobble data.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sha256: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sha256: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The title of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URI of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The handle of the user who created the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub user: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub user: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The avatar URL of the user who created the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub user_avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub user_avatar: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The display name of the user who created the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub user_display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub user_display_name: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -219,59 +221,59 @@ pub struct ScrobbleViewBasic<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ScrobbleViewDetailed<'a> {
     ///The album of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub album: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URI of the album.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub album_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///The artist of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub artist: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URI of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub artist_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artists: std::option::Option<
+    pub artists: core::option::Option<
         Vec<crate::app_rocksky::artist::ArtistViewBasic<'a>>,
     >,
     ///The album art URL of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub cover: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The timestamp when the scrobble was created.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub date: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The unique identifier of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The number of listeners
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub listeners: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub listeners: core::option::Option<i64>,
     ///The number of scrobbles for this song
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub scrobbles: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub scrobbles: core::option::Option<i64>,
     ///The SHA256 hash of the scrobble data.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sha256: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sha256: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The title of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URI of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The handle of the user who created the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub user: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub user: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Scrobble<'a> {
@@ -314,19 +316,19 @@ impl jacquard_common::types::collection::Collection for ScrobbleRecord {
     type Record = ScrobbleRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scrobble<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Scrobble<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.scrobble"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_scrobble()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.album;
             #[allow(unused_comparisons)]
@@ -585,36 +587,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Scrobble<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.scrobble.defs"
     }
     fn def_name() -> &'static str {
         "scrobbleViewBasic"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_scrobble_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewDetailed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ScrobbleViewDetailed<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.scrobble.defs"
     }
     fn def_name() -> &'static str {
         "scrobbleViewDetailed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_scrobble_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -629,105 +631,105 @@ pub mod scrobble_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AlbumArtist;
-        type Title;
-        type Artist;
-        type Duration;
-        type Album;
         type CreatedAt;
+        type AlbumArtist;
+        type Duration;
+        type Artist;
+        type Album;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AlbumArtist = Unset;
-        type Title = Unset;
-        type Artist = Unset;
-        type Duration = Unset;
-        type Album = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `album_artist` field to Set
-    pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
-    impl<S: State> State for SetAlbumArtist<S> {
-        type AlbumArtist = Set<members::album_artist>;
-        type Title = S::Title;
-        type Artist = S::Artist;
-        type Duration = S::Duration;
-        type Album = S::Album;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type AlbumArtist = S::AlbumArtist;
-        type Title = Set<members::title>;
-        type Artist = S::Artist;
-        type Duration = S::Duration;
-        type Album = S::Album;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type AlbumArtist = S::AlbumArtist;
-        type Title = S::Title;
-        type Artist = Set<members::artist>;
-        type Duration = S::Duration;
-        type Album = S::Album;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type AlbumArtist = S::AlbumArtist;
-        type Title = S::Title;
-        type Artist = S::Artist;
-        type Duration = Set<members::duration>;
-        type Album = S::Album;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `album` field to Set
-    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbum<S> {}
-    impl<S: State> State for SetAlbum<S> {
-        type AlbumArtist = S::AlbumArtist;
-        type Title = S::Title;
-        type Artist = S::Artist;
-        type Duration = S::Duration;
-        type Album = Set<members::album>;
-        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = Unset;
+        type Duration = Unset;
+        type Artist = Unset;
+        type Album = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type AlbumArtist = S::AlbumArtist;
-        type Title = S::Title;
-        type Artist = S::Artist;
-        type Duration = S::Duration;
-        type Album = S::Album;
         type CreatedAt = Set<members::created_at>;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `album_artist` field to Set
+    pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
+    impl<S: State> State for SetAlbumArtist<S> {
+        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = Set<members::album_artist>;
+        type Duration = S::Duration;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = Set<members::duration>;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type Artist = Set<members::artist>;
+        type Album = S::Album;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `album` field to Set
+    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlbum<S> {}
+    impl<S: State> State for SetAlbum<S> {
+        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type Artist = S::Artist;
+        type Album = Set<members::album>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type AlbumArtist = S::AlbumArtist;
+        type Duration = S::Duration;
+        type Artist = S::Artist;
+        type Album = S::Album;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `album_artist` field
-        pub struct album_artist(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
-        ///Marker type for the `album` field
-        pub struct album(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `album_artist` field
+        pub struct album_artist(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
+        ///Marker type for the `album` field
+        pub struct album(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -1250,12 +1252,12 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
 impl<'a, S> ScrobbleBuilder<'a, S>
 where
     S: scrobble_state::State,
-    S::AlbumArtist: scrobble_state::IsSet,
-    S::Title: scrobble_state::IsSet,
-    S::Artist: scrobble_state::IsSet,
-    S::Duration: scrobble_state::IsSet,
-    S::Album: scrobble_state::IsSet,
     S::CreatedAt: scrobble_state::IsSet,
+    S::AlbumArtist: scrobble_state::IsSet,
+    S::Duration: scrobble_state::IsSet,
+    S::Artist: scrobble_state::IsSet,
+    S::Album: scrobble_state::IsSet,
+    S::Title: scrobble_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Scrobble<'a> {
@@ -1291,7 +1293,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1327,9 +1329,7 @@ where
     }
 }
 
-fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_rocksky_scrobble() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.rocksky.scrobble"),
@@ -1872,7 +1872,7 @@ fn lexicon_doc_app_rocksky_scrobble() -> ::jacquard_lexicon::lexicon::LexiconDoc
     }
 }
 
-fn lexicon_doc_app_rocksky_scrobble_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_rocksky_scrobble_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

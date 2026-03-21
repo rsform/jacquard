@@ -20,13 +20,13 @@ pub struct Grid<'a> {
     #[serde(borrow)]
     pub children: jacquard_common::types::value::Data<'a>,
     ///Number of equal columns. Defaults to `3`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_grid_columns")]
-    pub columns: std::option::Option<i64>,
+    pub columns: core::option::Option<i64>,
     ///Space between children.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub gap: std::option::Option<GridGap<'a>>,
+    pub gap: core::option::Option<GridGap<'a>>,
 }
 
 /// Space between children.
@@ -175,7 +175,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GridRequest {
     type Response = GridResponse;
 }
 
-fn _default_grid_columns() -> std::option::Option<i64> {
+fn _default_grid_columns() -> core::option::Option<i64> {
     Some(3i64)
 }
 
@@ -302,7 +302,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

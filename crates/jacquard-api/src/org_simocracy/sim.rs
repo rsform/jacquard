@@ -21,9 +21,9 @@ pub struct Sim<'a> {
     ///Timestamp when the sim was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Rendered avatar PNG thumbnail for quick display
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Display name of the sim
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -44,9 +44,9 @@ pub struct Sim<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SimGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -93,19 +93,19 @@ impl jacquard_common::types::collection::Collection for SimRecord {
     type Record = SimRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sim<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Sim<'a> {
     fn nsid() -> &'static str {
         "org.simocracy.sim"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_simocracy_sim()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.image {
             {
                 let mime = value.blob().mime_type.as_str();
@@ -164,49 +164,49 @@ pub mod sim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Settings;
+        type Name;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Settings = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Settings = S::Settings;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `settings` field to Set
     pub struct SetSettings<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSettings<S> {}
     impl<S: State> State for SetSettings<S> {
-        type Name = S::Name;
         type Settings = Set<members::settings>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Settings = S::Settings;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Settings = S::Settings;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `settings` field
         pub struct settings(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -321,8 +321,8 @@ where
 impl<'a, S> SimBuilder<'a, S>
 where
     S: sim_state::State,
-    S::Name: sim_state::IsSet,
     S::Settings: sim_state::IsSet,
+    S::Name: sim_state::IsSet,
     S::CreatedAt: sim_state::IsSet,
 {
     /// Build the final struct
@@ -338,7 +338,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -353,7 +353,7 @@ where
     }
 }
 
-fn lexicon_doc_org_simocracy_sim() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_simocracy_sim() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.simocracy.sim"),

@@ -16,46 +16,46 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchPostsSkeleton<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub author: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub author: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub domain: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lang: std::option::Option<jacquard_common::types::string::Language>,
+    pub domain: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub lang: core::option::Option<jacquard_common::types::string::Language>,
     ///Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mentions: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    pub mentions: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
     #[serde(borrow)]
     pub q: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub since: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub since: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `"latest"`.
     #[serde(default = "_default_sort")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sort: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tag: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tag: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub until: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub until: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub viewer: core::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -70,12 +70,12 @@ pub struct SearchPostsSkeleton<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SearchPostsSkeletonOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Count of search hits. Optional, may be rounded/truncated, and may not be possible to paginate through all hits.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hits_total: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hits_total: core::option::Option<i64>,
     #[serde(borrow)]
     pub posts: Vec<crate::app_bsky::unspecced::SkeletonSearchPost<'a>>,
 }
@@ -96,7 +96,7 @@ pub struct SearchPostsSkeletonOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SearchPostsSkeletonError<'a> {
     #[serde(rename = "BadQueryString")]
-    BadQueryString(std::option::Option<jacquard_common::CowStr<'a>>),
+    BadQueryString(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for SearchPostsSkeletonError<'_> {
@@ -140,11 +140,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchPostsSkeletonRequest {
     type Response = SearchPostsSkeletonResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(25i64)
 }
 
-fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_sort() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("latest"))
 }
 

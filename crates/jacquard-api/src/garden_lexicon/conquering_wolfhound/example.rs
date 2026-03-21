@@ -30,9 +30,9 @@ pub struct Example<'a> {}
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExampleGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -79,24 +79,24 @@ impl jacquard_common::types::collection::Collection for ExampleRecord {
     type Record = ExampleRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Example<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Example<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.conquering-wolfhound.example"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_conquering_wolfhound_example()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_garden_lexicon_conquering_wolfhound_example() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_garden_lexicon_conquering_wolfhound_example() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

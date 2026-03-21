@@ -21,9 +21,9 @@
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteSessionError<'a> {
     #[serde(rename = "InvalidToken")]
-    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    ExpiredToken(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteSessionError<'_> {
@@ -48,16 +48,16 @@ impl core::fmt::Display for DeleteSessionError<'_> {
     }
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct DeleteSession;
 /// Response type for

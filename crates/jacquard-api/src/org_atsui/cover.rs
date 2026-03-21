@@ -18,9 +18,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct Cover<'a> {
     ///DID of the blob owner. Used to resolve blob URLs.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
     ///Blob ref for the background image.
     #[serde(borrow)]
     pub src: jacquard_common::types::value::Data<'a>,
@@ -187,7 +187,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

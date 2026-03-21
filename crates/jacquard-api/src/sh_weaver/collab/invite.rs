@@ -112,22 +112,22 @@ impl jacquard_common::IntoStatic for CollabScope<'_> {
 pub struct Invite<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional expiration for the invite.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///DID of the user being invited.
     #[serde(borrow)]
     pub invitee: jacquard_common::types::string::Did<'a>,
     ///Optional message to the invitee.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The resource to collaborate on (notebook, entry, chapter, etc.).
     #[serde(borrow)]
     pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     ///Optional explicit scope type. If omitted, inferred from resource lexicon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub scope: std::option::Option<crate::sh_weaver::collab::invite::CollabScope<'a>>,
+    pub scope: core::option::Option<crate::sh_weaver::collab::invite::CollabScope<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -142,9 +142,9 @@ pub struct Invite<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InviteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -191,19 +191,19 @@ impl jacquard_common::types::collection::Collection for InviteRecord {
     type Record = InviteRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Invite<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Invite<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.invite"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_invite()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.message {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -461,7 +461,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -478,7 +478,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_collab_invite() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_collab_invite() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

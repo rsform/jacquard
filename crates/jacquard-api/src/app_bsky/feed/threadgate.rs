@@ -64,14 +64,14 @@ pub struct ListRule<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Threadgate<'a> {
     ///List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub allow: std::option::Option<Vec<ThreadgateAllowItem<'a>>>,
+    pub allow: core::option::Option<Vec<ThreadgateAllowItem<'a>>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///List of hidden reply URIs.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hidden_replies: std::option::Option<
+    pub hidden_replies: core::option::Option<
         Vec<jacquard_common::types::string::AtUri<'a>>,
     >,
     ///Reference (AT-URI) to the post record.
@@ -114,9 +114,9 @@ pub enum ThreadgateAllowItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadgateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -150,53 +150,53 @@ impl<'a> Threadgate<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowerRule<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FollowerRule<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
     fn def_name() -> &'static str {
         "followerRule"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_threadgate()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FollowingRule<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FollowingRule<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
     fn def_name() -> &'static str {
         "followingRule"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_threadgate()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListRule<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ListRule<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
     fn def_name() -> &'static str {
         "listRule"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_threadgate()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -228,19 +228,19 @@ impl jacquard_common::types::collection::Collection for ThreadgateRecord {
     type Record = ThreadgateRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Threadgate<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Threadgate<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_threadgate()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.allow {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
@@ -269,24 +269,24 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Threadgate<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MentionRule<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MentionRule<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
     fn def_name() -> &'static str {
         "mentionRule"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_threadgate()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_app_bsky_feed_threadgate() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_feed_threadgate() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -605,7 +605,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -783,7 +783,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

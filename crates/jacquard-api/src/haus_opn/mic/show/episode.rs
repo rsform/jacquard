@@ -21,27 +21,27 @@ pub mod favorite;
 #[serde(rename_all = "camelCase")]
 pub struct Episode<'a> {
     ///Scheduled or actual date/time when this episode airs.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub airing_date: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub airing_date: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_art: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub cover_art: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Reference to the haus.opn.mic.show record.
     #[serde(borrow)]
     pub show_uri: jacquard_common::types::string::AtUri<'a>,
     ///Current episode lifecycle status.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<EpisodeStatus<'a>>,
+    pub status: core::option::Option<EpisodeStatus<'a>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub vod_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub vod_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 /// Current episode lifecycle status.
@@ -150,9 +150,9 @@ impl jacquard_common::IntoStatic for EpisodeStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EpisodeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -199,19 +199,19 @@ impl jacquard_common::types::collection::Collection for EpisodeRecord {
     type Record = EpisodeRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
     fn nsid() -> &'static str {
         "haus.opn.mic.show.episode"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_haus_opn_mic_show_episode()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cover_art {
             {
                 let size = value.blob().size;
@@ -293,51 +293,51 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShowUri;
         type Title;
         type CreatedAt;
+        type ShowUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShowUri = Unset;
         type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `show_uri` field to Set
-    pub struct SetShowUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShowUri<S> {}
-    impl<S: State> State for SetShowUri<S> {
-        type ShowUri = Set<members::show_uri>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
+        type ShowUri = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type ShowUri = S::ShowUri;
         type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
+        type ShowUri = S::ShowUri;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ShowUri = S::ShowUri;
         type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type ShowUri = S::ShowUri;
+    }
+    ///State transition - sets the `show_uri` field to Set
+    pub struct SetShowUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShowUri<S> {}
+    impl<S: State> State for SetShowUri<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type ShowUri = Set<members::show_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show_uri` field
-        pub struct show_uri(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `show_uri` field
+        pub struct show_uri(());
     }
 }
 
@@ -524,9 +524,9 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
-    S::ShowUri: episode_state::IsSet,
     S::Title: episode_state::IsSet,
     S::CreatedAt: episode_state::IsSet,
+    S::ShowUri: episode_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {
@@ -545,7 +545,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -564,7 +564,7 @@ where
     }
 }
 
-fn lexicon_doc_haus_opn_mic_show_episode() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_haus_opn_mic_show_episode() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

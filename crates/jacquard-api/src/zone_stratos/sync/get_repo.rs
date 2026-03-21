@@ -18,8 +18,8 @@
 pub struct GetRepo<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub since: std::option::Option<jacquard_common::types::string::Tid>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub since: core::option::Option<jacquard_common::types::string::Tid>,
 }
 
 #[derive(
@@ -53,7 +53,7 @@ pub struct GetRepoOutput {
 pub enum GetRepoError<'a> {
     /// The requested repo does not exist or has no commits.
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetRepoError<'_> {

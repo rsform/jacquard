@@ -19,53 +19,53 @@
 #[serde(rename_all = "camelCase")]
 pub struct HydratedProfile<'a> {
     ///Whether the identity is currently accepting new supporters.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub accepting_supporters: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accepting_supporters: core::option::Option<bool>,
     ///Avatar image blob reference.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Banner image blob reference.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub banner: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Profile bio/description with optional rich text.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///DID of the profile owner.
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     ///Display name for the profile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Rich text facets for description annotations.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     ///Handle of the profile owner.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
+    pub handle: core::option::Option<jacquard_common::types::string::Handle<'a>>,
     ///Number of supporters for this profile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub supporter_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub supporter_count: core::option::Option<i64>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HydratedProfile<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for HydratedProfile<'a> {
     fn nsid() -> &'static str {
         "com.atprotofans.hydratedProfile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atprotofans_hydratedProfile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -479,7 +479,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -499,7 +499,7 @@ where
     }
 }
 
-fn lexicon_doc_com_atprotofans_hydratedProfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atprotofans_hydratedProfile() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

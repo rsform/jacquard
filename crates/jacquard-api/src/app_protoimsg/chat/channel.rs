@@ -21,19 +21,19 @@ pub struct Channel<'a> {
     ///Timestamp of channel creation.
     pub created_at: jacquard_common::types::string::Datetime,
     ///What the channel is about.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Display name for the channel.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Sort position within the room. Lower numbers appear first.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub position: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub position: core::option::Option<i64>,
     ///Who can post messages in this channel.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub post_policy: std::option::Option<ChannelPostPolicy<'a>>,
+    pub post_policy: core::option::Option<ChannelPostPolicy<'a>>,
     ///AT-URI of the room this channel belongs to.
     #[serde(borrow)]
     pub room: jacquard_common::types::string::AtUri<'a>,
@@ -145,9 +145,9 @@ impl jacquard_common::IntoStatic for ChannelPostPolicy<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChannelGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -194,19 +194,19 @@ impl jacquard_common::types::collection::Collection for ChannelRecord {
     type Record = ChannelRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.channel"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_channel()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
@@ -257,51 +257,51 @@ pub mod channel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Name;
         type Room;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Name = Unset;
         type Room = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Room = S::Room;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Name = S::Name;
-        type Room = Set<members::room>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
         type Room = S::Room;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type Room = S::Room;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoom<S> {}
+    impl<S: State> State for SetRoom<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Room = Set<members::room>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `room` field
         pub struct room(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -445,9 +445,9 @@ where
 impl<'a, S> ChannelBuilder<'a, S>
 where
     S: channel_state::State,
+    S::CreatedAt: channel_state::IsSet,
     S::Name: channel_state::IsSet,
     S::Room: channel_state::IsSet,
-    S::CreatedAt: channel_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Channel<'a> {
@@ -464,7 +464,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -481,7 +481,7 @@ where
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_channel() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_protoimsg_chat_channel() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

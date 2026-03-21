@@ -22,31 +22,31 @@ pub struct Card<'a> {
     #[serde(borrow)]
     pub content: CardContent<'a>,
     ///Timestamp when this card was created (usually set by PDS).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Optional strong reference to the original card (for NOTE cards).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub original_card: std::option::Option<
+    pub original_card: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Optional strong reference to a parent card (for NOTE cards).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_card: std::option::Option<
+    pub parent_card: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Optional provenance information for this card.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub provenance: std::option::Option<crate::network_cosmik::Provenance<'a>>,
+    pub provenance: core::option::Option<crate::network_cosmik::Provenance<'a>>,
     ///The type of card
     #[serde(borrow)]
     pub r#type: CardType<'a>,
     ///Optional URL associated with the card. Required for URL cards, optional for NOTE cards.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -169,9 +169,9 @@ impl jacquard_common::IntoStatic for CardType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CardGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -211,9 +211,9 @@ pub struct NoteContent<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct UrlContent<'a> {
     ///Optional metadata about the URL
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<crate::network_cosmik::card::UrlMetadata<'a>>,
+    pub metadata: core::option::Option<crate::network_cosmik::card::UrlMetadata<'a>>,
     ///The URL being saved
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
@@ -234,43 +234,43 @@ pub struct UrlContent<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct UrlMetadata<'a> {
     ///Author of the content
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub author: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub author: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Description of the page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Digital Object Identifier (DOI) for academic content
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub doi: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub doi: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URL of a representative image
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub image_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///International Standard Book Number (ISBN) for books
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub isbn: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub isbn: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When the content was published
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub published_date: core::option::Option<jacquard_common::types::string::Datetime>,
     ///When the metadata was retrieved
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub retrieved_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub retrieved_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Name of the site
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub site_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub site_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Title of the page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Type of content (e.g., 'video', 'article')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Card<'a> {
@@ -313,36 +313,36 @@ impl jacquard_common::types::collection::Collection for CardRecord {
     type Record = CardRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Card<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Card<'a> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_cosmik_card()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NoteContent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for NoteContent<'a> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
     fn def_name() -> &'static str {
         "noteContent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_cosmik_card()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -360,36 +360,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NoteContent<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlContent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for UrlContent<'a> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
     fn def_name() -> &'static str {
         "urlContent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_cosmik_card()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlMetadata<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for UrlMetadata<'a> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
     fn def_name() -> &'static str {
         "urlMetadata"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_cosmik_card()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -626,7 +626,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -644,9 +644,7 @@ where
     }
 }
 
-fn lexicon_doc_network_cosmik_card() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_network_cosmik_card() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.cosmik.card"),
@@ -1234,7 +1232,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

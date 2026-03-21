@@ -27,23 +27,23 @@ pub struct Activity<'a> {
     ///Timestamp when the activity was logged
     pub created_at: jacquard_common::types::string::Datetime,
     ///Link to org.hypercerts.claim.evaluation record
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub evaluation: std::option::Option<
+    pub evaluation: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///The proposal text being evaluated
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub proposal_text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub proposal_text: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Summary of the simulation result
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub result_summary: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub result_summary: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Current status of the activity
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<ActivityStatus<'a>>,
+    pub status: core::option::Option<ActivityStatus<'a>>,
 }
 
 /// Type of senate activity
@@ -254,9 +254,9 @@ impl jacquard_common::IntoStatic for ActivityStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ActivityGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -303,19 +303,19 @@ impl jacquard_common::types::collection::Collection for ActivityRecord {
     type Record = ActivityRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Activity<'a> {
     fn nsid() -> &'static str {
         "org.simocracy.senate.activity"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_simocracy_senate_activity()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.committee_sims;
             #[allow(unused_comparisons)]
@@ -367,49 +367,49 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ActivityType;
         type CreatedAt;
+        type ActivityType;
         type CommitteeSims;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ActivityType = Unset;
         type CreatedAt = Unset;
+        type ActivityType = Unset;
         type CommitteeSims = Unset;
-    }
-    ///State transition - sets the `activity_type` field to Set
-    pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivityType<S> {}
-    impl<S: State> State for SetActivityType<S> {
-        type ActivityType = Set<members::activity_type>;
-        type CreatedAt = S::CreatedAt;
-        type CommitteeSims = S::CommitteeSims;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ActivityType = S::ActivityType;
         type CreatedAt = Set<members::created_at>;
+        type ActivityType = S::ActivityType;
+        type CommitteeSims = S::CommitteeSims;
+    }
+    ///State transition - sets the `activity_type` field to Set
+    pub struct SetActivityType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivityType<S> {}
+    impl<S: State> State for SetActivityType<S> {
+        type CreatedAt = S::CreatedAt;
+        type ActivityType = Set<members::activity_type>;
         type CommitteeSims = S::CommitteeSims;
     }
     ///State transition - sets the `committee_sims` field to Set
     pub struct SetCommitteeSims<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommitteeSims<S> {}
     impl<S: State> State for SetCommitteeSims<S> {
-        type ActivityType = S::ActivityType;
         type CreatedAt = S::CreatedAt;
+        type ActivityType = S::ActivityType;
         type CommitteeSims = Set<members::committee_sims>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `activity_type` field
-        pub struct activity_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `activity_type` field
+        pub struct activity_type(());
         ///Marker type for the `committee_sims` field
         pub struct committee_sims(());
     }
@@ -578,8 +578,8 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
-    S::ActivityType: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
+    S::ActivityType: activity_state::IsSet,
     S::CommitteeSims: activity_state::IsSet,
 {
     /// Build the final struct
@@ -598,7 +598,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -616,7 +616,7 @@ where
     }
 }
 
-fn lexicon_doc_org_simocracy_senate_activity() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_simocracy_senate_activity() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

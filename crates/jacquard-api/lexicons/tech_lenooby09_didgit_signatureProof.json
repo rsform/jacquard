@@ -1,0 +1,64 @@
+{
+  "lexicon": 1,
+  "id": "tech.lenooby09.didgit.signatureProof",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A cryptographic proof that a did-git object was signed by a specific DID. This provides key-rotation-independent verification by anchoring the proof to a PDS or signing event.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "objectId",
+          "objectType",
+          "signatureType",
+          "signature",
+          "signedAt",
+          "signer"
+        ],
+        "properties": {
+          "objectId": {
+            "type": "string",
+            "description": "The hex SHA-256 object ID being proven.",
+            "maxLength": 64
+          },
+          "objectType": {
+            "type": "string",
+            "description": "The type of object.",
+            "maxLength": 16,
+            "knownValues": [
+              "blob",
+              "tree",
+              "commit",
+              "tag"
+            ]
+          },
+          "pdsEndpoint": {
+            "type": "string",
+            "description": "The PDS endpoint that issued this proof (for service auth proofs).",
+            "maxLength": 256
+          },
+          "signature": {
+            "type": "string",
+            "description": "The base64url-encoded signature or JWT token.",
+            "maxLength": 2048
+          },
+          "signatureType": {
+            "type": "string",
+            "description": "The signature algorithm or token type (e.g., 'atproto-service-auth', 'jws', 'raw-ed25519', 'raw-ecdsa-secp256k1').",
+            "maxLength": 64
+          },
+          "signedAt": {
+            "type": "integer",
+            "description": "Unix timestamp (seconds) when the proof was created."
+          },
+          "signer": {
+            "type": "string",
+            "description": "The DID of the signer.",
+            "maxLength": 128
+          }
+        }
+      }
+    }
+  }
+}

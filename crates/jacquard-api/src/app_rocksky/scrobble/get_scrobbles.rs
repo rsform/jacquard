@@ -16,17 +16,17 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetScrobbles<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub following: std::option::Option<bool>,
+    pub did: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub following: core::option::Option<bool>,
     ///(min: 1)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///(min: 0)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offset: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -42,9 +42,9 @@ pub struct GetScrobbles<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetScrobblesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub scrobbles: std::option::Option<
+    pub scrobbles: core::option::Option<
         Vec<crate::app_rocksky::scrobble::ScrobbleViewBasic<'a>>,
     >,
 }

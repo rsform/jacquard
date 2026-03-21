@@ -18,23 +18,23 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<
+    pub profile: core::option::Option<
         crate::games_gamesgamesgamesgames::OrgProfileDetailView<'a>,
     >,
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct GetProfile;
 /// Response type for

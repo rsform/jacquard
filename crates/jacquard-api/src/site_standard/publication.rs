@@ -17,25 +17,25 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Publication<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub basic_theme: std::option::Option<crate::site_standard::theme::basic::Basic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub basic_theme: core::option::Option<crate::site_standard::theme::basic::Basic<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub icon: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub preferences: std::option::Option<
+    pub preferences: core::option::Option<
         crate::site_standard::publication::Preferences<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: std::option::Option<crate::pub_leaflet::publication::Theme<'a>>,
+    pub theme: core::option::Option<crate::pub_leaflet::publication::Theme<'a>>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
@@ -52,9 +52,9 @@ pub struct Publication<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublicationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -74,25 +74,25 @@ pub struct PublicationGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Preferences<'a> {
     ///Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_preferences_show_comments")]
-    pub show_comments: std::option::Option<bool>,
+    pub show_comments: core::option::Option<bool>,
     ///Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_preferences_show_in_discover")]
-    pub show_in_discover: std::option::Option<bool>,
+    pub show_in_discover: core::option::Option<bool>,
     ///Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_preferences_show_mentions")]
-    pub show_mentions: std::option::Option<bool>,
+    pub show_mentions: core::option::Option<bool>,
     ///Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_preferences_show_prev_next")]
-    pub show_prev_next: std::option::Option<bool>,
+    pub show_prev_next: core::option::Option<bool>,
     ///Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_preferences_show_recommends")]
-    pub show_recommends: std::option::Option<bool>,
+    pub show_recommends: core::option::Option<bool>,
 }
 
 impl<'a> Publication<'a> {
@@ -135,19 +135,19 @@ impl jacquard_common::types::collection::Collection for PublicationRecord {
     type Record = PublicationRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
     fn nsid() -> &'static str {
         "site.standard.publication"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_site_standard_publication()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -256,19 +256,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Preferences<'a> {
     fn nsid() -> &'static str {
         "site.standard.publication"
     }
     fn def_name() -> &'static str {
         "preferences"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_site_standard_publication()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -283,37 +283,37 @@ pub mod publication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Name;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Name = S::Name;
+        type Url = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Url = S::Url;
         type Name = Set<members::name>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Name = S::Name;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -486,8 +486,8 @@ where
 impl<'a, S> PublicationBuilder<'a, S>
 where
     S: publication_state::State,
-    S::Url: publication_state::IsSet,
     S::Name: publication_state::IsSet,
+    S::Url: publication_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Publication<'a> {
@@ -505,7 +505,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -523,7 +523,7 @@ where
     }
 }
 
-fn lexicon_doc_site_standard_publication() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_site_standard_publication() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -718,23 +718,23 @@ fn lexicon_doc_site_standard_publication() -> ::jacquard_lexicon::lexicon::Lexic
     }
 }
 
-fn _default_preferences_show_comments() -> std::option::Option<bool> {
+fn _default_preferences_show_comments() -> core::option::Option<bool> {
     Some(true)
 }
 
-fn _default_preferences_show_in_discover() -> std::option::Option<bool> {
+fn _default_preferences_show_in_discover() -> core::option::Option<bool> {
     Some(true)
 }
 
-fn _default_preferences_show_mentions() -> std::option::Option<bool> {
+fn _default_preferences_show_mentions() -> core::option::Option<bool> {
     Some(true)
 }
 
-fn _default_preferences_show_prev_next() -> std::option::Option<bool> {
+fn _default_preferences_show_prev_next() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_preferences_show_recommends() -> std::option::Option<bool> {
+fn _default_preferences_show_recommends() -> core::option::Option<bool> {
     Some(true)
 }
 

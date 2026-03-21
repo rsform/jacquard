@@ -44,9 +44,9 @@ pub mod threadgate;
 pub struct BlockedAuthor<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: core::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -76,12 +76,12 @@ pub struct BlockedPost<'a> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ClickthroughAuthor;
-impl std::fmt::Display for ClickthroughAuthor {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ClickthroughAuthor {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "clickthroughAuthor")
     }
 }
@@ -94,12 +94,12 @@ impl std::fmt::Display for ClickthroughAuthor {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ClickthroughEmbed;
-impl std::fmt::Display for ClickthroughEmbed {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ClickthroughEmbed {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "clickthroughEmbed")
     }
 }
@@ -112,12 +112,12 @@ impl std::fmt::Display for ClickthroughEmbed {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ClickthroughItem;
-impl std::fmt::Display for ClickthroughItem {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ClickthroughItem {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "clickthroughItem")
     }
 }
@@ -130,12 +130,12 @@ impl std::fmt::Display for ClickthroughItem {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ClickthroughReposter;
-impl std::fmt::Display for ClickthroughReposter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ClickthroughReposter {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "clickthroughReposter")
     }
 }
@@ -148,12 +148,12 @@ impl std::fmt::Display for ClickthroughReposter {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ContentModeUnspecified;
-impl std::fmt::Display for ContentModeUnspecified {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ContentModeUnspecified {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "contentModeUnspecified")
     }
 }
@@ -166,12 +166,12 @@ impl std::fmt::Display for ContentModeUnspecified {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ContentModeVideo;
-impl std::fmt::Display for ContentModeVideo {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ContentModeVideo {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "contentModeVideo")
     }
 }
@@ -189,21 +189,21 @@ impl std::fmt::Display for ContentModeVideo {
 #[serde(rename_all = "camelCase")]
 pub struct FeedViewPost<'a> {
     ///Context provided by feed generator that may be passed back alongside interactions.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub feed_context: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub post: crate::app_bsky::feed::PostView<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: std::option::Option<FeedViewPostReason<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reason: core::option::Option<FeedViewPostReason<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply: std::option::Option<crate::app_bsky::feed::ReplyRef<'a>>,
+    pub reply: core::option::Option<crate::app_bsky::feed::ReplyRef<'a>>,
     ///Unique identifier per request that may be passed back alongside interactions.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub req_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub req_id: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -237,24 +237,24 @@ pub enum FeedViewPostReason<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GeneratorView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub accepts_interactions: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accepts_interactions: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_mode: std::option::Option<GeneratorViewContentMode<'a>>,
+    pub content_mode: core::option::Option<GeneratorViewContentMode<'a>>,
     #[serde(borrow)]
     pub creator: crate::app_bsky::actor::ProfileView<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
+    pub description_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     #[serde(borrow)]
@@ -262,16 +262,16 @@ pub struct GeneratorView<'a> {
     #[serde(borrow)]
     pub display_name: jacquard_common::CowStr<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: std::option::Option<i64>,
+    pub labels: core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub like_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::feed::GeneratorViewerState<'a>>,
+    pub viewer: core::option::Option<crate::app_bsky::feed::GeneratorViewerState<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -381,9 +381,9 @@ impl jacquard_common::IntoStatic for GeneratorViewContentMode<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GeneratorViewerState<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub like: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -399,20 +399,20 @@ pub struct GeneratorViewerState<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Interaction<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub event: std::option::Option<InteractionEvent<'a>>,
+    pub event: core::option::Option<InteractionEvent<'a>>,
     ///Context on a feed item that was originally supplied by the feed generator on getFeedSkeleton.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub feed_context: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub item: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub item: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///Unique identifier per request that may be passed back alongside interactions.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub req_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub req_id: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -563,12 +563,12 @@ impl jacquard_common::IntoStatic for InteractionEvent<'_> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct InteractionLike;
-impl std::fmt::Display for InteractionLike {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for InteractionLike {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "interactionLike")
     }
 }
@@ -581,12 +581,12 @@ impl std::fmt::Display for InteractionLike {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct InteractionQuote;
-impl std::fmt::Display for InteractionQuote {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for InteractionQuote {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "interactionQuote")
     }
 }
@@ -599,12 +599,12 @@ impl std::fmt::Display for InteractionQuote {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct InteractionReply;
-impl std::fmt::Display for InteractionReply {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for InteractionReply {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "interactionReply")
     }
 }
@@ -617,12 +617,12 @@ impl std::fmt::Display for InteractionReply {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct InteractionRepost;
-impl std::fmt::Display for InteractionRepost {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for InteractionRepost {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "interactionRepost")
     }
 }
@@ -635,12 +635,12 @@ impl std::fmt::Display for InteractionRepost {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct InteractionSeen;
-impl std::fmt::Display for InteractionSeen {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for InteractionSeen {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "interactionSeen")
     }
 }
@@ -653,12 +653,12 @@ impl std::fmt::Display for InteractionSeen {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct InteractionShare;
-impl std::fmt::Display for InteractionShare {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for InteractionShare {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "interactionShare")
     }
 }
@@ -694,39 +694,39 @@ pub struct NotFoundPost<'a> {
 pub struct PostView<'a> {
     #[serde(borrow)]
     pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bookmark_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub bookmark_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     ///Debug information for internal development
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub debug: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<PostViewEmbed<'a>>,
+    pub embed: core::option::Option<PostViewEmbed<'a>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quote_count: std::option::Option<i64>,
+    pub labels: core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub like_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quote_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reply_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub repost_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reply_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub repost_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub threadgate: std::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
+    pub threadgate: core::option::Option<crate::app_bsky::feed::ThreadgateView<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::feed::ViewerState<'a>>,
+    pub viewer: core::option::Option<crate::app_bsky::feed::ViewerState<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -781,13 +781,13 @@ pub struct ReasonPin<'a> {}
 pub struct ReasonRepost<'a> {
     #[serde(borrow)]
     pub by: crate::app_bsky::actor::ProfileViewBasic<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -803,9 +803,9 @@ pub struct ReasonRepost<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ReplyRef<'a> {
     ///When parent is a reply to another post, this is the author of that post.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub grandparent_author: std::option::Option<
+    pub grandparent_author: core::option::Option<
         crate::app_bsky::actor::ProfileViewBasic<'a>,
     >,
     #[serde(borrow)]
@@ -864,12 +864,12 @@ pub enum ReplyRefRoot<'a> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct RequestLess;
-impl std::fmt::Display for RequestLess {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for RequestLess {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "requestLess")
     }
 }
@@ -882,12 +882,12 @@ impl std::fmt::Display for RequestLess {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct RequestMore;
-impl std::fmt::Display for RequestMore {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for RequestMore {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "requestMore")
     }
 }
@@ -905,14 +905,14 @@ impl std::fmt::Display for RequestMore {
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonFeedPost<'a> {
     ///Context that will be passed through to client and may be passed to feed generator back alongside interactions.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub feed_context: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub post: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: std::option::Option<SkeletonFeedPostReason<'a>>,
+    pub reason: core::option::Option<SkeletonFeedPostReason<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -977,9 +977,11 @@ pub struct SkeletonReasonRepost<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadContext<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub root_author_like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub root_author_like: core::option::Option<
+        jacquard_common::types::string::AtUri<'a>,
+    >,
 }
 
 #[jacquard_derive::lexicon]
@@ -994,17 +996,17 @@ pub struct ThreadContext<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadViewPost<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: std::option::Option<ThreadViewPostParent<'a>>,
+    pub parent: core::option::Option<ThreadViewPostParent<'a>>,
     #[serde(borrow)]
     pub post: crate::app_bsky::feed::PostView<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub replies: std::option::Option<Vec<ThreadViewPostRepliesItem<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub replies: core::option::Option<Vec<ThreadViewPostRepliesItem<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thread_context: std::option::Option<crate::app_bsky::feed::ThreadContext<'a>>,
+    pub thread_context: core::option::Option<crate::app_bsky::feed::ThreadContext<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -1062,18 +1064,18 @@ pub enum ThreadViewPostRepliesItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadgateView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lists: std::option::Option<Vec<crate::app_bsky::graph::ListViewBasic<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub lists: core::option::Option<Vec<crate::app_bsky::graph::ListViewBasic<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub record: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub record: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 /// Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests.
@@ -1090,71 +1092,71 @@ pub struct ThreadgateView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewerState<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bookmarked: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub embedding_disabled: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub bookmarked: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub embedding_disabled: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pinned: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reply_disabled: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub like: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pinned: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reply_disabled: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub repost: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub thread_muted: std::option::Option<bool>,
+    pub repost: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub thread_muted: core::option::Option<bool>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockedAuthor<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BlockedAuthor<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "blockedAuthor"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockedPost<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BlockedPost<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "blockedPost"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPost<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FeedViewPost<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "feedViewPost"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -1183,19 +1185,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPost<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GeneratorView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "generatorView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -1241,36 +1243,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GeneratorViewerState<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GeneratorViewerState<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "generatorViewerState"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interaction<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Interaction<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "interaction"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -1299,104 +1301,104 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interaction<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotFoundPost<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for NotFoundPost<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "notFoundPost"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PostView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "postView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonPin<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReasonPin<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "reasonPin"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReasonRepost<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReasonRepost<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "reasonRepost"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReplyRef<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "replyRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonFeedPost<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SkeletonFeedPost<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "skeletonFeedPost"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -1413,104 +1415,104 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonFeedPost<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonReasonPin<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SkeletonReasonPin<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "skeletonReasonPin"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonReasonRepost<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SkeletonReasonRepost<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "skeletonReasonRepost"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadContext<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ThreadContext<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "threadContext"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadViewPost<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ThreadViewPost<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "threadViewPost"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadgateView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ThreadgateView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "threadgateView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.defs"
     }
     fn def_name() -> &'static str {
         "viewerState"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1629,7 +1631,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1642,7 +1644,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_bsky_feed_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.feed.defs"),
@@ -3174,50 +3176,50 @@ pub mod blocked_post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Blocked;
-        type Uri;
         type Author;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Blocked = Unset;
-        type Uri = Unset;
         type Author = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `blocked` field to Set
     pub struct SetBlocked<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocked<S> {}
     impl<S: State> State for SetBlocked<S> {
         type Blocked = Set<members::blocked>;
+        type Author = S::Author;
         type Uri = S::Uri;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Blocked = S::Blocked;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
         type Blocked = S::Blocked;
-        type Uri = S::Uri;
         type Author = Set<members::author>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Blocked = S::Blocked;
+        type Author = S::Author;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `blocked` field
         pub struct blocked(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -3311,8 +3313,8 @@ impl<'a, S> BlockedPostBuilder<'a, S>
 where
     S: blocked_post_state::State,
     S::Blocked: blocked_post_state::IsSet,
-    S::Uri: blocked_post_state::IsSet,
     S::Author: blocked_post_state::IsSet,
+    S::Uri: blocked_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlockedPost<'a> {
@@ -3326,7 +3328,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3508,7 +3510,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3534,105 +3536,105 @@ pub mod generator_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Did;
         type Uri;
+        type Cid;
         type Creator;
-        type IndexedAt;
         type DisplayName;
+        type Did;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Did = Unset;
         type Uri = Unset;
+        type Cid = Unset;
         type Creator = Unset;
-        type IndexedAt = Unset;
         type DisplayName = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Did = S::Did;
-        type Uri = S::Uri;
-        type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Cid = S::Cid;
-        type Did = Set<members::did>;
-        type Uri = S::Uri;
-        type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
-        type DisplayName = S::DisplayName;
+        type Did = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Did = S::Did;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
         type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
         type DisplayName = S::DisplayName;
+        type Did = S::Did;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Creator = S::Creator;
+        type DisplayName = S::DisplayName;
+        type Did = S::Did;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
-        type Cid = S::Cid;
-        type Did = S::Did;
         type Uri = S::Uri;
+        type Cid = S::Cid;
         type Creator = Set<members::creator>;
-        type IndexedAt = S::IndexedAt;
         type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Cid = S::Cid;
         type Did = S::Did;
-        type Uri = S::Uri;
-        type Creator = S::Creator;
-        type IndexedAt = Set<members::indexed_at>;
-        type DisplayName = S::DisplayName;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type Cid = S::Cid;
-        type Did = S::Did;
         type Uri = S::Uri;
+        type Cid = S::Cid;
         type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
         type DisplayName = Set<members::display_name>;
+        type Did = S::Did;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Creator = S::Creator;
+        type DisplayName = S::DisplayName;
+        type Did = Set<members::did>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Creator = S::Creator;
+        type DisplayName = S::DisplayName;
+        type Did = S::Did;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `creator` field
         pub struct creator(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
@@ -3948,12 +3950,12 @@ impl<'a, S: generator_view_state::State> GeneratorViewBuilder<'a, S> {
 impl<'a, S> GeneratorViewBuilder<'a, S>
 where
     S: generator_view_state::State,
-    S::Cid: generator_view_state::IsSet,
-    S::Did: generator_view_state::IsSet,
     S::Uri: generator_view_state::IsSet,
+    S::Cid: generator_view_state::IsSet,
     S::Creator: generator_view_state::IsSet,
-    S::IndexedAt: generator_view_state::IsSet,
     S::DisplayName: generator_view_state::IsSet,
+    S::Did: generator_view_state::IsSet,
+    S::IndexedAt: generator_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GeneratorView<'a> {
@@ -3978,7 +3980,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4013,37 +4015,37 @@ pub mod not_found_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NotFound;
         type Uri;
+        type NotFound;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NotFound = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `not_found` field to Set
-    pub struct SetNotFound<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotFound<S> {}
-    impl<S: State> State for SetNotFound<S> {
-        type NotFound = Set<members::not_found>;
-        type Uri = S::Uri;
+        type NotFound = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type NotFound = S::NotFound;
         type Uri = Set<members::uri>;
+        type NotFound = S::NotFound;
+    }
+    ///State transition - sets the `not_found` field to Set
+    pub struct SetNotFound<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotFound<S> {}
+    impl<S: State> State for SetNotFound<S> {
+        type Uri = S::Uri;
+        type NotFound = Set<members::not_found>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `not_found` field
-        pub struct not_found(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `not_found` field
+        pub struct not_found(());
     }
 }
 
@@ -4116,8 +4118,8 @@ where
 impl<'a, S> NotFoundPostBuilder<'a, S>
 where
     S: not_found_post_state::State,
-    S::NotFound: not_found_post_state::IsSet,
     S::Uri: not_found_post_state::IsSet,
+    S::NotFound: not_found_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotFoundPost<'a> {
@@ -4130,7 +4132,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4155,9 +4157,9 @@ pub mod post_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type Author;
-        type IndexedAt;
-        type Cid;
         type Record;
+        type Cid;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -4165,9 +4167,9 @@ pub mod post_view_state {
     impl State for Empty {
         type Uri = Unset;
         type Author = Unset;
-        type IndexedAt = Unset;
-        type Cid = Unset;
         type Record = Unset;
+        type Cid = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
@@ -4175,9 +4177,9 @@ pub mod post_view_state {
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
         type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Record = S::Record;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
@@ -4185,29 +4187,9 @@ pub mod post_view_state {
     impl<S: State> State for SetAuthor<S> {
         type Uri = S::Uri;
         type Author = Set<members::author>;
-        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
         type Cid = S::Cid;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type Author = S::Author;
         type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Record = S::Record;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
@@ -4215,9 +4197,29 @@ pub mod post_view_state {
     impl<S: State> State for SetRecord<S> {
         type Uri = S::Uri;
         type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Record = Set<members::record>;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type Record = S::Record;
+        type Cid = Set<members::cid>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type Record = S::Record;
+        type Cid = S::Cid;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -4226,12 +4228,12 @@ pub mod post_view_state {
         pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
@@ -4546,9 +4548,9 @@ where
     S: post_view_state::State,
     S::Uri: post_view_state::IsSet,
     S::Author: post_view_state::IsSet,
-    S::IndexedAt: post_view_state::IsSet,
-    S::Cid: post_view_state::IsSet,
     S::Record: post_view_state::IsSet,
+    S::Cid: post_view_state::IsSet,
+    S::IndexedAt: post_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PostView<'a> {
@@ -4574,7 +4576,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4769,7 +4771,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4932,7 +4934,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -5078,7 +5080,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -5188,7 +5190,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -5350,7 +5352,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

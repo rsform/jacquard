@@ -18,8 +18,8 @@
 pub struct SearchSlugs<'a> {
     ///Defaults to `10`. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
 }
@@ -84,24 +84,24 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchSlugsRequest {
     type Response = SearchSlugsResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SlugResult<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SlugResult<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.searchSlugs"
     }
     fn def_name() -> &'static str {
         "slugResult"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_searchSlugs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(10i64)
 }
 
@@ -221,37 +221,37 @@ pub mod slug_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type Slug;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Slug = S::Slug;
+        type Ref = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Ref = S::Ref;
         type Slug = Set<members::slug>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Slug = S::Slug;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
@@ -324,8 +324,8 @@ where
 impl<'a, S> SlugResultBuilder<'a, S>
 where
     S: slug_result_state::State,
-    S::Ref: slug_result_state::IsSet,
     S::Slug: slug_result_state::IsSet,
+    S::Ref: slug_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SlugResult<'a> {
@@ -338,7 +338,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -351,7 +351,7 @@ where
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_games_gamesgamesgamesgames_searchSlugs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

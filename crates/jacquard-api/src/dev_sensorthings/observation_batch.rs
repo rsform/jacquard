@@ -17,9 +17,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BatchEntry<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub q: std::option::Option<BatchEntryQ<'a>>,
+    pub q: core::option::Option<BatchEntryQ<'a>>,
     ///Observation result, same union as dev.sensorthings.observation
     #[serde(borrow)]
     pub result: BatchEntryResult<'a>,
@@ -167,9 +167,9 @@ pub struct ObservationBatch<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ObservationBatchGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -189,19 +189,19 @@ impl<'a> ObservationBatch<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BatchEntry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BatchEntry<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.observationBatch"
     }
     fn def_name() -> &'static str {
         "batchEntry"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_observationBatch()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -233,19 +233,19 @@ impl jacquard_common::types::collection::Collection for ObservationBatchRecord {
     type Record = ObservationBatchRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ObservationBatch<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ObservationBatch<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.observationBatch"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_observationBatch()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.observations;
             #[allow(unused_comparisons)]
@@ -405,7 +405,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -419,7 +419,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_sensorthings_observationBatch() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_sensorthings_observationBatch() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -619,65 +619,65 @@ pub mod observation_batch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Datastream;
-        type WindowEnd;
         type WindowStart;
+        type WindowEnd;
+        type Datastream;
         type Observations;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Datastream = Unset;
-        type WindowEnd = Unset;
         type WindowStart = Unset;
+        type WindowEnd = Unset;
+        type Datastream = Unset;
         type Observations = Unset;
     }
-    ///State transition - sets the `datastream` field to Set
-    pub struct SetDatastream<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDatastream<S> {}
-    impl<S: State> State for SetDatastream<S> {
-        type Datastream = Set<members::datastream>;
+    ///State transition - sets the `window_start` field to Set
+    pub struct SetWindowStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWindowStart<S> {}
+    impl<S: State> State for SetWindowStart<S> {
+        type WindowStart = Set<members::window_start>;
         type WindowEnd = S::WindowEnd;
-        type WindowStart = S::WindowStart;
+        type Datastream = S::Datastream;
         type Observations = S::Observations;
     }
     ///State transition - sets the `window_end` field to Set
     pub struct SetWindowEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWindowEnd<S> {}
     impl<S: State> State for SetWindowEnd<S> {
-        type Datastream = S::Datastream;
-        type WindowEnd = Set<members::window_end>;
         type WindowStart = S::WindowStart;
+        type WindowEnd = Set<members::window_end>;
+        type Datastream = S::Datastream;
         type Observations = S::Observations;
     }
-    ///State transition - sets the `window_start` field to Set
-    pub struct SetWindowStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWindowStart<S> {}
-    impl<S: State> State for SetWindowStart<S> {
-        type Datastream = S::Datastream;
+    ///State transition - sets the `datastream` field to Set
+    pub struct SetDatastream<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDatastream<S> {}
+    impl<S: State> State for SetDatastream<S> {
+        type WindowStart = S::WindowStart;
         type WindowEnd = S::WindowEnd;
-        type WindowStart = Set<members::window_start>;
+        type Datastream = Set<members::datastream>;
         type Observations = S::Observations;
     }
     ///State transition - sets the `observations` field to Set
     pub struct SetObservations<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObservations<S> {}
     impl<S: State> State for SetObservations<S> {
-        type Datastream = S::Datastream;
-        type WindowEnd = S::WindowEnd;
         type WindowStart = S::WindowStart;
+        type WindowEnd = S::WindowEnd;
+        type Datastream = S::Datastream;
         type Observations = Set<members::observations>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `datastream` field
-        pub struct datastream(());
-        ///Marker type for the `window_end` field
-        pub struct window_end(());
         ///Marker type for the `window_start` field
         pub struct window_start(());
+        ///Marker type for the `window_end` field
+        pub struct window_end(());
+        ///Marker type for the `datastream` field
+        pub struct datastream(());
         ///Marker type for the `observations` field
         pub struct observations(());
     }
@@ -794,9 +794,9 @@ where
 impl<'a, S> ObservationBatchBuilder<'a, S>
 where
     S: observation_batch_state::State,
-    S::Datastream: observation_batch_state::IsSet,
-    S::WindowEnd: observation_batch_state::IsSet,
     S::WindowStart: observation_batch_state::IsSet,
+    S::WindowEnd: observation_batch_state::IsSet,
+    S::Datastream: observation_batch_state::IsSet,
     S::Observations: observation_batch_state::IsSet,
 {
     /// Build the final struct
@@ -812,7 +812,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

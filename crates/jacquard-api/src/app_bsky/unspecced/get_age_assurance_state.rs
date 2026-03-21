@@ -22,16 +22,16 @@ pub struct GetAgeAssuranceStateOutput<'a> {
     pub value: crate::app_bsky::unspecced::AgeAssuranceState<'a>,
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct GetAgeAssuranceState;
 /// Response type for

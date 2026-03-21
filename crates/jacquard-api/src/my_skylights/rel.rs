@@ -17,16 +17,16 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Rel<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub finished_at: std::option::Option<Vec<jacquard_common::types::string::Datetime>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub finished_at: core::option::Option<Vec<jacquard_common::types::string::Datetime>>,
     #[serde(borrow)]
     pub item: crate::my_skylights::Item<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: std::option::Option<crate::my_skylights::rel::Note<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub note: core::option::Option<crate::my_skylights::rel::Note<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rating: std::option::Option<crate::my_skylights::rel::Rating<'a>>,
+    pub rating: core::option::Option<crate::my_skylights::rel::Rating<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -41,9 +41,9 @@ pub struct Rel<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RelGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -124,53 +124,53 @@ impl jacquard_common::types::collection::Collection for RelRecord {
     type Record = RelRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rel<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Rel<'a> {
     fn nsid() -> &'static str {
         "my.skylights.rel"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_my_skylights_rel()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Note<'a> {
     fn nsid() -> &'static str {
         "my.skylights.rel"
     }
     fn def_name() -> &'static str {
         "note"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_my_skylights_rel()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rating<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Rating<'a> {
     fn nsid() -> &'static str {
         "my.skylights.rel"
     }
     fn def_name() -> &'static str {
         "rating"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_my_skylights_rel()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.value;
             if *value > 10i64 {
@@ -355,7 +355,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -370,7 +370,7 @@ where
     }
 }
 
-fn lexicon_doc_my_skylights_rel() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_my_skylights_rel() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("my.skylights.rel"),
@@ -591,51 +591,51 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type Value;
         type CreatedAt;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type Value = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Value = Set<members::value>;
         type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Value = S::Value;
         type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Value = S::Value;
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `value` field
         pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -728,9 +728,9 @@ where
 impl<'a, S> NoteBuilder<'a, S>
 where
     S: note_state::State,
-    S::UpdatedAt: note_state::IsSet,
     S::Value: note_state::IsSet,
     S::CreatedAt: note_state::IsSet,
+    S::UpdatedAt: note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Note<'a> {
@@ -744,7 +744,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -885,7 +885,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

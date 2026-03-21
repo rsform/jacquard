@@ -20,15 +20,15 @@
 pub struct Request<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Introduction message
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub ring: crate::net_asadaame5121::at_circle::RingRef<'a>,
     ///RSS feed URL of the site
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rss_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub rss_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Title of the site
     #[serde(borrow)]
     pub site_title: jacquard_common::CowStr<'a>,
@@ -49,9 +49,9 @@ pub struct Request<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -98,19 +98,19 @@ impl jacquard_common::types::collection::Collection for RequestRecord {
     type Record = RequestRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Request<'a> {
     fn nsid() -> &'static str {
         "net.asadaame5121.at-circle.request"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_asadaame5121_at_circle_request()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.message {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -189,8 +189,8 @@ pub mod request_state {
     pub trait State: sealed::Sealed {
         type Ring;
         type SiteTitle;
-        type CreatedAt;
         type SiteUrl;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -198,8 +198,8 @@ pub mod request_state {
     impl State for Empty {
         type Ring = Unset;
         type SiteTitle = Unset;
-        type CreatedAt = Unset;
         type SiteUrl = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
@@ -207,8 +207,8 @@ pub mod request_state {
     impl<S: State> State for SetRing<S> {
         type Ring = Set<members::ring>;
         type SiteTitle = S::SiteTitle;
-        type CreatedAt = S::CreatedAt;
         type SiteUrl = S::SiteUrl;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `site_title` field to Set
     pub struct SetSiteTitle<S: State = Empty>(PhantomData<fn() -> S>);
@@ -216,17 +216,8 @@ pub mod request_state {
     impl<S: State> State for SetSiteTitle<S> {
         type Ring = S::Ring;
         type SiteTitle = Set<members::site_title>;
+        type SiteUrl = S::SiteUrl;
         type CreatedAt = S::CreatedAt;
-        type SiteUrl = S::SiteUrl;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Ring = S::Ring;
-        type SiteTitle = S::SiteTitle;
-        type CreatedAt = Set<members::created_at>;
-        type SiteUrl = S::SiteUrl;
     }
     ///State transition - sets the `site_url` field to Set
     pub struct SetSiteUrl<S: State = Empty>(PhantomData<fn() -> S>);
@@ -234,8 +225,17 @@ pub mod request_state {
     impl<S: State> State for SetSiteUrl<S> {
         type Ring = S::Ring;
         type SiteTitle = S::SiteTitle;
-        type CreatedAt = S::CreatedAt;
         type SiteUrl = Set<members::site_url>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Ring = S::Ring;
+        type SiteTitle = S::SiteTitle;
+        type SiteUrl = S::SiteUrl;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -244,10 +244,10 @@ pub mod request_state {
         pub struct ring(());
         ///Marker type for the `site_title` field
         pub struct site_title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `site_url` field
         pub struct site_url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -399,8 +399,8 @@ where
     S: request_state::State,
     S::Ring: request_state::IsSet,
     S::SiteTitle: request_state::IsSet,
-    S::CreatedAt: request_state::IsSet,
     S::SiteUrl: request_state::IsSet,
+    S::CreatedAt: request_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Request<'a> {
@@ -417,7 +417,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -434,7 +434,7 @@ where
     }
 }
 
-fn lexicon_doc_net_asadaame5121_at_circle_request() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_net_asadaame5121_at_circle_request() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

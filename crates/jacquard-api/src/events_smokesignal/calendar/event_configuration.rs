@@ -19,15 +19,15 @@
 #[serde(rename_all = "camelCase")]
 pub struct EventConfiguration<'a> {
     ///When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disable_direct_rsvp: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disable_direct_rsvp: core::option::Option<bool>,
     ///When true, RSVPs require a confirmed email address.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub require_confirmed_email: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub require_confirmed_email: core::option::Option<bool>,
     ///URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rsvp_redirect_url: std::option::Option<
+    pub rsvp_redirect_url: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
 }
@@ -44,9 +44,9 @@ pub struct EventConfiguration<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventConfigurationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -93,19 +93,19 @@ impl jacquard_common::types::collection::Collection for EventConfigurationRecord
     type Record = EventConfigurationRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EventConfiguration<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EventConfiguration<'a> {
     fn nsid() -> &'static str {
         "events.smokesignal.calendar.eventConfiguration"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_events_smokesignal_calendar_eventConfiguration()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.rsvp_redirect_url {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
@@ -231,7 +231,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -245,7 +245,7 @@ where
     }
 }
 
-fn lexicon_doc_events_smokesignal_calendar_eventConfiguration() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_events_smokesignal_calendar_eventConfiguration() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -20,14 +20,14 @@
 #[serde(rename_all = "camelCase")]
 pub struct DatasetSize<'a> {
     ///Total size in bytes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bytes: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub bytes: core::option::Option<i64>,
     ///Total number of samples in the dataset
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub samples: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub samples: core::option::Option<i64>,
     ///Number of WebDataset shards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub shards: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub shards: core::option::Option<i64>,
 }
 
 /// Index entry for a WebDataset-backed dataset with references to storage location and sample schema
@@ -44,27 +44,27 @@ pub struct DatasetSize<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Entry<'a> {
     ///Dataset-level content metadata (e.g., instrument settings, acquisition parameters). Structure is validated against the schema referenced by metadataSchemaRef when present. Stored as an open JSON object.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub content_metadata: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///Timestamp when this dataset entry was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Human-readable description of the dataset
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///License identifier or URL. SPDX identifiers recommended (e.g., MIT, Apache-2.0, CC-BY-4.0) or full SPDX URLs (e.g., http://spdx.org/licenses/MIT). Aligns with Schema.org license property.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub license: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub license: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Msgpack-encoded metadata dict for arbitrary extended key-value pairs. Use this for additional metadata beyond the core top-level fields (license, tags, size). Top-level fields are preferred for discoverable/searchable metadata.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub metadata: std::option::Option<jacquard_common::deps::bytes::Bytes>,
+    pub metadata: core::option::Option<jacquard_common::deps::bytes::Bytes>,
     ///Optional AT-URI reference to a schema record defining the structure of this dataset's content metadata. When present, contentMetadata is validated against this schema at write time.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata_schema_ref: std::option::Option<
+    pub metadata_schema_ref: core::option::Option<
         jacquard_common::types::string::AtUri<'a>,
     >,
     ///Human-readable dataset name
@@ -74,16 +74,16 @@ pub struct Entry<'a> {
     #[serde(borrow)]
     pub schema_ref: jacquard_common::types::string::AtUri<'a>,
     ///Dataset size information (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub size: std::option::Option<crate::science_alt::dataset::entry::DatasetSize<'a>>,
+    pub size: core::option::Option<crate::science_alt::dataset::entry::DatasetSize<'a>>,
     ///Storage location for dataset files (WebDataset tar archives)
     #[serde(borrow)]
     pub storage: EntryStorage<'a>,
     ///Searchable tags for dataset discovery. Aligns with Schema.org keywords property.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 #[jacquard_derive::open_union]
@@ -119,9 +119,9 @@ pub enum EntryStorage<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EntryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -163,19 +163,19 @@ impl<'a> Entry<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DatasetSize<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DatasetSize<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.entry"
     }
     fn def_name() -> &'static str {
         "datasetSize"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_entry()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.bytes {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -240,19 +240,19 @@ impl jacquard_common::types::collection::Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.entry"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_entry()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
@@ -331,19 +331,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ShardChecksum<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ShardChecksum<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.entry"
     }
     fn def_name() -> &'static str {
         "shardChecksum"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_entry()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.algorithm;
             #[allow(unused_comparisons)]
@@ -374,7 +374,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ShardChecksum<'a> {
     }
 }
 
-fn lexicon_doc_science_alt_dataset_entry() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_science_alt_dataset_entry() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -751,66 +751,66 @@ pub mod entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Storage;
-        type CreatedAt;
         type SchemaRef;
+        type CreatedAt;
+        type Storage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Storage = Unset;
-        type CreatedAt = Unset;
         type SchemaRef = Unset;
+        type CreatedAt = Unset;
+        type Storage = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
-        type Storage = S::Storage;
+        type SchemaRef = S::SchemaRef;
         type CreatedAt = S::CreatedAt;
-        type SchemaRef = S::SchemaRef;
-    }
-    ///State transition - sets the `storage` field to Set
-    pub struct SetStorage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStorage<S> {}
-    impl<S: State> State for SetStorage<S> {
-        type Name = S::Name;
-        type Storage = Set<members::storage>;
-        type CreatedAt = S::CreatedAt;
-        type SchemaRef = S::SchemaRef;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Storage = S::Storage;
-        type CreatedAt = Set<members::created_at>;
-        type SchemaRef = S::SchemaRef;
     }
     ///State transition - sets the `schema_ref` field to Set
     pub struct SetSchemaRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchemaRef<S> {}
     impl<S: State> State for SetSchemaRef<S> {
         type Name = S::Name;
-        type Storage = S::Storage;
-        type CreatedAt = S::CreatedAt;
         type SchemaRef = Set<members::schema_ref>;
+        type CreatedAt = S::CreatedAt;
+        type Storage = S::Storage;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type SchemaRef = S::SchemaRef;
+        type CreatedAt = Set<members::created_at>;
+        type Storage = S::Storage;
+    }
+    ///State transition - sets the `storage` field to Set
+    pub struct SetStorage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStorage<S> {}
+    impl<S: State> State for SetStorage<S> {
+        type Name = S::Name;
+        type SchemaRef = S::SchemaRef;
+        type CreatedAt = S::CreatedAt;
+        type Storage = Set<members::storage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `storage` field
-        pub struct storage(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `schema_ref` field
         pub struct schema_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `storage` field
+        pub struct storage(());
     }
 }
 
@@ -1073,9 +1073,9 @@ impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
     S::Name: entry_state::IsSet,
-    S::Storage: entry_state::IsSet,
-    S::CreatedAt: entry_state::IsSet,
     S::SchemaRef: entry_state::IsSet,
+    S::CreatedAt: entry_state::IsSet,
+    S::Storage: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
@@ -1097,7 +1097,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -52,12 +52,12 @@ pub struct Webhook<'a> {
     ///When this webhook was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///A description of what this webhook is used for.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Number of consecutive errors for this webhook.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub error_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub error_count: core::option::Option<i64>,
     ///The types of events this webhook should receive.
     #[serde(borrow)]
     pub events: Vec<jacquard_common::CowStr<'a>>,
@@ -65,49 +65,49 @@ pub struct Webhook<'a> {
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///When this webhook was last triggered.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_triggered: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_triggered: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mute_words: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub mute_words: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///A user-friendly name for this webhook.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Text to prepend to webhook messages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub prefix: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Text replacement rules for webhook messages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rewrite: std::option::Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
+    pub rewrite: core::option::Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
     ///Text to append to webhook messages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub suffix: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub suffix: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When this webhook was last updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The webhook URL where events will be sent.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewriteRule<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RewriteRule<'a> {
     fn nsid() -> &'static str {
         "place.stream.server.defs"
     }
     fn def_name() -> &'static str {
         "rewriteRule"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_server_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.from;
             #[allow(unused_comparisons)]
@@ -151,19 +151,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RewriteRule<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
     fn nsid() -> &'static str {
         "place.stream.server.defs"
     }
     fn def_name() -> &'static str {
         "webhook"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_server_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
@@ -216,7 +216,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Webhook<'a> {
     }
 }
 
-fn lexicon_doc_place_stream_server_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_server_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -612,85 +612,85 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Active;
+        type Id;
+        type Events;
         type Url;
         type CreatedAt;
-        type Active;
-        type Events;
-        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Active = Unset;
+        type Id = Unset;
+        type Events = Unset;
         type Url = Unset;
         type CreatedAt = Unset;
-        type Active = Unset;
-        type Events = Unset;
-        type Id = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type CreatedAt = S::CreatedAt;
-        type Active = S::Active;
-        type Events = S::Events;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Url = S::Url;
-        type CreatedAt = Set<members::created_at>;
-        type Active = S::Active;
-        type Events = S::Events;
-        type Id = S::Id;
     }
     ///State transition - sets the `active` field to Set
     pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActive<S> {}
     impl<S: State> State for SetActive<S> {
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
         type Active = Set<members::active>;
-        type Events = S::Events;
         type Id = S::Id;
-    }
-    ///State transition - sets the `events` field to Set
-    pub struct SetEvents<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvents<S> {}
-    impl<S: State> State for SetEvents<S> {
+        type Events = S::Events;
         type Url = S::Url;
         type CreatedAt = S::CreatedAt;
-        type Active = S::Active;
-        type Events = Set<members::events>;
-        type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
+        type Active = S::Active;
+        type Id = Set<members::id>;
+        type Events = S::Events;
         type Url = S::Url;
         type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `events` field to Set
+    pub struct SetEvents<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvents<S> {}
+    impl<S: State> State for SetEvents<S> {
         type Active = S::Active;
+        type Id = S::Id;
+        type Events = Set<members::events>;
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Active = S::Active;
+        type Id = S::Id;
         type Events = S::Events;
-        type Id = Set<members::id>;
+        type Url = Set<members::url>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Active = S::Active;
+        type Id = S::Id;
+        type Events = S::Events;
+        type Url = S::Url;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `active` field
+        pub struct active(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `events` field
+        pub struct events(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `active` field
-        pub struct active(());
-        ///Marker type for the `events` field
-        pub struct events(());
-        ///Marker type for the `id` field
-        pub struct id(());
     }
 }
 
@@ -1003,11 +1003,11 @@ where
 impl<'a, S> WebhookBuilder<'a, S>
 where
     S: webhook_state::State,
+    S::Active: webhook_state::IsSet,
+    S::Id: webhook_state::IsSet,
+    S::Events: webhook_state::IsSet,
     S::Url: webhook_state::IsSet,
     S::CreatedAt: webhook_state::IsSet,
-    S::Active: webhook_state::IsSet,
-    S::Events: webhook_state::IsSet,
-    S::Id: webhook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Webhook<'a> {
@@ -1032,7 +1032,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -19,15 +19,15 @@
 #[serde(rename_all = "camelCase")]
 pub struct Subscription<'a> {
     ///Which of the user's record collections should be evaluated (NSIDs). Must be a subset of the evaluator's subjectCollections. If omitted, all supported collections are evaluated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collections: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub collections: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Timestamp of when this subscription was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Which evaluation types the user wants. If omitted, all types the evaluator supports are applied.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub evaluation_types: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub evaluation_types: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///DID of the evaluator service to subscribe to.
     #[serde(borrow)]
     pub evaluator: jacquard_common::types::string::Did<'a>,
@@ -45,9 +45,9 @@ pub struct Subscription<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubscriptionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -94,19 +94,19 @@ impl jacquard_common::types::collection::Collection for SubscriptionRecord {
     type Record = SubscriptionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subscription<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Subscription<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.subscription"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_subscription()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.collections {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
@@ -304,7 +304,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -319,7 +319,7 @@ where
     }
 }
 
-fn lexicon_doc_app_gainforest_evaluator_subscription() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_gainforest_evaluator_subscription() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

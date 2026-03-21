@@ -46,16 +46,16 @@ pub type Preferences<'a> = Vec<PreferencesItem<'a>>;
 #[serde(rename_all = "camelCase")]
 pub struct ProfileView<'a> {
     ///A link to the profile's avatar
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///When the profile record was first created
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The biography associated to the profile
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The DID of the profile
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
@@ -181,19 +181,19 @@ impl jacquard_common::IntoStatic for PublishingScopesPrefDefaultScope<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     fn nsid() -> &'static str {
         "social.clippr.actor.defs"
     }
     fn def_name() -> &'static str {
         "profileView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_clippr_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
@@ -260,19 +260,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingScopesPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PublishingScopesPref<'a> {
     fn nsid() -> &'static str {
         "social.clippr.actor.defs"
     }
     fn def_name() -> &'static str {
         "publishingScopesPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_clippr_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -288,50 +288,50 @@ pub mod profile_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type DisplayName;
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type DisplayName = Unset;
-        type Did = Unset;
         type Handle = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
         type DisplayName = Set<members::display_name>;
+        type Handle = S::Handle;
         type Did = S::Did;
-        type Handle = S::Handle;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type DisplayName = S::DisplayName;
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
         type DisplayName = S::DisplayName;
-        type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type DisplayName = S::DisplayName;
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `display_name` field
         pub struct display_name(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -485,8 +485,8 @@ impl<'a, S> ProfileViewBuilder<'a, S>
 where
     S: profile_view_state::State,
     S::DisplayName: profile_view_state::IsSet,
-    S::Did: profile_view_state::IsSet,
     S::Handle: profile_view_state::IsSet,
+    S::Did: profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileView<'a> {
@@ -503,7 +503,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -520,7 +520,7 @@ where
     }
 }
 
-fn lexicon_doc_social_clippr_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_clippr_actor_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

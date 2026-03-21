@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "test.collision.did",
+  "description": "Test fixture that defines a local type named Did, which collides with jacquard_common::types::string::Did.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "An object that also uses a DID-format string field, exercising the collision path.",
+      "required": ["owner", "identifier"],
+      "properties": {
+        "owner": {
+          "type": "string",
+          "format": "did",
+          "description": "A field typed as DID format, requiring the Did import but colliding with local Did type."
+        },
+        "identifier": {
+          "type": "ref",
+          "ref": "#did"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "did": {
+      "type": "object",
+      "description": "A locally-defined type named Did that collides with the string import.",
+      "required": ["method", "value"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "maxLength": 50,
+          "description": "The DID method (e.g., plc, web)."
+        },
+        "value": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "The full DID string."
+        }
+      }
+    }
+  }
+}

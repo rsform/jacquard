@@ -57,9 +57,9 @@ pub struct AbortUploadOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum AbortUploadError<'a> {
     #[serde(rename = "InvalidUploadId")]
-    InvalidUploadId(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidUploadId(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "AbortFailed")]
-    AbortFailed(std::option::Option<jacquard_common::CowStr<'a>>),
+    AbortFailed(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for AbortUploadError<'_> {

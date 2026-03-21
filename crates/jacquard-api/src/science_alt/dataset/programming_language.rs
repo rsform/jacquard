@@ -13,12 +13,12 @@
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Javascript;
-impl std::fmt::Display for Javascript {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Javascript {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "javascript")
     }
 }
@@ -124,12 +124,12 @@ impl jacquard_common::IntoStatic for ProgrammingLanguage<'_> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Python;
-impl std::fmt::Display for Python {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Python {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "python")
     }
 }
@@ -142,12 +142,12 @@ impl std::fmt::Display for Python {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Rust;
-impl std::fmt::Display for Rust {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Rust {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "rust")
     }
 }
@@ -160,12 +160,12 @@ impl std::fmt::Display for Rust {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Typescript;
-impl std::fmt::Display for Typescript {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Typescript {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "typescript")
     }
 }

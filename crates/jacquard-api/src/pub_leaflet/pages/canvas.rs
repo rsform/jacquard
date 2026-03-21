@@ -19,11 +19,11 @@
 pub struct Block<'a> {
     #[serde(borrow)]
     pub block: BlockBlock<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub height: core::option::Option<i64>,
     ///The rotation of the block in degrees
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rotation: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rotation: core::option::Option<i64>,
     pub width: i64,
     pub x: i64,
     pub y: i64,
@@ -88,9 +88,9 @@ pub enum BlockBlock<'a> {
 pub struct Canvas<'a> {
     #[serde(borrow)]
     pub blocks: Vec<crate::pub_leaflet::pages::canvas::Block<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -134,12 +134,12 @@ pub struct Quote<'a> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct TextAlignCenter;
-impl std::fmt::Display for TextAlignCenter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for TextAlignCenter {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "textAlignCenter")
     }
 }
@@ -151,12 +151,12 @@ impl std::fmt::Display for TextAlignCenter {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct TextAlignLeft;
-impl std::fmt::Display for TextAlignLeft {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for TextAlignLeft {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "textAlignLeft")
     }
 }
@@ -168,80 +168,80 @@ impl std::fmt::Display for TextAlignLeft {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct TextAlignRight;
-impl std::fmt::Display for TextAlignRight {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for TextAlignRight {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "textAlignRight")
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Block<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Block<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
     fn def_name() -> &'static str {
         "block"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Canvas<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Canvas<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Position<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Position<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
     fn def_name() -> &'static str {
         "position"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.pages.canvas"
     }
     fn def_name() -> &'static str {
         "quote"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_pages_canvas()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -256,67 +256,67 @@ pub mod block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Y;
         type X;
         type Width;
         type Block;
-        type Y;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Y = Unset;
         type X = Unset;
         type Width = Unset;
         type Block = Unset;
-        type Y = Unset;
-    }
-    ///State transition - sets the `x` field to Set
-    pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetX<S> {}
-    impl<S: State> State for SetX<S> {
-        type X = Set<members::x>;
-        type Width = S::Width;
-        type Block = S::Block;
-        type Y = S::Y;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type X = S::X;
-        type Width = Set<members::width>;
-        type Block = S::Block;
-        type Y = S::Y;
-    }
-    ///State transition - sets the `block` field to Set
-    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlock<S> {}
-    impl<S: State> State for SetBlock<S> {
-        type X = S::X;
-        type Width = S::Width;
-        type Block = Set<members::block>;
-        type Y = S::Y;
     }
     ///State transition - sets the `y` field to Set
     pub struct SetY<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetY<S> {}
     impl<S: State> State for SetY<S> {
+        type Y = Set<members::y>;
         type X = S::X;
         type Width = S::Width;
         type Block = S::Block;
-        type Y = Set<members::y>;
+    }
+    ///State transition - sets the `x` field to Set
+    pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetX<S> {}
+    impl<S: State> State for SetX<S> {
+        type Y = S::Y;
+        type X = Set<members::x>;
+        type Width = S::Width;
+        type Block = S::Block;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Y = S::Y;
+        type X = S::X;
+        type Width = Set<members::width>;
+        type Block = S::Block;
+    }
+    ///State transition - sets the `block` field to Set
+    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlock<S> {}
+    impl<S: State> State for SetBlock<S> {
+        type Y = S::Y;
+        type X = S::X;
+        type Width = S::Width;
+        type Block = Set<members::block>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `y` field
+        pub struct y(());
         ///Marker type for the `x` field
         pub struct x(());
         ///Marker type for the `width` field
         pub struct width(());
         ///Marker type for the `block` field
         pub struct block(());
-        ///Marker type for the `y` field
-        pub struct y(());
     }
 }
 
@@ -451,10 +451,10 @@ where
 impl<'a, S> BlockBuilder<'a, S>
 where
     S: block_state::State,
+    S::Y: block_state::IsSet,
     S::X: block_state::IsSet,
     S::Width: block_state::IsSet,
     S::Block: block_state::IsSet,
-    S::Y: block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Block<'a> {
@@ -471,7 +471,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -488,7 +488,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_leaflet_pages_canvas() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_pub_leaflet_pages_canvas() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -869,7 +869,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1009,7 +1009,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1149,7 +1149,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

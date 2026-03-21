@@ -53,7 +53,7 @@ pub struct ResolveHandleOutput<'a> {
 pub enum ResolveHandleError<'a> {
     /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    HandleNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveHandleError<'_> {

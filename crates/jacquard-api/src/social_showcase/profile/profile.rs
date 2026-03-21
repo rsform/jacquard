@@ -19,61 +19,61 @@
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
     ///Custom accent color hex code (e.g. #2e4a6e)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accent_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub accent_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Avatar image blob (1000x1000px max)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Banner image blob (3000x1000px max)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub banner: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Profile description
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub bio: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub bio: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Total number of collections Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_profile_collection_count")]
-    pub collection_count: std::option::Option<i64>,
+    pub collection_count: core::option::Option<i64>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///User's DID
     #[serde(borrow)]
     pub did: jacquard_common::CowStr<'a>,
     ///Display name
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///User's handle
     #[serde(borrow)]
     pub handle: jacquard_common::CowStr<'a>,
     ///Total number of items in the user's library Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_profile_item_count")]
-    pub item_count: std::option::Option<i64>,
+    pub item_count: core::option::Option<i64>,
     ///Schema version for migrations (defaults to 1 if missing) Defaults to `1`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_profile_schema_version")]
-    pub schema_version: std::option::Option<i64>,
+    pub schema_version: core::option::Option<i64>,
     ///Featured showcase items
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub showcase: std::option::Option<Vec<crate::social_showcase::ShowcaseItem<'a>>>,
+    pub showcase: core::option::Option<Vec<crate::social_showcase::ShowcaseItem<'a>>>,
     ///Profile tags for discovery (max 10)
     #[serde(borrow)]
     pub tags: Vec<jacquard_common::CowStr<'a>>,
     ///Profile theme preset name
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub theme: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///External website URL
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub website: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub website: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -88,9 +88,9 @@ pub struct Profile<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -137,19 +137,19 @@ impl jacquard_common::types::collection::Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "social.showcase.profile.profile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_profile_profile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.accent_color {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 7usize {
@@ -355,15 +355,15 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     }
 }
 
-fn _default_profile_collection_count() -> std::option::Option<i64> {
+fn _default_profile_collection_count() -> core::option::Option<i64> {
     Some(0i64)
 }
 
-fn _default_profile_item_count() -> std::option::Option<i64> {
+fn _default_profile_item_count() -> core::option::Option<i64> {
     Some(0i64)
 }
 
-fn _default_profile_schema_version() -> std::option::Option<i64> {
+fn _default_profile_schema_version() -> core::option::Option<i64> {
     Some(1i64)
 }
 
@@ -378,66 +378,66 @@ pub mod profile_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Handle;
+        type Did;
         type CreatedAt;
         type Tags;
-        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Handle = Unset;
+        type Did = Unset;
         type CreatedAt = Unset;
         type Tags = Unset;
-        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
         type Handle = Set<members::handle>;
+        type Did = S::Did;
         type CreatedAt = S::CreatedAt;
         type Tags = S::Tags;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Handle = S::Handle;
-        type CreatedAt = Set<members::created_at>;
-        type Tags = S::Tags;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
-        type Tags = Set<members::tags>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Handle = S::Handle;
+        type Did = Set<members::did>;
         type CreatedAt = S::CreatedAt;
         type Tags = S::Tags;
-        type Did = Set<members::did>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Handle = S::Handle;
+        type Did = S::Did;
+        type CreatedAt = Set<members::created_at>;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type Handle = S::Handle;
+        type Did = S::Did;
+        type CreatedAt = S::CreatedAt;
+        type Tags = Set<members::tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `tags` field
         pub struct tags(());
-        ///Marker type for the `did` field
-        pub struct did(());
     }
 }
 
@@ -781,9 +781,9 @@ impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
     S::Handle: profile_state::IsSet,
+    S::Did: profile_state::IsSet,
     S::CreatedAt: profile_state::IsSet,
     S::Tags: profile_state::IsSet,
-    S::Did: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
@@ -810,7 +810,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -837,7 +837,7 @@ where
     }
 }
 
-fn lexicon_doc_social_showcase_profile_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_showcase_profile_profile() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

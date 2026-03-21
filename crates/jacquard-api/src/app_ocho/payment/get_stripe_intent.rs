@@ -21,9 +21,9 @@ pub struct GetStripeIntent<'a> {
     pub id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub iss: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub token: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub token: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// The intent data

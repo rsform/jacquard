@@ -38,8 +38,8 @@ pub struct PlaceSheeps<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlaceSheepsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub success: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub success: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -90,19 +90,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for PlaceSheepsRequest {
     type Response = PlaceSheepsResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SheepPlacement<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SheepPlacement<'a> {
     fn nsid() -> &'static str {
         "games.firehose.barklesheep.placeSheeps"
     }
     fn def_name() -> &'static str {
         "sheepPlacement"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_firehose_barklesheep_placeSheeps()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -117,37 +117,37 @@ pub mod place_sheeps_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Sheeps;
         type GameId;
+        type Sheeps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Sheeps = Unset;
         type GameId = Unset;
-    }
-    ///State transition - sets the `sheeps` field to Set
-    pub struct SetSheeps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSheeps<S> {}
-    impl<S: State> State for SetSheeps<S> {
-        type Sheeps = Set<members::sheeps>;
-        type GameId = S::GameId;
+        type Sheeps = Unset;
     }
     ///State transition - sets the `game_id` field to Set
     pub struct SetGameId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGameId<S> {}
     impl<S: State> State for SetGameId<S> {
-        type Sheeps = S::Sheeps;
         type GameId = Set<members::game_id>;
+        type Sheeps = S::Sheeps;
+    }
+    ///State transition - sets the `sheeps` field to Set
+    pub struct SetSheeps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSheeps<S> {}
+    impl<S: State> State for SetSheeps<S> {
+        type GameId = S::GameId;
+        type Sheeps = Set<members::sheeps>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sheeps` field
-        pub struct sheeps(());
         ///Marker type for the `game_id` field
         pub struct game_id(());
+        ///Marker type for the `sheeps` field
+        pub struct sheeps(());
     }
 }
 
@@ -224,8 +224,8 @@ where
 impl<'a, S> PlaceSheepsBuilder<'a, S>
 where
     S: place_sheeps_state::State,
-    S::Sheeps: place_sheeps_state::IsSet,
     S::GameId: place_sheeps_state::IsSet,
+    S::Sheeps: place_sheeps_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlaceSheeps<'a> {
@@ -238,7 +238,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -261,49 +261,49 @@ pub mod sheep_placement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Horizontal;
+        type Type;
         type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Horizontal = Unset;
+        type Type = Unset;
         type Start = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Horizontal = S::Horizontal;
-        type Start = S::Start;
     }
     ///State transition - sets the `horizontal` field to Set
     pub struct SetHorizontal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHorizontal<S> {}
     impl<S: State> State for SetHorizontal<S> {
-        type Type = S::Type;
         type Horizontal = Set<members::horizontal>;
+        type Type = S::Type;
+        type Start = S::Start;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Horizontal = S::Horizontal;
+        type Type = Set<members::r#type>;
         type Start = S::Start;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
-        type Type = S::Type;
         type Horizontal = S::Horizontal;
+        type Type = S::Type;
         type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `horizontal` field
         pub struct horizontal(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `start` field
         pub struct start(());
     }
@@ -398,8 +398,8 @@ where
 impl<'a, S> SheepPlacementBuilder<'a, S>
 where
     S: sheep_placement_state::State,
-    S::Type: sheep_placement_state::IsSet,
     S::Horizontal: sheep_placement_state::IsSet,
+    S::Type: sheep_placement_state::IsSet,
     S::Start: sheep_placement_state::IsSet,
 {
     /// Build the final struct
@@ -414,7 +414,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -428,7 +428,7 @@ where
     }
 }
 
-fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_games_firehose_barklesheep_placeSheeps() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

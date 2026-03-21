@@ -40,9 +40,9 @@ pub struct CollectionLinkRemoval<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionLinkRemovalGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -89,19 +89,19 @@ impl jacquard_common::types::collection::Collection for CollectionLinkRemovalRec
     type Record = CollectionLinkRemovalRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionLinkRemoval<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionLinkRemoval<'a> {
     fn nsid() -> &'static str {
         "network.cosmik.collectionLinkRemoval"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_cosmik_collectionLinkRemoval()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -116,51 +116,51 @@ pub mod collection_link_removal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type RemovedLink;
         type RemovedAt;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type RemovedLink = Unset;
         type RemovedAt = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type RemovedLink = S::RemovedLink;
-        type RemovedAt = S::RemovedAt;
+        type Collection = Unset;
     }
     ///State transition - sets the `removed_link` field to Set
     pub struct SetRemovedLink<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRemovedLink<S> {}
     impl<S: State> State for SetRemovedLink<S> {
-        type Collection = S::Collection;
         type RemovedLink = Set<members::removed_link>;
         type RemovedAt = S::RemovedAt;
+        type Collection = S::Collection;
     }
     ///State transition - sets the `removed_at` field to Set
     pub struct SetRemovedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRemovedAt<S> {}
     impl<S: State> State for SetRemovedAt<S> {
-        type Collection = S::Collection;
         type RemovedLink = S::RemovedLink;
         type RemovedAt = Set<members::removed_at>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type RemovedLink = S::RemovedLink;
+        type RemovedAt = S::RemovedAt;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `removed_link` field
         pub struct removed_link(());
         ///Marker type for the `removed_at` field
         pub struct removed_at(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
@@ -265,9 +265,9 @@ where
 impl<'a, S> CollectionLinkRemovalBuilder<'a, S>
 where
     S: collection_link_removal_state::State,
-    S::Collection: collection_link_removal_state::IsSet,
     S::RemovedLink: collection_link_removal_state::IsSet,
     S::RemovedAt: collection_link_removal_state::IsSet,
+    S::Collection: collection_link_removal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionLinkRemoval<'a> {
@@ -281,7 +281,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -295,7 +295,7 @@ where
     }
 }
 
-fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

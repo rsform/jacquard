@@ -18,11 +18,11 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlobInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub digest: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
+    pub digest: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub size: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -38,19 +38,19 @@ pub struct BlobInfo<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChildManifestInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub digest: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub digest: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub media_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub platform: std::option::Option<
+    pub platform: core::option::Option<
         crate::io_atcr::hold::notify_manifest::PlatformInfo<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub size: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -66,14 +66,14 @@ pub struct ChildManifestInfo<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LayerInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub digest: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub digest: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
+    pub media_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub size: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -94,16 +94,16 @@ pub struct NotifyManifest<'a> {
     #[serde(borrow)]
     pub manifest_digest: jacquard_common::CowStr<'a>,
     ///Operation type (defaults to 'push' for backward compatibility)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub operation: std::option::Option<NotifyManifestOperation<'a>>,
+    pub operation: core::option::Option<NotifyManifestOperation<'a>>,
     ///Image repository name
     #[serde(borrow)]
     pub repository: jacquard_common::CowStr<'a>,
     ///Image tag (optional, required for Bluesky posts)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tag: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub tag: core::option::Option<jacquard_common::CowStr<'a>>,
     ///DID of the image owner
     #[serde(borrow)]
     pub user_did: jacquard_common::types::string::Did<'a>,
@@ -213,18 +213,18 @@ impl jacquard_common::IntoStatic for NotifyManifestOperation<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct NotifyManifestOutput<'a> {
     ///Number of layer records created (push only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub layers_created: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub layers_created: core::option::Option<i64>,
     ///The operation that was performed ('push' or 'pull')
     #[serde(borrow)]
     pub operation: jacquard_common::CowStr<'a>,
     ///Whether a Bluesky post was created (push only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub post_created: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub post_created: core::option::Option<bool>,
     ///AT-URI of the created Bluesky post (if postCreated is true)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub post_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub post_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///Whether stats were successfully updated
     pub stats_updated: bool,
     ///Whether the operation completed successfully
@@ -247,11 +247,11 @@ pub struct NotifyManifestOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum NotifyManifestError<'a> {
     #[serde(rename = "InvalidOperation")]
-    InvalidOperation(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidOperation(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "UserMismatch")]
-    UserMismatch(std::option::Option<jacquard_common::CowStr<'a>>),
+    UserMismatch(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "QuotaExceeded")]
-    QuotaExceeded(std::option::Option<jacquard_common::CowStr<'a>>),
+    QuotaExceeded(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for NotifyManifestError<'_> {
@@ -297,24 +297,26 @@ impl core::fmt::Display for NotifyManifestError<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ManifestInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub config: std::option::Option<crate::io_atcr::hold::notify_manifest::BlobInfo<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub config: core::option::Option<
+        crate::io_atcr::hold::notify_manifest::BlobInfo<'a>,
+    >,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub layers: std::option::Option<
+    pub layers: core::option::Option<
         Vec<crate::io_atcr::hold::notify_manifest::LayerInfo<'a>>,
     >,
     ///Child manifests for multi-arch images
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub manifests: std::option::Option<
+    pub manifests: core::option::Option<
         Vec<crate::io_atcr::hold::notify_manifest::ChildManifestInfo<'a>>,
     >,
     ///OCI media type
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub media_type: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -330,27 +332,27 @@ pub struct ManifestInfo<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlatformInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub architecture: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub architecture: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub os: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobInfo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobInfo<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.notifyManifest"
     }
     fn def_name() -> &'static str {
         "blobInfo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_notifyManifest()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.digest {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
@@ -367,19 +369,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobInfo<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChildManifestInfo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ChildManifestInfo<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.notifyManifest"
     }
     fn def_name() -> &'static str {
         "childManifestInfo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_notifyManifest()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.digest {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
@@ -408,19 +410,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChildManifestInfo<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LayerInfo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LayerInfo<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.notifyManifest"
     }
     fn def_name() -> &'static str {
         "layerInfo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_notifyManifest()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.digest {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
@@ -479,19 +481,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for NotifyManifestRequest {
     type Response = NotifyManifestResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestInfo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ManifestInfo<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.notifyManifest"
     }
     fn def_name() -> &'static str {
         "manifestInfo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_notifyManifest()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.media_type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
@@ -508,19 +510,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestInfo<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformInfo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PlatformInfo<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.notifyManifest"
     }
     fn def_name() -> &'static str {
         "platformInfo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_notifyManifest()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.architecture {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
@@ -549,7 +551,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformInfo<'a> {
     }
 }
 
-fn lexicon_doc_io_atcr_hold_notifyManifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_io_atcr_hold_notifyManifest() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1025,66 +1027,66 @@ pub mod notify_manifest_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type UserDid;
-        type Repository;
         type ManifestDigest;
         type Manifest;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type UserDid = Unset;
-        type Repository = Unset;
         type ManifestDigest = Unset;
         type Manifest = Unset;
+        type Repository = Unset;
     }
     ///State transition - sets the `user_did` field to Set
     pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUserDid<S> {}
     impl<S: State> State for SetUserDid<S> {
         type UserDid = Set<members::user_did>;
+        type ManifestDigest = S::ManifestDigest;
+        type Manifest = S::Manifest;
         type Repository = S::Repository;
-        type ManifestDigest = S::ManifestDigest;
-        type Manifest = S::Manifest;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type UserDid = S::UserDid;
-        type Repository = Set<members::repository>;
-        type ManifestDigest = S::ManifestDigest;
-        type Manifest = S::Manifest;
     }
     ///State transition - sets the `manifest_digest` field to Set
     pub struct SetManifestDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetManifestDigest<S> {}
     impl<S: State> State for SetManifestDigest<S> {
         type UserDid = S::UserDid;
-        type Repository = S::Repository;
         type ManifestDigest = Set<members::manifest_digest>;
         type Manifest = S::Manifest;
+        type Repository = S::Repository;
     }
     ///State transition - sets the `manifest` field to Set
     pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetManifest<S> {}
     impl<S: State> State for SetManifest<S> {
         type UserDid = S::UserDid;
-        type Repository = S::Repository;
         type ManifestDigest = S::ManifestDigest;
         type Manifest = Set<members::manifest>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type UserDid = S::UserDid;
+        type ManifestDigest = S::ManifestDigest;
+        type Manifest = S::Manifest;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `user_did` field
         pub struct user_did(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `manifest_digest` field
         pub struct manifest_digest(());
         ///Marker type for the `manifest` field
         pub struct manifest(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
@@ -1232,9 +1234,9 @@ impl<'a, S> NotifyManifestBuilder<'a, S>
 where
     S: notify_manifest_state::State,
     S::UserDid: notify_manifest_state::IsSet,
-    S::Repository: notify_manifest_state::IsSet,
     S::ManifestDigest: notify_manifest_state::IsSet,
     S::Manifest: notify_manifest_state::IsSet,
+    S::Repository: notify_manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotifyManifest<'a> {
@@ -1251,7 +1253,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

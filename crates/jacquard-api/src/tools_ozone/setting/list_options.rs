@@ -16,24 +16,24 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListOptions<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keys: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    pub keys: core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub prefix: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `"instance"`.
     #[serde(default = "_default_scope")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub scope: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub scope: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -48,9 +48,9 @@ pub struct ListOptions<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListOptionsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub options: Vec<crate::tools_ozone::setting::DefsOption<'a>>,
 }
@@ -81,11 +81,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListOptionsRequest {
     type Response = ListOptionsResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
-fn _default_scope() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_scope() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("instance"))
 }
 

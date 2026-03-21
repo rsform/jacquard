@@ -19,61 +19,63 @@
 #[serde(rename_all = "camelCase")]
 pub struct Post<'a> {
     ///Strong reference to a Bluesky post.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub bsky_post_ref: std::option::Option<
+    pub bsky_post_ref: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Open union for content. Supports markdown and other formats via $type.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: std::option::Option<crate::ai_syui::log::post::Markdown<'a>>,
+    pub content: core::option::Option<crate::ai_syui::log::post::Markdown<'a>>,
     ///Cover image. Less than 1MB.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub cover_image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///A brief description or excerpt from the post.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Indicates human language of post content.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub langs: core::option::Option<Vec<jacquard_common::types::string::Language>>,
     ///AT-URI of the parent message being replied to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub parent: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///Combine with site URL to construct a canonical URL to the post.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub path: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp of the post's publish time.
     pub published_at: jacquard_common::types::string::Datetime,
     ///AT-URI of the root message in a thread.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub root: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub root: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///Points to a publication record (at://) or a publication URL (https://).
     #[serde(borrow)]
     pub site: jacquard_common::types::string::UriValue<'a>,
     ///Tags to categorize the post.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Plaintext representation of the post content. Should not contain markdown or other formatting.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text_content: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text_content: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Title of the post.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///Translations of the post in other languages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub translations: std::option::Option<crate::ai_syui::log::post::TranslationMap<'a>>,
+    pub translations: core::option::Option<
+        crate::ai_syui::log::post::TranslationMap<'a>,
+    >,
     ///Timestamp of the post's last edit.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -88,9 +90,9 @@ pub struct Post<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -130,12 +132,12 @@ pub struct Markdown<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Translation<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub content: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Map of language codes to translations.
@@ -152,12 +154,12 @@ pub struct Translation<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TranslationMap<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub en: std::option::Option<crate::ai_syui::log::post::Translation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub en: core::option::Option<crate::ai_syui::log::post::Translation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ja: std::option::Option<crate::ai_syui::log::post::Translation<'a>>,
+    pub ja: core::option::Option<crate::ai_syui::log::post::Translation<'a>>,
 }
 
 impl<'a> Post<'a> {
@@ -200,19 +202,19 @@ impl jacquard_common::types::collection::Collection for PostRecord {
     type Record = PostRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     fn nsid() -> &'static str {
         "ai.syui.log.post"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ai_syui_log_post()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cover_image {
             {
                 let size = value.blob().size;
@@ -333,19 +335,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Post<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Markdown<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Markdown<'a> {
     fn nsid() -> &'static str {
         "ai.syui.log.post"
     }
     fn def_name() -> &'static str {
         "markdown"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ai_syui_log_post()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -382,19 +384,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Markdown<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
     fn nsid() -> &'static str {
         "ai.syui.log.post"
     }
     fn def_name() -> &'static str {
         "translation"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ai_syui_log_post()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.content {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000000usize {
@@ -459,19 +461,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TranslationMap<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TranslationMap<'a> {
     fn nsid() -> &'static str {
         "ai.syui.log.post"
     }
     fn def_name() -> &'static str {
         "translationMap"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ai_syui_log_post()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -486,51 +488,51 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PublishedAt;
         type Title;
         type Site;
+        type PublishedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PublishedAt = Unset;
         type Title = Unset;
         type Site = Unset;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
-        type PublishedAt = Set<members::published_at>;
-        type Title = S::Title;
-        type Site = S::Site;
+        type PublishedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type PublishedAt = S::PublishedAt;
         type Title = Set<members::title>;
         type Site = S::Site;
+        type PublishedAt = S::PublishedAt;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSite<S> {}
     impl<S: State> State for SetSite<S> {
-        type PublishedAt = S::PublishedAt;
         type Title = S::Title;
         type Site = Set<members::site>;
+        type PublishedAt = S::PublishedAt;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
+    impl<S: State> State for SetPublishedAt<S> {
+        type Title = S::Title;
+        type Site = S::Site;
+        type PublishedAt = Set<members::published_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `published_at` field
-        pub struct published_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `site` field
         pub struct site(());
+        ///Marker type for the `published_at` field
+        pub struct published_at(());
     }
 }
 
@@ -876,9 +878,9 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::PublishedAt: post_state::IsSet,
     S::Title: post_state::IsSet,
     S::Site: post_state::IsSet,
+    S::PublishedAt: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
@@ -904,7 +906,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -930,7 +932,7 @@ where
     }
 }
 
-fn lexicon_doc_ai_syui_log_post() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_ai_syui_log_post() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("ai.syui.log.post"),

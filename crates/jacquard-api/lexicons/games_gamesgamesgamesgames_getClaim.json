@@ -1,0 +1,132 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.getClaim",
+  "defs": {
+    "claimView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "type",
+        "claimantDid",
+        "createdAt"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string"
+        },
+        "claimantDid": {
+          "type": "string",
+          "format": "did"
+        },
+        "contact": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "games": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#gameSummaryView"
+          }
+        },
+        "message": {
+          "type": "string"
+        },
+        "org": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "review": {
+          "type": "ref",
+          "ref": "#reviewView"
+        },
+        "type": {
+          "type": "string",
+          "knownValues": [
+            "game",
+            "org"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get details of an ownership claim.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "claim"
+          ],
+          "properties": {
+            "claim": {
+              "type": "ref",
+              "ref": "#claimView"
+            }
+          }
+        }
+      }
+    },
+    "reviewView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "status",
+        "reviewedBy",
+        "createdAt"
+      ],
+      "properties": {
+        "approvedGames": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "reviewedBy": {
+          "type": "string",
+          "format": "did"
+        },
+        "status": {
+          "type": "string",
+          "knownValues": [
+            "approved",
+            "denied"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

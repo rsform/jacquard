@@ -19,44 +19,44 @@
 #[serde(rename_all = "camelCase")]
 pub struct Startup<'a> {
     ///Optional, e.g. 1,078
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub capacity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub capacity: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional, e.g. https://rpc.mahdiyari.info
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hive: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub hive: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///e.g. Podping startup complete
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
     ///Optional, e.g. hivepinger
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pinging_app: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub pinging_app: core::option::Option<jacquard_common::CowStr<'a>>,
     ///e.g. podping.aaa
     #[serde(borrow)]
     pub server_account: jacquard_common::CowStr<'a>,
     ///Optional, e.g. 9887936240807410000
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub session_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub session_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional source reference, minimized to save space, e.g. hive:92042659:cf11299faf19367f3f2d6bef0bf2bc4f59272506:0:podping.ccc (if mirroring the podping in hive block 92042659, transaction id cf11299faf19367f3f2d6bef0bf2bc4f59272506, first operation, hive auth podping.ccc)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Sender timestamp in ISO format, e.g. 2025-12-29T22:25:09.123Z
     pub timestamp: jacquard_common::types::string::Datetime,
     ///Optional
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub use_test_node: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub use_test_node: core::option::Option<bool>,
     ///Optional, e.g. 38a44421-a535-42de-b634-d1f6edce18ce
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uuid: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub uuid: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional, e.g. 2.1.0
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub v: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub v: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -71,9 +71,9 @@ pub struct Startup<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StartupGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -120,19 +120,19 @@ impl jacquard_common::types::collection::Collection for StartupRecord {
     type Record = StartupRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Startup<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Startup<'a> {
     fn nsid() -> &'static str {
         "at.podping.records.startup"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_podping_records_startup()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -147,51 +147,51 @@ pub mod startup_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
-        type ServerAccount;
         type Message;
+        type ServerAccount;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
-        type ServerAccount = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Timestamp = Set<members::timestamp>;
-        type ServerAccount = S::ServerAccount;
-        type Message = S::Message;
-    }
-    ///State transition - sets the `server_account` field to Set
-    pub struct SetServerAccount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServerAccount<S> {}
-    impl<S: State> State for SetServerAccount<S> {
-        type Timestamp = S::Timestamp;
-        type ServerAccount = Set<members::server_account>;
-        type Message = S::Message;
+        type ServerAccount = Unset;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type Timestamp = S::Timestamp;
-        type ServerAccount = S::ServerAccount;
         type Message = Set<members::message>;
+        type ServerAccount = S::ServerAccount;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `server_account` field to Set
+    pub struct SetServerAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServerAccount<S> {}
+    impl<S: State> State for SetServerAccount<S> {
+        type Message = S::Message;
+        type ServerAccount = Set<members::server_account>;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Message = S::Message;
+        type ServerAccount = S::ServerAccount;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
-        ///Marker type for the `server_account` field
-        pub struct server_account(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `server_account` field
+        pub struct server_account(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
@@ -435,9 +435,9 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 impl<'a, S> StartupBuilder<'a, S>
 where
     S: startup_state::State,
-    S::Timestamp: startup_state::IsSet,
-    S::ServerAccount: startup_state::IsSet,
     S::Message: startup_state::IsSet,
+    S::ServerAccount: startup_state::IsSet,
+    S::Timestamp: startup_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Startup<'a> {
@@ -459,7 +459,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -481,7 +481,7 @@ where
     }
 }
 
-fn lexicon_doc_at_podping_records_startup() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_at_podping_records_startup() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

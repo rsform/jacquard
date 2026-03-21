@@ -22,20 +22,20 @@ pub mod images;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Tombstone<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub camera: std::option::Option<crate::art_cllctv::embed::TombstoneCamera<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub camera: core::option::Option<crate::art_cllctv::embed::TombstoneCamera<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub dimensions: std::option::Option<
+    pub dimensions: core::option::Option<
         crate::art_cllctv::embed::TombstoneDimensions<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lens: std::option::Option<crate::art_cllctv::embed::TombstoneLens<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub lens: core::option::Option<crate::art_cllctv::embed::TombstoneLens<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub materials: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub materials: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -51,12 +51,12 @@ pub struct Tombstone<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TombstoneCamera<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub make: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub make: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub model: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub model: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -72,15 +72,15 @@ pub struct TombstoneCamera<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TombstoneDimensions<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub depth: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub depth: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub height: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub unit: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
+    pub unit: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub width: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -96,89 +96,89 @@ pub struct TombstoneDimensions<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TombstoneLens<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub exposure_time: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub exposure_time: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub fnumber: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub fnumber: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub focal_length: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub focal_length: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub iso: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub iso: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tombstone<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Tombstone<'a> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }
     fn def_name() -> &'static str {
         "tombstone"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_art_cllctv_embed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TombstoneCamera<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TombstoneCamera<'a> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }
     fn def_name() -> &'static str {
         "tombstoneCamera"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_art_cllctv_embed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TombstoneDimensions<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TombstoneDimensions<'a> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }
     fn def_name() -> &'static str {
         "tombstoneDimensions"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_art_cllctv_embed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TombstoneLens<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TombstoneLens<'a> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }
     fn def_name() -> &'static str {
         "tombstoneLens"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_art_cllctv_embed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_art_cllctv_embed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_art_cllctv_embed_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

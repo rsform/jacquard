@@ -40,9 +40,9 @@ pub struct ResetPassword<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ResetPasswordError<'a> {
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    ExpiredToken(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResetPasswordError<'_> {

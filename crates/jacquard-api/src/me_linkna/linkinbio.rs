@@ -20,13 +20,13 @@
 #[serde(rename_all = "camelCase")]
 pub struct ConnectedServices<'a> {
     ///GitHub username.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub github_username: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub github_username: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Goodreads numeric user ID.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub goodreads_user_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub goodreads_user_id: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// A single day's contribution data from GitHub.
@@ -69,16 +69,16 @@ pub struct GoodreadsBook<'a> {
     #[serde(borrow)]
     pub author: jacquard_common::CowStr<'a>,
     ///URL to the book cover image.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cover_url: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URL to the book on Goodreads.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub link: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub link: core::option::Option<jacquard_common::CowStr<'a>>,
     ///User's rating (1-5), or absent if unrated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rating: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rating: core::option::Option<i64>,
     ///Book title.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -99,27 +99,27 @@ pub struct GoodreadsBook<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct LinkCard<'a> {
     ///Whether the card is visible on the public page. Defaults to true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub enabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub enabled: core::option::Option<bool>,
     ///Whether the card is visually highlighted.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub highlighted: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub highlighted: core::option::Option<bool>,
     ///Unique identifier for the card.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Display text for the card (falls back to URL domain if empty).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Card type discriminator. Value: 'link' or absent for link cards.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URL the card links to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 /// A user's link-in-bio page containing cards, theme configuration, and social icons.
@@ -138,24 +138,24 @@ pub struct Linkinbio<'a> {
     ///Ordered list of cards on the page. Each card is a union of linkCard, widgetGoodreads, widgetGithub, or widgetTealfm.
     #[serde(borrow)]
     pub cards: Vec<LinkinbioCardsItem<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub connected_services: std::option::Option<
+    pub connected_services: core::option::Option<
         crate::me_linkna::linkinbio::ConnectedServices<'a>,
     >,
     ///Social media icons displayed on the profile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub social_icons: std::option::Option<
+    pub social_icons: core::option::Option<
         Vec<crate::me_linkna::linkinbio::SocialIcon<'a>>,
     >,
     ///Deprecated: use themeConfig instead.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub theme: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme_config: std::option::Option<crate::me_linkna::linkinbio::ThemeConfig<'a>>,
+    pub theme_config: core::option::Option<crate::me_linkna::linkinbio::ThemeConfig<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -193,9 +193,9 @@ pub enum LinkinbioCardsItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinkinbioGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -244,20 +244,20 @@ pub struct TealfmPlay<'a> {
     #[serde(borrow)]
     pub artist_name: jacquard_common::CowStr<'a>,
     ///URL to the album cover image (from Cover Art Archive).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cover_url: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URL to the track on the original music service.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub origin_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub origin_url: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When the track was played.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub played_time: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub played_time: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Album/release name.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Track/song name.
     #[serde(borrow)]
     pub track_name: jacquard_common::CowStr<'a>,
@@ -278,120 +278,122 @@ pub struct TealfmPlay<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ThemeConfig<'a> {
     ///Page background color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub background_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///CSS gradient for the page background.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_gradient: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub background_gradient: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Background wallpaper image blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub background_image: core::option::Option<
+        jacquard_common::types::blob::BlobRef<'a>,
+    >,
     ///Optional credit URL for the wallpaper image artist. Stored for attribution purposes only, not displayed on the public page.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_image_credit: std::option::Option<
+    pub background_image_credit: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
     ///Button content alignment. Default: left.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub button_alignment: std::option::Option<ThemeConfigButtonAlignment<'a>>,
+    pub button_alignment: core::option::Option<ThemeConfigButtonAlignment<'a>>,
     ///Whether buttons glow on hover. Default: false.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub button_hover_glow: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub button_hover_glow: core::option::Option<bool>,
     ///Color for the button hover glow effect.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub button_hover_glow_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub button_hover_glow_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Individual card/button background color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_background_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_background_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Card/button border color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_border_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_border_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Card/button border radius.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_border_radius: std::option::Option<ThemeConfigCardBorderRadius<'a>>,
+    pub card_border_radius: core::option::Option<ThemeConfigCardBorderRadius<'a>>,
     ///Card/button border color on hover.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_hover_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_hover_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Card/button shadow intensity.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_shadow: std::option::Option<ThemeConfigCardShadow<'a>>,
+    pub card_shadow: core::option::Option<ThemeConfigCardShadow<'a>>,
     ///Card/button text color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_text_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_text_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Card container background color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_card_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub content_card_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether cursor has sparkle trail. Default: false.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cursor_sparkles: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cursor_sparkles: core::option::Option<bool>,
     ///Custom cursor style. Default: default.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor_style: std::option::Option<ThemeConfigCursorStyle<'a>>,
+    pub cursor_style: core::option::Option<ThemeConfigCursorStyle<'a>>,
     ///Font family for the page.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub font_family: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub font_family: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Font size. Default: md.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub font_size: std::option::Option<ThemeConfigFontSize<'a>>,
+    pub font_size: core::option::Option<ThemeConfigFontSize<'a>>,
     ///Background particle effect. Default: none.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub particles: std::option::Option<ThemeConfigParticles<'a>>,
+    pub particles: core::option::Option<ThemeConfigParticles<'a>>,
     ///Theme preset ID.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub preset: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub preset: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Profile section alignment. Default: center.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile_alignment: std::option::Option<ThemeConfigProfileAlignment<'a>>,
+    pub profile_alignment: core::option::Option<ThemeConfigProfileAlignment<'a>>,
     ///Profile picture shape. Default: circle.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile_picture_shape: std::option::Option<ThemeConfigProfilePictureShape<'a>>,
+    pub profile_picture_shape: core::option::Option<ThemeConfigProfilePictureShape<'a>>,
     ///Profile picture size. Default: sm.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile_picture_size: std::option::Option<ThemeConfigProfilePictureSize<'a>>,
+    pub profile_picture_size: core::option::Option<ThemeConfigProfilePictureSize<'a>>,
     ///Profile section text color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile_text_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub profile_text_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether Linkname branding is visible. Default: true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_branding: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_branding: core::option::Option<bool>,
     ///Border color for social icons dock/sphere.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub social_icons_border_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub social_icons_border_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Social icons color.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub social_icons_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub social_icons_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Social icons container shape. Default: dock.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub social_icons_shape: std::option::Option<ThemeConfigSocialIconsShape<'a>>,
+    pub social_icons_shape: core::option::Option<ThemeConfigSocialIconsShape<'a>>,
     ///Background color for social icons dock/sphere.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub social_icons_shape_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub social_icons_shape_color: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Button content alignment. Default: left.
@@ -1385,8 +1387,8 @@ pub struct WidgetGithub<'a> {
     #[serde(borrow)]
     pub contributions: Vec<crate::me_linkna::linkinbio::GithubContributionDay<'a>>,
     ///Whether the widget is visible on the public page. Defaults to true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub enabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub enabled: core::option::Option<bool>,
     ///GitHub username.
     #[serde(borrow)]
     pub github_username: jacquard_common::CowStr<'a>,
@@ -1394,15 +1396,15 @@ pub struct WidgetGithub<'a> {
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///When the contribution data was last fetched from GitHub.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_synced_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_synced_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Widget display size. Default: 1x1.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub size: std::option::Option<WidgetGithubSize<'a>>,
+    pub size: core::option::Option<WidgetGithubSize<'a>>,
     ///Total number of contributions in the last year.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_contributions: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub total_contributions: core::option::Option<i64>,
     ///Card type discriminator.
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
@@ -1519,8 +1521,8 @@ pub struct WidgetGoodreads<'a> {
     #[serde(borrow)]
     pub books: Vec<crate::me_linkna::linkinbio::GoodreadsBook<'a>>,
     ///Whether the widget is visible on the public page. Defaults to true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub enabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub enabled: core::option::Option<bool>,
     ///Goodreads numeric user ID.
     #[serde(borrow)]
     pub goodreads_user_id: jacquard_common::CowStr<'a>,
@@ -1528,21 +1530,21 @@ pub struct WidgetGoodreads<'a> {
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///When the book data was last fetched from Goodreads.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_synced_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_synced_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Books on the read shelf (used by 1x2 size).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub read_books: std::option::Option<
+    pub read_books: core::option::Option<
         Vec<crate::me_linkna::linkinbio::GoodreadsBook<'a>>,
     >,
     ///Shelf name (currently-reading, read, or to-read).
     #[serde(borrow)]
     pub shelf: jacquard_common::CowStr<'a>,
     ///Widget display size. Default: 1x1.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub size: std::option::Option<WidgetGoodreadsSize<'a>>,
+    pub size: core::option::Option<WidgetGoodreadsSize<'a>>,
     ///Card type discriminator.
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
@@ -1656,25 +1658,25 @@ impl jacquard_common::IntoStatic for WidgetGoodreadsSize<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct WidgetTealfm<'a> {
     ///Copyright notice for cover art images.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_art_notice: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cover_art_notice: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether the widget is visible on the public page. Defaults to true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub enabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub enabled: core::option::Option<bool>,
     ///Unique identifier for the card.
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///When the play data was last fetched from the PDS.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_synced_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_synced_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Recently played tracks.
     #[serde(borrow)]
     pub plays: Vec<crate::me_linkna::linkinbio::TealfmPlay<'a>>,
     ///Widget display size. Default: 1x1.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub size: std::option::Option<WidgetTealfmSize<'a>>,
+    pub size: core::option::Option<WidgetTealfmSize<'a>>,
     ///Card type discriminator.
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
@@ -1787,36 +1789,36 @@ impl<'a> Linkinbio<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConnectedServices<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ConnectedServices<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "connectedServices"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GithubContributionDay<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GithubContributionDay<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "githubContributionDay"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.level;
             if *value > 4i64 {
@@ -1845,19 +1847,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GithubContributionDay<'a>
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GoodreadsBook<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GoodreadsBook<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "goodreadsBook"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.rating {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -1884,19 +1886,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GoodreadsBook<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkCard<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LinkCard<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "linkCard"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.text {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -1940,70 +1942,70 @@ impl jacquard_common::types::collection::Collection for LinkinbioRecord {
     type Record = LinkinbioRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Linkinbio<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Linkinbio<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SocialIcon<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SocialIcon<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "socialIcon"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TealfmPlay<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TealfmPlay<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "tealfmPlay"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThemeConfig<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ThemeConfig<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "themeConfig"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.background_image {
             {
                 let size = value.blob().size;
@@ -2053,60 +2055,58 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThemeConfig<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WidgetGithub<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for WidgetGithub<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "widgetGithub"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WidgetGoodreads<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for WidgetGoodreads<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "widgetGoodreads"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WidgetTealfm<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for WidgetTealfm<'a> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
     fn def_name() -> &'static str {
         "widgetTealfm"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_linkinbio()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_me_linkna_linkinbio() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_me_linkna_linkinbio() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("me.linkna.linkinbio"),
@@ -3941,51 +3941,51 @@ pub mod github_contribution_day_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Date;
         type Count;
         type Level;
+        type Date;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Date = Unset;
         type Count = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `date` field to Set
-    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDate<S> {}
-    impl<S: State> State for SetDate<S> {
-        type Date = Set<members::date>;
-        type Count = S::Count;
-        type Level = S::Level;
+        type Date = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type Date = S::Date;
         type Count = Set<members::count>;
         type Level = S::Level;
+        type Date = S::Date;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Date = S::Date;
         type Count = S::Count;
         type Level = Set<members::level>;
+        type Date = S::Date;
+    }
+    ///State transition - sets the `date` field to Set
+    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDate<S> {}
+    impl<S: State> State for SetDate<S> {
+        type Count = S::Count;
+        type Level = S::Level;
+        type Date = Set<members::date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `date` field
-        pub struct date(());
         ///Marker type for the `count` field
         pub struct count(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `date` field
+        pub struct date(());
     }
 }
 
@@ -4081,9 +4081,9 @@ where
 impl<'a, S> GithubContributionDayBuilder<'a, S>
 where
     S: github_contribution_day_state::State,
-    S::Date: github_contribution_day_state::IsSet,
     S::Count: github_contribution_day_state::IsSet,
     S::Level: github_contribution_day_state::IsSet,
+    S::Date: github_contribution_day_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GithubContributionDay<'a> {
@@ -4097,7 +4097,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4285,7 +4285,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4311,49 +4311,49 @@ pub mod social_icon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Platform;
         type Url;
+        type Platform;
         type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Platform = Unset;
         type Url = Unset;
+        type Platform = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type Platform = Set<members::platform>;
-        type Url = S::Url;
-        type Id = S::Id;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Platform = S::Platform;
         type Url = Set<members::url>;
+        type Platform = S::Platform;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlatform<S> {}
+    impl<S: State> State for SetPlatform<S> {
+        type Url = S::Url;
+        type Platform = Set<members::platform>;
         type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Platform = S::Platform;
         type Url = S::Url;
+        type Platform = S::Platform;
         type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
         ///Marker type for the `id` field
         pub struct id(());
     }
@@ -4448,8 +4448,8 @@ where
 impl<'a, S> SocialIconBuilder<'a, S>
 where
     S: social_icon_state::State,
-    S::Platform: social_icon_state::IsSet,
     S::Url: social_icon_state::IsSet,
+    S::Platform: social_icon_state::IsSet,
     S::Id: social_icon_state::IsSet,
 {
     /// Build the final struct
@@ -4464,7 +4464,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4489,66 +4489,66 @@ pub mod widget_github_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Type;
-        type Id;
-        type Contributions;
         type GithubUsername;
+        type Contributions;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Type = Unset;
-        type Id = Unset;
-        type Contributions = Unset;
         type GithubUsername = Unset;
+        type Contributions = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
         type Type = Set<members::r#type>;
-        type Id = S::Id;
+        type GithubUsername = S::GithubUsername;
         type Contributions = S::Contributions;
-        type GithubUsername = S::GithubUsername;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Type = S::Type;
-        type Id = Set<members::id>;
-        type Contributions = S::Contributions;
-        type GithubUsername = S::GithubUsername;
-    }
-    ///State transition - sets the `contributions` field to Set
-    pub struct SetContributions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContributions<S> {}
-    impl<S: State> State for SetContributions<S> {
-        type Type = S::Type;
         type Id = S::Id;
-        type Contributions = Set<members::contributions>;
-        type GithubUsername = S::GithubUsername;
     }
     ///State transition - sets the `github_username` field to Set
     pub struct SetGithubUsername<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGithubUsername<S> {}
     impl<S: State> State for SetGithubUsername<S> {
         type Type = S::Type;
-        type Id = S::Id;
-        type Contributions = S::Contributions;
         type GithubUsername = Set<members::github_username>;
+        type Contributions = S::Contributions;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `contributions` field to Set
+    pub struct SetContributions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContributions<S> {}
+    impl<S: State> State for SetContributions<S> {
+        type Type = S::Type;
+        type GithubUsername = S::GithubUsername;
+        type Contributions = Set<members::contributions>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Type = S::Type;
+        type GithubUsername = S::GithubUsername;
+        type Contributions = S::Contributions;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `contributions` field
-        pub struct contributions(());
         ///Marker type for the `github_username` field
         pub struct github_username(());
+        ///Marker type for the `contributions` field
+        pub struct contributions(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -4726,9 +4726,9 @@ impl<'a, S> WidgetGithubBuilder<'a, S>
 where
     S: widget_github_state::State,
     S::Type: widget_github_state::IsSet,
-    S::Id: widget_github_state::IsSet,
-    S::Contributions: widget_github_state::IsSet,
     S::GithubUsername: widget_github_state::IsSet,
+    S::Contributions: widget_github_state::IsSet,
+    S::Id: widget_github_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WidgetGithub<'a> {
@@ -4747,7 +4747,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4776,85 +4776,85 @@ pub mod widget_goodreads_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Books;
-        type Shelf;
-        type GoodreadsUserId;
-        type Id;
         type Type;
+        type Id;
+        type Shelf;
+        type Books;
+        type GoodreadsUserId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Books = Unset;
-        type Shelf = Unset;
-        type GoodreadsUserId = Unset;
-        type Id = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
-        type Books = Set<members::books>;
-        type Shelf = S::Shelf;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Id = S::Id;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `shelf` field to Set
-    pub struct SetShelf<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShelf<S> {}
-    impl<S: State> State for SetShelf<S> {
-        type Books = S::Books;
-        type Shelf = Set<members::shelf>;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Id = S::Id;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `goodreads_user_id` field to Set
-    pub struct SetGoodreadsUserId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGoodreadsUserId<S> {}
-    impl<S: State> State for SetGoodreadsUserId<S> {
-        type Books = S::Books;
-        type Shelf = S::Shelf;
-        type GoodreadsUserId = Set<members::goodreads_user_id>;
-        type Id = S::Id;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Books = S::Books;
-        type Shelf = S::Shelf;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Id = Set<members::id>;
-        type Type = S::Type;
+        type Id = Unset;
+        type Shelf = Unset;
+        type Books = Unset;
+        type GoodreadsUserId = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Books = S::Books;
-        type Shelf = S::Shelf;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Id = S::Id;
         type Type = Set<members::r#type>;
+        type Id = S::Id;
+        type Shelf = S::Shelf;
+        type Books = S::Books;
+        type GoodreadsUserId = S::GoodreadsUserId;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Type = S::Type;
+        type Id = Set<members::id>;
+        type Shelf = S::Shelf;
+        type Books = S::Books;
+        type GoodreadsUserId = S::GoodreadsUserId;
+    }
+    ///State transition - sets the `shelf` field to Set
+    pub struct SetShelf<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShelf<S> {}
+    impl<S: State> State for SetShelf<S> {
+        type Type = S::Type;
+        type Id = S::Id;
+        type Shelf = Set<members::shelf>;
+        type Books = S::Books;
+        type GoodreadsUserId = S::GoodreadsUserId;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooks<S> {}
+    impl<S: State> State for SetBooks<S> {
+        type Type = S::Type;
+        type Id = S::Id;
+        type Shelf = S::Shelf;
+        type Books = Set<members::books>;
+        type GoodreadsUserId = S::GoodreadsUserId;
+    }
+    ///State transition - sets the `goodreads_user_id` field to Set
+    pub struct SetGoodreadsUserId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGoodreadsUserId<S> {}
+    impl<S: State> State for SetGoodreadsUserId<S> {
+        type Type = S::Type;
+        type Id = S::Id;
+        type Shelf = S::Shelf;
+        type Books = S::Books;
+        type GoodreadsUserId = Set<members::goodreads_user_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `books` field
-        pub struct books(());
-        ///Marker type for the `shelf` field
-        pub struct shelf(());
-        ///Marker type for the `goodreads_user_id` field
-        pub struct goodreads_user_id(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `shelf` field
+        pub struct shelf(());
+        ///Marker type for the `books` field
+        pub struct books(());
+        ///Marker type for the `goodreads_user_id` field
+        pub struct goodreads_user_id(());
     }
 }
 
@@ -5065,11 +5065,11 @@ where
 impl<'a, S> WidgetGoodreadsBuilder<'a, S>
 where
     S: widget_goodreads_state::State,
-    S::Books: widget_goodreads_state::IsSet,
-    S::Shelf: widget_goodreads_state::IsSet,
-    S::GoodreadsUserId: widget_goodreads_state::IsSet,
-    S::Id: widget_goodreads_state::IsSet,
     S::Type: widget_goodreads_state::IsSet,
+    S::Id: widget_goodreads_state::IsSet,
+    S::Shelf: widget_goodreads_state::IsSet,
+    S::Books: widget_goodreads_state::IsSet,
+    S::GoodreadsUserId: widget_goodreads_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WidgetGoodreads<'a> {
@@ -5089,7 +5089,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -5119,51 +5119,51 @@ pub mod widget_tealfm_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Plays;
         type Id;
         type Type;
+        type Plays;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Plays = Unset;
         type Id = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `plays` field to Set
-    pub struct SetPlays<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlays<S> {}
-    impl<S: State> State for SetPlays<S> {
-        type Plays = Set<members::plays>;
-        type Id = S::Id;
-        type Type = S::Type;
+        type Plays = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Plays = S::Plays;
         type Id = Set<members::id>;
         type Type = S::Type;
+        type Plays = S::Plays;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Plays = S::Plays;
         type Id = S::Id;
         type Type = Set<members::r#type>;
+        type Plays = S::Plays;
+    }
+    ///State transition - sets the `plays` field to Set
+    pub struct SetPlays<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlays<S> {}
+    impl<S: State> State for SetPlays<S> {
+        type Id = S::Id;
+        type Type = S::Type;
+        type Plays = Set<members::plays>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `plays` field
-        pub struct plays(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `plays` field
+        pub struct plays(());
     }
 }
 
@@ -5324,9 +5324,9 @@ where
 impl<'a, S> WidgetTealfmBuilder<'a, S>
 where
     S: widget_tealfm_state::State,
-    S::Plays: widget_tealfm_state::IsSet,
     S::Id: widget_tealfm_state::IsSet,
     S::Type: widget_tealfm_state::IsSet,
+    S::Plays: widget_tealfm_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WidgetTealfm<'a> {
@@ -5344,7 +5344,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

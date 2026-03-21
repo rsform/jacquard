@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct Ingredient<'a> {
     ///The amount of the ingredient needed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub amount: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub amount: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the ingredient.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -40,27 +40,27 @@ pub struct Ingredient<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Recipe<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub created_at: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub created_at: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Free-form recipe description text.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Image representing the recipe.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub ingredients: Vec<crate::blue_recipes::feed::recipe::Ingredient<'a>>,
     ///The number of servings the recipe prepares.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub serves: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub serves: core::option::Option<i64>,
     #[serde(borrow)]
     pub steps: Vec<crate::blue_recipes::feed::recipe::Step<'a>>,
     ///The amount of time (in minutes) it takes to complete the recipe.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub time: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub time: core::option::Option<i64>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
@@ -77,9 +77,9 @@ pub struct Recipe<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecipeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -117,19 +117,19 @@ impl<'a> Recipe<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ingredient<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Ingredient<'a> {
     fn nsid() -> &'static str {
         "blue.recipes.feed.recipe"
     }
     fn def_name() -> &'static str {
         "ingredient"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_recipes_feed_recipe()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -193,19 +193,19 @@ impl jacquard_common::types::collection::Collection for RecipeRecord {
     type Record = RecipeRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
     fn nsid() -> &'static str {
         "blue.recipes.feed.recipe"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_recipes_feed_recipe()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -316,19 +316,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recipe<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Step<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Step<'a> {
     fn nsid() -> &'static str {
         "blue.recipes.feed.recipe"
     }
     fn def_name() -> &'static str {
         "step"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_recipes_feed_recipe()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -365,7 +365,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Step<'a> {
     }
 }
 
-fn lexicon_doc_blue_recipes_feed_recipe() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blue_recipes_feed_recipe() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -633,51 +633,51 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
         type Steps;
         type Ingredients;
-        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
         type Steps = Unset;
         type Ingredients = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `steps` field to Set
-    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSteps<S> {}
-    impl<S: State> State for SetSteps<S> {
-        type Steps = Set<members::steps>;
-        type Ingredients = S::Ingredients;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `ingredients` field to Set
-    pub struct SetIngredients<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIngredients<S> {}
-    impl<S: State> State for SetIngredients<S> {
-        type Steps = S::Steps;
-        type Ingredients = Set<members::ingredients>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
         type Steps = S::Steps;
         type Ingredients = S::Ingredients;
-        type Title = Set<members::title>;
+    }
+    ///State transition - sets the `steps` field to Set
+    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSteps<S> {}
+    impl<S: State> State for SetSteps<S> {
+        type Title = S::Title;
+        type Steps = Set<members::steps>;
+        type Ingredients = S::Ingredients;
+    }
+    ///State transition - sets the `ingredients` field to Set
+    pub struct SetIngredients<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIngredients<S> {}
+    impl<S: State> State for SetIngredients<S> {
+        type Title = S::Title;
+        type Steps = S::Steps;
+        type Ingredients = Set<members::ingredients>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `steps` field
         pub struct steps(());
         ///Marker type for the `ingredients` field
         pub struct ingredients(());
-        ///Marker type for the `title` field
-        pub struct title(());
     }
 }
 
@@ -858,9 +858,9 @@ where
 impl<'a, S> RecipeBuilder<'a, S>
 where
     S: recipe_state::State,
+    S::Title: recipe_state::IsSet,
     S::Steps: recipe_state::IsSet,
     S::Ingredients: recipe_state::IsSet,
-    S::Title: recipe_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Recipe<'a> {
@@ -879,7 +879,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

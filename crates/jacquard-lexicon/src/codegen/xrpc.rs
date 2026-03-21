@@ -18,6 +18,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         query: &LexXrpcQuery<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<GeneratedCode> {
         let type_base = self.def_to_type_name(nsid, def_name);
         let mut type_defs_parts = Vec::new();
@@ -37,21 +38,21 @@ impl<'c> CodeGenerator<'c> {
         let has_errors = query.errors.is_some();
 
         if let Some(params) = &query.parameters {
-            let sub = self.generate_params_struct(&type_base, nsid, params)?;
+            let sub = self.generate_params_struct(&type_base, nsid, params, resolved)?;
             type_defs_parts.push(sub.type_def);
             internals_parts.push(sub.default_fns);
             internals_parts.push(sub.builder);
         }
 
         if let Some(body) = &query.output {
-            let sub = self.generate_output_struct(nsid, &type_base, body)?;
+            let sub = self.generate_output_struct(nsid, &type_base, body, resolved)?;
             type_defs_parts.push(sub.type_def);
             internals_parts.push(sub.default_fns);
             internals_parts.push(sub.builder);
         }
 
         if let Some(errors) = &query.errors {
-            let error_enum = self.generate_error_enum(&type_base, errors)?;
+            let error_enum = self.generate_error_enum(&type_base, errors, resolved)?;
             type_defs_parts.push(error_enum);
         }
 
@@ -78,6 +79,7 @@ impl<'c> CodeGenerator<'c> {
             output_has_schema,
             has_errors,
             false, // queries never have binary inputs
+            resolved,
         )?;
 
         // Categorize tokens into buckets.
@@ -99,6 +101,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         proc: &LexXrpcProcedure<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<GeneratedCode> {
         let type_base = self.def_to_type_name(nsid, def_name);
         let mut type_defs_parts = Vec::new();
@@ -119,28 +122,28 @@ impl<'c> CodeGenerator<'c> {
         let has_errors = proc.errors.is_some();
 
         if let Some(params) = &proc.parameters {
-            let sub = self.generate_params_struct_proc(&type_base, nsid, params)?;
+            let sub = self.generate_params_struct_proc(&type_base, nsid, params, resolved)?;
             type_defs_parts.push(sub.type_def);
             internals_parts.push(sub.default_fns);
             internals_parts.push(sub.builder);
         }
 
         if let Some(body) = &proc.input {
-            let sub = self.generate_input_struct(nsid, &type_base, body)?;
+            let sub = self.generate_input_struct(nsid, &type_base, body, resolved)?;
             type_defs_parts.push(sub.type_def);
             internals_parts.push(sub.default_fns);
             internals_parts.push(sub.builder);
         }
 
         if let Some(body) = &proc.output {
-            let sub = self.generate_output_struct(nsid, &type_base, body)?;
+            let sub = self.generate_output_struct(nsid, &type_base, body, resolved)?;
             type_defs_parts.push(sub.type_def);
             internals_parts.push(sub.default_fns);
             internals_parts.push(sub.builder);
         }
 
         if let Some(errors) = &proc.errors {
-            let error_enum = self.generate_error_enum(&type_base, errors)?;
+            let error_enum = self.generate_error_enum(&type_base, errors, resolved)?;
             type_defs_parts.push(error_enum);
         }
 
@@ -171,6 +174,7 @@ impl<'c> CodeGenerator<'c> {
             output_has_schema,
             has_errors,
             is_binary_input,
+            resolved,
         )?;
 
         // Categorize tokens into buckets.
@@ -192,6 +196,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         sub: &LexXrpcSubscription<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<GeneratedCode> {
         let type_base = self.def_to_type_name(nsid, def_name);
         let mut type_defs_parts = Vec::new();
@@ -201,7 +206,7 @@ impl<'c> CodeGenerator<'c> {
             match params {
                 crate::lexicon::LexXrpcSubscriptionParameter::Params(params_inner) => {
                     let sub_out =
-                        self.generate_params_struct_inner(&type_base, nsid, params_inner)?;
+                        self.generate_params_struct_inner(&type_base, nsid, params_inner, resolved)?;
                     type_defs_parts.push(sub_out.type_def);
                     internals_parts.push(sub_out.default_fns);
                     internals_parts.push(sub_out.builder);
@@ -211,13 +216,13 @@ impl<'c> CodeGenerator<'c> {
 
         if let Some(message) = &sub.message {
             if let Some(schema) = &message.schema {
-                let message_generated = self.generate_subscription_message(nsid, &type_base, schema)?;
+                let message_generated = self.generate_subscription_message(nsid, &type_base, schema, resolved)?;
                 type_defs_parts.push(message_generated.into_tokens());
             }
         }
 
         if let Some(errors) = &sub.errors {
-            let error_enum = self.generate_error_enum(&type_base, errors)?;
+            let error_enum = self.generate_error_enum(&type_base, errors, resolved)?;
             type_defs_parts.push(error_enum);
         }
 
@@ -243,6 +248,7 @@ impl<'c> CodeGenerator<'c> {
             params_has_lifetime,
             has_message,
             has_errors,
+            resolved,
         )?;
 
         // Categorize tokens into buckets.
@@ -263,6 +269,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         type_base: &str,
         schema: &LexXrpcSubscriptionMessageSchema<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<GeneratedCode> {
         use crate::lexicon::LexXrpcSubscriptionMessageSchema;
 
@@ -280,7 +287,7 @@ impl<'c> CodeGenerator<'c> {
                 };
 
                 let union_variants = ctx.build_simple_union_variants(&union.refs, |ref_str| {
-                    self.ref_to_rust_type(ref_str)
+                    self.ref_to_rust_type(ref_str, resolved)
                 })?;
                 let variants = super::union_codegen::generate_variant_tokens(&union_variants);
 
@@ -318,10 +325,12 @@ impl<'c> CodeGenerator<'c> {
                     }
                 };
 
+                let open_union_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::OpenUnion);
+                let derive_attr = resolved.derive_standard();
                 let union_def = quote! {
                     #doc
-                    #[jacquard_derive::open_union]
-                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                    #open_union_attr
+                    #derive_attr
                     #[serde(tag = "$type")]
                     #[serde(bound(deserialize = "'de: 'a"))]
                     pub enum #enum_ident<'a> {
@@ -338,15 +347,17 @@ impl<'c> CodeGenerator<'c> {
                 let struct_ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
 
                 let (fields, default_fns) =
-                    self.generate_object_fields("", &struct_name, obj, false)?;
+                    self.generate_object_fields("", &struct_name, obj, false, resolved)?;
                 let doc = self.generate_doc_comment(obj.description.as_ref());
 
                 // Subscription message structs always get a lifetime since they have the #[lexicon] attribute
-                // which adds extra_data: BTreeMap<..., Data<'a>>
+                // which adds extra_data: BTreeMap<..., Data<'a>>.
+                let lexicon_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::LexiconAttr);
+                let derive_attr = resolved.derive_standard();
                 let struct_def = quote! {
                     #doc
-                    #[jacquard_derive::lexicon]
-                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                    #lexicon_attr
+                    #derive_attr
                     #[serde(rename_all = "camelCase")]
                     pub struct #struct_ident<'a> {
                         #fields
@@ -356,7 +367,7 @@ impl<'c> CodeGenerator<'c> {
 
                 // Generate union types for this message.
                 let nested_items =
-                    self.generate_nested_types(nsid, &struct_name, &obj.properties, false)?;
+                    self.generate_nested_types(nsid, &struct_name, &obj.properties, false, resolved)?;
 
                 let mut nested_type_defs = TokenStream::new();
                 let mut nested_internals = TokenStream::new();
@@ -379,11 +390,11 @@ impl<'c> CodeGenerator<'c> {
                 })
             }
             LexXrpcSubscriptionMessageSchema::Ref(ref_type) => {
-                // Just a type alias to the referenced type
-                // Refs generally have lifetimes, so always add <'a>
+                // Just a type alias to the referenced type.
+                // Refs generally have lifetimes, so always add <'a>.
                 let type_name = format!("{}Message", type_base);
                 let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
-                let rust_type = self.ref_to_rust_type(&ref_type.r#ref)?;
+                let rust_type = self.ref_to_rust_type(&ref_type.r#ref, resolved)?;
                 let doc = self.generate_doc_comment(ref_type.description.as_ref());
 
                 let type_alias = quote! {
@@ -401,11 +412,12 @@ impl<'c> CodeGenerator<'c> {
         type_base: &str,
         nsid: &str,
         params: &crate::lexicon::LexXrpcQueryParameter<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<super::prettify::SubGeneratorOutput> {
         use crate::lexicon::LexXrpcQueryParameter;
         match params {
             LexXrpcQueryParameter::Params(p) => {
-                self.generate_params_struct_inner(type_base, nsid, p)
+                self.generate_params_struct_inner(type_base, nsid, p, resolved)
             }
         }
     }
@@ -416,6 +428,7 @@ impl<'c> CodeGenerator<'c> {
         type_base: &str,
         nsid: &str,
         params: &crate::lexicon::LexXrpcProcedureParameter<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<super::prettify::SubGeneratorOutput> {
         use crate::lexicon::LexXrpcProcedureParameter;
         match params {
@@ -423,7 +436,7 @@ impl<'c> CodeGenerator<'c> {
             LexXrpcProcedureParameter::Params(p) => {
                 let struct_name = format!("{}Params", type_base);
                 let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
-                self.generate_params_struct_inner_with_name(&ident, nsid, p)
+                self.generate_params_struct_inner_with_name(&ident, nsid, p, resolved)
             }
         }
     }
@@ -434,9 +447,10 @@ impl<'c> CodeGenerator<'c> {
         type_base: &str,
         nsid: &str,
         p: &crate::lexicon::LexXrpcParameters<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<super::prettify::SubGeneratorOutput> {
         let ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
-        self.generate_params_struct_inner_with_name(&ident, nsid, p)
+        self.generate_params_struct_inner_with_name(&ident, nsid, p, resolved)
     }
 
     /// Generate params struct with custom name.
@@ -445,6 +459,7 @@ impl<'c> CodeGenerator<'c> {
         ident: &syn::Ident,
         nsid: &str,
         p: &crate::lexicon::LexXrpcParameters<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<super::prettify::SubGeneratorOutput> {
         let required = p.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
         let mut fields = Vec::new();
@@ -453,7 +468,7 @@ impl<'c> CodeGenerator<'c> {
         for (field_name, field_type) in &p.properties {
             let is_required = required.contains(field_name);
             let (field_tokens, default_fn) =
-                self.generate_param_field_with_default("", field_name, field_type, is_required)?;
+                self.generate_param_field_with_default("", field_name, field_type, is_required, resolved)?;
             fields.push(field_tokens);
             if let Some(fn_def) = default_fn {
                 default_fns.push(fn_def);
@@ -463,9 +478,7 @@ impl<'c> CodeGenerator<'c> {
         let doc = self.generate_doc_comment(p.description.as_ref());
         let needs_lifetime = self.params_need_lifetime(p);
 
-        let derives = quote! {
-            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
-        };
+        let derives = resolved.derive_standard();
 
         let struct_body = if fields.is_empty() {
             quote! {
@@ -524,6 +537,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         type_base: &str,
         body: &LexXrpcBody<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<super::prettify::SubGeneratorOutput> {
         let ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
 
@@ -541,12 +555,13 @@ impl<'c> CodeGenerator<'c> {
             (false, false)
         };
 
+        let bytes_type = resolved.external_type_tokens(&super::prettify::ExternalImport::Bytes);
         let (fields, default_fns) = if let Some(schema) = &body.schema {
-            self.generate_body_fields(nsid, type_base, schema, has_builder)?
+            self.generate_body_fields(nsid, type_base, schema, has_builder, resolved)?
         } else {
-            // Binary body: just a bytes field
+            // Binary body: just a bytes field.
             (quote! {
-                pub body: jacquard_common::deps::bytes::Bytes,
+                pub body: #bytes_type,
             }, Vec::new())
         };
 
@@ -554,29 +569,26 @@ impl<'c> CodeGenerator<'c> {
 
         // Binary bodies don't need #[lexicon] attribute or lifetime.
         let struct_def = if is_binary_body {
+            let derive_attr = resolved.derive_standard();
             quote! {
                 #doc
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                #derive_attr
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident {
                     #fields
                 }
             }
-        } else if has_default {
-            quote! {
-                #doc
-                #[jacquard_derive::lexicon]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, Default)]
-                #[serde(rename_all = "camelCase")]
-                pub struct #ident<'a> {
-                    #fields
-                }
-            }
         } else {
+            let lexicon_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::LexiconAttr);
+            let derive_attr = if has_default {
+                resolved.derive_standard_with(quote! { Default })
+            } else {
+                resolved.derive_standard()
+            };
             quote! {
                 #doc
-                #[jacquard_derive::lexicon]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                #lexicon_attr
+                #derive_attr
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident<'a> {
                     #fields
@@ -601,7 +613,7 @@ impl<'c> CodeGenerator<'c> {
 
         // Generate union types if schema is an Object.
         let nested_items = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
-            self.generate_nested_types(nsid, type_base, &obj.properties, false)?
+            self.generate_nested_types(nsid, type_base, &obj.properties, false, resolved)?
         } else {
             Vec::new()
         };
@@ -634,15 +646,17 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         type_base: &str,
         body: &LexXrpcBody<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<super::prettify::SubGeneratorOutput> {
         let struct_name = format!("{}Output", type_base);
         let ident = syn::Ident::new(&struct_name, proc_macro2::Span::call_site());
 
+        let bytes_type = resolved.external_type_tokens(&super::prettify::ExternalImport::Bytes);
         let (fields, default_fns) = if let Some(schema) = &body.schema {
-            self.generate_body_fields(nsid, &struct_name, schema, false)?
+            self.generate_body_fields(nsid, &struct_name, schema, false, resolved)?
         } else {
             (quote! {
-                pub body: jacquard_common::deps::bytes::Bytes,
+                pub body: #bytes_type,
             }, Vec::new())
         };
 
@@ -659,30 +673,28 @@ impl<'c> CodeGenerator<'c> {
 
         // Output structs always get a lifetime since they have the #[lexicon] attribute
         // which adds extra_data: BTreeMap<..., Data<'a>>.
-        let struct_def = if has_default {
+        let struct_def = if body.schema.is_none() {
+            // Binary output: no #[lexicon] attribute, no lifetime.
+            let derive_attr = resolved.derive_standard();
             quote! {
                 #doc
-                #[jacquard_derive::lexicon]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, Default)]
-                #[serde(rename_all = "camelCase")]
-                pub struct #ident<'a> {
-                    #fields
-                }
-            }
-        } else if body.schema.is_none() {
-            quote! {
-                #doc
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                #derive_attr
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident {
                     #fields
                 }
             }
         } else {
+            let lexicon_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::LexiconAttr);
+            let derive_attr = if has_default {
+                resolved.derive_standard_with(quote! { Default })
+            } else {
+                resolved.derive_standard()
+            };
             quote! {
                 #doc
-                #[jacquard_derive::lexicon]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                #lexicon_attr
+                #derive_attr
                 #[serde(rename_all = "camelCase")]
                 pub struct #ident<'a> {
                     #fields
@@ -692,7 +704,7 @@ impl<'c> CodeGenerator<'c> {
 
         // Generate union types if schema is an Object.
         let nested_items = if let Some(crate::lexicon::LexXrpcBodySchema::Object(obj)) = &body.schema {
-            self.generate_nested_types(nsid, &struct_name, &obj.properties, false)?
+            self.generate_nested_types(nsid, &struct_name, &obj.properties, false, resolved)?
         } else {
             Vec::new()
         };
@@ -725,15 +737,16 @@ impl<'c> CodeGenerator<'c> {
         parent_type_name: &str,
         schema: &LexXrpcBodySchema<'static>,
         is_builder: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<(TokenStream, Vec<TokenStream>)> {
         use crate::lexicon::LexXrpcBodySchema;
 
         match schema {
             LexXrpcBodySchema::Object(obj) => {
-                self.generate_object_fields(nsid, parent_type_name, obj, is_builder)
+                self.generate_object_fields(nsid, parent_type_name, obj, is_builder, resolved)
             }
             LexXrpcBodySchema::Ref(ref_type) => {
-                let rust_type = self.ref_to_rust_type(&ref_type.r#ref)?;
+                let rust_type = self.ref_to_rust_type(&ref_type.r#ref, resolved)?;
                 Ok((quote! {
                     #[serde(flatten)]
                     #[serde(borrow)]
@@ -741,36 +754,38 @@ impl<'c> CodeGenerator<'c> {
                 }, Vec::new()))
             }
             LexXrpcBodySchema::Union(_union) => {
-                let rust_type = quote! { jacquard_common::types::value::Data<'a> };
+                let data_type = resolved.type_tokens(&super::prettify::CommonType::Data);
                 Ok((quote! {
                     #[serde(flatten)]
                     #[serde(borrow)]
-                    pub value: #rust_type,
+                    pub value: #data_type,
                 }, Vec::new()))
             }
         }
     }
 
-    /// Generate a field for XRPC parameters
+    /// Generate a field for XRPC parameters.
     pub(super) fn generate_param_field(
         &self,
         _nsid: &str,
         field_name: &str,
         field_type: &crate::lexicon::LexXrpcParametersProperty<'static>,
         is_required: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<TokenStream> {
         use crate::lexicon::LexXrpcParametersProperty;
 
         let field_ident = make_ident(&field_name.to_snake_case());
 
+        let data_type = resolved.type_tokens(&super::prettify::CommonType::Data);
         let (rust_type, needs_lifetime) = match field_type {
             LexXrpcParametersProperty::Boolean(_) => (quote! { bool }, false),
             LexXrpcParametersProperty::Integer(_) => (quote! { i64 }, false),
             LexXrpcParametersProperty::String(s) => {
-                (self.string_to_rust_type(s), self.string_needs_lifetime(s))
+                (self.string_to_rust_type(s, resolved), self.string_needs_lifetime(s))
             }
             LexXrpcParametersProperty::Unknown(_) => {
-                (quote! { jacquard_common::types::value::Data<'a> }, true)
+                (data_type.clone(), true)
             }
             LexXrpcParametersProperty::Array(arr) => {
                 let needs_lifetime = match &arr.items {
@@ -784,9 +799,9 @@ impl<'c> CodeGenerator<'c> {
                 let item_type = match &arr.items {
                     crate::lexicon::LexPrimitiveArrayItem::Boolean(_) => quote! { bool },
                     crate::lexicon::LexPrimitiveArrayItem::Integer(_) => quote! { i64 },
-                    crate::lexicon::LexPrimitiveArrayItem::String(s) => self.string_to_rust_type(s),
+                    crate::lexicon::LexPrimitiveArrayItem::String(s) => self.string_to_rust_type(s, resolved),
                     crate::lexicon::LexPrimitiveArrayItem::Unknown(_) => {
-                        quote! { jacquard_common::types::value::Data<'a> }
+                        data_type.clone()
                     }
                 };
                 (quote! { Vec<#item_type> }, needs_lifetime)
@@ -796,16 +811,17 @@ impl<'c> CodeGenerator<'c> {
         let rust_type = if is_required {
             rust_type
         } else {
-            quote! { std::option::Option<#rust_type> }
+            quote! { core::option::Option<#rust_type> }
         };
 
         let mut attrs = Vec::new();
 
         if !is_required {
-            attrs.push(quote! { #[serde(skip_serializing_if = "std::option::Option::is_none")] });
+            let is_none_path = resolved.option_is_none_path();
+            attrs.push(quote! { #[serde(skip_serializing_if = #is_none_path)] });
         }
 
-        // Add serde(borrow) to all fields with lifetimes
+        // Add serde(borrow) to all fields with lifetimes.
         if needs_lifetime {
             attrs.push(quote! { #[serde(borrow)] });
         }
@@ -816,20 +832,21 @@ impl<'c> CodeGenerator<'c> {
         })
     }
 
-    /// Generate param field with serde default if present
-    /// Returns (field_tokens, optional_default_function)
+    /// Generate param field with serde default if present.
+    /// Returns (field_tokens, optional_default_function).
     pub(super) fn generate_param_field_with_default(
         &self,
         nsid: &str,
         field_name: &str,
         field_type: &crate::lexicon::LexXrpcParametersProperty<'static>,
         is_required: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<(TokenStream, Option<TokenStream>)> {
         use crate::lexicon::LexXrpcParametersProperty;
         use heck::ToSnakeCase;
 
-        // Get base field
-        let base_field = self.generate_param_field(nsid, field_name, field_type, is_required)?;
+        // Get base field.
+        let base_field = self.generate_param_field(nsid, field_name, field_type, is_required, resolved)?;
 
         // Generate default function and attribute for required fields with defaults
         // For optional fields, just add doc comments
@@ -863,12 +880,13 @@ impl<'c> CodeGenerator<'c> {
                     let v = s.default.as_ref().unwrap().as_ref();
                     let fn_name = format!("_default_{}", field_name.to_snake_case());
                     let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
+                    let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
                     (
                         Some(format!(" Defaults to `\"{}\"`", v)),
                         Some(quote! { #[serde(default = #fn_name)] }),
                         Some(quote! {
-                            fn #fn_ident() -> jacquard_common::CowStr<'static> {
-                                jacquard_common::CowStr::from(#v)
+                            fn #fn_ident() -> #cowstr_path<'static> {
+                                #cowstr_path::from(#v)
                             }
                         }),
                     )
@@ -886,7 +904,7 @@ impl<'c> CodeGenerator<'c> {
                         Some(format!(" Defaults to `{}`.", v)),
                         Some(quote! { #[serde(default = #fn_name)] }),
                         Some(quote! {
-                            fn #fn_ident() -> std::option::Option<bool> { Some(#v) }
+                            fn #fn_ident() -> core::option::Option<bool> { Some(#v) }
                         }),
                     )
                 }
@@ -906,7 +924,7 @@ impl<'c> CodeGenerator<'c> {
                         Some(parts.join(" ")),
                         Some(quote! { #[serde(default = #fn_name)] }),
                         Some(quote! {
-                            fn #fn_ident() -> std::option::Option<i64> { Some(#v) }
+                            fn #fn_ident() -> core::option::Option<i64> { Some(#v) }
                         }),
                     )
                 }
@@ -922,12 +940,13 @@ impl<'c> CodeGenerator<'c> {
                     }
                     let fn_name = format!("_default_{}", field_name.to_snake_case());
                     let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
+                    let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
                     (
                         Some(parts.join(" ")),
                         Some(quote! { #[serde(default = #fn_name)] }),
                         Some(quote! {
-                            fn #fn_ident() -> std::option::Option<jacquard_common::CowStr<'static>> {
-                                Some(jacquard_common::CowStr::from(#v))
+                            fn #fn_ident() -> core::option::Option<#cowstr_path<'static>> {
+                                Some(#cowstr_path::from(#v))
                             }
                         }),
                     )
@@ -988,11 +1007,12 @@ impl<'c> CodeGenerator<'c> {
         Ok((field_with_attrs, default_fn))
     }
 
-    /// Generate error enum from XRPC errors
+    /// Generate error enum from XRPC errors.
     pub(super) fn generate_error_enum(
         &self,
         type_base: &str,
         errors: &[LexXrpcError<'static>],
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<TokenStream> {
         let enum_name = format!("{}Error", type_base);
         let ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
@@ -1007,10 +1027,11 @@ impl<'c> CodeGenerator<'c> {
             let error_name = error.name.as_ref();
             let doc = self.generate_doc_comment(error.description.as_ref());
 
+            let cowstr_type = resolved.type_tokens(&super::prettify::CommonType::CowStr);
             variants.push(quote! {
                 #doc
                 #[serde(rename = #error_name)]
-                #variant_ident(std::option::Option<jacquard_common::CowStr<'a>>)
+                #variant_ident(core::option::Option<#cowstr_type>)
             });
 
             display_arms.push(quote! {
@@ -1024,11 +1045,13 @@ impl<'c> CodeGenerator<'c> {
             });
         }
 
-        // IntoStatic impl is generated by the derive macro now
+        // IntoStatic impl is generated by the derive macro now.
+        let open_union_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::OpenUnion);
+        let derive_attr = resolved.derive_error();
 
         Ok(quote! {
-            #[jacquard_derive::open_union]
-            #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic, jacquard_derive::IntoStatic)]
+            #open_union_attr
+            #derive_attr
             #[serde(tag = "error", content = "message")]
             #[serde(bound(deserialize = "'de: 'a"))]
             pub enum #ident<'a> {
@@ -1046,7 +1069,7 @@ impl<'c> CodeGenerator<'c> {
         })
     }
 
-    /// Generate XrpcRequest trait impl for a query or procedure
+    /// Generate XrpcRequest trait impl for a query or procedure.
     pub(super) fn generate_xrpc_request_impl(
         &self,
         nsid: &str,
@@ -1059,6 +1082,7 @@ impl<'c> CodeGenerator<'c> {
         output_has_schema: bool,
         has_errors: bool,
         is_binary_input: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<TokenStream> {
         let output_type = if has_output {
             let output_ident = syn::Ident::new(
@@ -1177,6 +1201,7 @@ impl<'c> CodeGenerator<'c> {
         };
 
         let endpoint_path = format!("/xrpc/{}", nsid);
+        let marker_derive = resolved.derive_standard_with(quote! { Copy });
 
         if has_params {
             // Implement on the params/input struct itself
@@ -1226,8 +1251,8 @@ impl<'c> CodeGenerator<'c> {
             let request_ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
 
             Ok(quote! {
-                /// XRPC request marker type
-                #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize, jacquard_derive::IntoStatic)]
+                /// XRPC request marker type.
+                #marker_derive
                 pub struct #request_ident;
 
                 #response_type
@@ -1254,7 +1279,7 @@ impl<'c> CodeGenerator<'c> {
         }
     }
 
-    /// Generate XrpcSubscription trait impl for a subscription endpoint
+    /// Generate XrpcSubscription trait impl for a subscription endpoint.
     pub(super) fn generate_xrpc_subscription_impl(
         &self,
         nsid: &str,
@@ -1263,6 +1288,7 @@ impl<'c> CodeGenerator<'c> {
         params_has_lifetime: bool,
         has_message: bool,
         has_errors: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<TokenStream> {
         // Generate stream response marker struct
         let stream_ident = syn::Ident::new(
@@ -1331,10 +1357,13 @@ impl<'c> CodeGenerator<'c> {
             }
         };
 
+        let ser_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Serialize);
+        let sub_marker_derive = quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, #ser_path)] };
+
         let params_ident = if has_params {
             syn::Ident::new(type_base, proc_macro2::Span::call_site())
         } else {
-            // Generate marker struct if no params
+            // Generate marker struct if no params.
             let marker = syn::Ident::new(type_base, proc_macro2::Span::call_site());
             let endpoint_ident = syn::Ident::new(
                 &format!("{}Endpoint", type_base),
@@ -1345,7 +1374,7 @@ impl<'c> CodeGenerator<'c> {
             return Ok(quote! {
                 #stream_resp_impl
 
-                #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
+                #sub_marker_derive
                 pub struct #marker;
 
                 impl jacquard_common::xrpc::XrpcSubscription for #marker {

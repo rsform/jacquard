@@ -19,21 +19,21 @@
 #[serde(rename_all = "camelCase")]
 pub struct Button<'a> {
     ///Alt text description of the button, for accessibility.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
     ///Hypertext reference (link) for the button.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub href: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub href: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Client-declared timestamp when this button was originally created.
     pub posted_at: jacquard_common::types::string::Datetime,
     ///Title text description of the button, for flavor.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -48,9 +48,9 @@ pub struct Button<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ButtonGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -97,19 +97,19 @@ impl jacquard_common::types::collection::Collection for ButtonRecord {
     type Record = ButtonRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Button<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Button<'a> {
     fn nsid() -> &'static str {
         "store.88x31.button"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_store_88x31_button()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -258,37 +258,37 @@ pub mod button_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
         type PostedAt;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
         type PostedAt = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type Blob = Set<members::blob>;
-        type PostedAt = S::PostedAt;
+        type Blob = Unset;
     }
     ///State transition - sets the `posted_at` field to Set
     pub struct SetPostedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPostedAt<S> {}
     impl<S: State> State for SetPostedAt<S> {
-        type Blob = S::Blob;
         type PostedAt = Set<members::posted_at>;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type PostedAt = S::PostedAt;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `posted_at` field
         pub struct posted_at(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
@@ -409,8 +409,8 @@ impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
 impl<'a, S> ButtonBuilder<'a, S>
 where
     S: button_state::State,
-    S::Blob: button_state::IsSet,
     S::PostedAt: button_state::IsSet,
+    S::Blob: button_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Button<'a> {
@@ -426,7 +426,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -442,7 +442,7 @@ where
     }
 }
 
-fn lexicon_doc_store_88x31_button() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_store_88x31_button() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("store.88x31.button"),

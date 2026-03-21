@@ -38,9 +38,9 @@ pub struct Approval<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ApprovalGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -87,19 +87,19 @@ impl jacquard_common::types::collection::Collection for ApprovalRecord {
     type Record = ApprovalRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Approval<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Approval<'a> {
     fn nsid() -> &'static str {
         "social.colibri.approval"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_colibri_approval()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -114,51 +114,51 @@ pub mod approval_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Community;
         type Membership;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Community = Unset;
         type Membership = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `community` field to Set
-    pub struct SetCommunity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommunity<S> {}
-    impl<S: State> State for SetCommunity<S> {
-        type Community = Set<members::community>;
-        type Membership = S::Membership;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `membership` field to Set
-    pub struct SetMembership<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMembership<S> {}
-    impl<S: State> State for SetMembership<S> {
-        type Community = S::Community;
-        type Membership = Set<members::membership>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Community = S::Community;
         type Membership = S::Membership;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `community` field to Set
+    pub struct SetCommunity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommunity<S> {}
+    impl<S: State> State for SetCommunity<S> {
+        type CreatedAt = S::CreatedAt;
+        type Community = Set<members::community>;
+        type Membership = S::Membership;
+    }
+    ///State transition - sets the `membership` field to Set
+    pub struct SetMembership<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMembership<S> {}
+    impl<S: State> State for SetMembership<S> {
+        type CreatedAt = S::CreatedAt;
+        type Community = S::Community;
+        type Membership = Set<members::membership>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `community` field
         pub struct community(());
         ///Marker type for the `membership` field
         pub struct membership(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -251,9 +251,9 @@ where
 impl<'a, S> ApprovalBuilder<'a, S>
 where
     S: approval_state::State,
+    S::CreatedAt: approval_state::IsSet,
     S::Community: approval_state::IsSet,
     S::Membership: approval_state::IsSet,
-    S::CreatedAt: approval_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Approval<'a> {
@@ -267,7 +267,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -281,7 +281,7 @@ where
     }
 }
 
-fn lexicon_doc_social_colibri_approval() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_colibri_approval() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

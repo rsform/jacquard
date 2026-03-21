@@ -20,11 +20,11 @@
 pub struct Fungus<'a> {
     #[serde(borrow)]
     pub common_name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub edible: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub edible: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub species: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub species: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -39,9 +39,9 @@ pub struct Fungus<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FungusGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -88,19 +88,19 @@ impl jacquard_common::types::collection::Collection for FungusRecord {
     type Record = FungusRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fungus<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Fungus<'a> {
     fn nsid() -> &'static str {
         "org.robocracy.demo.fungus"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_robocracy_demo_fungus()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.common_name;
             #[allow(unused_comparisons)]
@@ -293,7 +293,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -307,7 +307,7 @@ where
     }
 }
 
-fn lexicon_doc_org_robocracy_demo_fungus() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_robocracy_demo_fungus() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

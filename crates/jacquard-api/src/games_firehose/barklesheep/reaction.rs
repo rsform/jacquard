@@ -37,9 +37,9 @@ pub struct Reaction<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReactionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -86,19 +86,19 @@ impl jacquard_common::types::collection::Collection for ReactionRecord {
     type Record = ReactionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reaction<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Reaction<'a> {
     fn nsid() -> &'static str {
         "games.firehose.barklesheep.reaction"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_firehose_barklesheep_reaction()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.emoji;
             #[allow(unused_comparisons)]
@@ -126,51 +126,51 @@ pub mod reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Emoji;
         type CreatedAt;
         type GameId;
-        type Emoji;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Emoji = Unset;
         type CreatedAt = Unset;
         type GameId = Unset;
-        type Emoji = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type GameId = S::GameId;
-        type Emoji = S::Emoji;
-    }
-    ///State transition - sets the `game_id` field to Set
-    pub struct SetGameId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGameId<S> {}
-    impl<S: State> State for SetGameId<S> {
-        type CreatedAt = S::CreatedAt;
-        type GameId = Set<members::game_id>;
-        type Emoji = S::Emoji;
     }
     ///State transition - sets the `emoji` field to Set
     pub struct SetEmoji<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmoji<S> {}
     impl<S: State> State for SetEmoji<S> {
+        type Emoji = Set<members::emoji>;
         type CreatedAt = S::CreatedAt;
         type GameId = S::GameId;
-        type Emoji = Set<members::emoji>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Emoji = S::Emoji;
+        type CreatedAt = Set<members::created_at>;
+        type GameId = S::GameId;
+    }
+    ///State transition - sets the `game_id` field to Set
+    pub struct SetGameId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGameId<S> {}
+    impl<S: State> State for SetGameId<S> {
+        type Emoji = S::Emoji;
+        type CreatedAt = S::CreatedAt;
+        type GameId = Set<members::game_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `emoji` field
+        pub struct emoji(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `game_id` field
         pub struct game_id(());
-        ///Marker type for the `emoji` field
-        pub struct emoji(());
     }
 }
 
@@ -263,9 +263,9 @@ where
 impl<'a, S> ReactionBuilder<'a, S>
 where
     S: reaction_state::State,
+    S::Emoji: reaction_state::IsSet,
     S::CreatedAt: reaction_state::IsSet,
     S::GameId: reaction_state::IsSet,
-    S::Emoji: reaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reaction<'a> {
@@ -279,7 +279,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -293,7 +293,7 @@ where
     }
 }
 
-fn lexicon_doc_games_firehose_barklesheep_reaction() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_games_firehose_barklesheep_reaction() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

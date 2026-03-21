@@ -24,16 +24,16 @@ pub struct Award<'a> {
     ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional statement explaining the reason for this badge award.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Entity the badge award is for (either an account DID or any specific AT Protocol record), e.g. a user, a project, or a specific activity claim.
     #[serde(borrow)]
     pub subject: AwardSubject<'a>,
     ///Optional URL the badge award links to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -67,9 +67,9 @@ pub enum AwardSubject<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AwardGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -116,19 +116,19 @@ impl jacquard_common::types::collection::Collection for AwardRecord {
     type Record = AwardRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Award<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Award<'a> {
     fn nsid() -> &'static str {
         "app.certified.badge.award"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_certified_badge_award()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.note {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
@@ -167,51 +167,51 @@ pub mod award_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Badge;
         type CreatedAt;
         type Subject;
+        type Badge;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Badge = Unset;
         type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `badge` field to Set
-    pub struct SetBadge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadge<S> {}
-    impl<S: State> State for SetBadge<S> {
-        type Badge = Set<members::badge>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
+        type Badge = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Badge = S::Badge;
         type CreatedAt = Set<members::created_at>;
         type Subject = S::Subject;
+        type Badge = S::Badge;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Badge = S::Badge;
         type CreatedAt = S::CreatedAt;
         type Subject = Set<members::subject>;
+        type Badge = S::Badge;
+    }
+    ///State transition - sets the `badge` field to Set
+    pub struct SetBadge<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBadge<S> {}
+    impl<S: State> State for SetBadge<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+        type Badge = Set<members::badge>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `badge` field
-        pub struct badge(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `badge` field
+        pub struct badge(());
     }
 }
 
@@ -341,9 +341,9 @@ impl<'a, S: award_state::State> AwardBuilder<'a, S> {
 impl<'a, S> AwardBuilder<'a, S>
 where
     S: award_state::State,
-    S::Badge: award_state::IsSet,
     S::CreatedAt: award_state::IsSet,
     S::Subject: award_state::IsSet,
+    S::Badge: award_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Award<'a> {
@@ -359,7 +359,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -375,7 +375,7 @@ where
     }
 }
 
-fn lexicon_doc_app_certified_badge_award() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_certified_badge_award() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -56,9 +56,9 @@ pub struct DeleteUserDataOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteUserDataError<'a> {
     #[serde(rename = "AuthRequired")]
-    AuthRequired(std::option::Option<jacquard_common::CowStr<'a>>),
+    AuthRequired(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "DeletionFailed")]
-    DeletionFailed(std::option::Option<jacquard_common::CowStr<'a>>),
+    DeletionFailed(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteUserDataError<'_> {

@@ -18,12 +18,12 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisableInviteCodes<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accounts: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accounts: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub codes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub codes: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Response type for

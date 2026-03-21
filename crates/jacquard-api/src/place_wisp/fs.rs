@@ -75,19 +75,19 @@ pub enum EntryNode<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct File<'a> {
     ///True if blob content is base64-encoded (used to bypass PDS content sniffing)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub base64: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub base64: core::option::Option<bool>,
     ///Content blob ref
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
     ///Content encoding (e.g., gzip for compressed files)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub encoding: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub encoding: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Original MIME type before compression
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mime_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub mime_type: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
 }
@@ -106,8 +106,8 @@ pub struct File<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Fs<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub file_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub file_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub root: crate::place_wisp::fs::Directory<'a>,
     #[serde(borrow)]
@@ -126,9 +126,9 @@ pub struct Fs<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -148,8 +148,8 @@ pub struct FsGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Subfs<'a> {
     ///If true, the subfs record's root entries are merged (flattened) into the parent directory, replacing the subfs entry. If false (default), the subfs entries are placed in a subdirectory with the subfs entry's name. Flat merging is useful for splitting large directories across multiple records while maintaining a flat structure.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub flat: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub flat: core::option::Option<bool>,
     ///AT-URI pointing to a place.wisp.subfs record containing this subtree.
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
@@ -170,19 +170,19 @@ impl<'a> Fs<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Directory<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Directory<'a> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
     fn def_name() -> &'static str {
         "directory"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_wisp_fs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.entries;
             #[allow(unused_comparisons)]
@@ -200,19 +200,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Directory<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
     fn def_name() -> &'static str {
         "entry"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_wisp_fs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -230,19 +230,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entry<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for File<'a> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
     fn def_name() -> &'static str {
         "file"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_wisp_fs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.blob;
             {
@@ -318,19 +318,19 @@ impl jacquard_common::types::collection::Collection for FsRecord {
     type Record = FsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fs<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Fs<'a> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_wisp_fs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.file_count {
             if *value > 1000i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -357,19 +357,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Fs<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Subfs<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Subfs<'a> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
     fn def_name() -> &'static str {
         "subfs"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_wisp_fs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -501,7 +501,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -514,7 +514,7 @@ where
     }
 }
 
-fn lexicon_doc_place_wisp_fs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_wisp_fs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.wisp.fs"),
@@ -1002,7 +1002,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1196,7 +1196,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1223,50 +1223,50 @@ pub mod fs_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Site;
-        type CreatedAt;
         type Root;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Site = Unset;
-        type CreatedAt = Unset;
         type Root = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSite<S> {}
     impl<S: State> State for SetSite<S> {
         type Site = Set<members::site>;
+        type Root = S::Root;
         type CreatedAt = S::CreatedAt;
-        type Root = S::Root;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Site = S::Site;
-        type CreatedAt = Set<members::created_at>;
-        type Root = S::Root;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
         type Site = S::Site;
-        type CreatedAt = S::CreatedAt;
         type Root = Set<members::root>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Site = S::Site;
+        type Root = S::Root;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `site` field
         pub struct site(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `root` field
         pub struct root(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1374,8 +1374,8 @@ impl<'a, S> FsBuilder<'a, S>
 where
     S: fs_state::State,
     S::Site: fs_state::IsSet,
-    S::CreatedAt: fs_state::IsSet,
     S::Root: fs_state::IsSet,
+    S::CreatedAt: fs_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fs<'a> {
@@ -1390,7 +1390,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1547,7 +1547,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

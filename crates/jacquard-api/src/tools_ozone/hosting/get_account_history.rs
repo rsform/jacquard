@@ -18,12 +18,12 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccountCreated<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
+    pub handle: core::option::Option<jacquard_common::types::string::Handle<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -141,18 +141,18 @@ pub struct HandleUpdated<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountHistory<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub events: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub events: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -167,9 +167,9 @@ pub struct GetAccountHistory<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountHistoryOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub events: Vec<crate::tools_ozone::hosting::get_account_history::Event<'a>>,
 }
@@ -187,87 +187,87 @@ pub struct GetAccountHistoryOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PasswordUpdated<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountCreated<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AccountCreated<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
     fn def_name() -> &'static str {
         "accountCreated"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmailConfirmed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EmailConfirmed<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
     fn def_name() -> &'static str {
         "emailConfirmed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EmailUpdated<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EmailUpdated<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
     fn def_name() -> &'static str {
         "emailUpdated"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
     fn def_name() -> &'static str {
         "event"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HandleUpdated<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for HandleUpdated<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
     fn def_name() -> &'static str {
         "handleUpdated"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -298,24 +298,24 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAccountHistoryRequest {
     type Response = GetAccountHistoryResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PasswordUpdated<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PasswordUpdated<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
     fn def_name() -> &'static str {
         "passwordUpdated"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_hosting_getAccountHistory()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tools_ozone_hosting_getAccountHistory() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -675,51 +675,51 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Details;
         type CreatedBy;
         type CreatedAt;
+        type Details;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Details = Unset;
         type CreatedBy = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `details` field to Set
-    pub struct SetDetails<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDetails<S> {}
-    impl<S: State> State for SetDetails<S> {
-        type Details = Set<members::details>;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = S::CreatedAt;
+        type Details = Unset;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
-        type Details = S::Details;
         type CreatedBy = Set<members::created_by>;
         type CreatedAt = S::CreatedAt;
+        type Details = S::Details;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Details = S::Details;
         type CreatedBy = S::CreatedBy;
         type CreatedAt = Set<members::created_at>;
+        type Details = S::Details;
+    }
+    ///State transition - sets the `details` field to Set
+    pub struct SetDetails<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDetails<S> {}
+    impl<S: State> State for SetDetails<S> {
+        type CreatedBy = S::CreatedBy;
+        type CreatedAt = S::CreatedAt;
+        type Details = Set<members::details>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `details` field
-        pub struct details(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `details` field
+        pub struct details(());
     }
 }
 
@@ -812,9 +812,9 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::Details: event_state::IsSet,
     S::CreatedBy: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
+    S::Details: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -828,7 +828,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -935,7 +935,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -947,7 +947,7 @@ where
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 

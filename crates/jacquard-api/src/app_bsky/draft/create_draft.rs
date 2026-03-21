@@ -56,7 +56,7 @@ pub struct CreateDraftOutput<'a> {
 pub enum CreateDraftError<'a> {
     /// Trying to insert a new draft when the limit was already reached.
     #[serde(rename = "DraftLimitReached")]
-    DraftLimitReached(std::option::Option<jacquard_common::CowStr<'a>>),
+    DraftLimitReached(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateDraftError<'_> {
@@ -195,7 +195,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

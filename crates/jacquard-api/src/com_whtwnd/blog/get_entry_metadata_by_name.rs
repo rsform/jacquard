@@ -34,13 +34,13 @@ pub struct GetEntryMetadataByName<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetEntryMetadataByNameOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub entry_uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_update: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_update: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::open_union]
@@ -60,7 +60,7 @@ pub struct GetEntryMetadataByNameOutput<'a> {
 pub enum GetEntryMetadataByNameError<'a> {
     /// If the associated name isn't registered in the author's repo, this error is returned
     #[serde(rename = "NotFound")]
-    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetEntryMetadataByNameError<'_> {

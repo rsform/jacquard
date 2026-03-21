@@ -24,9 +24,9 @@ pub struct List<'a> {
     ///When this list was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Description of the reading challenge
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Deadline for completing the reading challenge
     pub duedate: jacquard_common::types::string::Datetime,
     ///DIDs of users who can issue stamps for this list
@@ -49,9 +49,9 @@ pub struct List<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -98,19 +98,19 @@ impl jacquard_common::types::collection::Collection for ListRecord {
     type Record = ListRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for List<'a> {
     fn nsid() -> &'static str {
         "bond.biblio.list"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_bond_biblio_list()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -187,85 +187,85 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
+        type Librarians;
+        type Books;
         type Duedate;
         type CreatedAt;
-        type Title;
-        type Books;
-        type Librarians;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
+        type Librarians = Unset;
+        type Books = Unset;
         type Duedate = Unset;
         type CreatedAt = Unset;
-        type Title = Unset;
-        type Books = Unset;
-        type Librarians = Unset;
-    }
-    ///State transition - sets the `duedate` field to Set
-    pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuedate<S> {}
-    impl<S: State> State for SetDuedate<S> {
-        type Duedate = Set<members::duedate>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Books = S::Books;
-        type Librarians = S::Librarians;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Duedate = S::Duedate;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type Books = S::Books;
-        type Librarians = S::Librarians;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Duedate = S::Duedate;
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
-        type Books = S::Books;
         type Librarians = S::Librarians;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
+        type Books = S::Books;
         type Duedate = S::Duedate;
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type Books = Set<members::books>;
-        type Librarians = S::Librarians;
     }
     ///State transition - sets the `librarians` field to Set
     pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLibrarians<S> {}
     impl<S: State> State for SetLibrarians<S> {
+        type Title = S::Title;
+        type Librarians = Set<members::librarians>;
+        type Books = S::Books;
         type Duedate = S::Duedate;
         type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooks<S> {}
+    impl<S: State> State for SetBooks<S> {
         type Title = S::Title;
+        type Librarians = S::Librarians;
+        type Books = Set<members::books>;
+        type Duedate = S::Duedate;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `duedate` field to Set
+    pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuedate<S> {}
+    impl<S: State> State for SetDuedate<S> {
+        type Title = S::Title;
+        type Librarians = S::Librarians;
         type Books = S::Books;
-        type Librarians = Set<members::librarians>;
+        type Duedate = Set<members::duedate>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Librarians = S::Librarians;
+        type Books = S::Books;
+        type Duedate = S::Duedate;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `librarians` field
+        pub struct librarians(());
+        ///Marker type for the `books` field
+        pub struct books(());
         ///Marker type for the `duedate` field
         pub struct duedate(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `books` field
-        pub struct books(());
-        ///Marker type for the `librarians` field
-        pub struct librarians(());
     }
 }
 
@@ -418,11 +418,11 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
+    S::Title: list_state::IsSet,
+    S::Librarians: list_state::IsSet,
+    S::Books: list_state::IsSet,
     S::Duedate: list_state::IsSet,
     S::CreatedAt: list_state::IsSet,
-    S::Title: list_state::IsSet,
-    S::Books: list_state::IsSet,
-    S::Librarians: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -439,7 +439,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -456,7 +456,7 @@ where
     }
 }
 
-fn lexicon_doc_bond_biblio_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_bond_biblio_list() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("bond.biblio.list"),

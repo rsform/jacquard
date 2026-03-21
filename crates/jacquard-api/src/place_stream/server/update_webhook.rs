@@ -19,43 +19,43 @@
 #[serde(rename_all = "camelCase")]
 pub struct UpdateWebhook<'a> {
     ///Whether this webhook should be active.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub active: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub active: core::option::Option<bool>,
     ///A description of what this webhook is used for.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The types of events this webhook should receive.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub events: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub events: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///The ID of the webhook to update.
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///Words to filter out from chat messages. Messages containing any of these words will not be forwarded.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mute_words: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub mute_words: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///A user-friendly name for this webhook.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Text to prepend to webhook messages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub prefix: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Text replacement rules for webhook messages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rewrite: std::option::Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
+    pub rewrite: core::option::Option<Vec<crate::place_stream::server::RewriteRule<'a>>>,
     ///Text to append to webhook messages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub suffix: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub suffix: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The webhook URL where events will be sent.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -91,16 +91,16 @@ pub struct UpdateWebhookOutput<'a> {
 pub enum UpdateWebhookError<'a> {
     /// The specified webhook was not found.
     #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    WebhookNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The authenticated user does not have access to this webhook.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The provided webhook URL is invalid or unreachable.
     #[serde(rename = "InvalidUrl")]
-    InvalidUrl(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidUrl(core::option::Option<jacquard_common::CowStr<'a>>),
     /// A webhook with this URL already exists for this user.
     #[serde(rename = "DuplicateWebhook")]
-    DuplicateWebhook(std::option::Option<jacquard_common::CowStr<'a>>),
+    DuplicateWebhook(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateWebhookError<'_> {

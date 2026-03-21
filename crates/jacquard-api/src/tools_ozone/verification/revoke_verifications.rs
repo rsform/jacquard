@@ -18,9 +18,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct RevokeVerifications<'a> {
     ///Reason for revoking the verification. This is optional and can be omitted if not needed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub revoke_reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub revoke_reason: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Array of verification record uris to revoke
     #[serde(borrow)]
     pub uris: Vec<jacquard_common::types::string::AtUri<'a>>,
@@ -99,19 +99,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for RevokeVerificationsRequest {
     type Response = RevokeVerificationsResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RevokeError<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RevokeError<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.verification.revokeVerifications"
     }
     fn def_name() -> &'static str {
         "revokeError"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_verification_revokeVerifications()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -230,7 +230,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -370,7 +370,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -383,7 +383,7 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tools_ozone_verification_revokeVerifications() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

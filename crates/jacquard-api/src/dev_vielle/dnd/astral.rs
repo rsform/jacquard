@@ -36,9 +36,9 @@ pub struct Astral<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AstralGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -274,19 +274,19 @@ impl jacquard_common::types::collection::Collection for AstralRecord {
     type Record = AstralRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Astral<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Astral<'a> {
     fn nsid() -> &'static str {
         "dev.vielle.dnd.astral"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_vielle_dnd_astral()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -305,37 +305,37 @@ pub mod astral_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Points;
         type Powers;
+        type Points;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Points = Unset;
         type Powers = Unset;
-    }
-    ///State transition - sets the `points` field to Set
-    pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoints<S> {}
-    impl<S: State> State for SetPoints<S> {
-        type Points = Set<members::points>;
-        type Powers = S::Powers;
+        type Points = Unset;
     }
     ///State transition - sets the `powers` field to Set
     pub struct SetPowers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPowers<S> {}
     impl<S: State> State for SetPowers<S> {
-        type Points = S::Points;
         type Powers = Set<members::powers>;
+        type Points = S::Points;
+    }
+    ///State transition - sets the `points` field to Set
+    pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoints<S> {}
+    impl<S: State> State for SetPoints<S> {
+        type Powers = S::Powers;
+        type Points = Set<members::points>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `points` field
-        pub struct points(());
         ///Marker type for the `powers` field
         pub struct powers(());
+        ///Marker type for the `points` field
+        pub struct points(());
     }
 }
 
@@ -408,8 +408,8 @@ where
 impl<'a, S> AstralBuilder<'a, S>
 where
     S: astral_state::State,
-    S::Points: astral_state::IsSet,
     S::Powers: astral_state::IsSet,
+    S::Points: astral_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Astral<'a> {
@@ -422,7 +422,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -435,7 +435,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_vielle_dnd_astral() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_vielle_dnd_astral() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

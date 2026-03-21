@@ -21,9 +21,9 @@ pub struct Layer<'a> {
     ///The date and time of the creation of the record
     pub created_at: jacquard_common::types::string::Datetime,
     ///The description of the layer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the site
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -47,9 +47,9 @@ pub struct Layer<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LayerGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -96,19 +96,19 @@ impl jacquard_common::types::collection::Collection for LayerRecord {
     type Record = LayerRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Layer<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Layer<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.layer"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_organization_layer()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -123,8 +123,8 @@ pub mod layer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Type;
+        type Name;
         type CreatedAt;
         type Uri;
     }
@@ -132,26 +132,26 @@ pub mod layer_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Type = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Name = S::Name;
         type Type = Set<members::r#type>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Type = S::Type;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
         type Uri = S::Uri;
     }
@@ -159,8 +159,8 @@ pub mod layer_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Type = S::Type;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
         type Uri = S::Uri;
     }
@@ -168,18 +168,18 @@ pub mod layer_state {
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
         type Type = S::Type;
+        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `uri` field
@@ -316,8 +316,8 @@ where
 impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
-    S::Name: layer_state::IsSet,
     S::Type: layer_state::IsSet,
+    S::Name: layer_state::IsSet,
     S::CreatedAt: layer_state::IsSet,
     S::Uri: layer_state::IsSet,
 {
@@ -335,7 +335,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -351,7 +351,7 @@ where
     }
 }
 
-fn lexicon_doc_app_gainforest_organization_layer() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_gainforest_organization_layer() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

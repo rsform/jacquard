@@ -120,19 +120,19 @@ pub struct Uri<'a> {
     pub uri: jacquard_common::types::string::UriValue<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LargeBlob<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LargeBlob<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
     fn def_name() -> &'static str {
         "largeBlob"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.blob;
             {
@@ -181,19 +181,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LargeBlob<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LargeImage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LargeImage<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
     fn def_name() -> &'static str {
         "largeImage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.image;
             {
@@ -250,19 +250,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LargeImage<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallBlob<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SmallBlob<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
     fn def_name() -> &'static str {
         "smallBlob"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.blob;
             {
@@ -311,19 +311,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallBlob<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallImage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SmallImage<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
     fn def_name() -> &'static str {
         "smallImage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.image;
             {
@@ -380,19 +380,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallImage<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallVideo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SmallVideo<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
     fn def_name() -> &'static str {
         "smallVideo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.video;
             {
@@ -443,19 +443,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SmallVideo<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Uri<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
     fn def_name() -> &'static str {
         "uri"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -553,7 +553,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -565,9 +565,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_hypercerts_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.hypercerts.defs"),
@@ -872,7 +870,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -977,7 +975,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1082,7 +1080,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1187,7 +1185,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1292,7 +1290,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

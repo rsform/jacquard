@@ -18,11 +18,11 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorListItem<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub index: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub index: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<AuthorListItemProfile<'a>>,
+    pub profile: core::option::Option<AuthorListItemProfile<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -59,8 +59,8 @@ pub enum AuthorListItemProfile<'a> {
 pub struct Authors<'a> {
     #[serde(borrow)]
     pub author_list: Vec<crate::sh_weaver::notebook::authors::AuthorListItem<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -75,9 +75,9 @@ pub struct Authors<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AuthorsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -97,19 +97,19 @@ impl<'a> Authors<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AuthorListItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AuthorListItem<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.authors"
     }
     fn def_name() -> &'static str {
         "authorListItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_authors()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -141,19 +141,19 @@ impl jacquard_common::types::collection::Collection for AuthorsRecord {
     type Record = AuthorsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Authors<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Authors<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.authors"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_authors()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -263,7 +263,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -276,7 +276,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_authors() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_notebook_authors() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -514,7 +514,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

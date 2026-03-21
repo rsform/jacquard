@@ -36,42 +36,42 @@ pub struct LiveNowConfig<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetConfigOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub check_email_confirmed: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub check_email_confirmed: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub live_now: std::option::Option<
+    pub live_now: core::option::Option<
         Vec<crate::app_bsky::unspecced::get_config::LiveNowConfig<'a>>,
     >,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LiveNowConfig<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LiveNowConfig<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getConfig"
     }
     fn def_name() -> &'static str {
         "liveNowConfig"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_getConfig()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct GetConfig;
 /// Response type for
@@ -227,7 +227,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -240,7 +240,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_unspecced_getConfig() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_unspecced_getConfig() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

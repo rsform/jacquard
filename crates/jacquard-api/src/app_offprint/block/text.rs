@@ -19,36 +19,36 @@
 #[serde(rename_all = "camelCase")]
 pub struct Text<'a> {
     ///Facets for text formatting
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub facets: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
     ///The plain text content
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
     ///Text alignment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text_align: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text_align: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Text<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.text"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_text()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_app_offprint_block_text() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_offprint_block_text() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

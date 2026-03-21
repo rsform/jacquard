@@ -18,13 +18,13 @@
 pub struct GetStarterPacksWithMembership<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -39,9 +39,9 @@ pub struct GetStarterPacksWithMembership<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetStarterPacksWithMembershipOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub starter_packs_with_membership: Vec<
         crate::app_bsky::graph::get_starter_packs_with_membership::StarterPackWithMembership<
@@ -63,9 +63,9 @@ pub struct GetStarterPacksWithMembershipOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StarterPackWithMembership<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
+    pub list_item: core::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
     #[serde(borrow)]
     pub starter_pack: crate::app_bsky::graph::StarterPackView<'a>,
 }
@@ -96,24 +96,24 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipReques
     type Response = GetStarterPacksWithMembershipResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StarterPackWithMembership<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for StarterPackWithMembership<'a> {
     fn nsid() -> &'static str {
         "app.bsky.graph.getStarterPacksWithMembership"
     }
     fn def_name() -> &'static str {
         "starterPackWithMembership"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_graph_getStarterPacksWithMembership()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
@@ -389,7 +389,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -402,7 +402,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -33,17 +33,17 @@ pub struct Status<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct StatusOutput<'a> {
     ///Authoritative boundaries assigned. Only included when request is authenticated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub boundaries: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub boundaries: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
     ///The DID that was checked.
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     ///Whether the DID is enrolled in this Stratos service.
     pub enrolled: bool,
     ///When the DID was enrolled, if enrolled.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub enrolled_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub enrolled_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Response type for

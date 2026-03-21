@@ -19,11 +19,11 @@ pub struct GetActorLovedSongs<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::ident::AtIdentifier<'a>,
     ///(min: 1)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///(min: 0)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offset: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -39,9 +39,9 @@ pub struct GetActorLovedSongs<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorLovedSongsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tracks: std::option::Option<Vec<crate::app_rocksky::song::SongViewBasic<'a>>>,
+    pub tracks: core::option::Option<Vec<crate::app_rocksky::song::SongViewBasic<'a>>>,
 }
 
 /// Response type for

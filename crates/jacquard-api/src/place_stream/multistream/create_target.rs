@@ -55,7 +55,7 @@ pub struct CreateTargetOutput<'a> {
 pub enum CreateTargetError<'a> {
     /// The provided target URL is invalid or unreachable.
     #[serde(rename = "InvalidTargetUrl")]
-    InvalidTargetUrl(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidTargetUrl(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateTargetError<'_> {
@@ -196,7 +196,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

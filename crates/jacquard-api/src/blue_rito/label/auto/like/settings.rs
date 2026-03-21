@@ -23,9 +23,9 @@ pub struct Settings<'a> {
     pub apply: crate::blue_rito::label::auto::like::settings::PostRef<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///The post to remove the label from
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub delete: std::option::Option<
+    pub delete: core::option::Option<
         crate::blue_rito::label::auto::like::settings::PostRef<'a>,
     >,
 }
@@ -42,9 +42,9 @@ pub struct Settings<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -111,36 +111,36 @@ impl jacquard_common::types::collection::Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     fn nsid() -> &'static str {
         "blue.rito.label.auto.like.settings"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_rito_label_auto_like_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PostRef<'a> {
     fn nsid() -> &'static str {
         "blue.rito.label.auto.like.settings"
     }
     fn def_name() -> &'static str {
         "postRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_rito_label_auto_like_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -155,37 +155,37 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Apply;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Apply = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Apply = S::Apply;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `apply` field to Set
     pub struct SetApply<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetApply<S> {}
     impl<S: State> State for SetApply<S> {
-        type CreatedAt = S::CreatedAt;
         type Apply = Set<members::apply>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Apply = S::Apply;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `apply` field
         pub struct apply(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -284,8 +284,8 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 impl<'a, S> SettingsBuilder<'a, S>
 where
     S: settings_state::State,
-    S::CreatedAt: settings_state::IsSet,
     S::Apply: settings_state::IsSet,
+    S::CreatedAt: settings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Settings<'a> {
@@ -299,7 +299,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -313,7 +313,7 @@ where
     }
 }
 
-fn lexicon_doc_blue_rito_label_auto_like_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blue_rito_label_auto_like_settings() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -590,7 +590,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -6,6 +6,7 @@ use quote::quote;
 
 use super::CodeGenerator;
 use super::nsid_utils::{NsidPath, RefPath};
+use super::prettify::{CommonType, ExternalImport, ResolvedImports};
 use super::utils::{join_module_path, join_path_parts, namespace_prefix, sanitize_name_cow};
 
 impl<'c> CodeGenerator<'c> {
@@ -16,6 +17,7 @@ impl<'c> CodeGenerator<'c> {
         parent_type_name: &str,
         field_name: &str,
         prop: &LexObjectProperty<'static>,
+        resolved: &ResolvedImports,
     ) -> Result<TokenStream> {
         match prop {
             LexObjectProperty::Boolean(_) => Ok(quote! { bool }),
@@ -28,21 +30,26 @@ impl<'c> CodeGenerator<'c> {
                     let enum_ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
                     Ok(quote! { #enum_ident<'a> })
                 } else {
-                    Ok(self.string_to_rust_type(s))
+                    Ok(self.string_to_rust_type(s, resolved))
                 }
             }
-            LexObjectProperty::Bytes(_) => Ok(quote! { jacquard_common::deps::bytes::Bytes }),
+            LexObjectProperty::Bytes(_) => Ok(resolved.external_type_tokens(&ExternalImport::Bytes)),
             LexObjectProperty::CidLink(_) => {
-                Ok(quote! { jacquard_common::types::cid::CidLink<'a> })
+                Ok(resolved.type_tokens(&CommonType::CidLink))
             }
-            LexObjectProperty::Blob(_) => Ok(quote! { jacquard_common::types::blob::BlobRef<'a> }),
-            LexObjectProperty::Unknown(_) => Ok(quote! { jacquard_common::types::value::Data<'a> }),
+            LexObjectProperty::Blob(_) => {
+                Ok(resolved.type_tokens(&CommonType::BlobRef))
+            }
+            LexObjectProperty::Unknown(_) => {
+                Ok(resolved.type_tokens(&CommonType::Data))
+            }
             LexObjectProperty::Array(array) => {
                 // For arrays with union items, check if multi-variant
                 if let LexArrayItem::Union(union) = &array.items {
                     if union.refs.is_empty() {
-                        // Empty union: fall back to Data
-                        Ok(quote! { Vec<jacquard_common::types::value::Data<'a>> })
+                        // Empty union: fall back to Data.
+                        let ty = resolved.type_tokens(&CommonType::Data);
+                        Ok(quote! { Vec<#ty> })
                     } else if union.refs.len() == 1 {
                         // Single-variant: use the ref type directly
                         let ref_str = if union.refs[0].starts_with('#') {
@@ -50,7 +57,7 @@ impl<'c> CodeGenerator<'c> {
                         } else {
                             union.refs[0].to_string()
                         };
-                        let ref_type = self.ref_to_rust_type(&ref_str)?;
+                        let ref_type = self.ref_to_rust_type(&ref_str, resolved)?;
                         Ok(quote! { Vec<#ref_type> })
                     } else {
                         // Multi-variant: use generated union type
@@ -65,14 +72,14 @@ impl<'c> CodeGenerator<'c> {
                         Ok(quote! { Vec<#union_ident<'a>> })
                     }
                 } else {
-                    let item_type = self.array_item_to_rust_type(nsid, &array.items)?;
+                    let item_type = self.array_item_to_rust_type(nsid, &array.items, resolved)?;
                     Ok(quote! { Vec<#item_type> })
                 }
             }
             LexObjectProperty::Object(object) => {
-                // Empty objects (no properties) are untyped data bags
+                // Empty objects (no properties) are untyped data bags.
                 if object.properties.is_empty() {
-                    return Ok(quote! { jacquard_common::types::value::Data<'a> });
+                    return Ok(resolved.type_tokens(&CommonType::Data));
                 }
                 // Generate unique nested object type name with collision detection
                 let object_name =
@@ -89,12 +96,12 @@ impl<'c> CodeGenerator<'c> {
                 };
                 // Track namespace dependency for cross-namespace refs
                 self.track_ref_namespace_dep(nsid, &ref_str);
-                self.ref_to_rust_type(&ref_str)
+                self.ref_to_rust_type(&ref_str, resolved)
             }
             LexObjectProperty::Union(union) => {
                 if union.refs.is_empty() {
-                    // Empty union: fall back to Data
-                    Ok(quote! { jacquard_common::types::value::Data<'a> })
+                    // Empty union: fall back to Data.
+                    Ok(resolved.type_tokens(&CommonType::Data))
                 } else if union.refs.len() == 1 {
                     // Check if this is a self-reference
                     let ref_str = if union.refs[0].starts_with('#') {
@@ -118,7 +125,7 @@ impl<'c> CodeGenerator<'c> {
                         // Non-self-ref single-variant: use the ref type directly
                         // Track namespace dependency for cross-namespace refs
                         self.track_ref_namespace_dep(nsid, &ref_str);
-                        self.ref_to_rust_type(&ref_str)
+                        self.ref_to_rust_type(&ref_str, resolved)
                     }
                 } else {
                     // Multi-variant: generate union type with collision detection
@@ -136,18 +143,25 @@ impl<'c> CodeGenerator<'c> {
         &self,
         nsid: &str,
         item: &LexArrayItem,
+        resolved: &ResolvedImports,
     ) -> Result<TokenStream> {
         match item {
             LexArrayItem::Boolean(_) => Ok(quote! { bool }),
             LexArrayItem::Integer(_) => Ok(quote! { i64 }),
-            LexArrayItem::String(s) => Ok(self.string_to_rust_type(s)),
-            LexArrayItem::Bytes(_) => Ok(quote! { jacquard_common::deps::bytes::Bytes }),
-            LexArrayItem::CidLink(_) => Ok(quote! { jacquard_common::types::cid::CidLink<'a> }),
-            LexArrayItem::Blob(_) => Ok(quote! { jacquard_common::types::blob::BlobRef<'a> }),
-            LexArrayItem::Unknown(_) => Ok(quote! { jacquard_common::types::value::Data<'a> }),
+            LexArrayItem::String(s) => Ok(self.string_to_rust_type(s, resolved)),
+            LexArrayItem::Bytes(_) => Ok(resolved.external_type_tokens(&ExternalImport::Bytes)),
+            LexArrayItem::CidLink(_) => {
+                Ok(resolved.type_tokens(&CommonType::CidLink))
+            }
+            LexArrayItem::Blob(_) => {
+                Ok(resolved.type_tokens(&CommonType::BlobRef))
+            }
+            LexArrayItem::Unknown(_) => {
+                Ok(resolved.type_tokens(&CommonType::Data))
+            }
             LexArrayItem::Object(_) => {
-                // For inline objects in arrays, use Data since we can't generate a unique type name
-                Ok(quote! { jacquard_common::types::value::Data<'a> })
+                // For inline objects in arrays, use Data since we can't generate a unique type name.
+                Ok(resolved.type_tokens(&CommonType::Data))
             }
             LexArrayItem::Ref(ref_type) => {
                 // Handle local refs (starting with #) by prepending the current NSID
@@ -156,43 +170,36 @@ impl<'c> CodeGenerator<'c> {
                 } else {
                     ref_type.r#ref.to_string()
                 };
-                self.ref_to_rust_type(&ref_str)
+                self.ref_to_rust_type(&ref_str, resolved)
             }
             LexArrayItem::Union(_) => {
-                // For now, use Data
-                Ok(quote! { jacquard_common::types::value::Data<'a> })
+                // For now, use Data.
+                Ok(resolved.type_tokens(&CommonType::Data))
             }
         }
     }
 
-    /// Convert string type to Rust type
-    pub(super) fn string_to_rust_type(&self, s: &LexString) -> TokenStream {
+    /// Convert string type to Rust type.
+    /// Lifetimes are included by `type_tokens()` — callers must not add them.
+    pub(super) fn string_to_rust_type(&self, s: &LexString, resolved: &ResolvedImports) -> TokenStream {
         match s.format {
-            Some(LexStringFormat::Datetime) => {
-                quote! { jacquard_common::types::string::Datetime }
-            }
-            Some(LexStringFormat::Did) => quote! { jacquard_common::types::string::Did<'a> },
-            Some(LexStringFormat::Handle) => quote! { jacquard_common::types::string::Handle<'a> },
-            Some(LexStringFormat::AtIdentifier) => {
-                quote! { jacquard_common::types::ident::AtIdentifier<'a> }
-            }
-            Some(LexStringFormat::Nsid) => quote! { jacquard_common::types::string::Nsid<'a> },
-            Some(LexStringFormat::AtUri) => quote! { jacquard_common::types::string::AtUri<'a> },
-            Some(LexStringFormat::Uri) => quote! { jacquard_common::types::string::UriValue<'a> },
-            Some(LexStringFormat::Cid) => quote! { jacquard_common::types::string::Cid<'a> },
-            Some(LexStringFormat::Language) => {
-                quote! { jacquard_common::types::string::Language }
-            }
-            Some(LexStringFormat::Tid) => quote! { jacquard_common::types::string::Tid },
-            Some(LexStringFormat::RecordKey) => {
-                quote! { jacquard_common::types::string::RecordKey<jacquard_common::types::string::Rkey<'a>> }
-            }
-            _ => quote! { jacquard_common::CowStr<'a> },
+            Some(LexStringFormat::Datetime) => resolved.type_tokens(&CommonType::Datetime),
+            Some(LexStringFormat::Did) => resolved.type_tokens(&CommonType::Did),
+            Some(LexStringFormat::Handle) => resolved.type_tokens(&CommonType::Handle),
+            Some(LexStringFormat::AtIdentifier) => resolved.type_tokens(&CommonType::AtIdentifier),
+            Some(LexStringFormat::Nsid) => resolved.type_tokens(&CommonType::Nsid),
+            Some(LexStringFormat::AtUri) => resolved.type_tokens(&CommonType::AtUri),
+            Some(LexStringFormat::Uri) => resolved.type_tokens(&CommonType::UriValue),
+            Some(LexStringFormat::Cid) => resolved.type_tokens(&CommonType::Cid),
+            Some(LexStringFormat::Language) => resolved.type_tokens(&CommonType::Language),
+            Some(LexStringFormat::Tid) => resolved.type_tokens(&CommonType::Tid),
+            Some(LexStringFormat::RecordKey) => resolved.type_tokens(&CommonType::RecordKey),
+            _ => resolved.type_tokens(&CommonType::CowStr),
         }
     }
 
     /// Convert ref to Rust type path
-    pub(super) fn ref_to_rust_type(&self, ref_str: &str) -> Result<TokenStream> {
+    pub(super) fn ref_to_rust_type(&self, ref_str: &str, resolved: &ResolvedImports) -> Result<TokenStream> {
         use crate::error::CodegenError;
 
         // Parse ref to get NSID and def
@@ -203,7 +210,7 @@ impl<'c> CodeGenerator<'c> {
         // Check if ref exists
         if !self.corpus.ref_exists(ref_str) {
             // Fallback to Data
-            return Ok(quote! { jacquard_common::types::value::Data<'a> });
+            return Ok(resolved.type_tokens(&CommonType::Data));
         }
 
         // Parse NSID into components

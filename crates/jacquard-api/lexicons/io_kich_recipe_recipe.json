@@ -7,17 +7,24 @@
       "type": "object",
       "required": [
         "id",
-        "name",
-        "grams"
+        "name"
       ],
       "properties": {
         "grams": {
           "type": "integer",
-          "description": "Amount needed in grams"
+          "description": "[Deprecated] Amount needed in grams. Use measuredAmount/measuredUnit instead."
         },
         "group": {
           "type": "string",
           "description": "Optional group name for organizing ingredients (e.g., 'For the sauce:', 'For the pasta:')"
+        },
+        "heuristicAmount": {
+          "type": "integer",
+          "description": "Heuristic amount from parsed ingredient text (e.g., 2 in \"2 cups\")"
+        },
+        "heuristicUnit": {
+          "type": "string",
+          "description": "Heuristic unit from parsed ingredient text (e.g., cup, cookies)"
         },
         "id": {
           "type": "string",
@@ -32,6 +39,14 @@
           "type": "boolean",
           "description": "Whether this ingredient is optional",
           "default": false
+        },
+        "measuredAmount": {
+          "type": "integer",
+          "description": "Measured amount needed (e.g., 250, 1.5)"
+        },
+        "measuredUnit": {
+          "type": "string",
+          "description": "Measured unit (g, kg, oz, lb, ml)"
         },
         "name": {
           "type": "string",
@@ -89,10 +104,25 @@
             "type": "string",
             "description": "Recipe description"
           },
+          "embedding": {
+            "type": "string",
+            "description": "Vector embedding for semantic similarity search (1024 dimensions, stored as JSON array of numbers)"
+          },
           "imageUrl": {
             "type": "string",
-            "description": "Image URL for the recipe",
+            "description": "[Deprecated] Image URL for the recipe. Use images blob array instead. Kept for legacy fallback.",
             "format": "uri"
+          },
+          "images": {
+            "type": "array",
+            "description": "Recipe images as blobs (hero first; preferred over imageUrl)",
+            "items": {
+              "type": "blob",
+              "accept": [
+                "image/*"
+              ]
+            },
+            "maxLength": 10
           },
           "ingredients": {
             "type": "array",
@@ -132,6 +162,14 @@
             "type": "string",
             "description": "Source name (book, magazine, blog)"
           },
+          "tags": {
+            "type": "array",
+            "description": "Tags for categorizing the recipe",
+            "items": {
+              "type": "ref",
+              "ref": "#tag"
+            }
+          },
           "updatedAt": {
             "type": "string",
             "description": "When this recipe was last updated",
@@ -141,7 +179,29 @@
             "type": "string",
             "description": "Source URL of the recipe",
             "format": "uri"
+          },
+          "variationOf": {
+            "type": "ref",
+            "description": "Optional reference to the original recipe this is a variation of (for attribution and variation discovery)",
+            "ref": "com.atproto.repo.strongRef"
           }
+        }
+      }
+    },
+    "tag": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Tag identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Tag display name"
         }
       }
     }

@@ -17,8 +17,8 @@
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedGenerators {
     ///(min: 1)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub size: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]

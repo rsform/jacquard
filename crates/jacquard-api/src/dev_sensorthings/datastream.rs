@@ -19,24 +19,24 @@
 #[serde(rename_all = "camelCase")]
 pub struct Datastream<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///O&M observation type URI, e.g. http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement
     #[serde(borrow)]
     pub observation_type: jacquard_common::types::string::UriValue<'a>,
     ///Representative location for the datastream
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub observed_area: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub observed_area: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///AT-URI of the dev.sensorthings.observedProperty record
     #[serde(borrow)]
     pub observed_property: jacquard_common::types::string::AtUri<'a>,
     ///10^n divisor for numeric results. E.g. 2 means observation integers are in centi-units (÷100). Default 0. Only meaningful for numericResult and arrayResult types.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub result_scale_factor: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub result_scale_factor: core::option::Option<i64>,
     ///AT-URI of the dev.sensorthings.sensor record
     #[serde(borrow)]
     pub sensor: jacquard_common::types::string::AtUri<'a>,
@@ -46,9 +46,9 @@ pub struct Datastream<'a> {
     #[serde(borrow)]
     pub unit_of_measurement: crate::dev_sensorthings::datastream::UnitOfMeasurement<'a>,
     ///Vertical datum reference for water level or elevation measurements. Either a URI (e.g. http://www.opengis.net/def/crs/EPSG/0/5731 for Malin Head) or a human-readable identifier (e.g. 'Chart Datum', 'local-gauge-zero'). Absent for non-vertical measurements.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub vertical_datum: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub vertical_datum: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -63,9 +63,9 @@ pub struct Datastream<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DatastreamGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -87,9 +87,9 @@ pub struct DatastreamGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct UnitOfMeasurement<'a> {
     ///URI from QUDT, UCUM, or similar unit ontology
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub definition: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub definition: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -136,19 +136,19 @@ impl jacquard_common::types::collection::Collection for DatastreamRecord {
     type Record = DatastreamRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Datastream<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Datastream<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.datastream"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_datastream()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
@@ -190,19 +190,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Datastream<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UnitOfMeasurement<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for UnitOfMeasurement<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.datastream"
     }
     fn def_name() -> &'static str {
         "unitOfMeasurement"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_datastream()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -243,127 +243,127 @@ pub mod datastream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Name;
-        type Sensor;
         type Thing;
+        type Sensor;
         type ObservedProperty;
+        type Name;
         type UnitOfMeasurement;
         type ObservationType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Name = Unset;
-        type Sensor = Unset;
         type Thing = Unset;
+        type Sensor = Unset;
         type ObservedProperty = Unset;
+        type Name = Unset;
         type UnitOfMeasurement = Unset;
         type ObservationType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Sensor = S::Sensor;
-        type Thing = S::Thing;
-        type ObservedProperty = S::ObservedProperty;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservationType = S::ObservationType;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type Sensor = S::Sensor;
-        type Thing = S::Thing;
-        type ObservedProperty = S::ObservedProperty;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservationType = S::ObservationType;
-    }
-    ///State transition - sets the `sensor` field to Set
-    pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSensor<S> {}
-    impl<S: State> State for SetSensor<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Sensor = Set<members::sensor>;
-        type Thing = S::Thing;
-        type ObservedProperty = S::ObservedProperty;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-        type ObservationType = S::ObservationType;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `thing` field to Set
     pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThing<S> {}
     impl<S: State> State for SetThing<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Sensor = S::Sensor;
         type Thing = Set<members::thing>;
+        type Sensor = S::Sensor;
         type ObservedProperty = S::ObservedProperty;
+        type Name = S::Name;
         type UnitOfMeasurement = S::UnitOfMeasurement;
         type ObservationType = S::ObservationType;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `sensor` field to Set
+    pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSensor<S> {}
+    impl<S: State> State for SetSensor<S> {
+        type Thing = S::Thing;
+        type Sensor = Set<members::sensor>;
+        type ObservedProperty = S::ObservedProperty;
+        type Name = S::Name;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type ObservationType = S::ObservationType;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `observed_property` field to Set
     pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
     impl<S: State> State for SetObservedProperty<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Sensor = S::Sensor;
         type Thing = S::Thing;
+        type Sensor = S::Sensor;
         type ObservedProperty = Set<members::observed_property>;
+        type Name = S::Name;
         type UnitOfMeasurement = S::UnitOfMeasurement;
         type ObservationType = S::ObservationType;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Thing = S::Thing;
+        type Sensor = S::Sensor;
+        type ObservedProperty = S::ObservedProperty;
+        type Name = Set<members::name>;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type ObservationType = S::ObservationType;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `unit_of_measurement` field to Set
     pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
     impl<S: State> State for SetUnitOfMeasurement<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Sensor = S::Sensor;
         type Thing = S::Thing;
+        type Sensor = S::Sensor;
         type ObservedProperty = S::ObservedProperty;
+        type Name = S::Name;
         type UnitOfMeasurement = Set<members::unit_of_measurement>;
         type ObservationType = S::ObservationType;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `observation_type` field to Set
     pub struct SetObservationType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObservationType<S> {}
     impl<S: State> State for SetObservationType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Sensor = S::Sensor;
         type Thing = S::Thing;
+        type Sensor = S::Sensor;
         type ObservedProperty = S::ObservedProperty;
+        type Name = S::Name;
         type UnitOfMeasurement = S::UnitOfMeasurement;
         type ObservationType = Set<members::observation_type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Thing = S::Thing;
+        type Sensor = S::Sensor;
+        type ObservedProperty = S::ObservedProperty;
+        type Name = S::Name;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type ObservationType = S::ObservationType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `sensor` field
-        pub struct sensor(());
         ///Marker type for the `thing` field
         pub struct thing(());
+        ///Marker type for the `sensor` field
+        pub struct sensor(());
         ///Marker type for the `observed_property` field
         pub struct observed_property(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `unit_of_measurement` field
         pub struct unit_of_measurement(());
         ///Marker type for the `observation_type` field
         pub struct observation_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -624,13 +624,13 @@ impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
 impl<'a, S> DatastreamBuilder<'a, S>
 where
     S: datastream_state::State,
-    S::CreatedAt: datastream_state::IsSet,
-    S::Name: datastream_state::IsSet,
-    S::Sensor: datastream_state::IsSet,
     S::Thing: datastream_state::IsSet,
+    S::Sensor: datastream_state::IsSet,
     S::ObservedProperty: datastream_state::IsSet,
+    S::Name: datastream_state::IsSet,
     S::UnitOfMeasurement: datastream_state::IsSet,
     S::ObservationType: datastream_state::IsSet,
+    S::CreatedAt: datastream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Datastream<'a> {
@@ -652,7 +652,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -674,7 +674,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_sensorthings_datastream() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_sensorthings_datastream() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

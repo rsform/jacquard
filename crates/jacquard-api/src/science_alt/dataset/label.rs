@@ -24,16 +24,16 @@ pub struct Label<'a> {
     #[serde(borrow)]
     pub dataset_uri: jacquard_common::types::string::AtUri<'a>,
     ///Optional description of this labeled version
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///User-facing label name, e.g. 'mnist'
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Semver or free-form version string, e.g. '1.0.1'. When omitted, the label is unversioned.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub version: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -48,9 +48,9 @@ pub struct Label<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LabelGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -97,19 +97,19 @@ impl jacquard_common::types::collection::Collection for LabelRecord {
     type Record = LabelRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Label<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Label<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.label"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_label()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.dataset_uri;
             #[allow(unused_comparisons)]
@@ -366,7 +366,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -382,7 +382,7 @@ where
     }
 }
 
-fn lexicon_doc_science_alt_dataset_label() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_science_alt_dataset_label() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

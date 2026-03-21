@@ -36,9 +36,9 @@ pub struct AcceptConvo<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct AcceptConvoOutput<'a> {
     ///Rev when the convo was accepted. If not present, the convo was already accepted.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rev: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rev: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for

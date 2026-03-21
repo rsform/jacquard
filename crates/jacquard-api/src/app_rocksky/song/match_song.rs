@@ -75,37 +75,37 @@ pub mod match_song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
         type Title;
+        type Artist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Artist = Set<members::artist>;
-        type Title = S::Title;
+        type Artist = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Artist = S::Artist;
         type Title = Set<members::title>;
+        type Artist = S::Artist;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Title = S::Title;
+        type Artist = Set<members::artist>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
     }
 }
 
@@ -178,8 +178,8 @@ where
 impl<'a, S> MatchSongBuilder<'a, S>
 where
     S: match_song_state::State,
-    S::Artist: match_song_state::IsSet,
     S::Title: match_song_state::IsSet,
+    S::Artist: match_song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MatchSong<'a> {

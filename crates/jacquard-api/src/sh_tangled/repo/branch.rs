@@ -34,26 +34,26 @@ pub struct Branch<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BranchOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub author: std::option::Option<crate::sh_tangled::repo::branch::Signature<'a>>,
+    pub author: core::option::Option<crate::sh_tangled::repo::branch::Signature<'a>>,
     ///Latest commit hash on this branch
     #[serde(borrow)]
     pub hash: jacquard_common::CowStr<'a>,
     ///Whether this is the default branch
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_default: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_default: core::option::Option<bool>,
     ///Latest commit message
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Branch name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Short commit hash
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub short_hash: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub short_hash: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp of latest commit
     pub when: jacquard_common::types::string::Datetime,
 }
@@ -75,13 +75,13 @@ pub struct BranchOutput<'a> {
 pub enum BranchError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Branch not found
     #[serde(rename = "BranchNotFound")]
-    BranchNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    BranchNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for BranchError<'_> {
@@ -161,19 +161,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for BranchRequest {
     type Response = BranchResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.branch"
     }
     fn def_name() -> &'static str {
         "signature"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_branch()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -466,7 +466,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -480,7 +480,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_repo_branch() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_tangled_repo_branch() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

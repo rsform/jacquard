@@ -37,9 +37,9 @@ pub struct ValidateSupporter<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ValidateSupporterOutput<'a> {
     ///Hydrated profile of the supporter, if available.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<
+    pub profile: core::option::Option<
         crate::com_atprotofans::hydrated_profile::HydratedProfile<'a>,
     >,
     ///Whether the supporter relationship exists and the required attestation is valid.
@@ -63,7 +63,7 @@ pub struct ValidateSupporterOutput<'a> {
 pub enum ValidateSupporterError<'a> {
     /// Invalid DID format or missing required parameters.
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ValidateSupporterError<'_> {

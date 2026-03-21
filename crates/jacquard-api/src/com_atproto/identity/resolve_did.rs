@@ -54,10 +54,10 @@ pub struct ResolveDidOutput<'a> {
 pub enum ResolveDidError<'a> {
     /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
-    DidNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    DidNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
-    DidDeactivated(std::option::Option<jacquard_common::CowStr<'a>>),
+    DidDeactivated(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveDidError<'_> {

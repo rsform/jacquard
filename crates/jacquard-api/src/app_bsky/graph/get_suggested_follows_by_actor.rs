@@ -32,17 +32,17 @@ pub struct GetSuggestedFollowsByActor<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedFollowsByActorOutput<'a> {
-    ///If true, response has fallen-back to generic results, and is not scoped using relativeToDid Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    ///DEPRECATED, unused. Previously: if true, response has fallen-back to generic results, and is not scoped using relativeToDid Defaults to `false`.
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_get_suggested_follows_by_actor_output_is_fallback")]
-    pub is_fallback: std::option::Option<bool>,
+    pub is_fallback: core::option::Option<bool>,
     ///DEPRECATED: use recIdStr instead.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rec_id: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rec_id: core::option::Option<i64>,
     ///Snowflake for this recommendation, use when submitting recommendation events.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rec_id_str: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub suggestions: Vec<crate::app_bsky::actor::ProfileView<'a>>,
 }
@@ -175,7 +175,7 @@ where
     }
 }
 
-fn _default_get_suggested_follows_by_actor_output_is_fallback() -> std::option::Option<
+fn _default_get_suggested_follows_by_actor_output_is_fallback() -> core::option::Option<
     bool,
 > {
     Some(false)

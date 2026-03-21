@@ -19,43 +19,43 @@
 #[serde(rename_all = "camelCase")]
 pub struct Section<'a> {
     ///Collection NSID to display (for type=collection)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collection: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub collection: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Content for block sections
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub content: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Content format
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub format: std::option::Option<SectionFormat<'a>>,
+    pub format: core::option::Option<SectionFormat<'a>>,
     ///If true, hides the section header in display mode
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_header: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hide_header: core::option::Option<bool>,
     ///Layout to use for rendering
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub layout: std::option::Option<SectionLayout<'a>>,
+    pub layout: core::option::Option<SectionLayout<'a>>,
     ///Maximum records to display
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///Specific record URIs to display (for type=records)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub records: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub records: core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     ///AT-URI of the referenced record (for content/profile sections)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub r#ref: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///Record key within the collection to display (e.g. 'self' for profile)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rkey: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rkey: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Section title
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Section type
     #[serde(borrow)]
     pub r#type: SectionType<'a>,
@@ -400,9 +400,9 @@ impl jacquard_common::IntoStatic for SectionType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SectionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -449,19 +449,19 @@ impl jacquard_common::types::collection::Collection for SectionRecord {
     type Record = SectionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Section<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Section<'a> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.site.section"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_coop_hypha_spores_site_section()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.content {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500000usize {
@@ -830,7 +830,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -852,7 +852,7 @@ where
     }
 }
 
-fn lexicon_doc_coop_hypha_spores_site_section() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_coop_hypha_spores_site_section() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -20,9 +20,9 @@ pub struct List<'a> {
     #[serde(borrow)]
     pub items: Vec<ListItemsItem<'a>>,
     ///Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_list_ordered")]
-    pub ordered: std::option::Option<bool>,
+    pub ordered: core::option::Option<bool>,
 }
 
 #[jacquard_derive::open_union]
@@ -44,24 +44,24 @@ pub enum ListItemsItem<'a> {
     List(Box<crate::fyi_questionable::richtext::list::List<'a>>),
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for List<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for List<'a> {
     fn nsid() -> &'static str {
         "fyi.questionable.richtext.list"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fyi_questionable_richtext_list()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_list_ordered() -> std::option::Option<bool> {
+fn _default_list_ordered() -> core::option::Option<bool> {
     Some(false)
 }
 
@@ -173,7 +173,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -186,7 +186,7 @@ where
     }
 }
 
-fn lexicon_doc_fyi_questionable_richtext_list() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_fyi_questionable_richtext_list() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

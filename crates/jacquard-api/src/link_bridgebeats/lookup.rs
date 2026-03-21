@@ -37,9 +37,9 @@ pub struct Lookup<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LookupGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -60,19 +60,19 @@ pub struct LookupGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ProviderResult<'a> {
     ///URL to the cover artwork image.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub art_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub art_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Primary artist name for the track or album artist.
     #[serde(borrow)]
     pub artist: jacquard_common::CowStr<'a>,
     ///ISRC (for tracks) or UPC (for albums) identifier for cross-platform matching.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub external_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///True for albums/EPs, false for individual tracks.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_album: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_album: core::option::Option<bool>,
     ///ISO3166-1 alpha-2 country code for the market/storefront. Defaults to `"us"`.
     #[serde(default = "_default_provider_result_market_region")]
     #[serde(borrow)]
@@ -128,19 +128,19 @@ impl jacquard_common::types::collection::Collection for LookupRecord {
     type Record = LookupRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lookup<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Lookup<'a> {
     fn nsid() -> &'static str {
         "link.bridgebeats.lookup"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_link_bridgebeats_lookup()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.results;
             #[allow(unused_comparisons)]
@@ -171,19 +171,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lookup<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ProviderResult<'a> {
     fn nsid() -> &'static str {
         "link.bridgebeats.lookup"
     }
     fn def_name() -> &'static str {
         "providerResult"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_link_bridgebeats_lookup()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.art_url {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -391,7 +391,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -404,7 +404,7 @@ where
     }
 }
 
-fn lexicon_doc_link_bridgebeats_lookup() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_link_bridgebeats_lookup() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -688,85 +688,85 @@ pub mod provider_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
-        type Url;
         type Provider;
-        type MarketRegion;
+        type Artist;
         type Title;
+        type Url;
+        type MarketRegion;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
-        type Url = Unset;
         type Provider = Unset;
-        type MarketRegion = Unset;
+        type Artist = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Artist = Set<members::artist>;
-        type Url = S::Url;
-        type Provider = S::Provider;
-        type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Artist = S::Artist;
-        type Url = Set<members::url>;
-        type Provider = S::Provider;
-        type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
+        type Url = Unset;
+        type MarketRegion = Unset;
     }
     ///State transition - sets the `provider` field to Set
     pub struct SetProvider<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProvider<S> {}
     impl<S: State> State for SetProvider<S> {
-        type Artist = S::Artist;
-        type Url = S::Url;
         type Provider = Set<members::provider>;
-        type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `market_region` field to Set
-    pub struct SetMarketRegion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMarketRegion<S> {}
-    impl<S: State> State for SetMarketRegion<S> {
         type Artist = S::Artist;
-        type Url = S::Url;
-        type Provider = S::Provider;
-        type MarketRegion = Set<members::market_region>;
         type Title = S::Title;
+        type Url = S::Url;
+        type MarketRegion = S::MarketRegion;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Provider = S::Provider;
+        type Artist = Set<members::artist>;
+        type Title = S::Title;
+        type Url = S::Url;
+        type MarketRegion = S::MarketRegion;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Artist = S::Artist;
-        type Url = S::Url;
         type Provider = S::Provider;
-        type MarketRegion = S::MarketRegion;
+        type Artist = S::Artist;
         type Title = Set<members::title>;
+        type Url = S::Url;
+        type MarketRegion = S::MarketRegion;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Provider = S::Provider;
+        type Artist = S::Artist;
+        type Title = S::Title;
+        type Url = Set<members::url>;
+        type MarketRegion = S::MarketRegion;
+    }
+    ///State transition - sets the `market_region` field to Set
+    pub struct SetMarketRegion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMarketRegion<S> {}
+    impl<S: State> State for SetMarketRegion<S> {
+        type Provider = S::Provider;
+        type Artist = S::Artist;
+        type Title = S::Title;
+        type Url = S::Url;
+        type MarketRegion = Set<members::market_region>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `provider` field
         pub struct provider(());
-        ///Marker type for the `market_region` field
-        pub struct market_region(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `market_region` field
+        pub struct market_region(());
     }
 }
 
@@ -953,11 +953,11 @@ where
 impl<'a, S> ProviderResultBuilder<'a, S>
 where
     S: provider_result_state::State,
-    S::Artist: provider_result_state::IsSet,
-    S::Url: provider_result_state::IsSet,
     S::Provider: provider_result_state::IsSet,
-    S::MarketRegion: provider_result_state::IsSet,
+    S::Artist: provider_result_state::IsSet,
     S::Title: provider_result_state::IsSet,
+    S::Url: provider_result_state::IsSet,
+    S::MarketRegion: provider_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProviderResult<'a> {
@@ -976,7 +976,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

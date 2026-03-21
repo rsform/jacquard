@@ -17,11 +17,11 @@
 #[serde(rename_all = "camelCase")]
 pub struct GetAlbumShouts<'a> {
     ///(min: 1)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///(min: 0)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offset: core::option::Option<i64>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -39,9 +39,9 @@ pub struct GetAlbumShouts<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetAlbumShoutsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub shouts: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub shouts: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
 }
 
 /// Response type for

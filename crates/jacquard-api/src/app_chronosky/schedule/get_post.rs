@@ -52,7 +52,7 @@ pub struct GetPostOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetPostError<'a> {
     #[serde(rename = "PostNotFound")]
-    PostNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    PostNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetPostError<'_> {

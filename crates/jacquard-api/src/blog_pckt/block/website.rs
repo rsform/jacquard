@@ -18,35 +18,37 @@
 #[serde(rename_all = "camelCase")]
 pub struct Website<'a> {
     ///A brief description of the website or page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URL of the preview image
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub preview_image: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub preview_image: core::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
     ///The URL of the website
     #[serde(borrow)]
     pub src: jacquard_common::types::string::UriValue<'a>,
     ///The title of the website or page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Website<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Website<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.block.website"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_block_website()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -204,7 +206,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -219,7 +221,7 @@ where
     }
 }
 
-fn lexicon_doc_blog_pckt_block_website() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blog_pckt_block_website() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

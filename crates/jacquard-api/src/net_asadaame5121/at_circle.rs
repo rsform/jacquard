@@ -24,27 +24,27 @@ pub mod ring;
 #[serde(rename_all = "camelCase")]
 pub struct RingRef<'a> {
     ///Optional CID for strong reference
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///AT-URI of the Ring
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RingRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RingRef<'a> {
     fn nsid() -> &'static str {
         "net.asadaame5121.at-circle.defs"
     }
     fn def_name() -> &'static str {
         "ringRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_asadaame5121_at_circle_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cid {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -188,7 +188,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -201,7 +201,7 @@ where
     }
 }
 
-fn lexicon_doc_net_asadaame5121_at_circle_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_net_asadaame5121_at_circle_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

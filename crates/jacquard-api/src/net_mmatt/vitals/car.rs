@@ -23,21 +23,21 @@ pub struct Car<'a> {
     ///The car fuel range value in miles
     pub car_fuel_range: i64,
     ///The car make value
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub car_make: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub car_make: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The car model value
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub car_model: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub car_model: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The car fuel level value in percentage (floating point string)
     #[serde(borrow)]
     pub car_percent_fuel_remaining: jacquard_common::CowStr<'a>,
     ///The car traveled distance value
     pub car_traveled_distance: i64,
     ///The car year value
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub car_year: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub car_year: core::option::Option<i64>,
     ///The unix timestamp of when the vital was recorded
     pub created_at: jacquard_common::types::string::Datetime,
 }
@@ -54,9 +54,9 @@ pub struct Car<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CarGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -103,19 +103,19 @@ impl jacquard_common::types::collection::Collection for CarRecord {
     type Record = CarRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Car<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Car<'a> {
     fn nsid() -> &'static str {
         "net.mmatt.vitals.car"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_mmatt_vitals_car()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -130,85 +130,85 @@ pub mod car_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CarFuelRange;
-        type AmountRemaining;
-        type CarTraveledDistance;
-        type CreatedAt;
         type CarPercentFuelRemaining;
+        type AmountRemaining;
+        type CarFuelRange;
+        type CreatedAt;
+        type CarTraveledDistance;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CarFuelRange = Unset;
-        type AmountRemaining = Unset;
-        type CarTraveledDistance = Unset;
-        type CreatedAt = Unset;
         type CarPercentFuelRemaining = Unset;
-    }
-    ///State transition - sets the `car_fuel_range` field to Set
-    pub struct SetCarFuelRange<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarFuelRange<S> {}
-    impl<S: State> State for SetCarFuelRange<S> {
-        type CarFuelRange = Set<members::car_fuel_range>;
-        type AmountRemaining = S::AmountRemaining;
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = S::CreatedAt;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-    }
-    ///State transition - sets the `amount_remaining` field to Set
-    pub struct SetAmountRemaining<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmountRemaining<S> {}
-    impl<S: State> State for SetAmountRemaining<S> {
-        type CarFuelRange = S::CarFuelRange;
-        type AmountRemaining = Set<members::amount_remaining>;
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = S::CreatedAt;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-    }
-    ///State transition - sets the `car_traveled_distance` field to Set
-    pub struct SetCarTraveledDistance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarTraveledDistance<S> {}
-    impl<S: State> State for SetCarTraveledDistance<S> {
-        type CarFuelRange = S::CarFuelRange;
-        type AmountRemaining = S::AmountRemaining;
-        type CarTraveledDistance = Set<members::car_traveled_distance>;
-        type CreatedAt = S::CreatedAt;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CarFuelRange = S::CarFuelRange;
-        type AmountRemaining = S::AmountRemaining;
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = Set<members::created_at>;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = Unset;
+        type CarFuelRange = Unset;
+        type CreatedAt = Unset;
+        type CarTraveledDistance = Unset;
     }
     ///State transition - sets the `car_percent_fuel_remaining` field to Set
     pub struct SetCarPercentFuelRemaining<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCarPercentFuelRemaining<S> {}
     impl<S: State> State for SetCarPercentFuelRemaining<S> {
-        type CarFuelRange = S::CarFuelRange;
-        type AmountRemaining = S::AmountRemaining;
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = S::CreatedAt;
         type CarPercentFuelRemaining = Set<members::car_percent_fuel_remaining>;
+        type AmountRemaining = S::AmountRemaining;
+        type CarFuelRange = S::CarFuelRange;
+        type CreatedAt = S::CreatedAt;
+        type CarTraveledDistance = S::CarTraveledDistance;
+    }
+    ///State transition - sets the `amount_remaining` field to Set
+    pub struct SetAmountRemaining<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmountRemaining<S> {}
+    impl<S: State> State for SetAmountRemaining<S> {
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = Set<members::amount_remaining>;
+        type CarFuelRange = S::CarFuelRange;
+        type CreatedAt = S::CreatedAt;
+        type CarTraveledDistance = S::CarTraveledDistance;
+    }
+    ///State transition - sets the `car_fuel_range` field to Set
+    pub struct SetCarFuelRange<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarFuelRange<S> {}
+    impl<S: State> State for SetCarFuelRange<S> {
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
+        type CarFuelRange = Set<members::car_fuel_range>;
+        type CreatedAt = S::CreatedAt;
+        type CarTraveledDistance = S::CarTraveledDistance;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
+        type CarFuelRange = S::CarFuelRange;
+        type CreatedAt = Set<members::created_at>;
+        type CarTraveledDistance = S::CarTraveledDistance;
+    }
+    ///State transition - sets the `car_traveled_distance` field to Set
+    pub struct SetCarTraveledDistance<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarTraveledDistance<S> {}
+    impl<S: State> State for SetCarTraveledDistance<S> {
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type AmountRemaining = S::AmountRemaining;
+        type CarFuelRange = S::CarFuelRange;
+        type CreatedAt = S::CreatedAt;
+        type CarTraveledDistance = Set<members::car_traveled_distance>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `car_fuel_range` field
-        pub struct car_fuel_range(());
-        ///Marker type for the `amount_remaining` field
-        pub struct amount_remaining(());
-        ///Marker type for the `car_traveled_distance` field
-        pub struct car_traveled_distance(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `car_percent_fuel_remaining` field
         pub struct car_percent_fuel_remaining(());
+        ///Marker type for the `amount_remaining` field
+        pub struct amount_remaining(());
+        ///Marker type for the `car_fuel_range` field
+        pub struct car_fuel_range(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `car_traveled_distance` field
+        pub struct car_traveled_distance(());
     }
 }
 
@@ -392,11 +392,11 @@ where
 impl<'a, S> CarBuilder<'a, S>
 where
     S: car_state::State,
-    S::CarFuelRange: car_state::IsSet,
-    S::AmountRemaining: car_state::IsSet,
-    S::CarTraveledDistance: car_state::IsSet,
-    S::CreatedAt: car_state::IsSet,
     S::CarPercentFuelRemaining: car_state::IsSet,
+    S::AmountRemaining: car_state::IsSet,
+    S::CarFuelRange: car_state::IsSet,
+    S::CreatedAt: car_state::IsSet,
+    S::CarTraveledDistance: car_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Car<'a> {
@@ -415,7 +415,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -434,9 +434,7 @@ where
     }
 }
 
-fn lexicon_doc_net_mmatt_vitals_car() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_net_mmatt_vitals_car() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.mmatt.vitals.car"),

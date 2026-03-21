@@ -19,14 +19,14 @@
 #[serde(rename_all = "camelCase")]
 pub struct TestingPolisPollV1<'a> {
     ///Optional timestamp when the poll was closed to new submissions
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub closed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub closed_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Timestamp when the poll was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional longer description of the poll
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The topic or question being discussed
     #[serde(borrow)]
     pub topic: jacquard_common::CowStr<'a>,
@@ -44,9 +44,9 @@ pub struct TestingPolisPollV1<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TestingPolisPollV1GetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -93,19 +93,19 @@ impl jacquard_common::types::collection::Collection for TestingPolisPollV1Record
     type Record = TestingPolisPollV1Record;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TestingPolisPollV1<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TestingPolisPollV1<'a> {
     fn nsid() -> &'static str {
         "scot.comhairle.testingPolisPollV1"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_scot_comhairle_testingPolisPollV1()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -145,37 +145,37 @@ pub mod testing_polis_poll_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Topic;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Topic = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Topic = S::Topic;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `topic` field to Set
     pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTopic<S> {}
     impl<S: State> State for SetTopic<S> {
-        type CreatedAt = S::CreatedAt;
         type Topic = Set<members::topic>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Topic = S::Topic;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `topic` field
         pub struct topic(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -288,8 +288,8 @@ where
 impl<'a, S> TestingPolisPollV1Builder<'a, S>
 where
     S: testing_polis_poll_v1_state::State,
-    S::CreatedAt: testing_polis_poll_v1_state::IsSet,
     S::Topic: testing_polis_poll_v1_state::IsSet,
+    S::CreatedAt: testing_polis_poll_v1_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TestingPolisPollV1<'a> {
@@ -304,7 +304,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -319,7 +319,7 @@ where
     }
 }
 
-fn lexicon_doc_scot_comhairle_testingPolisPollV1() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_scot_comhairle_testingPolisPollV1() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

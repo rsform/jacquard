@@ -18,22 +18,22 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublishingOwner<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collecting_society: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub collecting_society: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub company_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub company_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub first_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub first_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Interested Party Information (IPI) number assigned to the publishing owner by a collecting society
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ipi: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub ipi: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub last_name: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -48,9 +48,9 @@ pub struct PublishingOwner<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublishingOwnerGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -97,19 +97,19 @@ impl jacquard_common::types::collection::Collection for PublishingOwnerRecord {
     type Record = PublishingOwnerRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublishingOwner<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PublishingOwner<'a> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.actor.publishingOwner"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ch_indiemusi_alpha_actor_publishingOwner()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.collecting_society {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
@@ -331,7 +331,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -347,7 +347,7 @@ where
     }
 }
 
-fn lexicon_doc_ch_indiemusi_alpha_actor_publishingOwner() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_ch_indiemusi_alpha_actor_publishingOwner() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

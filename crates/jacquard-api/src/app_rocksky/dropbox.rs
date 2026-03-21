@@ -24,9 +24,9 @@ pub mod get_temporary_link;
 #[serde(rename_all = "camelCase")]
 pub struct FileListView<'a> {
     ///A list of files in the Dropbox.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub files: std::option::Option<Vec<crate::app_rocksky::dropbox::FileView<'a>>>,
+    pub files: core::option::Option<Vec<crate::app_rocksky::dropbox::FileView<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -43,27 +43,27 @@ pub struct FileListView<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct FileView<'a> {
     ///The last modified date and time of the file on the client.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub client_modified: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub client_modified: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The unique identifier of the file.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the file.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The display path of the file.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub path_display: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub path_display: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The lowercased path of the file.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub path_lower: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub path_lower: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The last modified date and time of the file on the server.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub server_modified: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub server_modified: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::lexicon]
@@ -80,63 +80,63 @@ pub struct FileView<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct TemporaryLinkView<'a> {
     ///The temporary link to access the file.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FileListView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FileListView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
     }
     fn def_name() -> &'static str {
         "fileListView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_dropbox_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FileView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FileView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
     }
     fn def_name() -> &'static str {
         "fileView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_dropbox_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TemporaryLinkView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TemporaryLinkView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
     }
     fn def_name() -> &'static str {
         "temporaryLinkView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_dropbox_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_app_rocksky_dropbox_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_rocksky_dropbox_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

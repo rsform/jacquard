@@ -16,10 +16,10 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetApikeys {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offset: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -35,9 +35,9 @@ pub struct GetApikeys {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetApikeysOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub api_keys: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub api_keys: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
 }
 
 /// Response type for

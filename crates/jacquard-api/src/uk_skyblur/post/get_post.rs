@@ -18,9 +18,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct GetPost<'a> {
     ///If the specified uri is password-protected, please provide the password. If no password is specified, the non-protected content will be returned.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub password: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub password: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Skyblur post at-uri. It shoud be uk.skyblur.post collection.
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
@@ -39,30 +39,30 @@ pub struct GetPost<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub additional: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub additional: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub encrypt_cid: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub encrypt_cid: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Error code for restricted content. e.g. AuthRequired, NotFollower, NotFollowing, NotMutual
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub error_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Description of the error code.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub error_description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub error_description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub visibility: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for
@@ -206,7 +206,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

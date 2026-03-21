@@ -18,33 +18,33 @@
 #[serde(rename_all = "camelCase")]
 pub struct Heading<'a> {
     ///Facets for text formatting
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub facets: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
     ///Heading level (1-3)
     pub level: i64,
     ///The heading text content
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
     ///Text alignment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text_align: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text_align: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.heading"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_heading()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.level;
             if *value > 3i64 {
@@ -242,7 +242,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -257,7 +257,7 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_heading() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_offprint_block_heading() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

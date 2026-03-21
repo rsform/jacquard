@@ -32,16 +32,16 @@ pub struct PutRecord<'a> {
         jacquard_common::types::string::Rkey<'a>,
     >,
     ///Compare and swap with the previous commit by CID.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_commit: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///Compare and swap with the previous record by CID. WARNING: nullable and optional field; may cause problems with golang implementation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_record: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_record: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub validate: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub validate: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -58,14 +58,14 @@ pub struct PutRecord<'a> {
 pub struct PutRecordOutput<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub commit: std::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
+    pub commit: core::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub validation_status: std::option::Option<PutRecordOutputValidationStatus<'a>>,
+    pub validation_status: core::option::Option<PutRecordOutputValidationStatus<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -178,7 +178,7 @@ impl jacquard_common::IntoStatic for PutRecordOutputValidationStatus<'_> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum PutRecordError<'a> {
     #[serde(rename = "InvalidSwap")]
-    InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidSwap(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for PutRecordError<'_> {
@@ -236,65 +236,65 @@ pub mod put_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type Repo;
         type Record;
+        type Collection;
         type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type Repo = Unset;
         type Record = Unset;
+        type Collection = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type Repo = S::Repo;
-        type Record = S::Record;
-        type Rkey = S::Rkey;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Collection = S::Collection;
         type Repo = Set<members::repo>;
         type Record = S::Record;
+        type Collection = S::Collection;
         type Rkey = S::Rkey;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Collection = S::Collection;
         type Repo = S::Repo;
         type Record = Set<members::record>;
+        type Collection = S::Collection;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Repo = S::Repo;
+        type Record = S::Record;
+        type Collection = Set<members::collection>;
         type Rkey = S::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Collection = S::Collection;
         type Repo = S::Repo;
         type Record = S::Record;
+        type Collection = S::Collection;
         type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
     }
@@ -471,9 +471,9 @@ impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
 impl<'a, S> PutRecordBuilder<'a, S>
 where
     S: put_record_state::State,
-    S::Collection: put_record_state::IsSet,
     S::Repo: put_record_state::IsSet,
     S::Record: put_record_state::IsSet,
+    S::Collection: put_record_state::IsSet,
     S::Rkey: put_record_state::IsSet,
 {
     /// Build the final struct
@@ -492,7 +492,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

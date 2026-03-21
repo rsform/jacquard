@@ -20,17 +20,17 @@
 #[serde(rename_all = "camelCase")]
 pub struct Interactions<'a> {
     ///Repository collection NSIDs this tile reads from or writes to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    pub collections: core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
     ///XRPC method NSIDs this tile may call. When present, the tile runtime restricts XRPC calls to only these methods. When absent, all server-allowed methods may be called (with user consent).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub methods: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub methods: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///AT Protocol service proxy targets this tile interacts with, identified by DID and service endpoint fragment.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub services: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub services: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// A tile with a name and associated resource or bundle.
@@ -47,41 +47,41 @@ pub struct Interactions<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Tile<'a> {
     ///Declared aspect ratio for tile rendering.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<TileAspectRatio<'a>>,
+    pub aspect_ratio: core::option::Option<TileAspectRatio<'a>>,
     ///The tile content, either a single resource or a bundle.
     #[serde(borrow)]
     pub content: TileContent<'a>,
     ///Optional rich text description of the tile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Rich text facets for the description (links, mentions, hashtags).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     ///Optional icon image for the tile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub icon: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Declaration of the XRPC methods, collections, and services this tile interacts with.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub interactions: std::option::Option<
+    pub interactions: core::option::Option<
         crate::garden_lexicon::exultant_zebra::tile::Interactions<'a>,
     >,
     ///Optional loading screen image for the tile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub loading_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub loading_image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///The name of the tile.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Input parameters this tile accepts. When present, the tile runtime shows a configuration form for required parameters without defaults before loading the tile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub params: std::option::Option<
+    pub params: core::option::Option<
         Vec<crate::garden_lexicon::exultant_zebra::tile::Param<'a>>,
     >,
 }
@@ -221,9 +221,9 @@ pub enum TileContent<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -245,19 +245,19 @@ pub struct TileGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Param<'a> {
     ///Default value for this parameter, encoded as a string.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub default: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub default: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Human-readable description of this parameter.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Parameter name, used as a URL search param key. Must not start with an underscore.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Whether this parameter must be provided before loading the tile.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub required: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub required: core::option::Option<bool>,
     ///Parameter value type.
     #[serde(borrow)]
     pub r#type: ParamType<'a>,
@@ -370,19 +370,19 @@ impl<'a> Tile<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interactions<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Interactions<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.tile"
     }
     fn def_name() -> &'static str {
         "interactions"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_exultant_zebra_tile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -414,19 +414,19 @@ impl jacquard_common::types::collection::Collection for TileRecord {
     type Record = TileRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tile<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Tile<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.tile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_exultant_zebra_tile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -531,19 +531,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tile<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Param<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Param<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.tile"
     }
     fn def_name() -> &'static str {
         "param"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_exultant_zebra_tile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -573,7 +573,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Param<'a> {
     }
 }
 
-fn lexicon_doc_garden_lexicon_exultant_zebra_tile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_garden_lexicon_exultant_zebra_tile() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1265,7 +1265,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

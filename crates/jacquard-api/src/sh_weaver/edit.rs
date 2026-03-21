@@ -85,21 +85,21 @@ pub struct EditBranchView<'a> {
     #[serde(borrow)]
     pub author: crate::sh_weaver::actor::ProfileViewBasic<'a>,
     ///Common ancestor if this is a fork
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub diverges_from: std::option::Option<
+    pub diverges_from: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     #[serde(borrow)]
     pub head: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_merged: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_merged: core::option::Option<bool>,
     pub last_updated: jacquard_common::types::string::Datetime,
     ///Number of diffs in this branch
     pub length: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub root: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub root: core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
 /// Summary of an edit (root or diff) for history queries.
@@ -120,21 +120,21 @@ pub struct EditHistoryEntry<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_inline_diff: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_inline_diff: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub prev_ref: std::option::Option<
+    pub prev_ref: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub root_ref: std::option::Option<
+    pub root_ref: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub snapshot_cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub snapshot_cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub r#type: EditHistoryEntryType<'a>,
     #[serde(borrow)]
@@ -247,16 +247,16 @@ pub struct EditTreeView<'a> {
     #[serde(borrow)]
     pub branches: Vec<crate::sh_weaver::edit::EditBranchView<'a>>,
     ///Diffs where branches diverge
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub conflict_points: std::option::Option<
+    pub conflict_points: core::option::Option<
         Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_conflicts: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_conflicts: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub main_branch: std::option::Option<crate::sh_weaver::edit::EditBranchView<'a>>,
+    pub main_branch: core::option::Option<crate::sh_weaver::edit::EditBranchView<'a>>,
     #[serde(borrow)]
     pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
@@ -293,36 +293,36 @@ pub struct NotebookRef<'a> {
     pub notebook: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DocRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DocRef<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
     fn def_name() -> &'static str {
         "docRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DraftRef<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
     fn def_name() -> &'static str {
         "draftRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.draft_key;
             #[allow(unused_comparisons)]
@@ -340,87 +340,87 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DraftRef<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditBranchView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EditBranchView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
     fn def_name() -> &'static str {
         "editBranchView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditHistoryEntry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EditHistoryEntry<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
     fn def_name() -> &'static str {
         "editHistoryEntry"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EditTreeView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EditTreeView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
     fn def_name() -> &'static str {
         "editTreeView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EntryRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EntryRef<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
     fn def_name() -> &'static str {
         "entryRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for NotebookRef<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
     fn def_name() -> &'static str {
         "notebookRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -516,7 +516,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -528,9 +528,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_edit_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_edit_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.edit.defs"),
@@ -1038,8 +1036,8 @@ pub mod edit_branch_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Length;
-        type Head;
         type LastUpdated;
+        type Head;
         type Author;
     }
     /// Empty state - all required fields are unset
@@ -1047,8 +1045,8 @@ pub mod edit_branch_view_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Length = Unset;
-        type Head = Unset;
         type LastUpdated = Unset;
+        type Head = Unset;
         type Author = Unset;
     }
     ///State transition - sets the `length` field to Set
@@ -1056,17 +1054,8 @@ pub mod edit_branch_view_state {
     impl<S: State> sealed::Sealed for SetLength<S> {}
     impl<S: State> State for SetLength<S> {
         type Length = Set<members::length>;
+        type LastUpdated = S::LastUpdated;
         type Head = S::Head;
-        type LastUpdated = S::LastUpdated;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `head` field to Set
-    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHead<S> {}
-    impl<S: State> State for SetHead<S> {
-        type Length = S::Length;
-        type Head = Set<members::head>;
-        type LastUpdated = S::LastUpdated;
         type Author = S::Author;
     }
     ///State transition - sets the `last_updated` field to Set
@@ -1074,8 +1063,17 @@ pub mod edit_branch_view_state {
     impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
     impl<S: State> State for SetLastUpdated<S> {
         type Length = S::Length;
-        type Head = S::Head;
         type LastUpdated = Set<members::last_updated>;
+        type Head = S::Head;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `head` field to Set
+    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHead<S> {}
+    impl<S: State> State for SetHead<S> {
+        type Length = S::Length;
+        type LastUpdated = S::LastUpdated;
+        type Head = Set<members::head>;
         type Author = S::Author;
     }
     ///State transition - sets the `author` field to Set
@@ -1083,8 +1081,8 @@ pub mod edit_branch_view_state {
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
         type Length = S::Length;
-        type Head = S::Head;
         type LastUpdated = S::LastUpdated;
+        type Head = S::Head;
         type Author = Set<members::author>;
     }
     /// Marker types for field names
@@ -1092,10 +1090,10 @@ pub mod edit_branch_view_state {
     pub mod members {
         ///Marker type for the `length` field
         pub struct length(());
-        ///Marker type for the `head` field
-        pub struct head(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
+        ///Marker type for the `head` field
+        pub struct head(());
         ///Marker type for the `author` field
         pub struct author(());
     }
@@ -1265,8 +1263,8 @@ impl<'a, S> EditBranchViewBuilder<'a, S>
 where
     S: edit_branch_view_state::State,
     S::Length: edit_branch_view_state::IsSet,
-    S::Head: edit_branch_view_state::IsSet,
     S::LastUpdated: edit_branch_view_state::IsSet,
+    S::Head: edit_branch_view_state::IsSet,
     S::Author: edit_branch_view_state::IsSet,
 {
     /// Build the final struct
@@ -1285,7 +1283,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1313,85 +1311,85 @@ pub mod edit_history_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type CreatedAt;
-        type Type;
-        type Uri;
         type Author;
+        type Type;
+        type Cid;
+        type Uri;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type CreatedAt = Unset;
-        type Type = Unset;
-        type Uri = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type Uri = S::Uri;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Cid = S::Cid;
-        type CreatedAt = Set<members::created_at>;
-        type Type = S::Type;
-        type Uri = S::Uri;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Type = Set<members::r#type>;
-        type Uri = S::Uri;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
+        type Type = Unset;
+        type Cid = Unset;
+        type Uri = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type Uri = S::Uri;
         type Author = Set<members::author>;
+        type Type = S::Type;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Author = S::Author;
+        type Type = Set<members::r#type>;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Author = S::Author;
+        type Type = S::Type;
+        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Author = S::Author;
+        type Type = S::Type;
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Author = S::Author;
+        type Type = S::Type;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1608,11 +1606,11 @@ where
 impl<'a, S> EditHistoryEntryBuilder<'a, S>
 where
     S: edit_history_entry_state::State,
-    S::Cid: edit_history_entry_state::IsSet,
-    S::CreatedAt: edit_history_entry_state::IsSet,
-    S::Type: edit_history_entry_state::IsSet,
-    S::Uri: edit_history_entry_state::IsSet,
     S::Author: edit_history_entry_state::IsSet,
+    S::Type: edit_history_entry_state::IsSet,
+    S::Cid: edit_history_entry_state::IsSet,
+    S::Uri: edit_history_entry_state::IsSet,
+    S::CreatedAt: edit_history_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditHistoryEntry<'a> {
@@ -1632,7 +1630,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1662,37 +1660,37 @@ pub mod edit_tree_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branches;
         type Resource;
+        type Branches;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branches = Unset;
         type Resource = Unset;
-    }
-    ///State transition - sets the `branches` field to Set
-    pub struct SetBranches<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranches<S> {}
-    impl<S: State> State for SetBranches<S> {
-        type Branches = Set<members::branches>;
-        type Resource = S::Resource;
+        type Branches = Unset;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
-        type Branches = S::Branches;
         type Resource = Set<members::resource>;
+        type Branches = S::Branches;
+    }
+    ///State transition - sets the `branches` field to Set
+    pub struct SetBranches<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranches<S> {}
+    impl<S: State> State for SetBranches<S> {
+        type Resource = S::Resource;
+        type Branches = Set<members::branches>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branches` field
-        pub struct branches(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `branches` field
+        pub struct branches(());
     }
 }
 
@@ -1821,8 +1819,8 @@ where
 impl<'a, S> EditTreeViewBuilder<'a, S>
 where
     S: edit_tree_view_state::State,
-    S::Branches: edit_tree_view_state::IsSet,
     S::Resource: edit_tree_view_state::IsSet,
+    S::Branches: edit_tree_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditTreeView<'a> {
@@ -1838,7 +1836,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1947,7 +1945,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2052,7 +2050,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

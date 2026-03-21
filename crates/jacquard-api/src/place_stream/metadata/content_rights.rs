@@ -13,12 +13,12 @@
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct AllRightsReserved;
-impl std::fmt::Display for AllRightsReserved {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for AllRightsReserved {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "all-rights-reserved")
     }
 }
@@ -31,12 +31,12 @@ impl std::fmt::Display for AllRightsReserved {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct CcByNcNd40;
-impl std::fmt::Display for CcByNcNd40 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for CcByNcNd40 {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "cc-by-nc-nd_4__0")
     }
 }
@@ -49,12 +49,12 @@ impl std::fmt::Display for CcByNcNd40 {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct CcByNcSa40;
-impl std::fmt::Display for CcByNcSa40 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for CcByNcSa40 {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "cc-by-nc-sa_4__0")
     }
 }
@@ -67,12 +67,12 @@ impl std::fmt::Display for CcByNcSa40 {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct CcByNc40;
-impl std::fmt::Display for CcByNc40 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for CcByNc40 {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "cc-by-nc_4__0")
     }
 }
@@ -85,12 +85,12 @@ impl std::fmt::Display for CcByNc40 {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct CcByNd40;
-impl std::fmt::Display for CcByNd40 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for CcByNd40 {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "cc-by-nd_4__0")
     }
 }
@@ -103,12 +103,12 @@ impl std::fmt::Display for CcByNd40 {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct CcBySa40;
-impl std::fmt::Display for CcBySa40 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for CcBySa40 {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "cc-by-sa_4__0")
     }
 }
@@ -121,12 +121,12 @@ impl std::fmt::Display for CcBySa40 {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct CcBy40;
-impl std::fmt::Display for CcBy40 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for CcBy40 {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "cc-by_4__0")
     }
 }
@@ -139,12 +139,12 @@ impl std::fmt::Display for CcBy40 {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Cc010;
-impl std::fmt::Display for Cc010 {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Cc010 {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "cc0_1__0")
     }
 }
@@ -164,24 +164,24 @@ impl std::fmt::Display for Cc010 {
 #[serde(rename_all = "camelCase")]
 pub struct ContentRights<'a> {
     ///Copyright notice for the work.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub copyright_notice: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub copyright_notice: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Year of creation or publication.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub copyright_year: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copyright_year: core::option::Option<i64>,
     ///Name of the creator of the work.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub creator: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub creator: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Credit line for the work.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub credit_line: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub credit_line: core::option::Option<jacquard_common::CowStr<'a>>,
     ///License URL or identifier.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub license: std::option::Option<ContentRightsLicense<'a>>,
+    pub license: core::option::Option<ContentRightsLicense<'a>>,
 }
 
 /// License URL or identifier.
@@ -313,24 +313,24 @@ impl jacquard_common::IntoStatic for ContentRightsLicense<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentRights<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ContentRights<'a> {
     fn nsid() -> &'static str {
         "place.stream.metadata.contentRights"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_metadata_contentRights()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_place_stream_metadata_contentRights() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_metadata_contentRights() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -18,63 +18,63 @@
 #[serde(rename_all = "camelCase")]
 pub struct Play<'a> {
     ///Array of Musicbrainz artist IDs. Prefer using 'artists'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist_mb_ids: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub artist_mb_ids: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Array of artist names in order of original appearance. Prefer using 'artists'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist_names: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub artist_names: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Array of artists in order of original appearance.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artists: std::option::Option<Vec<crate::fm_teal::alpha::feed::Artist<'a>>>,
+    pub artists: core::option::Option<Vec<crate::fm_teal::alpha::feed::Artist<'a>>>,
     ///The length of the track in seconds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration: core::option::Option<i64>,
     ///The ISRC code associated with the recording
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub isrc: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub isrc: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if unavailable or not provided.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub music_service_base_domain: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub music_service_base_domain: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URL associated with this track
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub origin_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub origin_url: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The unix timestamp of when the track was played
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub played_time: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub played_time: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The Musicbrainz recording ID of the track
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub recording_mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub recording_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Distinguishing information for release variants (e.g. 'Deluxe Edition', 'Remastered', '2023 Remaster', 'Special Edition'). Used to differentiate between different versions of the same base release while maintaining grouping capabilities.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_discriminant: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_discriminant: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The Musicbrainz release ID
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the release/album
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A metadata string specifying the user agent where the format is `<app-identifier>/<version> (<kernel/OS-base>; <platform/OS-version>; <device-model>)`. If string is provided, only `app-identifier` and `version` are required. `app-identifier` is recommended to be in reverse dns format. Defaults to 'manual/unknown' if unavailable or not provided.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub submission_client_agent: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub submission_client_agent: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Distinguishing information for track variants (e.g. 'Acoustic Version', 'Live at Wembley', 'Radio Edit', 'Demo'). Used to differentiate between different versions of the same base track while maintaining grouping capabilities.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub track_discriminant: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub track_discriminant: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The Musicbrainz ID of the track
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub track_mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub track_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the track
     #[serde(borrow)]
     pub track_name: jacquard_common::CowStr<'a>,
@@ -92,9 +92,9 @@ pub struct Play<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlayGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -141,19 +141,19 @@ impl jacquard_common::types::collection::Collection for PlayRecord {
     type Record = PlayRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Play<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Play<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.feed.play"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_feed_play()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.release_discriminant {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
@@ -739,7 +739,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -766,7 +766,7 @@ where
     }
 }
 
-fn lexicon_doc_fm_teal_alpha_feed_play() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_fm_teal_alpha_feed_play() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

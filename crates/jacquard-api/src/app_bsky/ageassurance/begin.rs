@@ -28,9 +28,9 @@ pub struct Begin<'a> {
     #[serde(borrow)]
     pub language: jacquard_common::CowStr<'a>,
     ///An optional ISO 3166-2 code of the user's region or state within the country.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub region_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub region_code: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -66,13 +66,13 @@ pub struct BeginOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum BeginError<'a> {
     #[serde(rename = "InvalidEmail")]
-    InvalidEmail(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidEmail(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "DidTooLong")]
-    DidTooLong(std::option::Option<jacquard_common::CowStr<'a>>),
+    DidTooLong(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidInitiation")]
-    InvalidInitiation(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidInitiation(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "RegionNotSupported")]
-    RegionNotSupported(std::option::Option<jacquard_common::CowStr<'a>>),
+    RegionNotSupported(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for BeginError<'_> {

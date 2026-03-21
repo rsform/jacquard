@@ -20,9 +20,9 @@
 pub struct Log<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Sparks visible at the moment of adding wood, with elapsed time for decay scoring
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub visible_sparks: std::option::Option<
+    pub visible_sparks: core::option::Option<
         Vec<crate::tech_tokimeki::takibi::log::SparkRef<'a>>,
     >,
 }
@@ -39,9 +39,9 @@ pub struct Log<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -108,19 +108,19 @@ impl jacquard_common::types::collection::Collection for LogRecord {
     type Record = LogRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Log<'a> {
     fn nsid() -> &'static str {
         "tech.tokimeki.takibi.log"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tech_tokimeki_takibi_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.visible_sparks {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
@@ -137,19 +137,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparkRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SparkRef<'a> {
     fn nsid() -> &'static str {
         "tech.tokimeki.takibi.log"
     }
     fn def_name() -> &'static str {
         "sparkRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tech_tokimeki_takibi_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.elapsed;
             if *value > 10000i64 {
@@ -292,7 +292,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -305,7 +305,7 @@ where
     }
 }
 
-fn lexicon_doc_tech_tokimeki_takibi_log() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tech_tokimeki_takibi_log() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -555,7 +555,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

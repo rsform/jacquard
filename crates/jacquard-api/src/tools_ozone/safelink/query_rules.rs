@@ -19,37 +19,37 @@
 #[serde(rename_all = "camelCase")]
 pub struct QueryRules<'a> {
     ///Filter by action types
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub actions: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub actions: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Filter by rule creator
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub created_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub created_by: core::option::Option<jacquard_common::types::string::Did<'a>>,
     ///Cursor for pagination
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Maximum number of results to return Defaults to `50`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_query_rules_limit")]
-    pub limit: std::option::Option<i64>,
+    pub limit: core::option::Option<i64>,
     ///Filter by pattern type
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pattern_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub pattern_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Filter by reason type
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub reason: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Sort direction
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort_direction: std::option::Option<QueryRulesSortDirection<'a>>,
+    pub sort_direction: core::option::Option<QueryRulesSortDirection<'a>>,
     ///Filter by specific URLs or domains
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub urls: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub urls: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Sort direction
@@ -156,9 +156,9 @@ impl jacquard_common::IntoStatic for QueryRulesSortDirection<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct QueryRulesOutput<'a> {
     ///Next cursor for pagination. Only present if there are more results.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub rules: Vec<crate::tools_ozone::safelink::UrlRule<'a>>,
 }
@@ -193,6 +193,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryRulesRequest {
     type Response = QueryRulesResponse;
 }
 
-fn _default_query_rules_limit() -> std::option::Option<i64> {
+fn _default_query_rules_limit() -> core::option::Option<i64> {
     Some(50i64)
 }

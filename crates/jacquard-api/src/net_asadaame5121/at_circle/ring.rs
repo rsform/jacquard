@@ -19,14 +19,14 @@
 #[serde(rename_all = "camelCase")]
 pub struct Ring<'a> {
     ///How new members are accepted
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub acceptance_policy: std::option::Option<RingAcceptancePolicy<'a>>,
+    pub acceptance_policy: core::option::Option<RingAcceptancePolicy<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///Description of the circle
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Recruitment status
     #[serde(borrow)]
     pub status: RingStatus<'a>,
@@ -227,9 +227,9 @@ impl jacquard_common::IntoStatic for RingStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RingGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -276,19 +276,19 @@ impl jacquard_common::types::collection::Collection for RingRecord {
     type Record = RingRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ring<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Ring<'a> {
     fn nsid() -> &'static str {
         "net.asadaame5121.at-circle.ring"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_asadaame5121_at_circle_ring()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.acceptance_policy {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
@@ -391,50 +391,50 @@ pub mod ring_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Title;
         type Status;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Title = Unset;
         type Status = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
         type Title = S::Title;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Title = Set<members::title>;
-        type Status = S::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
         type Status = Set<members::status>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -568,8 +568,8 @@ impl<'a, S> RingBuilder<'a, S>
 where
     S: ring_state::State,
     S::CreatedAt: ring_state::IsSet,
-    S::Title: ring_state::IsSet,
     S::Status: ring_state::IsSet,
+    S::Title: ring_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ring<'a> {
@@ -585,7 +585,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -601,7 +601,7 @@ where
     }
 }
 
-fn lexicon_doc_net_asadaame5121_at_circle_ring() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_net_asadaame5121_at_circle_ring() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

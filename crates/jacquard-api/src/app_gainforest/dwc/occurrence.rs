@@ -19,312 +19,312 @@
 #[serde(rename_all = "camelCase")]
 pub struct Occurrence<'a> {
     ///Identifiers (URIs) of media associated with the occurrence. Pipe-delimited for multiple.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated_media: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub associated_media: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Identifiers of other occurrences associated with this one (e.g., parasite-host). Pipe-delimited.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated_occurrences: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub associated_occurrences: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Identifiers (URIs) of literature associated with the occurrence. Pipe-delimited for multiple.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated_references: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub associated_references: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Identifiers (URIs) of genetic sequence information associated with the occurrence. Pipe-delimited for multiple.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated_sequences: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub associated_sequences: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Audio evidence (bioacoustics, soundscape, species call, field recording, etc.).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub audio_evidence: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub audio_evidence: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The specific nature of the data record. Must be one of the Darwin Core class names.
     #[serde(borrow)]
     pub basis_of_record: jacquard_common::CowStr<'a>,
     ///The behavior shown by the subject at the time of occurrence (e.g., 'foraging', 'nesting', 'roosting').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub behavior: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub behavior: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The full scientific name of the class.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub class: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub class: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name, acronym, or code identifying the collection or dataset from which the record was derived.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collection_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub collection_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Horizontal distance (meters) from the given coordinates describing the smallest circle containing the whole location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub coordinate_uncertainty_in_meters: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub coordinate_uncertainty_in_meters: core::option::Option<i64>,
     ///The name of the country or major administrative unit.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub country: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub country: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The standard code for the country (ISO 3166-1 alpha-2).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub country_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub country_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The full, unabbreviated name of the next smaller administrative region than stateProvince.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub county: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub county: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp of record creation in the ATProto PDS.
     pub created_at: jacquard_common::types::string::Datetime,
     ///A description of actions taken to make the data less specific or complete (e.g., 'coordinates rounded to nearest 0.1 degree').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub data_generalizations: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub data_generalizations: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name identifying the dataset from which the record was derived.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub dataset_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub dataset_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The date on which the identification was made. ISO 8601 format.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub date_identified: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub date_identified: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The Dublin Core type class that best describes the resource (dc:type).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub dc_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub dc_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Geographic latitude in decimal degrees (WGS84). Positive values are north of the Equator. Range: -90 to 90.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub decimal_latitude: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub decimal_latitude: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Geographic longitude in decimal degrees (WGS84). Positive values are east of the Greenwich Meridian. Range: -180 to 180.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub decimal_longitude: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub decimal_longitude: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Additional structured data as a valid JSON string (per Simple DwC Section 7.1). Example: '{"iucnStatus":"vulnerable","canopyCover":"85%"}'. Should be flattened to a single line with no non-printing characters.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub dynamic_properties: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub dynamic_properties: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The date or date-time (or interval) during which the occurrence was recorded. ISO 8601 format (e.g., '2024-03-15', '2024-03-15T10:30:00Z', '2024-03/2024-06').
     #[serde(borrow)]
     pub event_date: jacquard_common::CowStr<'a>,
     ///Identifier for the sampling event. Can be used to group occurrences from the same event.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub event_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub event_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///AT-URI reference to an app.gainforest.dwc.event record (for star-schema linkage).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub event_ref: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub event_ref: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///The time of the event. ISO 8601 format (e.g., '14:30:00', '14:30:00+02:00').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub event_time: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub event_time: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The full scientific name of the family.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub family: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub family: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Notes or reference to notes taken in the field about the event.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub field_notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub field_notes: core::option::Option<jacquard_common::CowStr<'a>>,
     ///GBIF backbone taxonomy key for the identified taxon. Retained for backward compatibility with existing GainForest workflows.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub gbif_taxon_key: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub gbif_taxon_key: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The full scientific name of the genus.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genus: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub genus: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The spatial reference system for the coordinates. Recommended: 'EPSG:4326' (WGS84).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub geodetic_datum: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub geodetic_datum: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A description of the habitat in which the event occurred (e.g., 'tropical rainforest', 'mangrove swamp', 'montane cloud forest').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub habitat: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub habitat: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A complete list of taxa names terminating at the rank immediately superior to the taxon. Pipe-delimited (e.g., 'Animalia|Chordata|Mammalia|Rodentia|Ctenomyidae|Ctenomys').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub higher_classification: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub higher_classification: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A brief phrase or standard term qualifying the identification (e.g., 'cf. agrestis', 'aff. agrestis').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identification_qualifier: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub identification_qualifier: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Comments or notes about the identification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identification_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub identification_remarks: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Person(s) who assigned the taxon to the occurrence. Pipe-delimited for multiple.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identified_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub identified_by: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Persistent identifier(s) (e.g., ORCID) of the person(s) who identified. Pipe-delimited.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identified_by_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub identified_by_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Image evidence (photo, camera trap, drone still, scanned specimen, etc.).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image_evidence: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub image_evidence: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The number of individuals present at the time of the occurrence.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub individual_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub individual_count: core::option::Option<i64>,
     ///A description of what information is withheld from this record and why (e.g., 'coordinates generalized to protect endangered species').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub information_withheld: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub information_withheld: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the lowest or terminal infraspecific epithet.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub infraspecific_epithet: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub infraspecific_epithet: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name or acronym of the institution having custody of the object(s) or information in the record.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub institution_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub institution_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The full scientific name of the kingdom (e.g., 'Animalia', 'Plantae', 'Fungi').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub kingdom: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub kingdom: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A legal document giving official permission to do something with the record. Recommended: a Creative Commons URI (e.g., 'http://creativecommons.org/licenses/by/4.0/').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub license: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub license: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The age class or life stage at the time of occurrence (e.g., 'adult', 'juvenile', 'larva', 'seedling', 'sapling').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub life_stage: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub life_stage: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The specific description of the place (e.g., '500m upstream of bridge on Rio Pará').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locality: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub locality: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Identifier for the location (e.g., a reference to a named site).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub location_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Comments about the location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub location_remarks: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The greater depth of a range of depth below the local surface (in meters).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub maximum_depth_in_meters: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub maximum_depth_in_meters: core::option::Option<i64>,
     ///The upper limit of the range of elevation (in meters above sea level).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub maximum_elevation_in_meters: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub maximum_elevation_in_meters: core::option::Option<i64>,
     ///The lesser depth of a range of depth below the local surface (in meters).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub minimum_depth_in_meters: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub minimum_depth_in_meters: core::option::Option<i64>,
     ///The lower limit of the range of elevation (in meters above sea level).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub minimum_elevation_in_meters: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub minimum_elevation_in_meters: core::option::Option<i64>,
     ///The full, unabbreviated name of the next smaller administrative region than county.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub municipality: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub municipality: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The nomenclatural code under which the scientificName is constructed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub nomenclatural_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub nomenclatural_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A globally unique identifier for the occurrence record. Recommended: a persistent URI (e.g., DOI, LSID, or UUID-based URI).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub occurrence_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub occurrence_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Comments or notes about the occurrence.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub occurrence_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub occurrence_remarks: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Statement about the presence or absence of a taxon at a location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub occurrence_status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub occurrence_status: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The full scientific name of the order.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub order: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub order: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A number or enumeration value for the quantity of organisms (e.g., '27', '12.5', 'many').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub organism_quantity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub organism_quantity: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The type of quantification system used for organismQuantity (e.g., 'individuals', '% biomass', 'stems/ha').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub organism_quantity_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub organism_quantity_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The full scientific name of the phylum or division.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub phylum: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub phylum: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Previous assignments of names to the occurrence. Pipe-delimited.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub previous_identifications: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub previous_identifications: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Person(s) responsible for recording the occurrence in the field. Pipe-delimited for multiple (e.g., 'Jane Smith | John Doe').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub recorded_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub recorded_by: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Persistent identifier(s) (e.g., ORCID) of the person(s) who recorded. Pipe-delimited for multiple.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub recorded_by_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub recorded_by_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A related resource that is referenced, cited, or otherwise pointed to by the record (URL).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub references: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub references: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The reproductive condition at the time of occurrence (e.g., 'flowering', 'fruiting', 'budding', 'pregnant').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reproductive_condition: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub reproductive_condition: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Person or organization owning or managing rights over the resource.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rights_holder: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rights_holder: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The amount of effort expended during the event (e.g., '2 trap-nights', '30 minutes', '10 km transect').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sampling_effort: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sampling_effort: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The method or protocol used during the event (e.g., 'camera trap', 'point count', 'mist net', '20m x 20m plot survey', 'acoustic monitoring').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sampling_protocol: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sampling_protocol: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The full scientific name, with authorship and date if known (e.g., 'Centropyge flavicauda Fraser-Brunner 1933').
     #[serde(borrow)]
     pub scientific_name: jacquard_common::CowStr<'a>,
     ///The authorship information for the scientific name (e.g., 'Fraser-Brunner 1933').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub scientific_name_authorship: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub scientific_name_authorship: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The sex of the biological individual(s).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sex: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sex: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the species epithet of the scientificName.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub specific_epithet: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub specific_epithet: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Spectrogram image showing frequency analysis of audio recording.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub spectrogram_evidence: std::option::Option<
+    pub spectrogram_evidence: core::option::Option<
         jacquard_common::types::value::Data<'a>,
     >,
     ///The name of the next smaller administrative region than country.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub state_province: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub state_province: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The taxonomic rank of the most specific name in scientificName.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub taxon_rank: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub taxon_rank: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The status of the use of the scientificName (e.g., 'accepted', 'synonym', 'doubtful').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub taxonomic_status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub taxonomic_status: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The original textual description of the place as provided by the recorder.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub verbatim_locality: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub verbatim_locality: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A common or vernacular name for the taxon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub vernacular_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub vernacular_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Video evidence (camera trap, drone footage, underwater video, behavioral observation, etc.).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub video_evidence: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub video_evidence: core::option::Option<jacquard_common::types::value::Data<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -339,9 +339,9 @@ pub struct Occurrence<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OccurrenceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -388,19 +388,19 @@ impl jacquard_common::types::collection::Collection for OccurrenceRecord {
     type Record = OccurrenceRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Occurrence<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.occurrence"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_dwc_occurrence()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.associated_media {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -3421,7 +3421,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3511,7 +3511,7 @@ where
     }
 }
 
-fn lexicon_doc_app_gainforest_dwc_occurrence() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_gainforest_dwc_occurrence() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

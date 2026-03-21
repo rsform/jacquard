@@ -26,9 +26,9 @@ pub struct Credit<'a> {
     #[serde(borrow)]
     pub role: CreditRole<'a>,
     ///URL to credited person's profile or website
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 /// Role: composer, lyricist, arranger, etc
@@ -150,19 +150,19 @@ impl jacquard_common::IntoStatic for CreditRole<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
     fn nsid() -> &'static str {
         "io.sound.credit"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_sound_credit()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -231,7 +231,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
     }
 }
 
-fn lexicon_doc_io_sound_credit() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_sound_credit() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.sound.credit"),

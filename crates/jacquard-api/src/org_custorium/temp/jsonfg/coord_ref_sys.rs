@@ -18,9 +18,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MultiRefSys<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ref_sys: std::option::Option<
+    pub ref_sys: core::option::Option<
         Vec<crate::org_custorium::temp::jsonfg::coord_ref_sys::SingleRefSys<'a>>,
     >,
 }
@@ -37,8 +37,8 @@ pub struct MultiRefSys<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RefSysByRef<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub epoch: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub epoch: core::option::Option<i64>,
     #[serde(borrow)]
     pub href: jacquard_common::types::string::UriValue<'a>,
 }
@@ -120,19 +120,19 @@ pub enum SingleRefSysRefSys<'a> {
     ),
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MultiRefSys<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MultiRefSys<'a> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
     fn def_name() -> &'static str {
         "multiRefSys"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_custorium_temp_jsonfg_coordRefSys()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.ref_sys {
             #[allow(unused_comparisons)]
             if value.len() < 2usize {
@@ -149,75 +149,75 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MultiRefSys<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefSysByRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RefSysByRef<'a> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
     fn def_name() -> &'static str {
         "refSysByRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_custorium_temp_jsonfg_coordRefSys()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefSysCustom<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RefSysCustom<'a> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
     fn def_name() -> &'static str {
         "refSysCustom"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_custorium_temp_jsonfg_coordRefSys()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RefSysSimpleRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RefSysSimpleRef<'a> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
     fn def_name() -> &'static str {
         "refSysSimpleRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_custorium_temp_jsonfg_coordRefSys()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SingleRefSys<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SingleRefSys<'a> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
     fn def_name() -> &'static str {
         "singleRefSys"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_custorium_temp_jsonfg_coordRefSys()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_custorium_temp_jsonfg_coordRefSys() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -529,7 +529,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -633,7 +633,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

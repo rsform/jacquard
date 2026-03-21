@@ -61,7 +61,7 @@ pub struct GetRsvpOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRsvpError<'a> {
     #[serde(rename = "NotFound")]
-    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetRsvpError<'_> {

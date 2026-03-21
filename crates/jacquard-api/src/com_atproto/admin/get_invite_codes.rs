@@ -16,18 +16,18 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetInviteCodes<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `100`. Min: 1. Max: 500.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///Defaults to `"recent"`.
     #[serde(default = "_default_sort")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -44,9 +44,9 @@ pub struct GetInviteCodes<'a> {
 pub struct GetInviteCodesOutput<'a> {
     #[serde(borrow)]
     pub codes: Vec<crate::com_atproto::server::InviteCode<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for
@@ -75,11 +75,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetInviteCodesRequest {
     type Response = GetInviteCodesResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(100i64)
 }
 
-fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_sort() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("recent"))
 }
 

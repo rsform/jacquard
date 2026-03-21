@@ -28,19 +28,19 @@ pub struct Broadcast<'a> {
     #[serde(borrow)]
     pub bearer: crate::media_ionosphere::Bearer<'a>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_broadcast_cost")]
-    pub cost: std::option::Option<i64>,
+    pub cost: core::option::Option<i64>,
     ///The datetime from which this method is available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub from: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub from: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Offset in milliseconds compared to other bearers Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_broadcast_offset")]
-    pub offset: std::option::Option<i64>,
+    pub offset: core::option::Option<i64>,
     ///The datetime where this method is no longer available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub until: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub until: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::lexicon]
@@ -211,8 +211,8 @@ pub struct Geocoordinates<'a> {
 pub struct Membership<'a> {
     #[serde(borrow)]
     pub group: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub index: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub index: core::option::Option<i64>,
 }
 
 /// Represents the method of accessing a recording
@@ -231,15 +231,15 @@ pub struct Recording<'a> {
     #[serde(borrow)]
     pub bearer: crate::media_ionosphere::Bearer<'a>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_recording_cost")]
-    pub cost: std::option::Option<i64>,
+    pub cost: core::option::Option<i64>,
     ///The datetime from which this method is available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub from: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub from: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The datetime where this method is no longer available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub until: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub until: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::lexicon]
@@ -254,9 +254,9 @@ pub struct Recording<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Track<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub album: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Artists in order of importance to the track
     #[serde(borrow)]
     pub artists: Vec<jacquard_common::CowStr<'a>>,
@@ -264,36 +264,36 @@ pub struct Track<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Broadcast<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Broadcast<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
     fn def_name() -> &'static str {
         "broadcast"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
     fn def_name() -> &'static str {
         "credit"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.role;
             #[allow(unused_comparisons)]
@@ -311,19 +311,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entity<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Entity<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
     fn def_name() -> &'static str {
         "entity"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             {
@@ -360,19 +360,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Entity<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geocoordinates<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Geocoordinates<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
     fn def_name() -> &'static str {
         "geocoordinates"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.latitude;
             #[allow(unused_comparisons)]
@@ -403,53 +403,53 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geocoordinates<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Membership<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Membership<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
     fn def_name() -> &'static str {
         "membership"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recording<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Recording<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
     fn def_name() -> &'static str {
         "recording"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Track<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Track<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.defs"
     }
     fn def_name() -> &'static str {
         "track"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.album {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
@@ -479,11 +479,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Track<'a> {
     }
 }
 
-fn _default_broadcast_cost() -> std::option::Option<i64> {
+fn _default_broadcast_cost() -> core::option::Option<i64> {
     Some(0i64)
 }
 
-fn _default_broadcast_offset() -> std::option::Option<i64> {
+fn _default_broadcast_offset() -> core::option::Option<i64> {
     Some(0i64)
 }
 
@@ -652,7 +652,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -668,7 +668,7 @@ where
     }
 }
 
-fn lexicon_doc_media_ionosphere_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_media_ionosphere_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1211,37 +1211,37 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entity;
         type Role;
+        type Entity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entity = Unset;
         type Role = Unset;
-    }
-    ///State transition - sets the `entity` field to Set
-    pub struct SetEntity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntity<S> {}
-    impl<S: State> State for SetEntity<S> {
-        type Entity = Set<members::entity>;
-        type Role = S::Role;
+        type Entity = Unset;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type Entity = S::Entity;
         type Role = Set<members::role>;
+        type Entity = S::Entity;
+    }
+    ///State transition - sets the `entity` field to Set
+    pub struct SetEntity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntity<S> {}
+    impl<S: State> State for SetEntity<S> {
+        type Role = S::Role;
+        type Entity = Set<members::entity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entity` field
-        pub struct entity(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `entity` field
+        pub struct entity(());
     }
 }
 
@@ -1314,8 +1314,8 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Entity: credit_state::IsSet,
     S::Role: credit_state::IsSet,
+    S::Entity: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
@@ -1328,7 +1328,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1449,7 +1449,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1462,7 +1462,7 @@ where
     }
 }
 
-fn _default_recording_cost() -> std::option::Option<i64> {
+fn _default_recording_cost() -> core::option::Option<i64> {
     Some(0i64)
 }
 
@@ -1616,7 +1616,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1641,37 +1641,37 @@ pub mod track_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artists;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artists = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Artists = S::Artists;
+        type Title = Unset;
     }
     ///State transition - sets the `artists` field to Set
     pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtists<S> {}
     impl<S: State> State for SetArtists<S> {
-        type Title = S::Title;
         type Artists = Set<members::artists>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Artists = S::Artists;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artists` field
         pub struct artists(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -1761,8 +1761,8 @@ where
 impl<'a, S> TrackBuilder<'a, S>
 where
     S: track_state::State,
-    S::Title: track_state::IsSet,
     S::Artists: track_state::IsSet,
+    S::Title: track_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Track<'a> {
@@ -1776,7 +1776,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

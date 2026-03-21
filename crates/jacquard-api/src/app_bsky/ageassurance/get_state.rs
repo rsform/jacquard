@@ -18,9 +18,9 @@
 pub struct GetState<'a> {
     #[serde(borrow)]
     pub country_code: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub region_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub region_code: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]

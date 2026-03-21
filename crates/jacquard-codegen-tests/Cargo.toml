@@ -1,0 +1,27 @@
+[package]
+name = "jacquard-codegen-tests"
+description = "Compile-time validation for Pretty and Macro codegen modes"
+edition.workspace = true
+version = "0.0.0"
+publish = false
+license.workspace = true
+
+[dependencies]
+jacquard-common = { path = "../jacquard-common" }
+jacquard-derive = { path = "../jacquard-derive" }
+jacquard-lexicon = { path = "../jacquard-lexicon" }
+serde = { workspace = true }
+thiserror = { workspace = true }
+miette = { workspace = true }
+
+[features]
+default = ["app_bsky", "com_atproto", "test_collision", "test_ns1", "test_ns2", "test_ns3"]
+app_bsky = ["com_atproto"]
+com_atproto = []
+test_collision = []
+test_ns1 = []
+test_ns2 = ["test_ns1"]
+test_ns3 = ["test_ns1"]
+
+[build-dependencies]
+jacquard-lexicon = { path = "../jacquard-lexicon", features = ["codegen"] }

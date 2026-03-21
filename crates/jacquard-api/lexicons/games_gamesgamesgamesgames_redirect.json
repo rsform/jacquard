@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.redirect",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A redirect mapping a source AT URI to a target AT URI after migration.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "sourceUri",
+          "targetUri",
+          "collection",
+          "createdAt"
+        ],
+        "properties": {
+          "collection": {
+            "type": "string",
+            "format": "nsid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "sourceUri": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "targetUri": {
+            "type": "string",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

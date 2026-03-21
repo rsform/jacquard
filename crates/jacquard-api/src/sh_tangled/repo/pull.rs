@@ -20,26 +20,26 @@ pub mod status;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Pull<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub body: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub body: core::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mentions: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub mentions: core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     ///(deprecated) use patchBlob instead
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub patch: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub patch: core::option::Option<jacquard_common::CowStr<'a>>,
     ///patch content
     #[serde(borrow)]
     pub patch_blob: jacquard_common::types::blob::BlobRef<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub references: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub references: core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<crate::sh_tangled::repo::pull::Source<'a>>,
+    pub source: core::option::Option<crate::sh_tangled::repo::pull::Source<'a>>,
     #[serde(borrow)]
     pub target: crate::sh_tangled::repo::pull::Target<'a>,
     #[serde(borrow)]
@@ -58,9 +58,9 @@ pub struct Pull<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PullGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -82,9 +82,9 @@ pub struct PullGetRecordOutput<'a> {
 pub struct Source<'a> {
     #[serde(borrow)]
     pub branch: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub repo: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub repo: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(borrow)]
     pub sha: jacquard_common::CowStr<'a>,
 }
@@ -147,19 +147,19 @@ impl jacquard_common::types::collection::Collection for PullRecord {
     type Record = PullRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pull<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Pull<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.pull"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_pull()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.patch_blob;
             {
@@ -193,19 +193,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Pull<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Source<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.pull"
     }
     fn def_name() -> &'static str {
         "source"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_pull()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.sha;
             #[allow(unused_comparisons)]
@@ -236,19 +236,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Target<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Target<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.pull"
     }
     fn def_name() -> &'static str {
         "target"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_pull()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -265,8 +265,8 @@ pub mod pull_state {
     pub trait State: sealed::Sealed {
         type Target;
         type CreatedAt;
-        type PatchBlob;
         type Title;
+        type PatchBlob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -274,8 +274,8 @@ pub mod pull_state {
     impl State for Empty {
         type Target = Unset;
         type CreatedAt = Unset;
-        type PatchBlob = Unset;
         type Title = Unset;
+        type PatchBlob = Unset;
     }
     ///State transition - sets the `target` field to Set
     pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
@@ -283,8 +283,8 @@ pub mod pull_state {
     impl<S: State> State for SetTarget<S> {
         type Target = Set<members::target>;
         type CreatedAt = S::CreatedAt;
-        type PatchBlob = S::PatchBlob;
         type Title = S::Title;
+        type PatchBlob = S::PatchBlob;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -292,17 +292,8 @@ pub mod pull_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Target = S::Target;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
         type PatchBlob = S::PatchBlob;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `patch_blob` field to Set
-    pub struct SetPatchBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPatchBlob<S> {}
-    impl<S: State> State for SetPatchBlob<S> {
-        type Target = S::Target;
-        type CreatedAt = S::CreatedAt;
-        type PatchBlob = Set<members::patch_blob>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
@@ -310,8 +301,17 @@ pub mod pull_state {
     impl<S: State> State for SetTitle<S> {
         type Target = S::Target;
         type CreatedAt = S::CreatedAt;
-        type PatchBlob = S::PatchBlob;
         type Title = Set<members::title>;
+        type PatchBlob = S::PatchBlob;
+    }
+    ///State transition - sets the `patch_blob` field to Set
+    pub struct SetPatchBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPatchBlob<S> {}
+    impl<S: State> State for SetPatchBlob<S> {
+        type Target = S::Target;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type PatchBlob = Set<members::patch_blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -320,10 +320,10 @@ pub mod pull_state {
         pub struct target(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `patch_blob` field
-        pub struct patch_blob(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `patch_blob` field
+        pub struct patch_blob(());
     }
 }
 
@@ -542,8 +542,8 @@ where
     S: pull_state::State,
     S::Target: pull_state::IsSet,
     S::CreatedAt: pull_state::IsSet,
-    S::PatchBlob: pull_state::IsSet,
     S::Title: pull_state::IsSet,
+    S::PatchBlob: pull_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pull<'a> {
@@ -563,7 +563,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -583,9 +583,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_repo_pull() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_tangled_repo_pull() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.tangled.repo.pull"),
@@ -1024,7 +1022,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

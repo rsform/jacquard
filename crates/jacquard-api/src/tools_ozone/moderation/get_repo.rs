@@ -53,7 +53,7 @@ pub struct GetRepoOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRepoError<'a> {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetRepoError<'_> {

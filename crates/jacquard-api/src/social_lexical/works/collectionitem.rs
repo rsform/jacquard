@@ -40,9 +40,9 @@ pub struct Collectionitem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionitemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -89,19 +89,19 @@ impl jacquard_common::types::collection::Collection for CollectionitemRecord {
     type Record = CollectionitemRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collectionitem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Collectionitem<'a> {
     fn nsid() -> &'static str {
         "social.lexical.works.collectionitem"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_lexical_works_collectionitem()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -116,51 +116,51 @@ pub mod collectionitem_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type List;
         type Work;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type List = Unset;
         type Work = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type List = S::List;
-        type Work = S::Work;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetList<S> {}
     impl<S: State> State for SetList<S> {
-        type CreatedAt = S::CreatedAt;
         type List = Set<members::list>;
         type Work = S::Work;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `work` field to Set
     pub struct SetWork<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWork<S> {}
     impl<S: State> State for SetWork<S> {
-        type CreatedAt = S::CreatedAt;
         type List = S::List;
         type Work = Set<members::work>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type List = S::List;
+        type Work = S::Work;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `list` field
         pub struct list(());
         ///Marker type for the `work` field
         pub struct work(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -253,9 +253,9 @@ where
 impl<'a, S> CollectionitemBuilder<'a, S>
 where
     S: collectionitem_state::State,
-    S::CreatedAt: collectionitem_state::IsSet,
     S::List: collectionitem_state::IsSet,
     S::Work: collectionitem_state::IsSet,
+    S::CreatedAt: collectionitem_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collectionitem<'a> {
@@ -269,7 +269,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -283,7 +283,7 @@ where
     }
 }
 
-fn lexicon_doc_social_lexical_works_collectionitem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_lexical_works_collectionitem() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

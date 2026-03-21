@@ -19,16 +19,16 @@
 #[serde(rename_all = "camelCase")]
 pub struct Create<'a> {
     ///Default branch to push to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub default_branch: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub default_branch: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Rkey of the repository record
     #[serde(borrow)]
     pub rkey: jacquard_common::CowStr<'a>,
     ///A source URL to clone from, populate this when forking or importing a repository.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for

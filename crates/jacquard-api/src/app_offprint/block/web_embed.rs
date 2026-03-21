@@ -18,57 +18,57 @@
 #[serde(rename_all = "camelCase")]
 pub struct WebEmbed<'a> {
     ///Horizontal alignment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alignment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Page description/excerpt
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Native embed height in pixels
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub embed_height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub embed_height: core::option::Option<i64>,
     ///oEmbed URL for iframe embedding
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub embed_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Native embed width in pixels
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub embed_width: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub embed_width: core::option::Option<i64>,
     ///The URL of the embedded page
     #[serde(borrow)]
     pub href: jacquard_common::types::string::UriValue<'a>,
     ///Screenshot of the embedded content (1280×720px)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub preview: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub preview: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Name of the website
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub site_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub site_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Page title
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///CSS width value (e.g., "100%", "75%". "50%" minimum)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub width: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub width: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for WebEmbed<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.webEmbed"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_webEmbed()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -466,7 +466,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -487,7 +487,7 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_webEmbed() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_offprint_block_webEmbed() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

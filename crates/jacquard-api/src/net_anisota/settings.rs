@@ -20,45 +20,45 @@
 #[serde(rename_all = "camelCase")]
 pub struct AnimationTiming<'a> {
     ///Card advance exit to right and entrance back in from right (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_advance: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_advance: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Card flip animation between front and back (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_flip: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_flip: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Card stack animate in entrance from the top of screen (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_stack_entrance: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_stack_entrance: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Staggered interactive corner element entrance animation (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub corner_elements: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub corner_elements: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Card stack height expansion and shrinking when entering/exiting fullscreen (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub fullscreen_transitions: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub fullscreen_transitions: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Modal entrance and exit animations (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub modals: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub modals: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Master speed multiplier that affects all animations (stored as string, e.g. '1.0' = normal speed)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub overall: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub overall: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Page transitions and navigation animations (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub page_transitions: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub page_transitions: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Thread train sliding, entering, and exiting animations (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thread_transitions: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub thread_transitions: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Control row and feed subtitle fade in/out animations (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ui_transitions: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub ui_transitions: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -75,23 +75,23 @@ pub struct AnimationTiming<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct BatchNotificationTypes<'a> {
     ///Batch follow notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub follows: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub follows: core::option::Option<bool>,
     ///Batch like notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub likes: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub likes: core::option::Option<bool>,
     ///Batch mention notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mentions: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mentions: core::option::Option<bool>,
     ///Batch quote notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quotes: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quotes: core::option::Option<bool>,
     ///Batch reply notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub replies: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub replies: core::option::Option<bool>,
     ///Batch repost notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reposts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reposts: core::option::Option<bool>,
 }
 
 /// App behavior and functionality settings
@@ -108,177 +108,179 @@ pub struct BatchNotificationTypes<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BehaviorSettings<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub animation_timing: std::option::Option<
+    pub animation_timing: core::option::Option<
         crate::net_anisota::settings::AnimationTiming<'a>,
     >,
     ///Show only Anisota posts in profiles instead of regular Bluesky posts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub anisota_only_mode: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub anisota_only_mode: core::option::Option<bool>,
     ///Whether background audio/soundscapes are enabled by default
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub audio_enabled: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub audio_enabled: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub batch_notification_types: std::option::Option<
+    pub batch_notification_types: core::option::Option<
         crate::net_anisota::settings::BatchNotificationTypes<'a>,
     >,
     ///Group similar notifications together
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub batch_notifications: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub batch_notifications: core::option::Option<bool>,
     ///Bypass detached quotes to see the full content that was removed by the author
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub bypass_detached_quotes: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub bypass_detached_quotes: core::option::Option<bool>,
     ///When enabled, show notifications that match either relationship OR follower count filters
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub combine_relationship_and_follower_filters: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub combine_relationship_and_follower_filters: core::option::Option<bool>,
     ///Show confirmation before deleting
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub confirm_deletes: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub confirm_deletes: core::option::Option<bool>,
     ///Show warning before saving drafts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub confirm_draft_saves: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub confirm_draft_saves: core::option::Option<bool>,
     ///Default page to show on app load
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub default_home_page: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub default_home_page: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Default publishing target for new posts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub default_post_target: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub default_post_target: core::option::Option<jacquard_common::CowStr<'a>>,
     ///How long to cache feed position in minutes (30, 60, 360, 720, 1440, 10080)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub feed_cache_length: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub feed_cache_length: core::option::Option<i64>,
     ///Filter by follower to following ratio
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub filter_by_follower_ratio: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub filter_by_follower_ratio: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub filter_notification_types: std::option::Option<
+    pub filter_notification_types: core::option::Option<
         crate::net_anisota::settings::FilterNotificationTypes<'a>,
     >,
     ///Filter notifications by follower count
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub filter_notifications_by_followers: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub filter_notifications_by_followers: core::option::Option<bool>,
     ///Filter notifications based on relationship with the author
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub filter_notifications_by_relationship: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub filter_notifications_by_relationship: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub filter_relationship_types: std::option::Option<
+    pub filter_relationship_types: core::option::Option<
         crate::net_anisota::settings::FilterRelationshipTypes<'a>,
     >,
     ///Force chronological sorting of posts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub force_chronological_sort: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub force_chronological_sort: core::option::Option<bool>,
     ///Fullscreen behavior mode: fullscreen (show control row), immersive (hide all UI), or cycle (cycle through states)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub fullscreen_behavior: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub fullscreen_behavior: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Hide posts that have been liked or reposted to focus on new content
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_interacted_posts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hide_interacted_posts: core::option::Option<bool>,
     ///Hide the exact notification count in the corner element, always showing 'notifications' instead
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_notification_count: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hide_notification_count: core::option::Option<bool>,
     ///Hide posts that have been read
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_read_posts: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hide_read_posts: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hide_reposts: std::option::Option<crate::net_anisota::settings::HideReposts<'a>>,
+    pub hide_reposts: core::option::Option<
+        crate::net_anisota::settings::HideReposts<'a>,
+    >,
     ///Also require a minimum follower-to-following ratio for highlighting
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub highlight_by_follower_ratio: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub highlight_by_follower_ratio: core::option::Option<bool>,
     ///Maximum follower count for notification highlighting
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub highlight_max_follower_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub highlight_max_follower_count: core::option::Option<i64>,
     ///Minimum follower count for notification highlighting (stored as string or integer)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub highlight_min_follower_count: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub highlight_min_follower_count: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Minimum follower-to-following ratio for highlighting (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub highlight_min_follower_ratio: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub highlight_min_follower_ratio: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub highlight_notification_types: std::option::Option<
+    pub highlight_notification_types: core::option::Option<
         crate::net_anisota::settings::HighlightNotificationTypes<'a>,
     >,
     ///Enable notification highlighting to surface important notifications from notable accounts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub highlight_notifications: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub highlight_notifications: core::option::Option<bool>,
     ///Include engagement metrics from reply posts in stats calculations
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub include_reply_engagement: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_reply_engagement: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keyboard_shortcuts: std::option::Option<
+    pub keyboard_shortcuts: core::option::Option<
         crate::net_anisota::settings::KeyboardShortcuts<'a>,
     >,
     ///Maximum follower count for notification filtering
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_follower_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub max_follower_count: core::option::Option<i64>,
     ///Minimum follower count for notification filtering (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub min_follower_count: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub min_follower_count: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Minimum follower ratio for filtering (stored as string)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub min_follower_ratio: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub min_follower_ratio: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub moderation_settings: std::option::Option<
+    pub moderation_settings: core::option::Option<
         crate::net_anisota::settings::ModerationSettings<'a>,
     >,
     ///Enable post drafts feature
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub post_drafts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub post_drafts: core::option::Option<bool>,
     ///Show newest posts first
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reverse_feed_order: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reverse_feed_order: core::option::Option<bool>,
     ///Show content from users you have blocked
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_blocked_posts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_blocked_posts: core::option::Option<bool>,
     ///Show New Highlights section in notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_new_highlights_section: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_new_highlights_section: core::option::Option<bool>,
     ///Enable notification sections (New Highlights, Unread, Recently Read, Older)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_notification_sections: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_notification_sections: core::option::Option<bool>,
     ///Show Older section in notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_older_section: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_older_section: core::option::Option<bool>,
     ///Display rarity indicator and rate in the stats modal header
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_rarity_in_header: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_rarity_in_header: core::option::Option<bool>,
     ///Show Recently Read section in notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_recently_read_section: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_recently_read_section: core::option::Option<bool>,
     ///Show thread suggestion when typing beyond character limit in post composer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_thread_suggestion: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_thread_suggestion: core::option::Option<bool>,
     ///Show Unread section in notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_unread_section: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_unread_section: core::option::Option<bool>,
     ///Selected background audio soundscape
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub soundscape: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub soundscape: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub stats_visible_sections: std::option::Option<
+    pub stats_visible_sections: core::option::Option<
         crate::net_anisota::settings::StatsVisibleSections<'a>,
     >,
     ///Filter out posts with images and videos for distraction-free reading
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub text_only_mode: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub text_only_mode: core::option::Option<bool>,
     ///Track which posts have been read
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub track_read_posts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub track_read_posts: core::option::Option<bool>,
 }
 
 /// Control button visibility settings
@@ -296,89 +298,89 @@ pub struct BehaviorSettings<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ControlSettings<'a> {
     ///Show account list button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub account_list: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub account_list: core::option::Option<bool>,
     ///Show back button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub back: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub back: core::option::Option<bool>,
     ///Show expandable comment button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub comment_button: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub comment_button: core::option::Option<bool>,
     ///Show copy author DID button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub copy_author_did: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copy_author_did: core::option::Option<bool>,
     ///Show expandable copy button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub copy_button: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copy_button: core::option::Option<bool>,
     ///Show copy post link button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub copy_post_link: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copy_post_link: core::option::Option<bool>,
     ///Show copy post text button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub copy_post_text: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub copy_post_text: core::option::Option<bool>,
     ///Show delete button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub delete: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub delete: core::option::Option<bool>,
     ///Show expandable engage button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub engage_button: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub engage_button: core::option::Option<bool>,
     ///Show feed switcher button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub feed_switcher: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub feed_switcher: core::option::Option<bool>,
     ///Show fetch button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub fetch: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub fetch: core::option::Option<bool>,
     ///Show flip button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub flip: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub flip: core::option::Option<bool>,
     ///Show forward button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub forward: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub forward: core::option::Option<bool>,
     ///Show fullscreen button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub fullscreen: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub fullscreen: core::option::Option<bool>,
     ///Show leaflet publications button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub leaflet_publications: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub leaflet_publications: core::option::Option<bool>,
     ///Show like button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub like: core::option::Option<bool>,
     ///Show list button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub list: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub list: core::option::Option<bool>,
     ///Show expandable multi-engage button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub multi_engage_button: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub multi_engage_button: core::option::Option<bool>,
     ///Show expandable multi-repost button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub multi_repost_button: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub multi_repost_button: core::option::Option<bool>,
     ///Show position button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub position_button: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub position_button: core::option::Option<bool>,
     ///Show post list button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub post_list: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub post_list: core::option::Option<bool>,
     ///Show quick access button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quick_access: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quick_access: core::option::Option<bool>,
     ///Show quote button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quote: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quote: core::option::Option<bool>,
     ///Show relationship button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub relationship_button: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub relationship_button: core::option::Option<bool>,
     ///Show reply button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reply: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reply: core::option::Option<bool>,
     ///Show repost button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub repost: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub repost: core::option::Option<bool>,
     ///Show shuffle button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub shuffle: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub shuffle: core::option::Option<bool>,
     ///Show text only mode button
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub text_only_mode: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub text_only_mode: core::option::Option<bool>,
 }
 
 /// Corner element positioning settings
@@ -396,21 +398,21 @@ pub struct ControlSettings<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CornerElements<'a> {
     ///Element to show in bottom left corner
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub bottom_left: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub bottom_left: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Element to show in bottom right corner
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub bottom_right: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub bottom_right: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Element to show in top left corner
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub top_left: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub top_left: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Element to show in top right corner
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub top_right: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub top_right: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -427,23 +429,23 @@ pub struct CornerElements<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct FilterNotificationTypes<'a> {
     ///Show follow notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub follows: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub follows: core::option::Option<bool>,
     ///Show like notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub likes: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub likes: core::option::Option<bool>,
     ///Show mention notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mentions: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mentions: core::option::Option<bool>,
     ///Show quote notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quotes: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quotes: core::option::Option<bool>,
     ///Show reply notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub replies: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub replies: core::option::Option<bool>,
     ///Show repost notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reposts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reposts: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -460,17 +462,17 @@ pub struct FilterNotificationTypes<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct FilterRelationshipTypes<'a> {
     ///Show notifications from followers
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub followers: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub followers: core::option::Option<bool>,
     ///Show notifications from accounts you follow
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub following: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub following: core::option::Option<bool>,
     ///Show notifications from mutual connections
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mutuals: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mutuals: core::option::Option<bool>,
     ///Show notifications from followers you don't follow back
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub non_mutuals: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub non_mutuals: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -487,11 +489,11 @@ pub struct FilterRelationshipTypes<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct HideReposts<'a> {
     ///Hide reposts in feed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub feed: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub feed: core::option::Option<bool>,
     ///Hide reposts in profile
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub profile: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub profile: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -508,23 +510,23 @@ pub struct HideReposts<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct HighlightNotificationTypes<'a> {
     ///Highlight follow notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub follows: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub follows: core::option::Option<bool>,
     ///Highlight like notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub likes: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub likes: core::option::Option<bool>,
     ///Highlight mention notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mentions: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mentions: core::option::Option<bool>,
     ///Highlight quote notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub quotes: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub quotes: core::option::Option<bool>,
     ///Highlight reply notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub replies: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub replies: core::option::Option<bool>,
     ///Highlight repost notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reposts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reposts: core::option::Option<bool>,
 }
 
 /// Keyboard shortcut configuration
@@ -541,29 +543,29 @@ pub struct HighlightNotificationTypes<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct KeyboardShortcuts<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub composer: std::option::Option<
+    pub composer: core::option::Option<
         crate::net_anisota::settings::KeyboardShortcutsComposer<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub global: std::option::Option<
+    pub global: core::option::Option<
         crate::net_anisota::settings::KeyboardShortcutsGlobal<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub modals: std::option::Option<
+    pub modals: core::option::Option<
         crate::net_anisota::settings::KeyboardShortcutsModals<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub navigation: std::option::Option<
+    pub navigation: core::option::Option<
         crate::net_anisota::settings::KeyboardShortcutsNavigation<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub post_interactions: std::option::Option<
+    pub post_interactions: core::option::Option<
         crate::net_anisota::settings::KeyboardShortcutsPostInteractions<'a>,
     >,
 }
@@ -583,9 +585,9 @@ pub struct KeyboardShortcuts<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct KeyboardShortcutsComposer<'a> {
     ///Publish post (e.g., ctrl+enter)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publish: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub publish: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Global navigation keyboard shortcuts
@@ -603,21 +605,21 @@ pub struct KeyboardShortcutsComposer<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct KeyboardShortcutsGlobal<'a> {
     ///Navigate to collection
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collection: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub collection: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Navigate to feed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub feed: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Navigate to inventory
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub inventory: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub inventory: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Navigate to profile
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub profile: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Modal keyboard shortcuts
@@ -635,25 +637,25 @@ pub struct KeyboardShortcutsGlobal<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct KeyboardShortcutsModals<'a> {
     ///Show keyboard shortcuts help
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keyboard_help: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub keyboard_help: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Open notifications
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notifications: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub notifications: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Open post composer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub post_composer: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub post_composer: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Open stats modal
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub stats: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub stats: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Open touch menu
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub touch_menu: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub touch_menu: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Navigation keyboard shortcuts
@@ -671,25 +673,25 @@ pub struct KeyboardShortcutsModals<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct KeyboardShortcutsNavigation<'a> {
     ///Scroll down or next item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub arrow_down: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub arrow_down: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Go back to previous card
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub arrow_left: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub arrow_left: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Advance to next card
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub arrow_right: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub arrow_right: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Scroll up or previous item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub arrow_up: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub arrow_up: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Exit fullscreen or close modals
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub escape: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub escape: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Post interaction keyboard shortcuts
@@ -707,21 +709,21 @@ pub struct KeyboardShortcutsNavigation<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct KeyboardShortcutsPostInteractions<'a> {
     ///Like current post
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub like: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub like: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Quote current post
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub quote: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub quote: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Reply to current post
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub reply: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Repost current post
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub repost: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub repost: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// User settings for the Anisota app, synchronized across devices via ATProto
@@ -737,29 +739,29 @@ pub struct KeyboardShortcutsPostInteractions<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub behavior_settings: std::option::Option<
+    pub behavior_settings: core::option::Option<
         crate::net_anisota::settings::BehaviorSettings<'a>,
     >,
     ///Order of control buttons
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub control_order: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub control_order: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub control_settings: std::option::Option<
+    pub control_settings: core::option::Option<
         crate::net_anisota::settings::ControlSettings<'a>,
     >,
     ///When the settings record was first created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Selected color theme
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub theme: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ui_settings: std::option::Option<crate::net_anisota::settings::UiSettings<'a>>,
+    pub ui_settings: core::option::Option<crate::net_anisota::settings::UiSettings<'a>>,
     ///When the settings were last updated
     pub updated_at: jacquard_common::types::string::Datetime,
     ///Settings schema version for backward compatibility
@@ -778,9 +780,9 @@ pub struct Settings<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -802,13 +804,13 @@ pub struct SettingsGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ModerationSettings<'a> {
     ///How to handle posts from muted accounts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub muted_accounts_handling: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub muted_accounts_handling: core::option::Option<jacquard_common::CowStr<'a>>,
     ///How to handle posts containing muted words or phrases
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub muted_content_handling: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub muted_content_handling: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -825,14 +827,14 @@ pub struct ModerationSettings<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct StatsVisibleSections<'a> {
     ///Show activity section in stats overview
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub activity: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub activity: core::option::Option<bool>,
     ///Show engagement section in stats overview
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub engagement: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub engagement: core::option::Option<bool>,
     ///Show progress section in stats overview
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub progress: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub progress: core::option::Option<bool>,
 }
 
 /// UI visibility and behavior settings
@@ -849,130 +851,130 @@ pub struct StatsVisibleSections<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UiSettings<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub corner_elements: std::option::Option<
+    pub corner_elements: core::option::Option<
         crate::net_anisota::settings::CornerElements<'a>,
     >,
     ///Font size scale (0.8 = 80%, 1.0 = 100% default, 1.2 = 120%)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub font_size: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub font_size: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Primary name slot for post cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub post_card_primary_slot: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub post_card_primary_slot: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Secondary name slot for post cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub post_card_secondary_slot: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub post_card_secondary_slot: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Primary name slot for profile cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile_card_primary_slot: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub profile_card_primary_slot: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Secondary name slot for profile cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile_card_secondary_slot: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub profile_card_secondary_slot: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Show Bluesky icon in post card headers
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_post_card_at_symbol: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_post_card_at_symbol: core::option::Option<bool>,
     ///Show avatar image in post card footer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_post_card_avatar: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_post_card_avatar: core::option::Option<bool>,
     ///Show display name on post cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_post_card_display_name: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_post_card_display_name: core::option::Option<bool>,
     ///Show the entire post card footer section
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_post_card_footer: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_post_card_footer: core::option::Option<bool>,
     ///Show handle/username on post cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_post_card_handle: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_post_card_handle: core::option::Option<bool>,
     ///Show the entire post card header section
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_post_card_header: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_post_card_header: core::option::Option<bool>,
     ///Show post number indicator
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_post_count: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_post_count: core::option::Option<bool>,
     ///Show indicator for posts that have been read
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_post_read_indicator: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_post_read_indicator: core::option::Option<bool>,
     ///Show Bluesky icon on profile cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_at_symbol: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_at_symbol: core::option::Option<bool>,
     ///Show blocked count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_blocked: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_blocked: core::option::Option<bool>,
     ///Show blocking count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_blocking: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_blocking: core::option::Option<bool>,
     ///Show cancelled count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_cancelled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_cancelled: core::option::Option<bool>,
     ///Show cancelling count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_cancelling: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_cancelling: core::option::Option<bool>,
     ///Show avatar image in profile card footer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_card_avatar: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_card_avatar: core::option::Option<bool>,
     ///Show the entire profile card footer section
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_card_footer: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_card_footer: core::option::Option<bool>,
     ///Show the entire profile card header section
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_card_header: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_card_header: core::option::Option<bool>,
     ///Show collection count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_collections: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_collections: core::option::Option<bool>,
     ///Show display name on profile cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_display_name: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_display_name: core::option::Option<bool>,
     ///Show follower count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_followers: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_followers: core::option::Option<bool>,
     ///Show following count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_following: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_following: core::option::Option<bool>,
     ///Show handle/username on profile cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_handle: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_handle: core::option::Option<bool>,
     ///Show lexicon count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_lexicons: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_lexicons: core::option::Option<bool>,
     ///Show listed count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_listed: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_listed: core::option::Option<bool>,
     ///Show listing count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_listing: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_listing: core::option::Option<bool>,
     ///Show lists count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_lists: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_lists: core::option::Option<bool>,
     ///Show post count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_posts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_posts: core::option::Option<bool>,
     ///Show pronouns on profile cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_pronouns: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_pronouns: core::option::Option<bool>,
     ///Show verified count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_verified: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_verified: core::option::Option<bool>,
     ///Show verifying count on profiles
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_verifying: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_verifying: core::option::Option<bool>,
     ///Show website link on profile cards
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_profile_website: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_profile_website: core::option::Option<bool>,
     ///Show rarity indicator based on post engagement
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_rarity_indicator: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_rarity_indicator: core::option::Option<bool>,
     ///Show when the post was created
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_timestamp: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_timestamp: core::option::Option<bool>,
     ///Show author username on posts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub show_username: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub show_username: core::option::Option<bool>,
 }
 
 impl<'a> Settings<'a> {
@@ -988,19 +990,19 @@ impl<'a> Settings<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AnimationTiming<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AnimationTiming<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "animationTiming"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.card_advance {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
@@ -1125,36 +1127,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AnimationTiming<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BatchNotificationTypes<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BatchNotificationTypes<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "batchNotificationTypes"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BehaviorSettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BehaviorSettings<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "behaviorSettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_cache_length {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -1218,138 +1220,138 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BehaviorSettings<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ControlSettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ControlSettings<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "controlSettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CornerElements<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CornerElements<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "cornerElements"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FilterNotificationTypes<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FilterNotificationTypes<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "filterNotificationTypes"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FilterRelationshipTypes<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FilterRelationshipTypes<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "filterRelationshipTypes"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HideReposts<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for HideReposts<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "hideReposts"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HighlightNotificationTypes<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for HighlightNotificationTypes<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "highlightNotificationTypes"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KeyboardShortcuts<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for KeyboardShortcuts<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "keyboardShortcuts"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsComposer<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsComposer<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "keyboardShortcutsComposer"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.publish {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -1366,19 +1368,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsComposer
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsGlobal<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsGlobal<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "keyboardShortcutsGlobal"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.collection {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -1431,19 +1433,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsGlobal<'
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsModals<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsModals<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "keyboardShortcutsModals"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.keyboard_help {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -1508,19 +1510,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsModals<'
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsNavigation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsNavigation<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "keyboardShortcutsNavigation"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.arrow_down {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -1585,7 +1587,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KeyboardShortcutsNavigati
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
+impl<'a> jacquard_lexicon::schema::LexiconSchema
 for KeyboardShortcutsPostInteractions<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
@@ -1593,12 +1595,12 @@ for KeyboardShortcutsPostInteractions<'a> {
     fn def_name() -> &'static str {
         "keyboardShortcutsPostInteractions"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.like {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -1678,19 +1680,19 @@ impl jacquard_common::types::collection::Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.version;
             if *value < 1i64 {
@@ -1707,53 +1709,53 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModerationSettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModerationSettings<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "moderationSettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatsVisibleSections<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for StatsVisibleSections<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "statsVisibleSections"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UiSettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for UiSettings<'a> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
     fn def_name() -> &'static str {
         "uiSettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.font_size {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
@@ -1770,9 +1772,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UiSettings<'a> {
     }
 }
 
-fn lexicon_doc_net_anisota_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_net_anisota_settings() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.anisota.settings"),
@@ -4631,49 +4631,49 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type CreatedAt;
+        type UpdatedAt;
         type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type CreatedAt = Unset;
+        type UpdatedAt = Unset;
         type Version = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type CreatedAt = S::CreatedAt;
-        type Version = S::Version;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
         type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = S::UpdatedAt;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = Set<members::updated_at>;
         type Version = S::Version;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVersion<S> {}
     impl<S: State> State for SetVersion<S> {
-        type UpdatedAt = S::UpdatedAt;
         type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
         type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `version` field
         pub struct version(());
     }
@@ -4865,8 +4865,8 @@ where
 impl<'a, S> SettingsBuilder<'a, S>
 where
     S: settings_state::State,
-    S::UpdatedAt: settings_state::IsSet,
     S::CreatedAt: settings_state::IsSet,
+    S::UpdatedAt: settings_state::IsSet,
     S::Version: settings_state::IsSet,
 {
     /// Build the final struct
@@ -4886,7 +4886,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

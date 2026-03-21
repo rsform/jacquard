@@ -21,15 +21,15 @@ pub struct Question<'a> {
     #[serde(borrow)]
     pub content: crate::fyi_questionable::richtext::content::Content<'a>,
     ///Indicates the context in which this question was asked. Currently only fyi.questionable.actor.profile
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub context_ref: std::option::Option<
+    pub context_ref: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     pub created_at: jacquard_common::types::string::Datetime,
     ///Indicates human language of the primary text content.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub languages: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub languages: core::option::Option<Vec<jacquard_common::types::string::Language>>,
     ///A short summary of the question
     #[serde(borrow)]
     pub summary: jacquard_common::CowStr<'a>,
@@ -47,9 +47,9 @@ pub struct Question<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuestionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -96,19 +96,19 @@ impl jacquard_common::types::collection::Collection for QuestionRecord {
     type Record = QuestionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Question<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Question<'a> {
     fn nsid() -> &'static str {
         "fyi.questionable.question"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fyi_questionable_question()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.languages {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
@@ -181,50 +181,50 @@ pub mod question_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Summary;
-        type CreatedAt;
         type Content;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Summary = Unset;
-        type CreatedAt = Unset;
         type Content = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
         type Summary = Set<members::summary>;
+        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Summary = S::Summary;
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
         type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
         type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Summary = S::Summary;
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `summary` field
         pub struct summary(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -358,8 +358,8 @@ impl<'a, S> QuestionBuilder<'a, S>
 where
     S: question_state::State,
     S::Summary: question_state::IsSet,
-    S::CreatedAt: question_state::IsSet,
     S::Content: question_state::IsSet,
+    S::CreatedAt: question_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Question<'a> {
@@ -375,7 +375,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -391,7 +391,7 @@ where
     }
 }
 
-fn lexicon_doc_fyi_questionable_question() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_fyi_questionable_question() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

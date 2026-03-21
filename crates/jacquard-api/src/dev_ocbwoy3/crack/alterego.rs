@@ -19,25 +19,25 @@
 #[serde(rename_all = "camelCase")]
 pub struct Alterego<'a> {
     ///New profile picture
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///New profile banner
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub banner: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///New profile bio (e.g. [[#1 Rated Salesman1997]])
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///New display name (e.g. Spamton G. Spamton)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///New profile handle (e.g. spamton.bigshot), can have ANY DOMAIN.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub handle: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -52,9 +52,9 @@ pub struct Alterego<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AlteregoGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -101,19 +101,19 @@ impl jacquard_common::types::collection::Collection for AlteregoRecord {
     type Record = AlteregoRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Alterego<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Alterego<'a> {
     fn nsid() -> &'static str {
         "dev.ocbwoy3.crack.alterego"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_ocbwoy3_crack_alterego()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -426,7 +426,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -442,7 +442,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_ocbwoy3_crack_alterego() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_ocbwoy3_crack_alterego() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

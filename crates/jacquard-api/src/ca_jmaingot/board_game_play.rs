@@ -39,9 +39,9 @@ pub struct BoardGamePlay<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BoardGamePlayGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -88,19 +88,19 @@ impl jacquard_common::types::collection::Collection for BoardGamePlayRecord {
     type Record = BoardGamePlayRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BoardGamePlay<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BoardGamePlay<'a> {
     fn nsid() -> &'static str {
         "ca.jmaingot.boardGamePlay"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ca_jmaingot_boardGamePlay()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -116,50 +116,50 @@ pub mod board_game_play_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type BggId;
         type PlayedAt;
+        type BggId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type BggId = Unset;
         type PlayedAt = Unset;
+        type BggId = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type PlayedAt = S::PlayedAt;
         type BggId = S::BggId;
-        type PlayedAt = S::PlayedAt;
-    }
-    ///State transition - sets the `bgg_id` field to Set
-    pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBggId<S> {}
-    impl<S: State> State for SetBggId<S> {
-        type Name = S::Name;
-        type BggId = Set<members::bgg_id>;
-        type PlayedAt = S::PlayedAt;
     }
     ///State transition - sets the `played_at` field to Set
     pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
     impl<S: State> State for SetPlayedAt<S> {
         type Name = S::Name;
-        type BggId = S::BggId;
         type PlayedAt = Set<members::played_at>;
+        type BggId = S::BggId;
+    }
+    ///State transition - sets the `bgg_id` field to Set
+    pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBggId<S> {}
+    impl<S: State> State for SetBggId<S> {
+        type Name = S::Name;
+        type PlayedAt = S::PlayedAt;
+        type BggId = Set<members::bgg_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `bgg_id` field
-        pub struct bgg_id(());
         ///Marker type for the `played_at` field
         pub struct played_at(());
+        ///Marker type for the `bgg_id` field
+        pub struct bgg_id(());
     }
 }
 
@@ -253,8 +253,8 @@ impl<'a, S> BoardGamePlayBuilder<'a, S>
 where
     S: board_game_play_state::State,
     S::Name: board_game_play_state::IsSet,
-    S::BggId: board_game_play_state::IsSet,
     S::PlayedAt: board_game_play_state::IsSet,
+    S::BggId: board_game_play_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BoardGamePlay<'a> {
@@ -268,7 +268,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -282,7 +282,7 @@ where
     }
 }
 
-fn lexicon_doc_ca_jmaingot_boardGamePlay() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_ca_jmaingot_boardGamePlay() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

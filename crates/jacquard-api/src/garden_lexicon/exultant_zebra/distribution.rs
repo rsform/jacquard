@@ -19,16 +19,16 @@
 #[serde(rename_all = "camelCase")]
 pub struct Artifact<'a> {
     ///An optional description of this artifact.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The downloadable binary.
     #[serde(borrow)]
     pub download: jacquard_common::types::blob::BlobRef<'a>,
     ///Optional tags describing this artifact, e.g. 'aarch64', 'apple-darwin', 'linux'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// A distribution of an application.
@@ -50,9 +50,9 @@ pub struct Distribution<'a> {
         crate::garden_lexicon::exultant_zebra::distribution::Artifact<'a>,
     >,
     ///An optional description of this distribution.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The version of this distribution, e.g. '0.14.0'.
     #[serde(borrow)]
     pub version: jacquard_common::CowStr<'a>,
@@ -70,9 +70,9 @@ pub struct Distribution<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DistributionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -92,19 +92,19 @@ impl<'a> Distribution<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artifact<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Artifact<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.distribution"
     }
     fn def_name() -> &'static str {
         "artifact"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_exultant_zebra_distribution()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.download;
             {
@@ -165,19 +165,19 @@ impl jacquard_common::types::collection::Collection for DistributionRecord {
     type Record = DistributionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Distribution<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Distribution<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.distribution"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_exultant_zebra_distribution()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -317,7 +317,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -331,7 +331,7 @@ where
     }
 }
 
-fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_garden_lexicon_exultant_zebra_distribution() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -522,37 +522,37 @@ pub mod distribution_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artifacts;
         type Version;
+        type Artifacts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artifacts = Unset;
         type Version = Unset;
-    }
-    ///State transition - sets the `artifacts` field to Set
-    pub struct SetArtifacts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtifacts<S> {}
-    impl<S: State> State for SetArtifacts<S> {
-        type Artifacts = Set<members::artifacts>;
-        type Version = S::Version;
+        type Artifacts = Unset;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVersion<S> {}
     impl<S: State> State for SetVersion<S> {
-        type Artifacts = S::Artifacts;
         type Version = Set<members::version>;
+        type Artifacts = S::Artifacts;
+    }
+    ///State transition - sets the `artifacts` field to Set
+    pub struct SetArtifacts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtifacts<S> {}
+    impl<S: State> State for SetArtifacts<S> {
+        type Version = S::Version;
+        type Artifacts = Set<members::artifacts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artifacts` field
-        pub struct artifacts(());
         ///Marker type for the `version` field
         pub struct version(());
+        ///Marker type for the `artifacts` field
+        pub struct artifacts(());
     }
 }
 
@@ -649,8 +649,8 @@ where
 impl<'a, S> DistributionBuilder<'a, S>
 where
     S: distribution_state::State,
-    S::Artifacts: distribution_state::IsSet,
     S::Version: distribution_state::IsSet,
+    S::Artifacts: distribution_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Distribution<'a> {
@@ -664,7 +664,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

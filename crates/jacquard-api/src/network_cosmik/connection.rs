@@ -19,16 +19,16 @@
 #[serde(rename_all = "camelCase")]
 pub struct Connection<'a> {
     ///Optional type of connection
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub connection_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub connection_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp when this connection was created.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Optional note about the connection
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Source entity (URL string or AT URI)
     #[serde(borrow)]
     pub source: jacquard_common::CowStr<'a>,
@@ -36,8 +36,8 @@ pub struct Connection<'a> {
     #[serde(borrow)]
     pub target: jacquard_common::CowStr<'a>,
     ///Timestamp when this connection was last updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -52,9 +52,9 @@ pub struct Connection<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ConnectionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -101,19 +101,19 @@ impl jacquard_common::types::collection::Collection for ConnectionRecord {
     type Record = ConnectionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Connection<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Connection<'a> {
     fn nsid() -> &'static str {
         "network.cosmik.connection"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_cosmik_connection()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.note {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -338,7 +338,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -355,7 +355,7 @@ where
     }
 }
 
-fn lexicon_doc_network_cosmik_connection() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_network_cosmik_connection() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

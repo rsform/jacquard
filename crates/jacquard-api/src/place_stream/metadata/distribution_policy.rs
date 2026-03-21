@@ -20,32 +20,32 @@
 #[serde(rename_all = "camelCase")]
 pub struct DistributionPolicy<'a> {
     ///List of did:webs of the broadcasters you want to allow to distribute your content. "*" allows anyone. Starting a line with a "!" bans that broadcaster.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub allowed_broadcasters: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub allowed_broadcasters: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Duration in seconds after which segments should be deleted. Each segment will expire N seconds after its creation time. -1 to allow indefinite archival.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub delete_after: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub delete_after: core::option::Option<i64>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DistributionPolicy<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DistributionPolicy<'a> {
     fn nsid() -> &'static str {
         "place.stream.metadata.distributionPolicy"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_metadata_distributionPolicy()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_place_stream_metadata_distributionPolicy() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_metadata_distributionPolicy() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

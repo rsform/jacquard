@@ -18,34 +18,34 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub broadcast: std::option::Option<Vec<crate::media_ionosphere::Broadcast<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub broadcast: core::option::Option<Vec<crate::media_ionosphere::Broadcast<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genres: std::option::Option<Vec<crate::media_ionosphere::Genre<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub genres: core::option::Option<Vec<crate::media_ionosphere::Genre<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub geolocation: std::option::Option<crate::media_ionosphere::Geocoordinates<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub geolocation: core::option::Option<crate::media_ionosphere::Geocoordinates<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub icon: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Version identifier
     #[serde(borrow)]
     pub ionosphere: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keywords: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub keywords: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///The language of the string values in this record. NOT the language of the content
     pub language: jacquard_common::types::string::Language,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///This is the language that the content is actually presented in. If multiple, choose to omit this.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub presentation_language: std::option::Option<
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub presentation_language: core::option::Option<
         jacquard_common::types::string::Language,
     >,
 }
@@ -62,9 +62,9 @@ pub struct Service<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -111,19 +111,19 @@ impl jacquard_common::types::collection::Collection for ServiceRecord {
     type Record = ServiceRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Service<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.service"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_service()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
@@ -210,51 +210,51 @@ pub mod service_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Ionosphere;
         type Language;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Ionosphere = Unset;
         type Language = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
-    impl<S: State> State for SetIonosphere<S> {
-        type Ionosphere = Set<members::ionosphere>;
-        type Language = S::Language;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLanguage<S> {}
-    impl<S: State> State for SetLanguage<S> {
-        type Ionosphere = S::Ionosphere;
-        type Language = Set<members::language>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type Ionosphere = S::Ionosphere;
         type Language = S::Language;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `ionosphere` field to Set
+    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
+    impl<S: State> State for SetIonosphere<S> {
+        type Name = S::Name;
+        type Ionosphere = Set<members::ionosphere>;
+        type Language = S::Language;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLanguage<S> {}
+    impl<S: State> State for SetLanguage<S> {
+        type Name = S::Name;
+        type Ionosphere = S::Ionosphere;
+        type Language = Set<members::language>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
         ///Marker type for the `language` field
         pub struct language(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -498,9 +498,9 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 impl<'a, S> ServiceBuilder<'a, S>
 where
     S: service_state::State,
+    S::Name: service_state::IsSet,
     S::Ionosphere: service_state::IsSet,
     S::Language: service_state::IsSet,
-    S::Name: service_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Service<'a> {
@@ -521,7 +521,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -542,7 +542,7 @@ where
     }
 }
 
-fn lexicon_doc_media_ionosphere_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_media_ionosphere_service() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

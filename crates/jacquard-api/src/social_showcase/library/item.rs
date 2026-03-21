@@ -19,41 +19,43 @@
 #[serde(rename_all = "camelCase")]
 pub struct Item<'a> {
     ///Category/type of item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///Item description
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Link to external site
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub external_link: core::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
     ///Embedded image blobs (max 6 images, 2000x2000px max, 5MB each)
     #[serde(borrow)]
     pub images: Vec<crate::social_showcase::ItemImage<'a>>,
     ///Freeform metadata (brand, model, condition, datePurchased, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub metadata: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///Personal notes or story about the item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Schema version for migrations (defaults to 1 if missing) Defaults to `1`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_item_schema_version")]
-    pub schema_version: std::option::Option<i64>,
+    pub schema_version: core::option::Option<i64>,
     ///Tags for discovery (max 20)
     #[serde(borrow)]
     pub tags: Vec<jacquard_common::CowStr<'a>>,
     ///Item title
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub visibility: ItemVisibility<'a>,
 }
@@ -163,9 +165,9 @@ impl jacquard_common::IntoStatic for ItemVisibility<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ItemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -212,19 +214,19 @@ impl jacquard_common::types::collection::Collection for ItemRecord {
     type Record = ItemRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Item<'a> {
     fn nsid() -> &'static str {
         "social.showcase.library.item"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_library_item()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.category {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -317,7 +319,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
     }
 }
 
-fn _default_item_schema_version() -> std::option::Option<i64> {
+fn _default_item_schema_version() -> core::option::Option<i64> {
     Some(1i64)
 }
 
@@ -331,85 +333,85 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Tags;
-        type Images;
-        type Visibility;
         type CreatedAt;
+        type Tags;
+        type Visibility;
+        type Title;
+        type Images;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Tags = Unset;
-        type Images = Unset;
-        type Visibility = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Tags = S::Tags;
-        type Images = S::Images;
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Title = S::Title;
-        type Tags = Set<members::tags>;
-        type Images = S::Images;
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
-        type Title = S::Title;
-        type Tags = S::Tags;
-        type Images = Set<members::images>;
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Title = S::Title;
-        type Tags = S::Tags;
-        type Images = S::Images;
-        type Visibility = Set<members::visibility>;
-        type CreatedAt = S::CreatedAt;
+        type Tags = Unset;
+        type Visibility = Unset;
+        type Title = Unset;
+        type Images = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Tags = S::Tags;
-        type Images = S::Images;
-        type Visibility = S::Visibility;
         type CreatedAt = Set<members::created_at>;
+        type Tags = S::Tags;
+        type Visibility = S::Visibility;
+        type Title = S::Title;
+        type Images = S::Images;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type CreatedAt = S::CreatedAt;
+        type Tags = Set<members::tags>;
+        type Visibility = S::Visibility;
+        type Title = S::Title;
+        type Images = S::Images;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type Visibility = Set<members::visibility>;
+        type Title = S::Title;
+        type Images = S::Images;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type Visibility = S::Visibility;
+        type Title = Set<members::title>;
+        type Images = S::Images;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImages<S> {}
+    impl<S: State> State for SetImages<S> {
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type Visibility = S::Visibility;
+        type Title = S::Title;
+        type Images = Set<members::images>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
-        ///Marker type for the `images` field
-        pub struct images(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `images` field
+        pub struct images(());
     }
 }
 
@@ -683,11 +685,11 @@ where
 impl<'a, S> ItemBuilder<'a, S>
 where
     S: item_state::State,
-    S::Title: item_state::IsSet,
-    S::Tags: item_state::IsSet,
-    S::Images: item_state::IsSet,
-    S::Visibility: item_state::IsSet,
     S::CreatedAt: item_state::IsSet,
+    S::Tags: item_state::IsSet,
+    S::Visibility: item_state::IsSet,
+    S::Title: item_state::IsSet,
+    S::Images: item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Item<'a> {
@@ -710,7 +712,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -733,7 +735,7 @@ where
     }
 }
 
-fn lexicon_doc_social_showcase_library_item() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_showcase_library_item() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

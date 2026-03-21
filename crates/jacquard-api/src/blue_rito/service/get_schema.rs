@@ -17,9 +17,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Langs<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub lang: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -68,41 +68,41 @@ pub struct GetSchemaOutput<'a> {
     #[serde(borrow)]
     pub nsid: jacquard_common::CowStr<'a>,
     ///The Open Graph Protocol (OGP) description for the bookmark.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp_description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub ogp_description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The Open Graph Protocol (OGP) image URL for the bookmark.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp_image: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub ogp_image: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The Open Graph Protocol (OGP) title for the bookmark.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp_title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub ogp_title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The schema URL pattern associated with this NSID (e.g., 'https://skyblur.uk/post/{did}/{rkey}').
     #[serde(borrow)]
     pub schema: jacquard_common::CowStr<'a>,
     ///This field contains tags. If registered by the owner, it may include 'Verified'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///If this comment registed by owner, this field should be true.
     pub verified: bool,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Langs<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Langs<'a> {
     fn nsid() -> &'static str {
         "blue.rito.service.getSchema"
     }
     fn def_name() -> &'static str {
         "langs"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_rito_service_getSchema()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -147,49 +147,49 @@ pub mod langs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Moderation;
         type Title;
+        type Moderation;
         type Lang;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Moderation = Unset;
         type Title = Unset;
+        type Moderation = Unset;
         type Lang = Unset;
-    }
-    ///State transition - sets the `moderation` field to Set
-    pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModeration<S> {}
-    impl<S: State> State for SetModeration<S> {
-        type Moderation = Set<members::moderation>;
-        type Title = S::Title;
-        type Lang = S::Lang;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Moderation = S::Moderation;
         type Title = Set<members::title>;
+        type Moderation = S::Moderation;
+        type Lang = S::Lang;
+    }
+    ///State transition - sets the `moderation` field to Set
+    pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModeration<S> {}
+    impl<S: State> State for SetModeration<S> {
+        type Title = S::Title;
+        type Moderation = Set<members::moderation>;
         type Lang = S::Lang;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLang<S> {}
     impl<S: State> State for SetLang<S> {
-        type Moderation = S::Moderation;
         type Title = S::Title;
+        type Moderation = S::Moderation;
         type Lang = Set<members::lang>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `moderation` field
-        pub struct moderation(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `moderation` field
+        pub struct moderation(());
         ///Marker type for the `lang` field
         pub struct lang(());
     }
@@ -301,8 +301,8 @@ where
 impl<'a, S> LangsBuilder<'a, S>
 where
     S: langs_state::State,
-    S::Moderation: langs_state::IsSet,
     S::Title: langs_state::IsSet,
+    S::Moderation: langs_state::IsSet,
     S::Lang: langs_state::IsSet,
 {
     /// Build the final struct
@@ -318,7 +318,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -333,7 +333,7 @@ where
     }
 }
 
-fn lexicon_doc_blue_rito_service_getSchema() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blue_rito_service_getSchema() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

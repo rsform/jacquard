@@ -22,9 +22,9 @@ pub struct ObservedProperty<'a> {
     ///URI identifying the property from a controlled vocabulary (CF Standard Names, QUDT quantity kinds, etc.)
     #[serde(borrow)]
     pub definition: jacquard_common::types::string::UriValue<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
@@ -41,9 +41,9 @@ pub struct ObservedProperty<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ObservedPropertyGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -90,19 +90,19 @@ impl jacquard_common::types::collection::Collection for ObservedPropertyRecord {
     type Record = ObservedPropertyRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ObservedProperty<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ObservedProperty<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.observedProperty"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_observedProperty()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
@@ -143,50 +143,50 @@ pub mod observed_property_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Definition;
         type CreatedAt;
+        type Definition;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Definition = Unset;
         type CreatedAt = Unset;
+        type Definition = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
         type Definition = S::Definition;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `definition` field to Set
-    pub struct SetDefinition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefinition<S> {}
-    impl<S: State> State for SetDefinition<S> {
-        type Name = S::Name;
-        type Definition = Set<members::definition>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Name = S::Name;
-        type Definition = S::Definition;
         type CreatedAt = Set<members::created_at>;
+        type Definition = S::Definition;
+    }
+    ///State transition - sets the `definition` field to Set
+    pub struct SetDefinition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefinition<S> {}
+    impl<S: State> State for SetDefinition<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Definition = Set<members::definition>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `definition` field
-        pub struct definition(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `definition` field
+        pub struct definition(());
     }
 }
 
@@ -300,8 +300,8 @@ impl<'a, S> ObservedPropertyBuilder<'a, S>
 where
     S: observed_property_state::State,
     S::Name: observed_property_state::IsSet,
-    S::Definition: observed_property_state::IsSet,
     S::CreatedAt: observed_property_state::IsSet,
+    S::Definition: observed_property_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ObservedProperty<'a> {
@@ -316,7 +316,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -331,7 +331,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_sensorthings_observedProperty() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_sensorthings_observedProperty() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

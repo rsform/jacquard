@@ -16,13 +16,13 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListKeys<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `100`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -38,9 +38,9 @@ pub struct ListKeys<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ListKeysOutput<'a> {
     ///Pagination cursor for next page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub keys: Vec<crate::sh_tangled::knot::list_keys::PublicKey<'a>>,
 }
@@ -62,7 +62,7 @@ pub struct ListKeysOutput<'a> {
 pub enum ListKeysError<'a> {
     /// Failed to retrieve public keys
     #[serde(rename = "InternalServerError")]
-    InternalServerError(std::option::Option<jacquard_common::CowStr<'a>>),
+    InternalServerError(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ListKeysError<'_> {
@@ -128,19 +128,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListKeysRequest {
     type Response = ListKeysResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.knot.listKeys"
     }
     fn def_name() -> &'static str {
         "publicKey"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_knot_listKeys()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.key;
             #[allow(unused_comparisons)]
@@ -158,7 +158,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PublicKey<'a> {
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(100i64)
 }
 
@@ -262,50 +262,50 @@ pub mod public_key_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Did;
         type Key;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Did = Unset;
         type Key = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Key = S::Key;
         type Did = S::Did;
-        type Key = S::Key;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type CreatedAt = S::CreatedAt;
-        type Did = Set<members::did>;
-        type Key = S::Key;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
         type CreatedAt = S::CreatedAt;
-        type Did = S::Did;
         type Key = Set<members::key>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Key = S::Key;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -399,8 +399,8 @@ impl<'a, S> PublicKeyBuilder<'a, S>
 where
     S: public_key_state::State,
     S::CreatedAt: public_key_state::IsSet,
-    S::Did: public_key_state::IsSet,
     S::Key: public_key_state::IsSet,
+    S::Did: public_key_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PublicKey<'a> {
@@ -414,7 +414,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -428,7 +428,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_knot_listKeys() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_tangled_knot_listKeys() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

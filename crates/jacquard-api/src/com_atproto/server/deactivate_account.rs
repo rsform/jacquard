@@ -19,8 +19,8 @@
 #[serde(rename_all = "camelCase")]
 pub struct DeactivateAccount<'a> {
     ///A recommendation to server as to how long they should hold onto the deactivated account before deleting.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub delete_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub delete_after: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Response type for

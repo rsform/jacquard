@@ -55,32 +55,32 @@ pub struct BodyTemplate<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Component<'a> {
     ///How this component is rendered. Omit for primitives rendered by the host.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub body: std::option::Option<ComponentBody<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub body: core::option::Option<ComponentBody<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Ordered list of pack URIs (import stack). First pack that exports an NSID wins.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub imports: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub imports: core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     ///NSID this component implements (also the XRPC procedure)
     #[serde(borrow)]
     pub r#type: jacquard_common::types::string::Nsid<'a>,
     ///Last update timestamp. Set by the publish flow to bust cached responses.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Platform-managed deployment metadata
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub via: std::option::Option<crate::at_inlay::ViaValtown<'a>>,
+    pub via: core::option::Option<crate::at_inlay::ViaValtown<'a>>,
     ///What data this component views and which prop receives it
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub view: std::option::Option<crate::at_inlay::component::View<'a>>,
+    pub view: core::option::Option<crate::at_inlay::component::View<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -114,9 +114,9 @@ pub enum ComponentBody<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ComponentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -178,9 +178,9 @@ pub enum ViewAcceptsItem<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ViewPrimitive<'a> {
     ///String format constraint. Only applies when type is 'string'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub format: std::option::Option<ViewPrimitiveFormat<'a>>,
+    pub format: core::option::Option<ViewPrimitiveFormat<'a>>,
     ///Lexicon primitive type.
     #[serde(borrow)]
     pub r#type: ViewPrimitiveType<'a>,
@@ -444,13 +444,13 @@ impl jacquard_common::IntoStatic for ViewPrimitiveType<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct ViewRecord<'a> {
     ///The collection this component views. Omit for any-collection.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collection: std::option::Option<jacquard_common::types::string::Nsid<'a>>,
+    pub collection: core::option::Option<jacquard_common::types::string::Nsid<'a>>,
     ///The record key, baked from the collection's lexicon at authoring time. Presence enables DID expansion and identity page routing.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rkey: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rkey: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Component<'a> {
@@ -466,36 +466,36 @@ impl<'a> Component<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BodyExternal<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BodyExternal<'a> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
     fn def_name() -> &'static str {
         "bodyExternal"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_component()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BodyTemplate<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BodyTemplate<'a> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
     fn def_name() -> &'static str {
         "bodyTemplate"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_component()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -527,19 +527,19 @@ impl jacquard_common::types::collection::Collection for ComponentRecord {
     type Record = ComponentRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Component<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Component<'a> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_component()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {
@@ -574,19 +574,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Component<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for View<'a> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
     fn def_name() -> &'static str {
         "view"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_component()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.accepts;
             #[allow(unused_comparisons)]
@@ -617,19 +617,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for View<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewPrimitive<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewPrimitive<'a> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
     fn def_name() -> &'static str {
         "viewPrimitive"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_component()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.format {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
@@ -659,19 +659,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewPrimitive<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewRecord<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewRecord<'a> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
     fn def_name() -> &'static str {
         "viewRecord"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_component()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.rkey {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
@@ -781,7 +781,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -793,7 +793,7 @@ where
     }
 }
 
-fn lexicon_doc_at_inlay_component() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_at_inlay_component() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("at.inlay.component"),
@@ -1338,7 +1338,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1581,7 +1581,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1727,7 +1727,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

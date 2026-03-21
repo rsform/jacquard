@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "app.chavatar.settings",
+  "description": "User settings for avatar rotation.",
+  "defs": {
+    "avatarItem": {
+      "type": "object",
+      "required": [
+        "id",
+        "image"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 13
+        },
+        "image": {
+          "type": "ref",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Rotation configuration for a user.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "interval",
+          "mode",
+          "avatars"
+        ],
+        "properties": {
+          "avatars": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#avatarItem"
+            }
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "interval": {
+            "type": "string",
+            "maxLength": 10,
+            "knownValues": [
+              "1h",
+              "3h",
+              "6h",
+              "12h",
+              "1d",
+              "1w",
+              "1mo"
+            ]
+          },
+          "mode": {
+            "type": "string",
+            "maxLength": 20,
+            "knownValues": [
+              "sequential",
+              "random"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

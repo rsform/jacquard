@@ -19,428 +19,428 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Embedded<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub about: std::option::Option<EmbeddedAbout<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub about: core::option::Option<EmbeddedAbout<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#abstract: std::option::Option<EmbeddedAbstract<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub r#abstract: core::option::Option<EmbeddedAbstract<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub access_mode: std::option::Option<EmbeddedAccessMode<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub access_mode: core::option::Option<EmbeddedAccessMode<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub access_mode_sufficient: std::option::Option<EmbeddedAccessModeSufficient<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub access_mode_sufficient: core::option::Option<EmbeddedAccessModeSufficient<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_api: std::option::Option<EmbeddedAccessibilityApi<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accessibility_api: core::option::Option<EmbeddedAccessibilityApi<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_control: std::option::Option<EmbeddedAccessibilityControl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accessibility_control: core::option::Option<EmbeddedAccessibilityControl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_feature: std::option::Option<EmbeddedAccessibilityFeature<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accessibility_feature: core::option::Option<EmbeddedAccessibilityFeature<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_hazard: std::option::Option<EmbeddedAccessibilityHazard<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accessibility_hazard: core::option::Option<EmbeddedAccessibilityHazard<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_summary: std::option::Option<EmbeddedAccessibilitySummary<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accessibility_summary: core::option::Option<EmbeddedAccessibilitySummary<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accountable_person: std::option::Option<EmbeddedAccountablePerson<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accountable_person: core::option::Option<EmbeddedAccountablePerson<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub acquire_license_page: std::option::Option<EmbeddedAcquireLicensePage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub acquire_license_page: core::option::Option<EmbeddedAcquireLicensePage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub actor: std::option::Option<EmbeddedActor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub actor: core::option::Option<EmbeddedActor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub additional_type: std::option::Option<EmbeddedAdditionalType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub additional_type: core::option::Option<EmbeddedAdditionalType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aggregate_rating: std::option::Option<EmbeddedAggregateRating<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub aggregate_rating: core::option::Option<EmbeddedAggregateRating<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alternate_name: std::option::Option<EmbeddedAlternateName<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alternate_name: core::option::Option<EmbeddedAlternateName<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alternative_headline: std::option::Option<EmbeddedAlternativeHeadline<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alternative_headline: core::option::Option<EmbeddedAlternativeHeadline<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub archived_at: std::option::Option<EmbeddedArchivedAt<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub archived_at: core::option::Option<EmbeddedArchivedAt<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub assesses: std::option::Option<EmbeddedAssesses<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub assesses: core::option::Option<EmbeddedAssesses<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated_media: std::option::Option<EmbeddedAssociatedMedia<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub associated_media: core::option::Option<EmbeddedAssociatedMedia<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub audience: std::option::Option<EmbeddedAudience<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub audience: core::option::Option<EmbeddedAudience<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub audio: std::option::Option<EmbeddedAudio<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub audio: core::option::Option<EmbeddedAudio<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub author: std::option::Option<EmbeddedAuthor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub author: core::option::Option<EmbeddedAuthor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub award: std::option::Option<EmbeddedAward<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub award: core::option::Option<EmbeddedAward<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub awards: std::option::Option<EmbeddedAwards<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub awards: core::option::Option<EmbeddedAwards<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub character: std::option::Option<EmbeddedCharacter<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub character: core::option::Option<EmbeddedCharacter<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub citation: std::option::Option<EmbeddedCitation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub citation: core::option::Option<EmbeddedCitation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<EmbeddedComment<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub comment: core::option::Option<EmbeddedComment<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment_count: std::option::Option<EmbeddedCommentCount<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub comment_count: core::option::Option<EmbeddedCommentCount<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub conditions_of_access: std::option::Option<EmbeddedConditionsOfAccess<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub conditions_of_access: core::option::Option<EmbeddedConditionsOfAccess<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_location: std::option::Option<EmbeddedContentLocation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub content_location: core::option::Option<EmbeddedContentLocation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_rating: std::option::Option<EmbeddedContentRating<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub content_rating: core::option::Option<EmbeddedContentRating<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_reference_time: std::option::Option<EmbeddedContentReferenceTime<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub content_reference_time: core::option::Option<EmbeddedContentReferenceTime<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contributor: std::option::Option<EmbeddedContributor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub contributor: core::option::Option<EmbeddedContributor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub copyright_holder: std::option::Option<EmbeddedCopyrightHolder<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub copyright_holder: core::option::Option<EmbeddedCopyrightHolder<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub copyright_notice: std::option::Option<EmbeddedCopyrightNotice<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub copyright_notice: core::option::Option<EmbeddedCopyrightNotice<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub copyright_year: std::option::Option<EmbeddedCopyrightYear<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub copyright_year: core::option::Option<EmbeddedCopyrightYear<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub correction: std::option::Option<EmbeddedCorrection<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub correction: core::option::Option<EmbeddedCorrection<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub country_of_origin: std::option::Option<EmbeddedCountryOfOrigin<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub country_of_origin: core::option::Option<EmbeddedCountryOfOrigin<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub creative_work_status: std::option::Option<EmbeddedCreativeWorkStatus<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub creative_work_status: core::option::Option<EmbeddedCreativeWorkStatus<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub creator: std::option::Option<EmbeddedCreator<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub creator: core::option::Option<EmbeddedCreator<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub credit_text: std::option::Option<EmbeddedCreditText<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub credit_text: core::option::Option<EmbeddedCreditText<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub date_created: std::option::Option<EmbeddedDateCreated<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub date_created: core::option::Option<EmbeddedDateCreated<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub date_modified: std::option::Option<EmbeddedDateModified<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub date_modified: core::option::Option<EmbeddedDateModified<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub date_published: std::option::Option<EmbeddedDatePublished<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub date_published: core::option::Option<EmbeddedDatePublished<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<EmbeddedDescription<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<EmbeddedDescription<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub digital_source_type: std::option::Option<EmbeddedDigitalSourceType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub digital_source_type: core::option::Option<EmbeddedDigitalSourceType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub director: std::option::Option<EmbeddedDirector<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub director: core::option::Option<EmbeddedDirector<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub disambiguating_description: std::option::Option<
+    pub disambiguating_description: core::option::Option<
         EmbeddedDisambiguatingDescription<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub discussion_url: std::option::Option<EmbeddedDiscussionUrl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub discussion_url: core::option::Option<EmbeddedDiscussionUrl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub edit_eidr: std::option::Option<EmbeddedEditEidr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub edit_eidr: core::option::Option<EmbeddedEditEidr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub editor: std::option::Option<EmbeddedEditor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub editor: core::option::Option<EmbeddedEditor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub educational_alignment: std::option::Option<EmbeddedEducationalAlignment<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub educational_alignment: core::option::Option<EmbeddedEducationalAlignment<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub educational_level: std::option::Option<EmbeddedEducationalLevel<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub educational_level: core::option::Option<EmbeddedEducationalLevel<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub educational_use: std::option::Option<EmbeddedEducationalUse<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub educational_use: core::option::Option<EmbeddedEducationalUse<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub encoding: std::option::Option<EmbeddedEncoding<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub encoding: core::option::Option<EmbeddedEncoding<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub encoding_format: std::option::Option<EmbeddedEncodingFormat<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub encoding_format: core::option::Option<EmbeddedEncodingFormat<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub encodings: std::option::Option<EmbeddedEncodings<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub encodings: core::option::Option<EmbeddedEncodings<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub end_date: std::option::Option<EmbeddedEndDate<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub end_date: core::option::Option<EmbeddedEndDate<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub episode: std::option::Option<EmbeddedEpisode<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub episode: core::option::Option<EmbeddedEpisode<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub episodes: std::option::Option<EmbeddedEpisodes<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub episodes: core::option::Option<EmbeddedEpisodes<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub example_of_work: std::option::Option<EmbeddedExampleOfWork<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub example_of_work: core::option::Option<EmbeddedExampleOfWork<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub expires: std::option::Option<EmbeddedExpires<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub expires: core::option::Option<EmbeddedExpires<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub file_format: std::option::Option<EmbeddedFileFormat<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub file_format: core::option::Option<EmbeddedFileFormat<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub funder: std::option::Option<EmbeddedFunder<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub funder: core::option::Option<EmbeddedFunder<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub funding: std::option::Option<EmbeddedFunding<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub funding: core::option::Option<EmbeddedFunding<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genre: std::option::Option<EmbeddedGenre<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub genre: core::option::Option<EmbeddedGenre<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_part: std::option::Option<EmbeddedHasPart<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_part: core::option::Option<EmbeddedHasPart<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub headline: std::option::Option<EmbeddedHeadline<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub headline: core::option::Option<EmbeddedHeadline<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identifier: std::option::Option<EmbeddedIdentifier<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub identifier: core::option::Option<EmbeddedIdentifier<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<EmbeddedImage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub image: core::option::Option<EmbeddedImage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub in_language: std::option::Option<EmbeddedInLanguage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub in_language: core::option::Option<EmbeddedInLanguage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub interaction_statistic: std::option::Option<EmbeddedInteractionStatistic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub interaction_statistic: core::option::Option<EmbeddedInteractionStatistic<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub interactivity_type: std::option::Option<EmbeddedInteractivityType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub interactivity_type: core::option::Option<EmbeddedInteractivityType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub interpreted_as_claim: std::option::Option<EmbeddedInterpretedAsClaim<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub interpreted_as_claim: core::option::Option<EmbeddedInterpretedAsClaim<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_accessible_for_free: std::option::Option<EmbeddedIsAccessibleForFree<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_accessible_for_free: core::option::Option<EmbeddedIsAccessibleForFree<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_based_on: std::option::Option<EmbeddedIsBasedOn<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_based_on: core::option::Option<EmbeddedIsBasedOn<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_based_on_url: std::option::Option<EmbeddedIsBasedOnUrl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_based_on_url: core::option::Option<EmbeddedIsBasedOnUrl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_family_friendly: std::option::Option<EmbeddedIsFamilyFriendly<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_family_friendly: core::option::Option<EmbeddedIsFamilyFriendly<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_part_of: std::option::Option<EmbeddedIsPartOf<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_part_of: core::option::Option<EmbeddedIsPartOf<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keywords: std::option::Option<EmbeddedKeywords<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub keywords: core::option::Option<EmbeddedKeywords<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub learning_resource_type: std::option::Option<EmbeddedLearningResourceType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub learning_resource_type: core::option::Option<EmbeddedLearningResourceType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub license: std::option::Option<EmbeddedLicense<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub license: core::option::Option<EmbeddedLicense<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location_created: std::option::Option<EmbeddedLocationCreated<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub location_created: core::option::Option<EmbeddedLocationCreated<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub main_entity: std::option::Option<EmbeddedMainEntity<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub main_entity: core::option::Option<EmbeddedMainEntity<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub main_entity_of_page: std::option::Option<EmbeddedMainEntityOfPage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub main_entity_of_page: core::option::Option<EmbeddedMainEntityOfPage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub maintainer: std::option::Option<EmbeddedMaintainer<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub maintainer: core::option::Option<EmbeddedMaintainer<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub material: std::option::Option<EmbeddedMaterial<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub material: core::option::Option<EmbeddedMaterial<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub material_extent: std::option::Option<EmbeddedMaterialExtent<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub material_extent: core::option::Option<EmbeddedMaterialExtent<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mentions: std::option::Option<EmbeddedMentions<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub mentions: core::option::Option<EmbeddedMentions<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<EmbeddedName<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub name: core::option::Option<EmbeddedName<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub number_of_episodes: std::option::Option<EmbeddedNumberOfEpisodes<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub number_of_episodes: core::option::Option<EmbeddedNumberOfEpisodes<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub offers: std::option::Option<EmbeddedOffers<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub offers: core::option::Option<EmbeddedOffers<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub part_of_series: std::option::Option<EmbeddedPartOfSeries<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub part_of_series: core::option::Option<EmbeddedPartOfSeries<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub part_of_tv_series: std::option::Option<EmbeddedPartOfTvSeries<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub part_of_tv_series: core::option::Option<EmbeddedPartOfTvSeries<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pattern: std::option::Option<EmbeddedPattern<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pattern: core::option::Option<EmbeddedPattern<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub position: std::option::Option<EmbeddedPosition<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub position: core::option::Option<EmbeddedPosition<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub potential_action: std::option::Option<EmbeddedPotentialAction<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub potential_action: core::option::Option<EmbeddedPotentialAction<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub producer: std::option::Option<EmbeddedProducer<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub producer: core::option::Option<EmbeddedProducer<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub production_company: std::option::Option<EmbeddedProductionCompany<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub production_company: core::option::Option<EmbeddedProductionCompany<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub provider: std::option::Option<EmbeddedProvider<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub provider: core::option::Option<EmbeddedProvider<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publication: std::option::Option<EmbeddedPublication<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub publication: core::option::Option<EmbeddedPublication<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publisher: std::option::Option<EmbeddedPublisher<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub publisher: core::option::Option<EmbeddedPublisher<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publisher_imprint: std::option::Option<EmbeddedPublisherImprint<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub publisher_imprint: core::option::Option<EmbeddedPublisherImprint<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publishing_principles: std::option::Option<EmbeddedPublishingPrinciples<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub publishing_principles: core::option::Option<EmbeddedPublishingPrinciples<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub recorded_at: std::option::Option<EmbeddedRecordedAt<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub recorded_at: core::option::Option<EmbeddedRecordedAt<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub released_event: std::option::Option<EmbeddedReleasedEvent<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub released_event: core::option::Option<EmbeddedReleasedEvent<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub review: std::option::Option<EmbeddedReview<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub review: core::option::Option<EmbeddedReview<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reviews: std::option::Option<EmbeddedReviews<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reviews: core::option::Option<EmbeddedReviews<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub same_as: std::option::Option<EmbeddedSameAs<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub same_as: core::option::Option<EmbeddedSameAs<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub schema_version: std::option::Option<EmbeddedSchemaVersion<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub schema_version: core::option::Option<EmbeddedSchemaVersion<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sd_date_published: std::option::Option<EmbeddedSdDatePublished<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sd_date_published: core::option::Option<EmbeddedSdDatePublished<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sd_license: std::option::Option<EmbeddedSdLicense<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sd_license: core::option::Option<EmbeddedSdLicense<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sd_publisher: std::option::Option<EmbeddedSdPublisher<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sd_publisher: core::option::Option<EmbeddedSdPublisher<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub season_number: std::option::Option<EmbeddedSeasonNumber<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub season_number: core::option::Option<EmbeddedSeasonNumber<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub size: std::option::Option<EmbeddedSize<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub size: core::option::Option<EmbeddedSize<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_organization: std::option::Option<EmbeddedSourceOrganization<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub source_organization: core::option::Option<EmbeddedSourceOrganization<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub spatial: std::option::Option<EmbeddedSpatial<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub spatial: core::option::Option<EmbeddedSpatial<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub spatial_coverage: std::option::Option<EmbeddedSpatialCoverage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub spatial_coverage: core::option::Option<EmbeddedSpatialCoverage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sponsor: std::option::Option<EmbeddedSponsor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sponsor: core::option::Option<EmbeddedSponsor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub start_date: std::option::Option<EmbeddedStartDate<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub start_date: core::option::Option<EmbeddedStartDate<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_of: std::option::Option<EmbeddedSubjectOf<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subject_of: core::option::Option<EmbeddedSubjectOf<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub teaches: std::option::Option<EmbeddedTeaches<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub teaches: core::option::Option<EmbeddedTeaches<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub temporal: std::option::Option<EmbeddedTemporal<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub temporal: core::option::Option<EmbeddedTemporal<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub temporal_coverage: std::option::Option<EmbeddedTemporalCoverage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub temporal_coverage: core::option::Option<EmbeddedTemporalCoverage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<EmbeddedText<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub text: core::option::Option<EmbeddedText<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: std::option::Option<EmbeddedThumbnail<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub thumbnail: core::option::Option<EmbeddedThumbnail<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail_url: std::option::Option<EmbeddedThumbnailUrl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub thumbnail_url: core::option::Option<EmbeddedThumbnailUrl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub time_required: std::option::Option<EmbeddedTimeRequired<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub time_required: core::option::Option<EmbeddedTimeRequired<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title_eidr: std::option::Option<EmbeddedTitleEidr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub title_eidr: core::option::Option<EmbeddedTitleEidr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub trailer: std::option::Option<EmbeddedTrailer<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub trailer: core::option::Option<EmbeddedTrailer<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub translation_of_work: std::option::Option<EmbeddedTranslationOfWork<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub translation_of_work: core::option::Option<EmbeddedTranslationOfWork<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub translator: std::option::Option<EmbeddedTranslator<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub translator: core::option::Option<EmbeddedTranslator<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub typical_age_range: std::option::Option<EmbeddedTypicalAgeRange<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub typical_age_range: core::option::Option<EmbeddedTypicalAgeRange<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<EmbeddedUrl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub url: core::option::Option<EmbeddedUrl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub usage_info: std::option::Option<EmbeddedUsageInfo<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub usage_info: core::option::Option<EmbeddedUsageInfo<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub version: std::option::Option<EmbeddedVersion<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub version: core::option::Option<EmbeddedVersion<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub video: std::option::Option<EmbeddedVideo<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub video: core::option::Option<EmbeddedVideo<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub word_count: std::option::Option<EmbeddedWordCount<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub word_count: core::option::Option<EmbeddedWordCount<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub work_example: std::option::Option<EmbeddedWorkExample<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub work_example: core::option::Option<EmbeddedWorkExample<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub work_translation: std::option::Option<EmbeddedWorkTranslation<'a>>,
+    pub work_translation: core::option::Option<EmbeddedWorkTranslation<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -2469,428 +2469,428 @@ pub enum EmbeddedWorkTranslation<'a> {}
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TvSeason<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub about: std::option::Option<TvSeasonAbout<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub about: core::option::Option<TvSeasonAbout<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#abstract: std::option::Option<TvSeasonAbstract<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub r#abstract: core::option::Option<TvSeasonAbstract<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub access_mode: std::option::Option<TvSeasonAccessMode<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub access_mode: core::option::Option<TvSeasonAccessMode<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub access_mode_sufficient: std::option::Option<TvSeasonAccessModeSufficient<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub access_mode_sufficient: core::option::Option<TvSeasonAccessModeSufficient<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_api: std::option::Option<TvSeasonAccessibilityApi<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accessibility_api: core::option::Option<TvSeasonAccessibilityApi<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_control: std::option::Option<TvSeasonAccessibilityControl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accessibility_control: core::option::Option<TvSeasonAccessibilityControl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_feature: std::option::Option<TvSeasonAccessibilityFeature<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accessibility_feature: core::option::Option<TvSeasonAccessibilityFeature<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_hazard: std::option::Option<TvSeasonAccessibilityHazard<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accessibility_hazard: core::option::Option<TvSeasonAccessibilityHazard<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accessibility_summary: std::option::Option<TvSeasonAccessibilitySummary<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accessibility_summary: core::option::Option<TvSeasonAccessibilitySummary<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accountable_person: std::option::Option<TvSeasonAccountablePerson<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub accountable_person: core::option::Option<TvSeasonAccountablePerson<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub acquire_license_page: std::option::Option<TvSeasonAcquireLicensePage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub acquire_license_page: core::option::Option<TvSeasonAcquireLicensePage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub actor: std::option::Option<TvSeasonActor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub actor: core::option::Option<TvSeasonActor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub additional_type: std::option::Option<TvSeasonAdditionalType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub additional_type: core::option::Option<TvSeasonAdditionalType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aggregate_rating: std::option::Option<TvSeasonAggregateRating<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub aggregate_rating: core::option::Option<TvSeasonAggregateRating<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alternate_name: std::option::Option<TvSeasonAlternateName<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alternate_name: core::option::Option<TvSeasonAlternateName<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alternative_headline: std::option::Option<TvSeasonAlternativeHeadline<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alternative_headline: core::option::Option<TvSeasonAlternativeHeadline<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub archived_at: std::option::Option<TvSeasonArchivedAt<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub archived_at: core::option::Option<TvSeasonArchivedAt<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub assesses: std::option::Option<TvSeasonAssesses<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub assesses: core::option::Option<TvSeasonAssesses<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated_media: std::option::Option<TvSeasonAssociatedMedia<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub associated_media: core::option::Option<TvSeasonAssociatedMedia<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub audience: std::option::Option<TvSeasonAudience<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub audience: core::option::Option<TvSeasonAudience<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub audio: std::option::Option<TvSeasonAudio<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub audio: core::option::Option<TvSeasonAudio<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub author: std::option::Option<TvSeasonAuthor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub author: core::option::Option<TvSeasonAuthor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub award: std::option::Option<TvSeasonAward<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub award: core::option::Option<TvSeasonAward<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub awards: std::option::Option<TvSeasonAwards<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub awards: core::option::Option<TvSeasonAwards<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub character: std::option::Option<TvSeasonCharacter<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub character: core::option::Option<TvSeasonCharacter<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub citation: std::option::Option<TvSeasonCitation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub citation: core::option::Option<TvSeasonCitation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<TvSeasonComment<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub comment: core::option::Option<TvSeasonComment<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment_count: std::option::Option<TvSeasonCommentCount<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub comment_count: core::option::Option<TvSeasonCommentCount<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub conditions_of_access: std::option::Option<TvSeasonConditionsOfAccess<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub conditions_of_access: core::option::Option<TvSeasonConditionsOfAccess<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_location: std::option::Option<TvSeasonContentLocation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub content_location: core::option::Option<TvSeasonContentLocation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_rating: std::option::Option<TvSeasonContentRating<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub content_rating: core::option::Option<TvSeasonContentRating<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_reference_time: std::option::Option<TvSeasonContentReferenceTime<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub content_reference_time: core::option::Option<TvSeasonContentReferenceTime<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contributor: std::option::Option<TvSeasonContributor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub contributor: core::option::Option<TvSeasonContributor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub copyright_holder: std::option::Option<TvSeasonCopyrightHolder<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub copyright_holder: core::option::Option<TvSeasonCopyrightHolder<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub copyright_notice: std::option::Option<TvSeasonCopyrightNotice<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub copyright_notice: core::option::Option<TvSeasonCopyrightNotice<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub copyright_year: std::option::Option<TvSeasonCopyrightYear<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub copyright_year: core::option::Option<TvSeasonCopyrightYear<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub correction: std::option::Option<TvSeasonCorrection<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub correction: core::option::Option<TvSeasonCorrection<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub country_of_origin: std::option::Option<TvSeasonCountryOfOrigin<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub country_of_origin: core::option::Option<TvSeasonCountryOfOrigin<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub creative_work_status: std::option::Option<TvSeasonCreativeWorkStatus<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub creative_work_status: core::option::Option<TvSeasonCreativeWorkStatus<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub creator: std::option::Option<TvSeasonCreator<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub creator: core::option::Option<TvSeasonCreator<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub credit_text: std::option::Option<TvSeasonCreditText<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub credit_text: core::option::Option<TvSeasonCreditText<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub date_created: std::option::Option<TvSeasonDateCreated<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub date_created: core::option::Option<TvSeasonDateCreated<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub date_modified: std::option::Option<TvSeasonDateModified<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub date_modified: core::option::Option<TvSeasonDateModified<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub date_published: std::option::Option<TvSeasonDatePublished<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub date_published: core::option::Option<TvSeasonDatePublished<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<TvSeasonDescription<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<TvSeasonDescription<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub digital_source_type: std::option::Option<TvSeasonDigitalSourceType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub digital_source_type: core::option::Option<TvSeasonDigitalSourceType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub director: std::option::Option<TvSeasonDirector<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub director: core::option::Option<TvSeasonDirector<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub disambiguating_description: std::option::Option<
+    pub disambiguating_description: core::option::Option<
         TvSeasonDisambiguatingDescription<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub discussion_url: std::option::Option<TvSeasonDiscussionUrl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub discussion_url: core::option::Option<TvSeasonDiscussionUrl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub edit_eidr: std::option::Option<TvSeasonEditEidr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub edit_eidr: core::option::Option<TvSeasonEditEidr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub editor: std::option::Option<TvSeasonEditor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub editor: core::option::Option<TvSeasonEditor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub educational_alignment: std::option::Option<TvSeasonEducationalAlignment<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub educational_alignment: core::option::Option<TvSeasonEducationalAlignment<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub educational_level: std::option::Option<TvSeasonEducationalLevel<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub educational_level: core::option::Option<TvSeasonEducationalLevel<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub educational_use: std::option::Option<TvSeasonEducationalUse<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub educational_use: core::option::Option<TvSeasonEducationalUse<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub encoding: std::option::Option<TvSeasonEncoding<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub encoding: core::option::Option<TvSeasonEncoding<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub encoding_format: std::option::Option<TvSeasonEncodingFormat<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub encoding_format: core::option::Option<TvSeasonEncodingFormat<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub encodings: std::option::Option<TvSeasonEncodings<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub encodings: core::option::Option<TvSeasonEncodings<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub end_date: std::option::Option<TvSeasonEndDate<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub end_date: core::option::Option<TvSeasonEndDate<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub episode: std::option::Option<TvSeasonEpisode<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub episode: core::option::Option<TvSeasonEpisode<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub episodes: std::option::Option<TvSeasonEpisodes<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub episodes: core::option::Option<TvSeasonEpisodes<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub example_of_work: std::option::Option<TvSeasonExampleOfWork<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub example_of_work: core::option::Option<TvSeasonExampleOfWork<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub expires: std::option::Option<TvSeasonExpires<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub expires: core::option::Option<TvSeasonExpires<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub file_format: std::option::Option<TvSeasonFileFormat<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub file_format: core::option::Option<TvSeasonFileFormat<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub funder: std::option::Option<TvSeasonFunder<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub funder: core::option::Option<TvSeasonFunder<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub funding: std::option::Option<TvSeasonFunding<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub funding: core::option::Option<TvSeasonFunding<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genre: std::option::Option<TvSeasonGenre<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub genre: core::option::Option<TvSeasonGenre<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub has_part: std::option::Option<TvSeasonHasPart<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub has_part: core::option::Option<TvSeasonHasPart<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub headline: std::option::Option<TvSeasonHeadline<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub headline: core::option::Option<TvSeasonHeadline<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identifier: std::option::Option<TvSeasonIdentifier<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub identifier: core::option::Option<TvSeasonIdentifier<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<TvSeasonImage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub image: core::option::Option<TvSeasonImage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub in_language: std::option::Option<TvSeasonInLanguage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub in_language: core::option::Option<TvSeasonInLanguage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub interaction_statistic: std::option::Option<TvSeasonInteractionStatistic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub interaction_statistic: core::option::Option<TvSeasonInteractionStatistic<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub interactivity_type: std::option::Option<TvSeasonInteractivityType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub interactivity_type: core::option::Option<TvSeasonInteractivityType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub interpreted_as_claim: std::option::Option<TvSeasonInterpretedAsClaim<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub interpreted_as_claim: core::option::Option<TvSeasonInterpretedAsClaim<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_accessible_for_free: std::option::Option<TvSeasonIsAccessibleForFree<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_accessible_for_free: core::option::Option<TvSeasonIsAccessibleForFree<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_based_on: std::option::Option<TvSeasonIsBasedOn<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_based_on: core::option::Option<TvSeasonIsBasedOn<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_based_on_url: std::option::Option<TvSeasonIsBasedOnUrl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_based_on_url: core::option::Option<TvSeasonIsBasedOnUrl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_family_friendly: std::option::Option<TvSeasonIsFamilyFriendly<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_family_friendly: core::option::Option<TvSeasonIsFamilyFriendly<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub is_part_of: std::option::Option<TvSeasonIsPartOf<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub is_part_of: core::option::Option<TvSeasonIsPartOf<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keywords: std::option::Option<TvSeasonKeywords<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub keywords: core::option::Option<TvSeasonKeywords<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub learning_resource_type: std::option::Option<TvSeasonLearningResourceType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub learning_resource_type: core::option::Option<TvSeasonLearningResourceType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub license: std::option::Option<TvSeasonLicense<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub license: core::option::Option<TvSeasonLicense<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location_created: std::option::Option<TvSeasonLocationCreated<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub location_created: core::option::Option<TvSeasonLocationCreated<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub main_entity: std::option::Option<TvSeasonMainEntity<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub main_entity: core::option::Option<TvSeasonMainEntity<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub main_entity_of_page: std::option::Option<TvSeasonMainEntityOfPage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub main_entity_of_page: core::option::Option<TvSeasonMainEntityOfPage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub maintainer: std::option::Option<TvSeasonMaintainer<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub maintainer: core::option::Option<TvSeasonMaintainer<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub material: std::option::Option<TvSeasonMaterial<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub material: core::option::Option<TvSeasonMaterial<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub material_extent: std::option::Option<TvSeasonMaterialExtent<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub material_extent: core::option::Option<TvSeasonMaterialExtent<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mentions: std::option::Option<TvSeasonMentions<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub mentions: core::option::Option<TvSeasonMentions<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<TvSeasonName<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub name: core::option::Option<TvSeasonName<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub number_of_episodes: std::option::Option<TvSeasonNumberOfEpisodes<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub number_of_episodes: core::option::Option<TvSeasonNumberOfEpisodes<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub offers: std::option::Option<TvSeasonOffers<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub offers: core::option::Option<TvSeasonOffers<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub part_of_series: std::option::Option<TvSeasonPartOfSeries<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub part_of_series: core::option::Option<TvSeasonPartOfSeries<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub part_of_tv_series: std::option::Option<TvSeasonPartOfTvSeries<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub part_of_tv_series: core::option::Option<TvSeasonPartOfTvSeries<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pattern: std::option::Option<TvSeasonPattern<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pattern: core::option::Option<TvSeasonPattern<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub position: std::option::Option<TvSeasonPosition<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub position: core::option::Option<TvSeasonPosition<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub potential_action: std::option::Option<TvSeasonPotentialAction<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub potential_action: core::option::Option<TvSeasonPotentialAction<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub producer: std::option::Option<TvSeasonProducer<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub producer: core::option::Option<TvSeasonProducer<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub production_company: std::option::Option<TvSeasonProductionCompany<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub production_company: core::option::Option<TvSeasonProductionCompany<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub provider: std::option::Option<TvSeasonProvider<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub provider: core::option::Option<TvSeasonProvider<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publication: std::option::Option<TvSeasonPublication<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub publication: core::option::Option<TvSeasonPublication<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publisher: std::option::Option<TvSeasonPublisher<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub publisher: core::option::Option<TvSeasonPublisher<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publisher_imprint: std::option::Option<TvSeasonPublisherImprint<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub publisher_imprint: core::option::Option<TvSeasonPublisherImprint<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publishing_principles: std::option::Option<TvSeasonPublishingPrinciples<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub publishing_principles: core::option::Option<TvSeasonPublishingPrinciples<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub recorded_at: std::option::Option<TvSeasonRecordedAt<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub recorded_at: core::option::Option<TvSeasonRecordedAt<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub released_event: std::option::Option<TvSeasonReleasedEvent<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub released_event: core::option::Option<TvSeasonReleasedEvent<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub review: std::option::Option<TvSeasonReview<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub review: core::option::Option<TvSeasonReview<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reviews: std::option::Option<TvSeasonReviews<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub reviews: core::option::Option<TvSeasonReviews<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub same_as: std::option::Option<TvSeasonSameAs<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub same_as: core::option::Option<TvSeasonSameAs<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub schema_version: std::option::Option<TvSeasonSchemaVersion<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub schema_version: core::option::Option<TvSeasonSchemaVersion<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sd_date_published: std::option::Option<TvSeasonSdDatePublished<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sd_date_published: core::option::Option<TvSeasonSdDatePublished<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sd_license: std::option::Option<TvSeasonSdLicense<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sd_license: core::option::Option<TvSeasonSdLicense<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sd_publisher: std::option::Option<TvSeasonSdPublisher<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sd_publisher: core::option::Option<TvSeasonSdPublisher<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub season_number: std::option::Option<TvSeasonSeasonNumber<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub season_number: core::option::Option<TvSeasonSeasonNumber<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub size: std::option::Option<TvSeasonSize<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub size: core::option::Option<TvSeasonSize<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_organization: std::option::Option<TvSeasonSourceOrganization<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub source_organization: core::option::Option<TvSeasonSourceOrganization<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub spatial: std::option::Option<TvSeasonSpatial<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub spatial: core::option::Option<TvSeasonSpatial<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub spatial_coverage: std::option::Option<TvSeasonSpatialCoverage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub spatial_coverage: core::option::Option<TvSeasonSpatialCoverage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sponsor: std::option::Option<TvSeasonSponsor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sponsor: core::option::Option<TvSeasonSponsor<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub start_date: std::option::Option<TvSeasonStartDate<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub start_date: core::option::Option<TvSeasonStartDate<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_of: std::option::Option<TvSeasonSubjectOf<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subject_of: core::option::Option<TvSeasonSubjectOf<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub teaches: std::option::Option<TvSeasonTeaches<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub teaches: core::option::Option<TvSeasonTeaches<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub temporal: std::option::Option<TvSeasonTemporal<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub temporal: core::option::Option<TvSeasonTemporal<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub temporal_coverage: std::option::Option<TvSeasonTemporalCoverage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub temporal_coverage: core::option::Option<TvSeasonTemporalCoverage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<TvSeasonText<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub text: core::option::Option<TvSeasonText<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: std::option::Option<TvSeasonThumbnail<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub thumbnail: core::option::Option<TvSeasonThumbnail<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail_url: std::option::Option<TvSeasonThumbnailUrl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub thumbnail_url: core::option::Option<TvSeasonThumbnailUrl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub time_required: std::option::Option<TvSeasonTimeRequired<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub time_required: core::option::Option<TvSeasonTimeRequired<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title_eidr: std::option::Option<TvSeasonTitleEidr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub title_eidr: core::option::Option<TvSeasonTitleEidr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub trailer: std::option::Option<TvSeasonTrailer<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub trailer: core::option::Option<TvSeasonTrailer<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub translation_of_work: std::option::Option<TvSeasonTranslationOfWork<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub translation_of_work: core::option::Option<TvSeasonTranslationOfWork<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub translator: std::option::Option<TvSeasonTranslator<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub translator: core::option::Option<TvSeasonTranslator<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub typical_age_range: std::option::Option<TvSeasonTypicalAgeRange<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub typical_age_range: core::option::Option<TvSeasonTypicalAgeRange<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<TvSeasonUrl<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub url: core::option::Option<TvSeasonUrl<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub usage_info: std::option::Option<TvSeasonUsageInfo<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub usage_info: core::option::Option<TvSeasonUsageInfo<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub version: std::option::Option<TvSeasonVersion<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub version: core::option::Option<TvSeasonVersion<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub video: std::option::Option<TvSeasonVideo<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub video: core::option::Option<TvSeasonVideo<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub word_count: std::option::Option<TvSeasonWordCount<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub word_count: core::option::Option<TvSeasonWordCount<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub work_example: std::option::Option<TvSeasonWorkExample<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub work_example: core::option::Option<TvSeasonWorkExample<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub work_translation: std::option::Option<TvSeasonWorkTranslation<'a>>,
+    pub work_translation: core::option::Option<TvSeasonWorkTranslation<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -4919,9 +4919,9 @@ pub enum TvSeasonWorkTranslation<'a> {}
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TvSeasonGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -4941,19 +4941,19 @@ impl<'a> TvSeason<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Embedded<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Embedded<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.TVSeason"
     }
     fn def_name() -> &'static str {
         "embedded"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_type_TVSeason()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -4985,24 +4985,24 @@ impl jacquard_common::types::collection::Collection for TvSeasonRecord {
     type Record = TvSeasonRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TvSeason<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TvSeason<'a> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.TVSeason"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_flockfeeds_lexical_type_TVSeason()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_social_flockfeeds_lexical_type_TVSeason() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_flockfeeds_lexical_type_TVSeason() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -11542,7 +11542,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

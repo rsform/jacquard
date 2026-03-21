@@ -37,9 +37,9 @@ pub struct Favorites<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FavoritesGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -86,19 +86,19 @@ impl jacquard_common::types::collection::Collection for FavoritesRecord {
     type Record = FavoritesRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Favorites<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Favorites<'a> {
     fn nsid() -> &'static str {
         "app.beaconbits.favorites"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_beaconbits_favorites()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.dids;
             #[allow(unused_comparisons)]
@@ -126,37 +126,37 @@ pub mod favorites_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Dids;
         type UpdatedAt;
+        type Dids;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Dids = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `dids` field to Set
-    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDids<S> {}
-    impl<S: State> State for SetDids<S> {
-        type Dids = Set<members::dids>;
-        type UpdatedAt = S::UpdatedAt;
+        type Dids = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Dids = S::Dids;
         type UpdatedAt = Set<members::updated_at>;
+        type Dids = S::Dids;
+    }
+    ///State transition - sets the `dids` field to Set
+    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDids<S> {}
+    impl<S: State> State for SetDids<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Dids = Set<members::dids>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `dids` field
-        pub struct dids(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `dids` field
+        pub struct dids(());
     }
 }
 
@@ -229,8 +229,8 @@ where
 impl<'a, S> FavoritesBuilder<'a, S>
 where
     S: favorites_state::State,
-    S::Dids: favorites_state::IsSet,
     S::UpdatedAt: favorites_state::IsSet,
+    S::Dids: favorites_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Favorites<'a> {
@@ -243,7 +243,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -256,7 +256,7 @@ where
     }
 }
 
-fn lexicon_doc_app_beaconbits_favorites() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_beaconbits_favorites() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

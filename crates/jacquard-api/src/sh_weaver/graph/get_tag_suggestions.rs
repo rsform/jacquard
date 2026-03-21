@@ -16,17 +16,17 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetTagSuggestions<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub existing_tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub existing_tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Defaults to `20`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///(max length: 128)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub query: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub query: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -71,7 +71,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTagSuggestionsRequest {
     type Response = GetTagSuggestionsResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(20i64)
 }
 

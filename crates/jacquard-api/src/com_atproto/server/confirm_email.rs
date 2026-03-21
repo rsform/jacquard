@@ -40,13 +40,13 @@ pub struct ConfirmEmail<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ConfirmEmailError<'a> {
     #[serde(rename = "AccountNotFound")]
-    AccountNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    AccountNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    ExpiredToken(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidEmail")]
-    InvalidEmail(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidEmail(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ConfirmEmailError<'_> {

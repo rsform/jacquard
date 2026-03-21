@@ -60,15 +60,15 @@ pub struct VerifyPhoneOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum VerifyPhoneError<'a> {
     #[serde(rename = "RateLimitExceeded")]
-    RateLimitExceeded(std::option::Option<jacquard_common::CowStr<'a>>),
+    RateLimitExceeded(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidDid")]
-    InvalidDid(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDid(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidPhone")]
-    InvalidPhone(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidPhone(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidCode")]
-    InvalidCode(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidCode(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InternalError")]
-    InternalError(std::option::Option<jacquard_common::CowStr<'a>>),
+    InternalError(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for VerifyPhoneError<'_> {

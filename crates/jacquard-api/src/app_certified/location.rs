@@ -21,9 +21,9 @@ pub struct Location<'a> {
     ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Additional context about this location, such as its significance to the work or specific boundaries
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The location of where the work was performed as a URI, blob, or inline string.
     #[serde(borrow)]
     pub location: LocationLocation<'a>,
@@ -34,9 +34,9 @@ pub struct Location<'a> {
     #[serde(borrow)]
     pub lp_version: jacquard_common::CowStr<'a>,
     ///Human-readable name for this location (e.g. 'Golden Gate Park', 'San Francisco Bay Area')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The Spatial Reference System URI (e.g., http://www.opengis.net/def/crs/OGC/1.3/CRS84) that defines the coordinate system.
     #[serde(borrow)]
     pub srs: jacquard_common::types::string::UriValue<'a>,
@@ -200,9 +200,9 @@ impl jacquard_common::IntoStatic for LocationLocationType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LocationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -268,19 +268,19 @@ impl jacquard_common::types::collection::Collection for LocationRecord {
     type Record = LocationRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Location<'a> {
     fn nsid() -> &'static str {
         "app.certified.location"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_certified_location()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -384,19 +384,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Location<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LocationString<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LocationString<'a> {
     fn nsid() -> &'static str {
         "app.certified.location"
     }
     fn def_name() -> &'static str {
         "string"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_certified_location()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.string;
             #[allow(unused_comparisons)]
@@ -443,85 +443,85 @@ pub mod location_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Srs;
         type LpVersion;
+        type Location;
         type LocationType;
         type CreatedAt;
-        type Location;
+        type Srs;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Srs = Unset;
         type LpVersion = Unset;
+        type Location = Unset;
         type LocationType = Unset;
         type CreatedAt = Unset;
-        type Location = Unset;
-    }
-    ///State transition - sets the `srs` field to Set
-    pub struct SetSrs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrs<S> {}
-    impl<S: State> State for SetSrs<S> {
-        type Srs = Set<members::srs>;
-        type LpVersion = S::LpVersion;
-        type LocationType = S::LocationType;
-        type CreatedAt = S::CreatedAt;
-        type Location = S::Location;
+        type Srs = Unset;
     }
     ///State transition - sets the `lp_version` field to Set
     pub struct SetLpVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLpVersion<S> {}
     impl<S: State> State for SetLpVersion<S> {
-        type Srs = S::Srs;
         type LpVersion = Set<members::lp_version>;
+        type Location = S::Location;
         type LocationType = S::LocationType;
         type CreatedAt = S::CreatedAt;
-        type Location = S::Location;
-    }
-    ///State transition - sets the `location_type` field to Set
-    pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocationType<S> {}
-    impl<S: State> State for SetLocationType<S> {
         type Srs = S::Srs;
-        type LpVersion = S::LpVersion;
-        type LocationType = Set<members::location_type>;
-        type CreatedAt = S::CreatedAt;
-        type Location = S::Location;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Srs = S::Srs;
-        type LpVersion = S::LpVersion;
-        type LocationType = S::LocationType;
-        type CreatedAt = Set<members::created_at>;
-        type Location = S::Location;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocation<S> {}
     impl<S: State> State for SetLocation<S> {
-        type Srs = S::Srs;
         type LpVersion = S::LpVersion;
+        type Location = Set<members::location>;
         type LocationType = S::LocationType;
         type CreatedAt = S::CreatedAt;
-        type Location = Set<members::location>;
+        type Srs = S::Srs;
+    }
+    ///State transition - sets the `location_type` field to Set
+    pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocationType<S> {}
+    impl<S: State> State for SetLocationType<S> {
+        type LpVersion = S::LpVersion;
+        type Location = S::Location;
+        type LocationType = Set<members::location_type>;
+        type CreatedAt = S::CreatedAt;
+        type Srs = S::Srs;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type LpVersion = S::LpVersion;
+        type Location = S::Location;
+        type LocationType = S::LocationType;
+        type CreatedAt = Set<members::created_at>;
+        type Srs = S::Srs;
+    }
+    ///State transition - sets the `srs` field to Set
+    pub struct SetSrs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrs<S> {}
+    impl<S: State> State for SetSrs<S> {
+        type LpVersion = S::LpVersion;
+        type Location = S::Location;
+        type LocationType = S::LocationType;
+        type CreatedAt = S::CreatedAt;
+        type Srs = Set<members::srs>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `srs` field
-        pub struct srs(());
         ///Marker type for the `lp_version` field
         pub struct lp_version(());
+        ///Marker type for the `location` field
+        pub struct location(());
         ///Marker type for the `location_type` field
         pub struct location_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `location` field
-        pub struct location(());
+        ///Marker type for the `srs` field
+        pub struct srs(());
     }
 }
 
@@ -691,11 +691,11 @@ where
 impl<'a, S> LocationBuilder<'a, S>
 where
     S: location_state::State,
-    S::Srs: location_state::IsSet,
     S::LpVersion: location_state::IsSet,
+    S::Location: location_state::IsSet,
     S::LocationType: location_state::IsSet,
     S::CreatedAt: location_state::IsSet,
-    S::Location: location_state::IsSet,
+    S::Srs: location_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Location<'a> {
@@ -713,7 +713,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -731,7 +731,7 @@ where
     }
 }
 
-fn lexicon_doc_app_certified_location() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_certified_location() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

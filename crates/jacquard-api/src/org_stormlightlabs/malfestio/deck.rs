@@ -19,39 +19,41 @@
 #[serde(rename_all = "camelCase")]
 pub struct Deck<'a> {
     ///Ordered list of references to cards in this deck.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_refs: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub card_refs: core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///Description of the deck context.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Language code for the deck content (e.g., 'en', 'es', 'fr').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub language: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub language: core::option::Option<jacquard_common::CowStr<'a>>,
     ///License for the deck content.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub license: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub license: core::option::Option<jacquard_common::CowStr<'a>>,
     ///References to source materials (articles, lectures) used in this deck.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_refs: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub source_refs: core::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Title of the deck.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///Timestamp of last update.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Visibility setting for the deck.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub visibility: std::option::Option<DeckVisibility<'a>>,
+    pub visibility: core::option::Option<DeckVisibility<'a>>,
 }
 
 /// Visibility setting for the deck.
@@ -160,9 +162,9 @@ impl jacquard_common::IntoStatic for DeckVisibility<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeckGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -209,19 +211,19 @@ impl jacquard_common::types::collection::Collection for DeckRecord {
     type Record = DeckRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Deck<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Deck<'a> {
     fn nsid() -> &'static str {
         "org.stormlightlabs.malfestio.deck"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_stormlightlabs_malfestio_deck()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -593,7 +595,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -614,7 +616,7 @@ where
     }
 }
 
-fn lexicon_doc_org_stormlightlabs_malfestio_deck() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_stormlightlabs_malfestio_deck() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

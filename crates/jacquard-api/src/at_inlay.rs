@@ -31,13 +31,13 @@ pub mod throw;
 #[serde(rename_all = "camelCase")]
 pub struct CachePolicy<'a> {
     ///How frequently the underlying data changes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub life: std::option::Option<CachePolicyLife<'a>>,
+    pub life: core::option::Option<CachePolicyLife<'a>>,
     ///Data dependencies for cache invalidation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<CachePolicyTagsItem<'a>>>,
+    pub tags: core::option::Option<Vec<CachePolicyTagsItem<'a>>>,
 }
 
 /// How frequently the underlying data changes
@@ -172,13 +172,13 @@ pub enum CachePolicyTagsItem<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Element<'a> {
     ///Stable key that identifies the component among its siblings.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub key: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub key: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Properties to pass to the component.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub props: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub props: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///NSID of the component to render.
     #[serde(borrow)]
     pub r#type: jacquard_common::types::string::Nsid<'a>,
@@ -219,9 +219,9 @@ pub struct Response<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct TagLink<'a> {
     ///Collection NSID of the linking records. Omit for any collection.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub from: std::option::Option<jacquard_common::types::string::Nsid<'a>>,
+    pub from: core::option::Option<jacquard_common::types::string::Nsid<'a>>,
     ///Subject AT URI that is linked to
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::AtUri<'a>,
@@ -263,19 +263,19 @@ pub struct ViaValtown<'a> {
     pub val_id: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CachePolicy<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CachePolicy<'a> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
     fn def_name() -> &'static str {
         "cachePolicy"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.life {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
@@ -292,19 +292,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CachePolicy<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Element<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Element<'a> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
     fn def_name() -> &'static str {
         "element"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.key {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
@@ -321,70 +321,70 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Element<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Response<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Response<'a> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
     fn def_name() -> &'static str {
         "response"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagLink<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TagLink<'a> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
     fn def_name() -> &'static str {
         "tagLink"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagRecord<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TagRecord<'a> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
     fn def_name() -> &'static str {
         "tagRecord"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViaValtown<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViaValtown<'a> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
     fn def_name() -> &'static str {
         "viaValtown"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_inlay_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.val_id;
             #[allow(unused_comparisons)]
@@ -402,7 +402,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViaValtown<'a> {
     }
 }
 
-fn lexicon_doc_at_inlay_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_at_inlay_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("at.inlay.defs"),
@@ -864,7 +864,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -888,37 +888,37 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cache;
         type Node;
+        type Cache;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cache = Unset;
         type Node = Unset;
-    }
-    ///State transition - sets the `cache` field to Set
-    pub struct SetCache<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCache<S> {}
-    impl<S: State> State for SetCache<S> {
-        type Cache = Set<members::cache>;
-        type Node = S::Node;
+        type Cache = Unset;
     }
     ///State transition - sets the `node` field to Set
     pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNode<S> {}
     impl<S: State> State for SetNode<S> {
-        type Cache = S::Cache;
         type Node = Set<members::node>;
+        type Cache = S::Cache;
+    }
+    ///State transition - sets the `cache` field to Set
+    pub struct SetCache<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCache<S> {}
+    impl<S: State> State for SetCache<S> {
+        type Node = S::Node;
+        type Cache = Set<members::cache>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cache` field
-        pub struct cache(());
         ///Marker type for the `node` field
         pub struct node(());
+        ///Marker type for the `cache` field
+        pub struct cache(());
     }
 }
 
@@ -991,8 +991,8 @@ where
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::Cache: response_state::IsSet,
     S::Node: response_state::IsSet,
+    S::Cache: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
@@ -1005,7 +1005,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1132,7 +1132,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1238,7 +1238,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

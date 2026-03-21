@@ -18,24 +18,24 @@
 #[serde(rename_all = "camelCase")]
 pub struct WikiLink<'a> {
     ///Why this link exists
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub context: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub context: core::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub link_type: WikiLinkLinkType<'a>,
     #[serde(borrow)]
     pub source: jacquard_common::types::string::AtUri<'a>,
     ///Section heading slug in source
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_anchor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source_anchor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub target: jacquard_common::types::string::AtUri<'a>,
     ///Section heading slug in target
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub target_anchor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub target_anchor: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -173,9 +173,9 @@ impl jacquard_common::IntoStatic for WikiLinkLinkType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WikiLinkGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -222,19 +222,19 @@ impl jacquard_common::types::collection::Collection for WikiLinkRecord {
     type Record = WikiLinkRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WikiLink<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for WikiLink<'a> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.wikiLink"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_diy_razorgirl_winter_wikiLink()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
@@ -262,66 +262,66 @@ pub mod wiki_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Source;
-        type LinkType;
-        type Target;
         type CreatedAt;
+        type Target;
+        type LinkType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Source = Unset;
-        type LinkType = Unset;
-        type Target = Unset;
         type CreatedAt = Unset;
+        type Target = Unset;
+        type LinkType = Unset;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
         type Source = Set<members::source>;
-        type LinkType = S::LinkType;
+        type CreatedAt = S::CreatedAt;
         type Target = S::Target;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `link_type` field to Set
-    pub struct SetLinkType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLinkType<S> {}
-    impl<S: State> State for SetLinkType<S> {
-        type Source = S::Source;
-        type LinkType = Set<members::link_type>;
-        type Target = S::Target;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type Source = S::Source;
         type LinkType = S::LinkType;
-        type Target = Set<members::target>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Source = S::Source;
-        type LinkType = S::LinkType;
-        type Target = S::Target;
         type CreatedAt = Set<members::created_at>;
+        type Target = S::Target;
+        type LinkType = S::LinkType;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type Source = S::Source;
+        type CreatedAt = S::CreatedAt;
+        type Target = Set<members::target>;
+        type LinkType = S::LinkType;
+    }
+    ///State transition - sets the `link_type` field to Set
+    pub struct SetLinkType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLinkType<S> {}
+    impl<S: State> State for SetLinkType<S> {
+        type Source = S::Source;
+        type CreatedAt = S::CreatedAt;
+        type Target = S::Target;
+        type LinkType = Set<members::link_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `source` field
         pub struct source(());
-        ///Marker type for the `link_type` field
-        pub struct link_type(());
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `target` field
+        pub struct target(());
+        ///Marker type for the `link_type` field
+        pub struct link_type(());
     }
 }
 
@@ -492,9 +492,9 @@ impl<'a, S> WikiLinkBuilder<'a, S>
 where
     S: wiki_link_state::State,
     S::Source: wiki_link_state::IsSet,
-    S::LinkType: wiki_link_state::IsSet,
-    S::Target: wiki_link_state::IsSet,
     S::CreatedAt: wiki_link_state::IsSet,
+    S::Target: wiki_link_state::IsSet,
+    S::LinkType: wiki_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WikiLink<'a> {
@@ -512,7 +512,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -530,7 +530,7 @@ where
     }
 }
 
-fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_diy_razorgirl_winter_wikiLink() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

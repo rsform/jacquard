@@ -22,9 +22,9 @@ pub struct ArticleLink<'a> {
     #[serde(borrow)]
     pub article_id: jacquard_common::CowStr<'a>,
     ///The URL of the article.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub article_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub article_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///A strong reference to the root post (e.g., app.bsky.feed.post) of the comments thread.
     #[serde(borrow)]
     pub comments_thread: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -44,9 +44,9 @@ pub struct ArticleLink<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ArticleLinkGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -93,19 +93,19 @@ impl jacquard_common::types::collection::Collection for ArticleLinkRecord {
     type Record = ArticleLinkRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArticleLink<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ArticleLink<'a> {
     fn nsid() -> &'static str {
         "app.juttu.articleLink"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_juttu_articleLink()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.article_id;
             #[allow(unused_comparisons)]
@@ -307,7 +307,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -322,7 +322,7 @@ where
     }
 }
 
-fn lexicon_doc_app_juttu_articleLink() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_juttu_articleLink() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

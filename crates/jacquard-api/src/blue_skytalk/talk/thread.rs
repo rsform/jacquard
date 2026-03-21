@@ -19,18 +19,18 @@
 #[serde(rename_all = "camelCase")]
 pub struct Thread<'a> {
     ///Optional attached media (image or audio)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub blobs: std::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
+    pub blobs: core::option::Option<Vec<jacquard_common::types::blob::BlobRef<'a>>>,
     ///The channel this thread belongs to
     #[serde(borrow)]
     pub channel_id: jacquard_common::CowStr<'a>,
     ///Timestamp of thread creation
     pub created_at: jacquard_common::types::string::Datetime,
     ///The text content of the thread
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The title of the thread
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -48,9 +48,9 @@ pub struct Thread<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -97,19 +97,19 @@ impl jacquard_common::types::collection::Collection for ThreadRecord {
     type Record = ThreadRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thread<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Thread<'a> {
     fn nsid() -> &'static str {
         "blue.skytalk.talk.thread"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_skytalk_talk_thread()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.blobs {
             #[allow(unused_comparisons)]
             if value.len() > 1usize {
@@ -198,51 +198,51 @@ pub mod thread_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ChannelId;
         type Title;
         type CreatedAt;
+        type ChannelId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ChannelId = Unset;
         type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `channel_id` field to Set
-    pub struct SetChannelId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannelId<S> {}
-    impl<S: State> State for SetChannelId<S> {
-        type ChannelId = Set<members::channel_id>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
+        type ChannelId = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type ChannelId = S::ChannelId;
         type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
+        type ChannelId = S::ChannelId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ChannelId = S::ChannelId;
         type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type ChannelId = S::ChannelId;
+    }
+    ///State transition - sets the `channel_id` field to Set
+    pub struct SetChannelId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChannelId<S> {}
+    impl<S: State> State for SetChannelId<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type ChannelId = Set<members::channel_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `channel_id` field
-        pub struct channel_id(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `channel_id` field
+        pub struct channel_id(());
     }
 }
 
@@ -372,9 +372,9 @@ where
 impl<'a, S> ThreadBuilder<'a, S>
 where
     S: thread_state::State,
-    S::ChannelId: thread_state::IsSet,
     S::Title: thread_state::IsSet,
     S::CreatedAt: thread_state::IsSet,
+    S::ChannelId: thread_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Thread<'a> {
@@ -390,7 +390,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -406,7 +406,7 @@ where
     }
 }
 
-fn lexicon_doc_blue_skytalk_talk_thread() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blue_skytalk_talk_thread() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

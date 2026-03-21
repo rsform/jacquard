@@ -54,7 +54,7 @@ pub struct DeleteDraftOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteDraftError<'a> {
     #[serde(rename = "DraftNotFound")]
-    DraftNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    DraftNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteDraftError<'_> {

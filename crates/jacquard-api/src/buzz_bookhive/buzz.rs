@@ -41,9 +41,9 @@ pub struct Buzz<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BuzzGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -90,19 +90,19 @@ impl jacquard_common::types::collection::Collection for BuzzRecord {
     type Record = BuzzRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Buzz<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Buzz<'a> {
     fn nsid() -> &'static str {
         "buzz.bookhive.buzz"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_buzz_bookhive_buzz()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.comment;
             #[allow(unused_comparisons)]
@@ -149,67 +149,67 @@ pub mod buzz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Book;
         type Parent;
         type Comment;
         type CreatedAt;
-        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Book = Unset;
         type Parent = Unset;
         type Comment = Unset;
         type CreatedAt = Unset;
-        type Book = Unset;
-    }
-    ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Parent = Set<members::parent>;
-        type Comment = S::Comment;
-        type CreatedAt = S::CreatedAt;
-        type Book = S::Book;
-    }
-    ///State transition - sets the `comment` field to Set
-    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComment<S> {}
-    impl<S: State> State for SetComment<S> {
-        type Parent = S::Parent;
-        type Comment = Set<members::comment>;
-        type CreatedAt = S::CreatedAt;
-        type Book = S::Book;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Parent = S::Parent;
-        type Comment = S::Comment;
-        type CreatedAt = Set<members::created_at>;
-        type Book = S::Book;
     }
     ///State transition - sets the `book` field to Set
     pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBook<S> {}
     impl<S: State> State for SetBook<S> {
+        type Book = Set<members::book>;
         type Parent = S::Parent;
         type Comment = S::Comment;
         type CreatedAt = S::CreatedAt;
-        type Book = Set<members::book>;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetParent<S> {}
+    impl<S: State> State for SetParent<S> {
+        type Book = S::Book;
+        type Parent = Set<members::parent>;
+        type Comment = S::Comment;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `comment` field to Set
+    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComment<S> {}
+    impl<S: State> State for SetComment<S> {
+        type Book = S::Book;
+        type Parent = S::Parent;
+        type Comment = Set<members::comment>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Book = S::Book;
+        type Parent = S::Parent;
+        type Comment = S::Comment;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `book` field
+        pub struct book(());
         ///Marker type for the `parent` field
         pub struct parent(());
         ///Marker type for the `comment` field
         pub struct comment(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `book` field
-        pub struct book(());
     }
 }
 
@@ -322,10 +322,10 @@ where
 impl<'a, S> BuzzBuilder<'a, S>
 where
     S: buzz_state::State,
+    S::Book: buzz_state::IsSet,
     S::Parent: buzz_state::IsSet,
     S::Comment: buzz_state::IsSet,
     S::CreatedAt: buzz_state::IsSet,
-    S::Book: buzz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Buzz<'a> {
@@ -340,7 +340,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -355,7 +355,7 @@ where
     }
 }
 
-fn lexicon_doc_buzz_bookhive_buzz() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_buzz_bookhive_buzz() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("buzz.bookhive.buzz"),

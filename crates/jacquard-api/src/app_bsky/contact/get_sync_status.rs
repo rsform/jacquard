@@ -30,9 +30,9 @@ pub struct GetSyncStatus;
 #[serde(rename_all = "camelCase")]
 pub struct GetSyncStatusOutput<'a> {
     ///If present, indicates the user has imported their contacts. If not present, indicates the user never used the feature or called `app.bsky.contact.removeData` and didn't import again since.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sync_status: std::option::Option<crate::app_bsky::contact::SyncStatus<'a>>,
+    pub sync_status: core::option::Option<crate::app_bsky::contact::SyncStatus<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -51,9 +51,9 @@ pub struct GetSyncStatusOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetSyncStatusError<'a> {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDid(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InternalError")]
-    InternalError(std::option::Option<jacquard_common::CowStr<'a>>),
+    InternalError(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetSyncStatusError<'_> {

@@ -29,13 +29,13 @@ pub struct DeleteRecord<'a> {
         jacquard_common::types::string::Rkey<'a>,
     >,
     ///Compare and swap with the previous commit by CID.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_commit: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///Compare and swap with the previous record by CID.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_record: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_record: core::option::Option<jacquard_common::types::string::Cid<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -51,9 +51,9 @@ pub struct DeleteRecord<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub commit: std::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
+    pub commit: core::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -72,7 +72,7 @@ pub struct DeleteRecordOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteRecordError<'a> {
     #[serde(rename = "InvalidSwap")]
-    InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidSwap(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteRecordError<'_> {
@@ -130,51 +130,51 @@ pub mod delete_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
         type Collection;
         type Repo;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
         type Collection = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Rkey = Set<members::rkey>;
-        type Collection = S::Collection;
-        type Repo = S::Repo;
+        type Rkey = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Rkey = S::Rkey;
         type Collection = Set<members::collection>;
         type Repo = S::Repo;
+        type Rkey = S::Rkey;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Rkey = S::Rkey;
         type Collection = S::Collection;
         type Repo = Set<members::repo>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Collection = S::Collection;
+        type Repo = S::Repo;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
@@ -315,9 +315,9 @@ impl<'a, S: delete_record_state::State> DeleteRecordBuilder<'a, S> {
 impl<'a, S> DeleteRecordBuilder<'a, S>
 where
     S: delete_record_state::State,
-    S::Rkey: delete_record_state::IsSet,
     S::Collection: delete_record_state::IsSet,
     S::Repo: delete_record_state::IsSet,
+    S::Rkey: delete_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteRecord<'a> {
@@ -333,7 +333,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

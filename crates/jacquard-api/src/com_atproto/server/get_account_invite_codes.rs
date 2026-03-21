@@ -18,12 +18,12 @@
 pub struct GetAccountInviteCodes {
     /// Defaults to `true`.
     #[serde(default = "_default_create_available")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub create_available: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub create_available: core::option::Option<bool>,
     /// Defaults to `true`.
     #[serde(default = "_default_include_used")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub include_used: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_used: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -58,7 +58,7 @@ pub struct GetAccountInviteCodesOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetAccountInviteCodesError<'a> {
     #[serde(rename = "DuplicateCreate")]
-    DuplicateCreate(std::option::Option<jacquard_common::CowStr<'a>>),
+    DuplicateCreate(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetAccountInviteCodesError<'_> {
@@ -102,11 +102,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInviteCodesRequest {
     type Response = GetAccountInviteCodesResponse;
 }
 
-fn _default_create_available() -> std::option::Option<bool> {
+fn _default_create_available() -> core::option::Option<bool> {
     Some(true)
 }
 
-fn _default_include_used() -> std::option::Option<bool> {
+fn _default_include_used() -> core::option::Option<bool> {
     Some(true)
 }
 

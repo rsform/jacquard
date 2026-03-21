@@ -50,7 +50,7 @@ pub struct GetProfileCardOutput {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetProfileCardError<'a> {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetProfileCardError<'_> {

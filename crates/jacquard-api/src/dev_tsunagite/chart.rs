@@ -25,16 +25,16 @@ pub struct Chart<'a> {
     #[serde(borrow)]
     pub game: jacquard_common::types::string::AtUri<'a>,
     ///The jacket or banner art of this chart, for display in UI. Will fall back to the song jacket if not present
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub jacket: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub jacket: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///The name of the jacket artist for this chart.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub jacket_artist: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub jacket_artist: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The md5 hashes of any versions of the chart that are up-to-date enough to be leaderboard-legal. Optional if you will not perform leaderboard resets upon any chart changes.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ranked_versions: std::option::Option<Vec<jacquard_common::deps::bytes::Bytes>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ranked_versions: core::option::Option<Vec<jacquard_common::deps::bytes::Bytes>>,
     ///The numeric difficulty rating displayed to players, formatted as a string to support decimal or + difficulties.
     #[serde(borrow)]
     pub rating: jacquard_common::CowStr<'a>,
@@ -74,9 +74,9 @@ pub enum ChartDifficulty<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChartGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -123,19 +123,19 @@ impl jacquard_common::types::collection::Collection for ChartRecord {
     type Record = ChartRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chart<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Chart<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.chart"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_chart()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.jacket {
             {
                 let size = value.blob().size;
@@ -200,67 +200,67 @@ pub mod chart_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Song;
-        type Rating;
         type Game;
         type Difficulty;
+        type Song;
+        type Rating;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Song = Unset;
-        type Rating = Unset;
         type Game = Unset;
         type Difficulty = Unset;
-    }
-    ///State transition - sets the `song` field to Set
-    pub struct SetSong<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSong<S> {}
-    impl<S: State> State for SetSong<S> {
-        type Song = Set<members::song>;
-        type Rating = S::Rating;
-        type Game = S::Game;
-        type Difficulty = S::Difficulty;
-    }
-    ///State transition - sets the `rating` field to Set
-    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRating<S> {}
-    impl<S: State> State for SetRating<S> {
-        type Song = S::Song;
-        type Rating = Set<members::rating>;
-        type Game = S::Game;
-        type Difficulty = S::Difficulty;
+        type Song = Unset;
+        type Rating = Unset;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type Song = S::Song;
-        type Rating = S::Rating;
         type Game = Set<members::game>;
         type Difficulty = S::Difficulty;
+        type Song = S::Song;
+        type Rating = S::Rating;
     }
     ///State transition - sets the `difficulty` field to Set
     pub struct SetDifficulty<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDifficulty<S> {}
     impl<S: State> State for SetDifficulty<S> {
-        type Song = S::Song;
-        type Rating = S::Rating;
         type Game = S::Game;
         type Difficulty = Set<members::difficulty>;
+        type Song = S::Song;
+        type Rating = S::Rating;
+    }
+    ///State transition - sets the `song` field to Set
+    pub struct SetSong<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSong<S> {}
+    impl<S: State> State for SetSong<S> {
+        type Game = S::Game;
+        type Difficulty = S::Difficulty;
+        type Song = Set<members::song>;
+        type Rating = S::Rating;
+    }
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRating<S> {}
+    impl<S: State> State for SetRating<S> {
+        type Game = S::Game;
+        type Difficulty = S::Difficulty;
+        type Song = S::Song;
+        type Rating = Set<members::rating>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `song` field
-        pub struct song(());
-        ///Marker type for the `rating` field
-        pub struct rating(());
         ///Marker type for the `game` field
         pub struct game(());
         ///Marker type for the `difficulty` field
         pub struct difficulty(());
+        ///Marker type for the `song` field
+        pub struct song(());
+        ///Marker type for the `rating` field
+        pub struct rating(());
     }
 }
 
@@ -433,10 +433,10 @@ where
 impl<'a, S> ChartBuilder<'a, S>
 where
     S: chart_state::State,
-    S::Song: chart_state::IsSet,
-    S::Rating: chart_state::IsSet,
     S::Game: chart_state::IsSet,
     S::Difficulty: chart_state::IsSet,
+    S::Song: chart_state::IsSet,
+    S::Rating: chart_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Chart<'a> {
@@ -454,7 +454,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -472,9 +472,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_tsunagite_chart() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_tsunagite_chart() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.tsunagite.chart"),

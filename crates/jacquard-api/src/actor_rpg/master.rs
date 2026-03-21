@@ -19,30 +19,30 @@
 #[serde(rename_all = "camelCase")]
 pub struct Master<'a> {
     ///Name of the campaign this validation relates to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub campaign: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub campaign: core::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///DID of the player this record validates
     #[serde(borrow)]
     pub player: jacquard_common::types::string::Did<'a>,
     ///What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub snapshot_scope: std::option::Option<MasterSnapshotScope<'a>>,
+    pub snapshot_scope: core::option::Option<MasterSnapshotScope<'a>>,
     ///CID of the approved sprite blob (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sprite_cid: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sprite_cid: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Snapshot of the player's stats for this system. Omitted when snapshotScope is 'none'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub stats: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub stats: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The stat system being validated (e.g. 'dnd', 'reverie', 'rmmz')
     #[serde(borrow)]
     pub system: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match
@@ -151,9 +151,9 @@ impl jacquard_common::IntoStatic for MasterSnapshotScope<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MasterGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -200,19 +200,19 @@ impl jacquard_common::types::collection::Collection for MasterRecord {
     type Record = MasterRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Master<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Master<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.master"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_master()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.campaign {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -252,51 +252,51 @@ pub mod master_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Player;
         type System;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Player = Unset;
         type System = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Player = S::Player;
-        type System = S::System;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `player` field to Set
     pub struct SetPlayer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayer<S> {}
     impl<S: State> State for SetPlayer<S> {
-        type CreatedAt = S::CreatedAt;
         type Player = Set<members::player>;
         type System = S::System;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `system` field to Set
     pub struct SetSystem<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSystem<S> {}
     impl<S: State> State for SetSystem<S> {
-        type CreatedAt = S::CreatedAt;
         type Player = S::Player;
         type System = Set<members::system>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Player = S::Player;
+        type System = S::System;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `player` field
         pub struct player(());
         ///Marker type for the `system` field
         pub struct system(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -486,9 +486,9 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 impl<'a, S> MasterBuilder<'a, S>
 where
     S: master_state::State,
-    S::CreatedAt: master_state::IsSet,
     S::Player: master_state::IsSet,
     S::System: master_state::IsSet,
+    S::CreatedAt: master_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Master<'a> {
@@ -507,7 +507,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -526,7 +526,7 @@ where
     }
 }
 
-fn lexicon_doc_actor_rpg_master() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_actor_rpg_master() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("actor.rpg.master"),

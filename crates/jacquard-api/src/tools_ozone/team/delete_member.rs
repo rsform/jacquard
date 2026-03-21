@@ -38,10 +38,10 @@ pub struct DeleteMember<'a> {
 pub enum DeleteMemberError<'a> {
     /// The member being deleted does not exist
     #[serde(rename = "MemberNotFound")]
-    MemberNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    MemberNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// You can not delete yourself from the team
     #[serde(rename = "CannotDeleteSelf")]
-    CannotDeleteSelf(std::option::Option<jacquard_common::CowStr<'a>>),
+    CannotDeleteSelf(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteMemberError<'_> {
@@ -189,7 +189,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

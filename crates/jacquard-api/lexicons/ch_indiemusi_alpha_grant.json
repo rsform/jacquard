@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "ch.indiemusi.alpha.grant",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A cryptographic grant allowing a streaming service to decrypt the artist's music catalog. This record contains the master content key encrypted with the service's public key.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "serviceDid",
+          "wrappedMasterKey",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the grant was created",
+            "format": "datetime"
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "Optional expiration date. After this, the grant should be considered revoked.",
+            "format": "datetime"
+          },
+          "serviceDid": {
+            "type": "string",
+            "description": "The DID of the streaming service being authorized",
+            "format": "did",
+            "maxLength": 256
+          },
+          "wrappedMasterKey": {
+            "type": "string",
+            "description": "The Master Content Key (32 bytes) encrypted with the service's public key, base64-encoded. Only the service can decrypt this with their private key.",
+            "maxLength": 512
+          },
+          "wrappedMasterKeyIv": {
+            "type": "string",
+            "description": "Base64-encoded IV (12 bytes) used to encrypt the master key. Only present for AES-GCM wrapping; empty for RSA-OAEP.",
+            "maxLength": 32
+          },
+          "wrappingAlgorithm": {
+            "type": "string",
+            "description": "The algorithm used to wrap the master key. Currently RSA-OAEP (asymmetric, using the service's public key).",
+            "default": "RSA-OAEP",
+            "maxLength": 50
+          }
+        }
+      }
+    }
+  }
+}

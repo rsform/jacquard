@@ -42,7 +42,7 @@ pub struct DeleteValues<'a> {
 pub enum DeleteValuesError<'a> {
     /// set with the given name does not exist
     #[serde(rename = "SetNotFound")]
-    SetNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    SetNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteValuesError<'_> {
@@ -100,37 +100,37 @@ pub mod delete_values_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Values;
         type Name;
+        type Values;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Values = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `values` field to Set
-    pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValues<S> {}
-    impl<S: State> State for SetValues<S> {
-        type Values = Set<members::values>;
-        type Name = S::Name;
+        type Values = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Values = S::Values;
         type Name = Set<members::name>;
+        type Values = S::Values;
+    }
+    ///State transition - sets the `values` field to Set
+    pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValues<S> {}
+    impl<S: State> State for SetValues<S> {
+        type Name = S::Name;
+        type Values = Set<members::values>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `values` field
-        pub struct values(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `values` field
+        pub struct values(());
     }
 }
 
@@ -203,8 +203,8 @@ where
 impl<'a, S> DeleteValuesBuilder<'a, S>
 where
     S: delete_values_state::State,
-    S::Values: delete_values_state::IsSet,
     S::Name: delete_values_state::IsSet,
+    S::Values: delete_values_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteValues<'a> {
@@ -217,7 +217,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

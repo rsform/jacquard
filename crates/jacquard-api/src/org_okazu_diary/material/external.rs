@@ -19,43 +19,45 @@
 #[serde(rename_all = "camelCase")]
 pub struct External<'a> {
     ///Description of the material, typically taken from the material's HTML metadata.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///General-purpose self-label values primarily for consumption by generic AT clients who may not expect the sensitive nature of this Lexicon. Publishers of this record are strongly recommended to always include at least one of the protocol-global label values; namely, `porn`, `sexual`, `graphic-media`, and `nudity`, unless the material and tags are all known to be safe by themselves. It is the safest to unconditionally include the `sexual` value, which has the `adultOnly` semantics, but it is acceptable to use a stronger (`porn`/`graphic-media`) or more moderate (`nudity`) value instead if the user decides so.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub generic_labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub generic_labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     ///User-specified self-label values for the material. While the Lexicon by its nature assumes the material to be possibly sensitive by default, these label values are intended to signal that a warning should be put on the material even for the explicit Okazu-Diary.org application users who are willing to see mature contents in general.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     ///Reference to a record representing the material, such as a Bluesky post.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub record: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub record: core::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
     ///User-specified tags for the material.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<crate::org_okazu_diary::material::Tag<'a>>>,
+    pub tags: core::option::Option<Vec<crate::org_okazu_diary::material::Tag<'a>>>,
     ///Link to a thumbnail of the material, typically taken from the material's HTML metadata.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumb: std::option::Option<
+    pub thumb: core::option::Option<
         crate::org_okazu_diary::material::external::Thumb<'a>,
     >,
     ///Title of the material, typically taken from the material's HTML `<title>` element.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URI of the material, typically an HTTP(S) URL. If the URL is of a Web interface for an AT resource (such as a `bsky.app` URL), the record should also include the `record` property referencing the AT resource.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Reference to an `org.okazu-diary.feed.material` record from another repository from which this collection item is derived. Clients can use this property to offer the user to update this record if the original record have updated from the referenced version.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub via: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub via: core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -70,9 +72,9 @@ pub struct External<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExternalGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -91,9 +93,9 @@ pub struct ExternalGetRecordOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Thumb<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
@@ -138,19 +140,19 @@ impl jacquard_common::types::collection::Collection for ExternalRecord {
     type Record = ExternalRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for External<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for External<'a> {
     fn nsid() -> &'static str {
         "org.okazu-diary.material.external"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_okazu_diary_material_external()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.tags {
             #[allow(unused_comparisons)]
             if value.len() > 64usize {
@@ -167,19 +169,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for External<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Thumb<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Thumb<'a> {
     fn nsid() -> &'static str {
         "org.okazu-diary.material.external"
     }
     fn def_name() -> &'static str {
         "thumb"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_okazu_diary_material_external()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -438,7 +440,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -458,7 +460,7 @@ where
     }
 }
 
-fn lexicon_doc_org_okazu_diary_material_external() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_okazu_diary_material_external() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -811,7 +813,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

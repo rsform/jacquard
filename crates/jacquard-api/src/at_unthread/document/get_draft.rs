@@ -53,7 +53,7 @@ pub struct GetDraftOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetDraftError<'a> {
     #[serde(rename = "DraftNotFound")]
-    DraftNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    DraftNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetDraftError<'_> {

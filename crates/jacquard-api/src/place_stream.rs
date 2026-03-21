@@ -78,53 +78,53 @@ pub struct Renditions<'a> {
     pub renditions: Vec<crate::place_stream::Rendition<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlockView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BlockView<'a> {
     fn nsid() -> &'static str {
         "place.stream.defs"
     }
     fn def_name() -> &'static str {
         "blockView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rendition<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Rendition<'a> {
     fn nsid() -> &'static str {
         "place.stream.defs"
     }
     fn def_name() -> &'static str {
         "rendition"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Renditions<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Renditions<'a> {
     fn nsid() -> &'static str {
         "place.stream.defs"
     }
     fn def_name() -> &'static str {
         "renditions"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -139,83 +139,83 @@ pub mod block_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Blocker;
-        type Uri;
+        type Record;
         type IndexedAt;
+        type Uri;
         type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Blocker = Unset;
-        type Uri = Unset;
+        type Record = Unset;
         type IndexedAt = Unset;
+        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Blocker = S::Blocker;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `blocker` field to Set
     pub struct SetBlocker<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocker<S> {}
     impl<S: State> State for SetBlocker<S> {
-        type Record = S::Record;
         type Blocker = Set<members::blocker>;
-        type Uri = S::Uri;
+        type Record = S::Record;
         type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
         type Cid = S::Cid;
     }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Record = S::Record;
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
         type Blocker = S::Blocker;
-        type Uri = Set<members::uri>;
+        type Record = Set<members::record>;
         type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
         type Cid = S::Cid;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Record = S::Record;
         type Blocker = S::Blocker;
-        type Uri = S::Uri;
+        type Record = S::Record;
         type IndexedAt = Set<members::indexed_at>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Blocker = S::Blocker;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+        type Uri = Set<members::uri>;
         type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Record = S::Record;
         type Blocker = S::Blocker;
-        type Uri = S::Uri;
+        type Record = S::Record;
         type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `blocker` field
         pub struct blocker(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
     }
@@ -350,10 +350,10 @@ where
 impl<'a, S> BlockViewBuilder<'a, S>
 where
     S: block_view_state::State,
-    S::Record: block_view_state::IsSet,
     S::Blocker: block_view_state::IsSet,
-    S::Uri: block_view_state::IsSet,
+    S::Record: block_view_state::IsSet,
     S::IndexedAt: block_view_state::IsSet,
+    S::Uri: block_view_state::IsSet,
     S::Cid: block_view_state::IsSet,
 {
     /// Build the final struct
@@ -370,7 +370,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -386,7 +386,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_place_stream_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.stream.defs"),
@@ -657,7 +657,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

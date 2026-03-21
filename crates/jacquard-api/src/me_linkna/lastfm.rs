@@ -18,26 +18,38 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Lastfm<'a> {
+    ///MusicBrainz ID for the artist.
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub artist_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Artist name(s).
     #[serde(borrow)]
     pub artist_names: Vec<jacquard_common::CowStr<'a>>,
     ///URL to the album cover art.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_art_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cover_art_url: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When this record was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///URL to the track on Last.fm.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub origin_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub origin_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///When the track was played on Last.fm.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub played_time: std::option::Option<jacquard_common::types::string::Datetime>,
-    ///Album/release name.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub played_time: core::option::Option<jacquard_common::types::string::Datetime>,
+    ///MusicBrainz ID for the release/album.
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    ///Album/release name.
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub release_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    ///MusicBrainz ID for the track.
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub track_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Track/song name.
     #[serde(borrow)]
     pub track_name: jacquard_common::CowStr<'a>,
@@ -55,9 +67,9 @@ pub struct Lastfm<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LastfmGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -104,19 +116,19 @@ impl jacquard_common::types::collection::Collection for LastfmRecord {
     type Record = LastfmRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Lastfm<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Lastfm<'a> {
     fn nsid() -> &'static str {
         "me.linkna.lastfm"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_me_linkna_lastfm()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -131,51 +143,51 @@ pub mod lastfm_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TrackName;
-        type CreatedAt;
         type ArtistNames;
+        type CreatedAt;
+        type TrackName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TrackName = Unset;
-        type CreatedAt = Unset;
         type ArtistNames = Unset;
-    }
-    ///State transition - sets the `track_name` field to Set
-    pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTrackName<S> {}
-    impl<S: State> State for SetTrackName<S> {
-        type TrackName = Set<members::track_name>;
-        type CreatedAt = S::CreatedAt;
-        type ArtistNames = S::ArtistNames;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type TrackName = S::TrackName;
-        type CreatedAt = Set<members::created_at>;
-        type ArtistNames = S::ArtistNames;
+        type CreatedAt = Unset;
+        type TrackName = Unset;
     }
     ///State transition - sets the `artist_names` field to Set
     pub struct SetArtistNames<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtistNames<S> {}
     impl<S: State> State for SetArtistNames<S> {
-        type TrackName = S::TrackName;
-        type CreatedAt = S::CreatedAt;
         type ArtistNames = Set<members::artist_names>;
+        type CreatedAt = S::CreatedAt;
+        type TrackName = S::TrackName;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ArtistNames = S::ArtistNames;
+        type CreatedAt = Set<members::created_at>;
+        type TrackName = S::TrackName;
+    }
+    ///State transition - sets the `track_name` field to Set
+    pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTrackName<S> {}
+    impl<S: State> State for SetTrackName<S> {
+        type ArtistNames = S::ArtistNames;
+        type CreatedAt = S::CreatedAt;
+        type TrackName = Set<members::track_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `track_name` field
-        pub struct track_name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `artist_names` field
         pub struct artist_names(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `track_name` field
+        pub struct track_name(());
     }
 }
 
@@ -183,11 +195,14 @@ pub mod lastfm_state {
 pub struct LastfmBuilder<'a, S: lastfm_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
         ::core::option::Option<jacquard_common::types::string::UriValue<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
@@ -206,9 +221,39 @@ impl<'a> LastfmBuilder<'a, lastfm_state::Empty> {
     pub fn new() -> Self {
         LastfmBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
+    /// Set the `artistMbId` field (optional)
+    pub fn artist_mb_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `artistMbId` field to an Option value (optional)
+    pub fn maybe_artist_mb_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
     }
 }
 
@@ -222,7 +267,7 @@ where
         mut self,
         value: impl Into<Vec<jacquard_common::CowStr<'a>>>,
     ) -> LastfmBuilder<'a, lastfm_state::SetArtistNames<S>> {
-        self.__unsafe_private_named.0 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         LastfmBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -237,7 +282,7 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `coverArtUrl` field to an Option value (optional)
@@ -245,7 +290,7 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self.__unsafe_private_named.2 = value;
         self
     }
 }
@@ -260,7 +305,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
     ) -> LastfmBuilder<'a, lastfm_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
         LastfmBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -275,7 +320,7 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::UriValue<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `originUrl` field to an Option value (optional)
@@ -283,7 +328,7 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::UriValue<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -294,7 +339,7 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self.__unsafe_private_named.5 = value.into();
         self
     }
     /// Set the `playedTime` field to an Option value (optional)
@@ -302,7 +347,26 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
+    /// Set the `releaseMbId` field (optional)
+    pub fn release_mb_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `releaseMbId` field to an Option value (optional)
+    pub fn maybe_release_mb_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value;
         self
     }
 }
@@ -313,7 +377,7 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `releaseName` field to an Option value (optional)
@@ -321,7 +385,26 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
+    /// Set the `trackMbId` field (optional)
+    pub fn track_mb_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `trackMbId` field to an Option value (optional)
+    pub fn maybe_track_mb_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
         self
     }
 }
@@ -336,7 +419,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> LastfmBuilder<'a, lastfm_state::SetTrackName<S>> {
-        self.__unsafe_private_named.6 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.9 = ::core::option::Option::Some(value.into());
         LastfmBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -348,45 +431,51 @@ where
 impl<'a, S> LastfmBuilder<'a, S>
 where
     S: lastfm_state::State,
-    S::TrackName: lastfm_state::IsSet,
-    S::CreatedAt: lastfm_state::IsSet,
     S::ArtistNames: lastfm_state::IsSet,
+    S::CreatedAt: lastfm_state::IsSet,
+    S::TrackName: lastfm_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lastfm<'a> {
         Lastfm {
-            artist_names: self.__unsafe_private_named.0.unwrap(),
-            cover_art_url: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            origin_url: self.__unsafe_private_named.3,
-            played_time: self.__unsafe_private_named.4,
-            release_name: self.__unsafe_private_named.5,
-            track_name: self.__unsafe_private_named.6.unwrap(),
+            artist_mb_id: self.__unsafe_private_named.0,
+            artist_names: self.__unsafe_private_named.1.unwrap(),
+            cover_art_url: self.__unsafe_private_named.2,
+            created_at: self.__unsafe_private_named.3.unwrap(),
+            origin_url: self.__unsafe_private_named.4,
+            played_time: self.__unsafe_private_named.5,
+            release_mb_id: self.__unsafe_private_named.6,
+            release_name: self.__unsafe_private_named.7,
+            track_mb_id: self.__unsafe_private_named.8,
+            track_name: self.__unsafe_private_named.9.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> Lastfm<'a> {
         Lastfm {
-            artist_names: self.__unsafe_private_named.0.unwrap(),
-            cover_art_url: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            origin_url: self.__unsafe_private_named.3,
-            played_time: self.__unsafe_private_named.4,
-            release_name: self.__unsafe_private_named.5,
-            track_name: self.__unsafe_private_named.6.unwrap(),
+            artist_mb_id: self.__unsafe_private_named.0,
+            artist_names: self.__unsafe_private_named.1.unwrap(),
+            cover_art_url: self.__unsafe_private_named.2,
+            created_at: self.__unsafe_private_named.3.unwrap(),
+            origin_url: self.__unsafe_private_named.4,
+            played_time: self.__unsafe_private_named.5,
+            release_mb_id: self.__unsafe_private_named.6,
+            release_name: self.__unsafe_private_named.7,
+            track_mb_id: self.__unsafe_private_named.8,
+            track_name: self.__unsafe_private_named.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }
 }
 
-fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_me_linkna_lastfm() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("me.linkna.lastfm"),
@@ -416,6 +505,27 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = ::alloc::collections::BTreeMap::new();
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "artistMbId",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "MusicBrainz ID for the artist.",
+                                        ),
+                                    ),
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
                             map.insert(
                                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "artistNames",
@@ -532,11 +642,53 @@ fn lexicon_doc_me_linkna_lastfm() -> ::jacquard_lexicon::lexicon::LexiconDoc<'st
                             );
                             map.insert(
                                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "releaseMbId",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "MusicBrainz ID for the release/album.",
+                                        ),
+                                    ),
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                     "releaseName",
                                 ),
                                 ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: Some(
                                         ::jacquard_common::CowStr::new_static("Album/release name."),
+                                    ),
+                                    format: None,
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "trackMbId",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "MusicBrainz ID for the track.",
+                                        ),
                                     ),
                                     format: None,
                                     default: None,

@@ -25,25 +25,25 @@ pub struct Song<'a> {
     #[serde(borrow)]
     pub game: Vec<jacquard_common::types::string::AtUri<'a>>,
     ///The genre this song belongs to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genre: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub genre: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The jacket or banner art of this song, for display in UI.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub jacket: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub jacket: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///The name of the jacket artist for this song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub jacket_artist: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub jacket_artist: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The source this song is from - an album, competition, other game, etc.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub source: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The human-readable subtitle of this song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subtitle: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub subtitle: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The human-readable title of this song in UI. Translations will typically be listed alongside the default.
     #[serde(borrow)]
     pub title: jacquard_common::types::value::Data<'a>,
@@ -61,9 +61,9 @@ pub struct Song<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SongGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -110,19 +110,19 @@ impl jacquard_common::types::collection::Collection for SongRecord {
     type Record = SongRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Song<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.song"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_song()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.jacket {
             {
                 let size = value.blob().size;
@@ -187,49 +187,49 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Game;
+        type Title;
         type Composer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Game = Unset;
+        type Title = Unset;
         type Composer = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Game = S::Game;
-        type Composer = S::Composer;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type Title = S::Title;
         type Game = Set<members::game>;
+        type Title = S::Title;
+        type Composer = S::Composer;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Game = S::Game;
+        type Title = Set<members::title>;
         type Composer = S::Composer;
     }
     ///State transition - sets the `composer` field to Set
     pub struct SetComposer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetComposer<S> {}
     impl<S: State> State for SetComposer<S> {
-        type Title = S::Title;
         type Game = S::Game;
+        type Title = S::Title;
         type Composer = Set<members::composer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `game` field
         pub struct game(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `composer` field
         pub struct composer(());
     }
@@ -424,8 +424,8 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::Title: song_state::IsSet,
     S::Game: song_state::IsSet,
+    S::Title: song_state::IsSet,
     S::Composer: song_state::IsSet,
 {
     /// Build the final struct
@@ -445,7 +445,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -464,7 +464,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_tsunagite_song() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_dev_tsunagite_song() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.tsunagite.song"),

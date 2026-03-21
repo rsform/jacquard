@@ -18,37 +18,37 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Programme<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub credits: std::option::Option<Vec<crate::media_ionosphere::Credit<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub credits: core::option::Option<Vec<crate::media_ionosphere::Credit<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub delivery: std::option::Option<Vec<ProgrammeDeliveryItem<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub delivery: core::option::Option<Vec<ProgrammeDeliveryItem<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genres: std::option::Option<Vec<crate::media_ionosphere::Genre<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub genres: core::option::Option<Vec<crate::media_ionosphere::Genre<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub icon: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Version identifier
     #[serde(borrow)]
     pub ionosphere: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keywords: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub keywords: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///The language of the string values in this record. NOT the language of the content
     pub language: jacquard_common::types::string::Language,
     ///A list of groups this record is a member of
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub member_of: std::option::Option<Vec<crate::media_ionosphere::Membership<'a>>>,
+    pub member_of: core::option::Option<Vec<crate::media_ionosphere::Membership<'a>>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub presentation_language: std::option::Option<
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub presentation_language: core::option::Option<
         jacquard_common::types::string::Language,
     >,
 }
@@ -83,9 +83,9 @@ pub enum ProgrammeDeliveryItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProgrammeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -132,19 +132,19 @@ impl jacquard_common::types::collection::Collection for ProgrammeRecord {
     type Record = ProgrammeRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Programme<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Programme<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.programme"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_programme()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
@@ -564,7 +564,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -586,7 +586,7 @@ where
     }
 }
 
-fn lexicon_doc_media_ionosphere_programme() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_media_ionosphere_programme() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

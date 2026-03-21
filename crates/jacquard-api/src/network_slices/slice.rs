@@ -56,9 +56,9 @@ pub struct Slice<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SliceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -87,31 +87,31 @@ pub struct SliceView<'a> {
     #[serde(borrow)]
     pub domain: jacquard_common::CowStr<'a>,
     ///Total number of unique indexed actors in this slice
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_actor_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub indexed_actor_count: core::option::Option<i64>,
     ///Number of collections with indexed records
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_collection_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub indexed_collection_count: core::option::Option<i64>,
     ///Total number of indexed records in this slice
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_record_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub indexed_record_count: core::option::Option<i64>,
     ///Display name of the slice
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Recent activity sparkline data points for the last 24 hours
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sparkline: std::option::Option<
+    pub sparkline: core::option::Option<
         Vec<crate::network_slices::slice::SparklinePoint<'a>>,
     >,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     ///Total number of waitlist invites for this slice
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub waitlist_invite_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub waitlist_invite_count: core::option::Option<i64>,
     ///Total number of waitlist requests for this slice
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub waitlist_request_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub waitlist_request_count: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -170,19 +170,19 @@ impl jacquard_common::types::collection::Collection for SliceRecord {
     type Record = SliceRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.domain;
             #[allow(unused_comparisons)]
@@ -213,36 +213,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Slice<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SliceView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SliceView<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.defs"
     }
     fn def_name() -> &'static str {
         "sliceView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SparklinePoint<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SparklinePoint<'a> {
     fn nsid() -> &'static str {
         "network.slices.slice.defs"
     }
     fn def_name() -> &'static str {
         "sparklinePoint"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_slice_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.count;
             if *value < 0i64 {
@@ -269,51 +269,51 @@ pub mod slice_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Domain;
         type Name;
+        type Domain;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Domain = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Domain = S::Domain;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `domain` field to Set
-    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDomain<S> {}
-    impl<S: State> State for SetDomain<S> {
-        type CreatedAt = S::CreatedAt;
-        type Domain = Set<members::domain>;
-        type Name = S::Name;
+        type Domain = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Domain = S::Domain;
         type Name = Set<members::name>;
+        type Domain = S::Domain;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomain<S> {}
+    impl<S: State> State for SetDomain<S> {
+        type Name = S::Name;
+        type Domain = Set<members::domain>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Domain = S::Domain;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `domain` field
-        pub struct domain(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `domain` field
+        pub struct domain(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -406,9 +406,9 @@ where
 impl<'a, S> SliceBuilder<'a, S>
 where
     S: slice_state::State,
-    S::CreatedAt: slice_state::IsSet,
-    S::Domain: slice_state::IsSet,
     S::Name: slice_state::IsSet,
+    S::Domain: slice_state::IsSet,
+    S::CreatedAt: slice_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Slice<'a> {
@@ -422,7 +422,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -436,9 +436,7 @@ where
     }
 }
 
-fn lexicon_doc_network_slices_slice() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_network_slices_slice() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("network.slices.slice"),
@@ -547,105 +545,105 @@ pub mod slice_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Domain;
-        type Name;
-        type Cid;
         type CreatedAt;
         type Creator;
+        type Cid;
+        type Name;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Domain = Unset;
-        type Name = Unset;
-        type Cid = Unset;
         type CreatedAt = Unset;
         type Creator = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Domain = S::Domain;
-        type Name = S::Name;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Creator = S::Creator;
+        type Cid = Unset;
+        type Name = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `domain` field to Set
     pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDomain<S> {}
     impl<S: State> State for SetDomain<S> {
-        type Uri = S::Uri;
         type Domain = Set<members::domain>;
-        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Creator = S::Creator;
         type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Creator = S::Creator;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
-        type Domain = S::Domain;
-        type Name = Set<members::name>;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type Creator = S::Creator;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type Domain = S::Domain;
         type Name = S::Name;
-        type Cid = Set<members::cid>;
-        type CreatedAt = S::CreatedAt;
-        type Creator = S::Creator;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
         type Domain = S::Domain;
-        type Name = S::Name;
-        type Cid = S::Cid;
         type CreatedAt = Set<members::created_at>;
         type Creator = S::Creator;
+        type Cid = S::Cid;
+        type Name = S::Name;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
-        type Uri = S::Uri;
         type Domain = S::Domain;
-        type Name = S::Name;
-        type Cid = S::Cid;
         type CreatedAt = S::CreatedAt;
         type Creator = Set<members::creator>;
+        type Cid = S::Cid;
+        type Name = S::Name;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Domain = S::Domain;
+        type CreatedAt = S::CreatedAt;
+        type Creator = S::Creator;
+        type Cid = Set<members::cid>;
+        type Name = S::Name;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Domain = S::Domain;
+        type CreatedAt = S::CreatedAt;
+        type Creator = S::Creator;
+        type Cid = S::Cid;
+        type Name = Set<members::name>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Domain = S::Domain;
+        type CreatedAt = S::CreatedAt;
+        type Creator = S::Creator;
+        type Cid = S::Cid;
+        type Name = S::Name;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `domain` field
         pub struct domain(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `creator` field
         pub struct creator(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -901,12 +899,12 @@ impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
 impl<'a, S> SliceViewBuilder<'a, S>
 where
     S: slice_view_state::State,
-    S::Uri: slice_view_state::IsSet,
     S::Domain: slice_view_state::IsSet,
-    S::Name: slice_view_state::IsSet,
-    S::Cid: slice_view_state::IsSet,
     S::CreatedAt: slice_view_state::IsSet,
     S::Creator: slice_view_state::IsSet,
+    S::Cid: slice_view_state::IsSet,
+    S::Name: slice_view_state::IsSet,
+    S::Uri: slice_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SliceView<'a> {
@@ -929,7 +927,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -952,7 +950,7 @@ where
     }
 }
 
-fn lexicon_doc_network_slices_slice_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_network_slices_slice_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1361,7 +1359,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

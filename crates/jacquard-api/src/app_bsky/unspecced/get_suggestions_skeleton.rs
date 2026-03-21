@@ -16,19 +16,19 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestionsSkeleton<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub relative_to_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub relative_to_did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub viewer: core::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -45,20 +45,20 @@ pub struct GetSuggestionsSkeleton<'a> {
 pub struct GetSuggestionsSkeletonOutput<'a> {
     #[serde(borrow)]
     pub actors: Vec<crate::app_bsky::unspecced::SkeletonSearchActor<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///DEPRECATED: use recIdStr instead.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rec_id: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rec_id: core::option::Option<i64>,
     ///Snowflake for this recommendation, use when submitting recommendation events.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rec_id_str: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rec_id_str: core::option::Option<jacquard_common::CowStr<'a>>,
     ///DID of the account these suggestions are relative to. If this is returned undefined, suggestions are based on the viewer.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub relative_to_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub relative_to_did: core::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 /// Response type for
@@ -87,7 +87,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestionsSkeletonRequest {
     type Response = GetSuggestionsSkeletonResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 

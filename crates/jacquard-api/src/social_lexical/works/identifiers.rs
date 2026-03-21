@@ -25,9 +25,9 @@ pub struct Identifier<'a> {
     #[serde(borrow)]
     pub provider_id: jacquard_common::CowStr<'a>,
     ///
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 ///
@@ -155,9 +155,9 @@ pub struct Identifiers<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IdentifiersGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -177,19 +177,19 @@ impl<'a> Identifiers<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identifier<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Identifier<'a> {
     fn nsid() -> &'static str {
         "social.lexical.works.identifiers"
     }
     fn def_name() -> &'static str {
         "identifier"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_lexical_works_identifiers()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -221,19 +221,19 @@ impl jacquard_common::types::collection::Collection for IdentifiersRecord {
     type Record = IdentifiersRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identifiers<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Identifiers<'a> {
     fn nsid() -> &'static str {
         "social.lexical.works.identifiers"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_lexical_works_identifiers()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.identifiers;
             #[allow(unused_comparisons)]
@@ -251,7 +251,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identifiers<'a> {
     }
 }
 
-fn lexicon_doc_social_lexical_works_identifiers() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_lexical_works_identifiers() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -413,37 +413,37 @@ pub mod identifiers_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Identifiers;
         type Work;
+        type Identifiers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Identifiers = Unset;
         type Work = Unset;
-    }
-    ///State transition - sets the `identifiers` field to Set
-    pub struct SetIdentifiers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIdentifiers<S> {}
-    impl<S: State> State for SetIdentifiers<S> {
-        type Identifiers = Set<members::identifiers>;
-        type Work = S::Work;
+        type Identifiers = Unset;
     }
     ///State transition - sets the `work` field to Set
     pub struct SetWork<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWork<S> {}
     impl<S: State> State for SetWork<S> {
-        type Identifiers = S::Identifiers;
         type Work = Set<members::work>;
+        type Identifiers = S::Identifiers;
+    }
+    ///State transition - sets the `identifiers` field to Set
+    pub struct SetIdentifiers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIdentifiers<S> {}
+    impl<S: State> State for SetIdentifiers<S> {
+        type Work = S::Work;
+        type Identifiers = Set<members::identifiers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `identifiers` field
-        pub struct identifiers(());
         ///Marker type for the `work` field
         pub struct work(());
+        ///Marker type for the `identifiers` field
+        pub struct identifiers(());
     }
 }
 
@@ -518,8 +518,8 @@ where
 impl<'a, S> IdentifiersBuilder<'a, S>
 where
     S: identifiers_state::State,
-    S::Identifiers: identifiers_state::IsSet,
     S::Work: identifiers_state::IsSet,
+    S::Identifiers: identifiers_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Identifiers<'a> {
@@ -532,7 +532,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -16,13 +16,13 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetNotebookDetail<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_entry_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub entry_limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub entry_limit: core::option::Option<i64>,
     #[serde(borrow)]
     pub notebook: jacquard_common::types::string::AtUri<'a>,
 }
@@ -41,9 +41,9 @@ pub struct GetNotebookDetail<'a> {
 pub struct GetNotebookDetailOutput<'a> {
     #[serde(borrow)]
     pub entries: Vec<crate::sh_weaver::notebook::BookEntryView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
 }
@@ -64,7 +64,7 @@ pub struct GetNotebookDetailOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetNotebookDetailError<'a> {
     #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotebookNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetNotebookDetailError<'_> {
@@ -108,7 +108,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookDetailRequest {
     type Response = GetNotebookDetailResponse;
 }
 
-fn _default_entry_limit() -> std::option::Option<i64> {
+fn _default_entry_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 

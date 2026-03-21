@@ -18,8 +18,8 @@
 pub struct GetContributors<'a> {
     /// Defaults to `true`.
     #[serde(default = "_default_include_cascaded")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub include_cascaded: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_cascaded: core::option::Option<bool>,
     #[serde(borrow)]
     pub resource: jacquard_common::types::string::AtUri<'a>,
 }
@@ -66,7 +66,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetContributorsRequest {
     type Response = GetContributorsResponse;
 }
 
-fn _default_include_cascaded() -> std::option::Option<bool> {
+fn _default_include_cascaded() -> core::option::Option<bool> {
     Some(true)
 }
 

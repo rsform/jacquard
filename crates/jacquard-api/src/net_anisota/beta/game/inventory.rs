@@ -26,48 +26,48 @@ pub struct Inventory<'a> {
     #[serde(borrow)]
     pub item_id: jacquard_common::CowStr<'a>,
     ///Display name of the item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub item_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Type category of the item (consumable, tool, equipment, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub item_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub item_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Base value of the item in game currency
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub item_value: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub item_value: core::option::Option<i64>,
     ///When the record was last modified
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_modified: core::option::Option<jacquard_common::types::string::Datetime>,
     ///URI of the game.log record that documents the acquisition of this item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub log_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub log_record_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Maximum stack size for this item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_stack: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub max_stack: core::option::Option<i64>,
     ///Additional item-specific data (stats, attributes, enchantments, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub metadata: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///Number of items in the stack
     pub quantity: i64,
     ///Rarity level of the item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rarity: core::option::Option<jacquard_common::CowStr<'a>>,
     ///How the item was acquired
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub source: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_details: std::option::Option<
+    pub source_details: core::option::Option<
         crate::net_anisota::beta::game::inventory::SourceDetails<'a>,
     >,
     ///Whether this item can be stacked with others of the same type
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stackable: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub stackable: core::option::Option<bool>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -82,9 +82,9 @@ pub struct Inventory<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InventoryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -106,16 +106,16 @@ pub struct InventoryGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SourceDetails<'a> {
     ///URI of the game card that provided this item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub game_card_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///ID of the quest that rewarded this item
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub quest_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub quest_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Daily reward streak when item was acquired
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reward_streak: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reward_streak: core::option::Option<i64>,
 }
 
 impl<'a> Inventory<'a> {
@@ -158,19 +158,19 @@ impl jacquard_common::types::collection::Collection for InventoryRecord {
     type Record = InventoryRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.inventory"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_inventory()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.item_id;
             #[allow(unused_comparisons)]
@@ -246,19 +246,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Inventory<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.inventory"
     }
     fn def_name() -> &'static str {
         "sourceDetails"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_inventory()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -273,67 +273,67 @@ pub mod inventory_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Quantity;
-        type ItemId;
         type AcquiredAt;
+        type CreatedAt;
+        type ItemId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Quantity = Unset;
-        type ItemId = Unset;
         type AcquiredAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Quantity = S::Quantity;
-        type ItemId = S::ItemId;
-        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = Unset;
+        type ItemId = Unset;
     }
     ///State transition - sets the `quantity` field to Set
     pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuantity<S> {}
     impl<S: State> State for SetQuantity<S> {
-        type CreatedAt = S::CreatedAt;
         type Quantity = Set<members::quantity>;
-        type ItemId = S::ItemId;
         type AcquiredAt = S::AcquiredAt;
-    }
-    ///State transition - sets the `item_id` field to Set
-    pub struct SetItemId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItemId<S> {}
-    impl<S: State> State for SetItemId<S> {
         type CreatedAt = S::CreatedAt;
-        type Quantity = S::Quantity;
-        type ItemId = Set<members::item_id>;
-        type AcquiredAt = S::AcquiredAt;
+        type ItemId = S::ItemId;
     }
     ///State transition - sets the `acquired_at` field to Set
     pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
     impl<S: State> State for SetAcquiredAt<S> {
-        type CreatedAt = S::CreatedAt;
         type Quantity = S::Quantity;
-        type ItemId = S::ItemId;
         type AcquiredAt = Set<members::acquired_at>;
+        type CreatedAt = S::CreatedAt;
+        type ItemId = S::ItemId;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Quantity = S::Quantity;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = Set<members::created_at>;
+        type ItemId = S::ItemId;
+    }
+    ///State transition - sets the `item_id` field to Set
+    pub struct SetItemId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItemId<S> {}
+    impl<S: State> State for SetItemId<S> {
+        type Quantity = S::Quantity;
+        type AcquiredAt = S::AcquiredAt;
+        type CreatedAt = S::CreatedAt;
+        type ItemId = Set<members::item_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `quantity` field
         pub struct quantity(());
-        ///Marker type for the `item_id` field
-        pub struct item_id(());
         ///Marker type for the `acquired_at` field
         pub struct acquired_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `item_id` field
+        pub struct item_id(());
     }
 }
 
@@ -662,10 +662,10 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
 impl<'a, S> InventoryBuilder<'a, S>
 where
     S: inventory_state::State,
-    S::CreatedAt: inventory_state::IsSet,
     S::Quantity: inventory_state::IsSet,
-    S::ItemId: inventory_state::IsSet,
     S::AcquiredAt: inventory_state::IsSet,
+    S::CreatedAt: inventory_state::IsSet,
+    S::ItemId: inventory_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Inventory<'a> {
@@ -691,7 +691,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -717,7 +717,7 @@ where
     }
 }
 
-fn lexicon_doc_net_anisota_beta_game_inventory() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_net_anisota_beta_game_inventory() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

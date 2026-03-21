@@ -132,9 +132,9 @@ impl jacquard_common::IntoStatic for RoleRole<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoleGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -181,19 +181,19 @@ impl jacquard_common::types::collection::Collection for RoleRecord {
     type Record = RoleRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Role<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Role<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.role"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_role()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -208,65 +208,65 @@ pub mod role_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Subject;
         type Room;
+        type Subject;
+        type CreatedAt;
         type Role;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Subject = Unset;
         type Room = Unset;
+        type Subject = Unset;
+        type CreatedAt = Unset;
         type Role = Unset;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoom<S> {}
+    impl<S: State> State for SetRoom<S> {
+        type Room = Set<members::room>;
         type Subject = S::Subject;
-        type Room = S::Room;
+        type CreatedAt = S::CreatedAt;
         type Role = S::Role;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
-        type Subject = Set<members::subject>;
         type Room = S::Room;
+        type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
         type Role = S::Role;
     }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type CreatedAt = S::CreatedAt;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Room = S::Room;
         type Subject = S::Subject;
-        type Room = Set<members::room>;
+        type CreatedAt = Set<members::created_at>;
         type Role = S::Role;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
         type Room = S::Room;
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
         type Role = Set<members::role>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `room` field
         pub struct room(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `role` field
         pub struct role(());
     }
@@ -381,9 +381,9 @@ where
 impl<'a, S> RoleBuilder<'a, S>
 where
     S: role_state::State,
-    S::CreatedAt: role_state::IsSet,
-    S::Subject: role_state::IsSet,
     S::Room: role_state::IsSet,
+    S::Subject: role_state::IsSet,
+    S::CreatedAt: role_state::IsSet,
     S::Role: role_state::IsSet,
 {
     /// Build the final struct
@@ -399,7 +399,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -414,7 +414,7 @@ where
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_role() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_protoimsg_chat_role() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

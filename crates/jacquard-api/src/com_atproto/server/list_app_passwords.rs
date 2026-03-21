@@ -20,8 +20,8 @@ pub struct AppPassword<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub privileged: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub privileged: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -56,7 +56,7 @@ pub struct ListAppPasswordsOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ListAppPasswordsError<'a> {
     #[serde(rename = "AccountTakedown")]
-    AccountTakedown(std::option::Option<jacquard_common::CowStr<'a>>),
+    AccountTakedown(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ListAppPasswordsError<'_> {
@@ -74,33 +74,33 @@ impl core::fmt::Display for ListAppPasswordsError<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AppPassword<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AppPassword<'a> {
     fn nsid() -> &'static str {
         "com.atproto.server.listAppPasswords"
     }
     fn def_name() -> &'static str {
         "appPassword"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_server_listAppPasswords()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct ListAppPasswords;
 /// Response type for
@@ -271,7 +271,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -285,7 +285,7 @@ where
     }
 }
 
-fn lexicon_doc_com_atproto_server_listAppPasswords() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atproto_server_listAppPasswords() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

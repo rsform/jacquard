@@ -19,19 +19,19 @@
 #[serde(rename_all = "camelCase")]
 pub struct Tag<'a> {
     ///Alternative human-readable names for this scope (e.g., translations, abbreviations, or common synonyms). Unlike sameAs, these are plain-text labels, not links to external ontologies.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aliases: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub aliases: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Category type of this scope.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: std::option::Option<TagCategory<'a>>,
+    pub category: core::option::Option<TagCategory<'a>>,
     ///Client-declared timestamp when this record was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional longer description of this scope.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Lowercase, underscore-separated machine-readable key for this scope (e.g., 'mangrove_restoration', 'biodiversity_monitoring'). Used as the canonical identifier in CEL expressions.
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
@@ -39,25 +39,27 @@ pub struct Tag<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Optional strong reference to a parent work scope tag record for taxonomy/hierarchy support. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub parent: core::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
     ///Link to a governance or reference document where this work scope tag is defined and further explained.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reference_document: std::option::Option<TagReferenceDocument<'a>>,
+    pub reference_document: core::option::Option<TagReferenceDocument<'a>>,
     ///URIs to semantically equivalent concepts in external ontologies or taxonomies (e.g., Wikidata QIDs, ENVO terms, SDG targets). Used for interoperability, not as documentation.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub same_as: std::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
+    pub same_as: core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
     ///Lifecycle status of this tag. Communities propose tags, curators accept them, deprecated tags point to replacements via supersededBy.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<TagStatus<'a>>,
+    pub status: core::option::Option<TagStatus<'a>>,
     ///When status is 'deprecated', points to the replacement work scope tag record. The record referenced must conform with the lexicon org.hypercerts.workscope.tag.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub superseded_by: std::option::Option<
+    pub superseded_by: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
 }
@@ -286,9 +288,9 @@ impl jacquard_common::IntoStatic for TagStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TagGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -335,19 +337,19 @@ impl jacquard_common::types::collection::Collection for TagRecord {
     type Record = TagRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.workscope.tag"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_workscope_tag()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.aliases {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
@@ -787,7 +789,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -809,7 +811,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_workscope_tag() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hypercerts_workscope_tag() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

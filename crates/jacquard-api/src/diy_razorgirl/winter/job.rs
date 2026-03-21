@@ -36,22 +36,22 @@ pub struct IntervalSchedule<'a> {
 pub struct Job<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_job_failure_count")]
-    pub failure_count: std::option::Option<i64>,
+    pub failure_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub instructions: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_run: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_run: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub next_run: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub next_run: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub schedule: JobSchedule<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<JobStatus<'a>>,
+    pub status: core::option::Option<JobStatus<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -183,9 +183,9 @@ impl jacquard_common::IntoStatic for JobStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct JobGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -222,19 +222,19 @@ impl<'a> Job<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IntervalSchedule<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for IntervalSchedule<'a> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.job"
     }
     fn def_name() -> &'static str {
         "intervalSchedule"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_diy_razorgirl_winter_job()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -266,19 +266,19 @@ impl jacquard_common::types::collection::Collection for JobRecord {
     type Record = JobRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Job<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Job<'a> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.job"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_diy_razorgirl_winter_job()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.instructions;
             #[allow(unused_comparisons)]
@@ -309,19 +309,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Job<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OnceSchedule<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for OnceSchedule<'a> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.job"
     }
     fn def_name() -> &'static str {
         "onceSchedule"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_diy_razorgirl_winter_job()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -336,37 +336,37 @@ pub mod interval_schedule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Seconds;
         type Type;
+        type Seconds;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Seconds = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `seconds` field to Set
-    pub struct SetSeconds<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeconds<S> {}
-    impl<S: State> State for SetSeconds<S> {
-        type Seconds = Set<members::seconds>;
-        type Type = S::Type;
+        type Seconds = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Seconds = S::Seconds;
         type Type = Set<members::r#type>;
+        type Seconds = S::Seconds;
+    }
+    ///State transition - sets the `seconds` field to Set
+    pub struct SetSeconds<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeconds<S> {}
+    impl<S: State> State for SetSeconds<S> {
+        type Type = S::Type;
+        type Seconds = Set<members::seconds>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `seconds` field
-        pub struct seconds(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `seconds` field
+        pub struct seconds(());
     }
 }
 
@@ -439,8 +439,8 @@ where
 impl<'a, S> IntervalScheduleBuilder<'a, S>
 where
     S: interval_schedule_state::State,
-    S::Seconds: interval_schedule_state::IsSet,
     S::Type: interval_schedule_state::IsSet,
+    S::Seconds: interval_schedule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IntervalSchedule<'a> {
@@ -453,7 +453,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -466,7 +466,7 @@ where
     }
 }
 
-fn lexicon_doc_diy_razorgirl_winter_job() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_diy_razorgirl_winter_job() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -743,7 +743,7 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-fn _default_job_failure_count() -> std::option::Option<i64> {
+fn _default_job_failure_count() -> core::option::Option<i64> {
     Some(0i64)
 }
 
@@ -757,65 +757,65 @@ pub mod job_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Schedule;
         type CreatedAt;
+        type Schedule;
+        type Name;
         type Instructions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Schedule = Unset;
         type CreatedAt = Unset;
+        type Schedule = Unset;
+        type Name = Unset;
         type Instructions = Unset;
     }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Schedule = S::Schedule;
-        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
         type Instructions = S::Instructions;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchedule<S> {}
     impl<S: State> State for SetSchedule<S> {
-        type Name = S::Name;
-        type Schedule = Set<members::schedule>;
         type CreatedAt = S::CreatedAt;
+        type Schedule = Set<members::schedule>;
+        type Name = S::Name;
         type Instructions = S::Instructions;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
         type Schedule = S::Schedule;
-        type CreatedAt = Set<members::created_at>;
+        type Name = Set<members::name>;
         type Instructions = S::Instructions;
     }
     ///State transition - sets the `instructions` field to Set
     pub struct SetInstructions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInstructions<S> {}
     impl<S: State> State for SetInstructions<S> {
-        type Name = S::Name;
-        type Schedule = S::Schedule;
         type CreatedAt = S::CreatedAt;
+        type Schedule = S::Schedule;
+        type Name = S::Name;
         type Instructions = Set<members::instructions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `schedule` field
-        pub struct schedule(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `schedule` field
+        pub struct schedule(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `instructions` field
         pub struct instructions(());
     }
@@ -998,9 +998,9 @@ impl<'a, S: job_state::State> JobBuilder<'a, S> {
 impl<'a, S> JobBuilder<'a, S>
 where
     S: job_state::State,
-    S::Name: job_state::IsSet,
-    S::Schedule: job_state::IsSet,
     S::CreatedAt: job_state::IsSet,
+    S::Schedule: job_state::IsSet,
+    S::Name: job_state::IsSet,
     S::Instructions: job_state::IsSet,
 {
     /// Build the final struct
@@ -1020,7 +1020,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1049,37 +1049,37 @@ pub mod once_schedule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type RunAt;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type RunAt = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type RunAt = S::RunAt;
+        type Type = Unset;
     }
     ///State transition - sets the `run_at` field to Set
     pub struct SetRunAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRunAt<S> {}
     impl<S: State> State for SetRunAt<S> {
-        type Type = S::Type;
         type RunAt = Set<members::run_at>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type RunAt = S::RunAt;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `run_at` field
         pub struct run_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -1152,8 +1152,8 @@ where
 impl<'a, S> OnceScheduleBuilder<'a, S>
 where
     S: once_schedule_state::State,
-    S::Type: once_schedule_state::IsSet,
     S::RunAt: once_schedule_state::IsSet,
+    S::Type: once_schedule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> OnceSchedule<'a> {
@@ -1166,7 +1166,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

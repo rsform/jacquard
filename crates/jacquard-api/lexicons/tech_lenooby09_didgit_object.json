@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "tech.lenooby09.didgit.object",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A did-git object stored in an AT Protocol repository. Each record represents a single content-addressable object (blob, tree, commit, or tag), keyed by its hex SHA-256 object ID.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "objectType",
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "blob",
+            "description": "The git object content, stored as an AT Protocol blob.",
+            "accept": [
+              "application/octet-stream"
+            ],
+            "maxSize": 52428800
+          },
+          "objectType": {
+            "type": "string",
+            "description": "The type of the git object.",
+            "maxLength": 16,
+            "knownValues": [
+              "blob",
+              "tree",
+              "commit",
+              "tag"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

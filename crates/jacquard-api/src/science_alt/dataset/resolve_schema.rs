@@ -21,9 +21,9 @@ pub struct ResolveSchema<'a> {
     #[serde(borrow)]
     pub schema_id: jacquard_common::CowStr<'a>,
     ///(max length: 20)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub version: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -66,7 +66,7 @@ pub struct ResolveSchemaOutput<'a> {
 pub enum ResolveSchemaError<'a> {
     /// No schema found with the given NSID
     #[serde(rename = "SchemaNotFound")]
-    SchemaNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    SchemaNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveSchemaError<'_> {
@@ -120,37 +120,37 @@ pub mod resolve_schema_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type SchemaId;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type SchemaId = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type SchemaId = S::SchemaId;
+        type Handle = Unset;
     }
     ///State transition - sets the `schema_id` field to Set
     pub struct SetSchemaId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchemaId<S> {}
     impl<S: State> State for SetSchemaId<S> {
-        type Handle = S::Handle;
         type SchemaId = Set<members::schema_id>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type SchemaId = S::SchemaId;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `schema_id` field
         pub struct schema_id(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -240,8 +240,8 @@ impl<'a, S: resolve_schema_state::State> ResolveSchemaBuilder<'a, S> {
 impl<'a, S> ResolveSchemaBuilder<'a, S>
 where
     S: resolve_schema_state::State,
-    S::Handle: resolve_schema_state::IsSet,
     S::SchemaId: resolve_schema_state::IsSet,
+    S::Handle: resolve_schema_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResolveSchema<'a> {

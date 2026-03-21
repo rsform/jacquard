@@ -25,9 +25,11 @@ pub struct Painting<'a> {
     #[serde(borrow)]
     pub image_url: jacquard_common::types::string::UriValue<'a>,
     ///URL to .zip recording file (if available)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub recording_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub recording_url: core::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
     ///MongoDB ObjectId reference for bidirectional sync
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
@@ -35,9 +37,9 @@ pub struct Painting<'a> {
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
     ///Thumbnail preview (max 1MB)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub thumbnail: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Creation timestamp (ISO 8601)
     pub when: jacquard_common::types::string::Datetime,
 }
@@ -54,9 +56,9 @@ pub struct Painting<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PaintingGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -103,19 +105,19 @@ impl jacquard_common::types::collection::Collection for PaintingRecord {
     type Record = PaintingRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Painting<'a> {
     fn nsid() -> &'static str {
         "computer.aesthetic.painting"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_computer_aesthetic_painting()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.code;
             #[allow(unused_comparisons)]
@@ -238,85 +240,85 @@ pub mod painting_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type Code;
-        type When;
         type Ref;
+        type When;
         type ImageUrl;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type Code = Unset;
-        type When = Unset;
         type Ref = Unset;
+        type When = Unset;
         type ImageUrl = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type Code = S::Code;
-        type When = S::When;
-        type Ref = S::Ref;
-        type ImageUrl = S::ImageUrl;
+        type Slug = Unset;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type Slug = S::Slug;
         type Code = Set<members::code>;
+        type Ref = S::Ref;
         type When = S::When;
-        type Ref = S::Ref;
         type ImageUrl = S::ImageUrl;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
         type Slug = S::Slug;
-        type Code = S::Code;
-        type When = Set<members::when>;
-        type Ref = S::Ref;
-        type ImageUrl = S::ImageUrl;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Slug = S::Slug;
         type Code = S::Code;
-        type When = S::When;
         type Ref = Set<members::r#ref>;
+        type When = S::When;
         type ImageUrl = S::ImageUrl;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Code = S::Code;
+        type Ref = S::Ref;
+        type When = Set<members::when>;
+        type ImageUrl = S::ImageUrl;
+        type Slug = S::Slug;
     }
     ///State transition - sets the `image_url` field to Set
     pub struct SetImageUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImageUrl<S> {}
     impl<S: State> State for SetImageUrl<S> {
-        type Slug = S::Slug;
         type Code = S::Code;
-        type When = S::When;
         type Ref = S::Ref;
+        type When = S::When;
         type ImageUrl = Set<members::image_url>;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Code = S::Code;
+        type Ref = S::Ref;
+        type When = S::When;
+        type ImageUrl = S::ImageUrl;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `code` field
         pub struct code(());
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `when` field
+        pub struct when(());
         ///Marker type for the `image_url` field
         pub struct image_url(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
@@ -489,11 +491,11 @@ where
 impl<'a, S> PaintingBuilder<'a, S>
 where
     S: painting_state::State,
-    S::Slug: painting_state::IsSet,
     S::Code: painting_state::IsSet,
-    S::When: painting_state::IsSet,
     S::Ref: painting_state::IsSet,
+    S::When: painting_state::IsSet,
     S::ImageUrl: painting_state::IsSet,
+    S::Slug: painting_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Painting<'a> {
@@ -511,7 +513,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -529,7 +531,7 @@ where
     }
 }
 
-fn lexicon_doc_computer_aesthetic_painting() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_computer_aesthetic_painting() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

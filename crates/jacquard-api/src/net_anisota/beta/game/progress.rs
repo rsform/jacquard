@@ -19,52 +19,52 @@
 #[serde(rename_all = "camelCase")]
 pub struct Progress<'a> {
     ///URI of the card that was advanced when triggerSource is card_advance
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub card_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When the progress record was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Current stamina level when this progress was recorded (decimal string, e.g. '85.5')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub current_stamina: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub current_stamina: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Current player level
     pub level: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<
+    pub metadata: core::option::Option<
         crate::net_anisota::beta::game::progress::Metadata<'a>,
     >,
     ///Previous level before this update (for tracking level progression)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub previous_level: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub previous_level: core::option::Option<i64>,
     ///Progress percentage to the next level (decimal string, e.g. '75.5')
     #[serde(borrow)]
     pub progress_percentage: jacquard_common::CowStr<'a>,
     ///URIs of related game log records that contributed to this progress
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub related_log_uris: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub related_log_uris: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Session ID when this progress was recorded (for linking with log records)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub session_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub session_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URI of the session record when this progress was recorded
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub session_uri: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub session_uri: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub stats: std::option::Option<crate::net_anisota::beta::game::progress::Stats<'a>>,
+    pub stats: core::option::Option<crate::net_anisota::beta::game::progress::Stats<'a>>,
     ///Total experience points accumulated
     pub total_xp: i64,
     ///What action triggered this progress save
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub trigger_source: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub trigger_source: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Experience points gained since the last progress save
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub xp_gained_since_last_save: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub xp_gained_since_last_save: core::option::Option<i64>,
     ///Experience points needed to reach the next level
     pub xp_to_next_level: i64,
 }
@@ -81,9 +81,9 @@ pub struct Progress<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProgressGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -105,13 +105,13 @@ pub struct ProgressGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Metadata<'a> {
     ///Version of the client when this progress was recorded
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub client_version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub client_version: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Platform where the level up occurred (web, mobile, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub platform: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Game-specific statistics and metrics
@@ -129,31 +129,31 @@ pub struct Metadata<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Stats<'a> {
     ///Total daily rewards claimed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub daily_rewards_claimed: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub daily_rewards_claimed: core::option::Option<i64>,
     ///Total items collected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub items_collected: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub items_collected: core::option::Option<i64>,
     ///Date when posts read today was last updated (for daily reset tracking)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_post_read_date: std::option::Option<
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_post_read_date: core::option::Option<
         jacquard_common::types::string::Datetime,
     >,
     ///Posts read today (resets daily)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_read_today: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub posts_read_today: core::option::Option<i64>,
     ///Total posts read (all time, cumulative)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_read_total: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub posts_read_total: core::option::Option<i64>,
     ///Total posts viewed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_viewed: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub posts_viewed: core::option::Option<i64>,
     ///Total shuffles performed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub shuffles_performed: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub shuffles_performed: core::option::Option<i64>,
     ///Total specimens collected
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub specimens_collected: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub specimens_collected: core::option::Option<i64>,
 }
 
 impl<'a> Progress<'a> {
@@ -196,19 +196,19 @@ impl jacquard_common::types::collection::Collection for ProgressRecord {
     type Record = ProgressRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.progress"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_progress()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.level;
             if *value < 1i64 {
@@ -271,36 +271,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Progress<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Metadata<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.progress"
     }
     fn def_name() -> &'static str {
         "metadata"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_progress()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.progress"
     }
     fn def_name() -> &'static str {
         "stats"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_progress()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.daily_rewards_claimed {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -394,9 +394,9 @@ pub mod progress_state {
     pub trait State: sealed::Sealed {
         type Level;
         type CreatedAt;
-        type ProgressPercentage;
-        type XpToNextLevel;
         type TotalXp;
+        type XpToNextLevel;
+        type ProgressPercentage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -404,9 +404,9 @@ pub mod progress_state {
     impl State for Empty {
         type Level = Unset;
         type CreatedAt = Unset;
-        type ProgressPercentage = Unset;
-        type XpToNextLevel = Unset;
         type TotalXp = Unset;
+        type XpToNextLevel = Unset;
+        type ProgressPercentage = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
@@ -414,9 +414,9 @@ pub mod progress_state {
     impl<S: State> State for SetLevel<S> {
         type Level = Set<members::level>;
         type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = S::ProgressPercentage;
-        type XpToNextLevel = S::XpToNextLevel;
         type TotalXp = S::TotalXp;
+        type XpToNextLevel = S::XpToNextLevel;
+        type ProgressPercentage = S::ProgressPercentage;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -424,29 +424,9 @@ pub mod progress_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Level = S::Level;
         type CreatedAt = Set<members::created_at>;
-        type ProgressPercentage = S::ProgressPercentage;
+        type TotalXp = S::TotalXp;
         type XpToNextLevel = S::XpToNextLevel;
-        type TotalXp = S::TotalXp;
-    }
-    ///State transition - sets the `progress_percentage` field to Set
-    pub struct SetProgressPercentage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProgressPercentage<S> {}
-    impl<S: State> State for SetProgressPercentage<S> {
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = Set<members::progress_percentage>;
-        type XpToNextLevel = S::XpToNextLevel;
-        type TotalXp = S::TotalXp;
-    }
-    ///State transition - sets the `xp_to_next_level` field to Set
-    pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetXpToNextLevel<S> {}
-    impl<S: State> State for SetXpToNextLevel<S> {
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
         type ProgressPercentage = S::ProgressPercentage;
-        type XpToNextLevel = Set<members::xp_to_next_level>;
-        type TotalXp = S::TotalXp;
     }
     ///State transition - sets the `total_xp` field to Set
     pub struct SetTotalXp<S: State = Empty>(PhantomData<fn() -> S>);
@@ -454,9 +434,29 @@ pub mod progress_state {
     impl<S: State> State for SetTotalXp<S> {
         type Level = S::Level;
         type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = S::ProgressPercentage;
-        type XpToNextLevel = S::XpToNextLevel;
         type TotalXp = Set<members::total_xp>;
+        type XpToNextLevel = S::XpToNextLevel;
+        type ProgressPercentage = S::ProgressPercentage;
+    }
+    ///State transition - sets the `xp_to_next_level` field to Set
+    pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetXpToNextLevel<S> {}
+    impl<S: State> State for SetXpToNextLevel<S> {
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalXp = S::TotalXp;
+        type XpToNextLevel = Set<members::xp_to_next_level>;
+        type ProgressPercentage = S::ProgressPercentage;
+    }
+    ///State transition - sets the `progress_percentage` field to Set
+    pub struct SetProgressPercentage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProgressPercentage<S> {}
+    impl<S: State> State for SetProgressPercentage<S> {
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type TotalXp = S::TotalXp;
+        type XpToNextLevel = S::XpToNextLevel;
+        type ProgressPercentage = Set<members::progress_percentage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -465,12 +465,12 @@ pub mod progress_state {
         pub struct level(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `progress_percentage` field
-        pub struct progress_percentage(());
-        ///Marker type for the `xp_to_next_level` field
-        pub struct xp_to_next_level(());
         ///Marker type for the `total_xp` field
         pub struct total_xp(());
+        ///Marker type for the `xp_to_next_level` field
+        pub struct xp_to_next_level(());
+        ///Marker type for the `progress_percentage` field
+        pub struct progress_percentage(());
     }
 }
 
@@ -806,9 +806,9 @@ where
     S: progress_state::State,
     S::Level: progress_state::IsSet,
     S::CreatedAt: progress_state::IsSet,
-    S::ProgressPercentage: progress_state::IsSet,
-    S::XpToNextLevel: progress_state::IsSet,
     S::TotalXp: progress_state::IsSet,
+    S::XpToNextLevel: progress_state::IsSet,
+    S::ProgressPercentage: progress_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Progress<'a> {
@@ -834,7 +834,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -860,7 +860,7 @@ where
     }
 }
 
-fn lexicon_doc_net_anisota_beta_game_progress() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_net_anisota_beta_game_progress() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

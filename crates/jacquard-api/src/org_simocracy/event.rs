@@ -22,31 +22,31 @@ pub struct Event<'a> {
     #[serde(borrow)]
     pub actor_did: jacquard_common::CowStr<'a>,
     ///The actual content — sim response for chat, sim opinion for comment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub content: core::option::Option<jacquard_common::CowStr<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///Title of the proposal (for hearing/comment events)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub proposal_title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub proposal_title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Hearing round: 1=evaluation, 2=response, 3=summary (for comment events)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub round: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub round: core::option::Option<i64>,
     ///Names of sims involved
     #[serde(borrow)]
     pub sim_names: Vec<jacquard_common::CowStr<'a>>,
     ///AT-URIs of sims involved
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sim_uris: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub sim_uris: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Event type: chat, hearing, or comment
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
     ///User's message that prompted the response (for chat events)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub user_message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub user_message: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -61,9 +61,9 @@ pub struct Event<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -110,19 +110,19 @@ impl jacquard_common::types::collection::Collection for EventRecord {
     type Record = EventRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     fn nsid() -> &'static str {
         "org.simocracy.event"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_simocracy_event()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.content {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -216,67 +216,67 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SimNames;
-        type Type;
         type CreatedAt;
+        type Type;
         type ActorDid;
+        type SimNames;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SimNames = Unset;
-        type Type = Unset;
         type CreatedAt = Unset;
+        type Type = Unset;
         type ActorDid = Unset;
-    }
-    ///State transition - sets the `sim_names` field to Set
-    pub struct SetSimNames<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSimNames<S> {}
-    impl<S: State> State for SetSimNames<S> {
-        type SimNames = Set<members::sim_names>;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-        type ActorDid = S::ActorDid;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type SimNames = S::SimNames;
-        type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
-        type ActorDid = S::ActorDid;
+        type SimNames = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SimNames = S::SimNames;
-        type Type = S::Type;
         type CreatedAt = Set<members::created_at>;
+        type Type = S::Type;
         type ActorDid = S::ActorDid;
+        type SimNames = S::SimNames;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type CreatedAt = S::CreatedAt;
+        type Type = Set<members::r#type>;
+        type ActorDid = S::ActorDid;
+        type SimNames = S::SimNames;
     }
     ///State transition - sets the `actor_did` field to Set
     pub struct SetActorDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActorDid<S> {}
     impl<S: State> State for SetActorDid<S> {
-        type SimNames = S::SimNames;
-        type Type = S::Type;
         type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
         type ActorDid = Set<members::actor_did>;
+        type SimNames = S::SimNames;
+    }
+    ///State transition - sets the `sim_names` field to Set
+    pub struct SetSimNames<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSimNames<S> {}
+    impl<S: State> State for SetSimNames<S> {
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type ActorDid = S::ActorDid;
+        type SimNames = Set<members::sim_names>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sim_names` field
-        pub struct sim_names(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `actor_did` field
         pub struct actor_did(());
+        ///Marker type for the `sim_names` field
+        pub struct sim_names(());
     }
 }
 
@@ -490,10 +490,10 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::SimNames: event_state::IsSet,
-    S::Type: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
+    S::Type: event_state::IsSet,
     S::ActorDid: event_state::IsSet,
+    S::SimNames: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -513,7 +513,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -533,9 +533,7 @@ where
     }
 }
 
-fn lexicon_doc_org_simocracy_event() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_simocracy_event() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.simocracy.event"),

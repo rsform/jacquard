@@ -180,16 +180,17 @@ fn get_field_rust_type(
     field_name: &SmolStr,
     schema: &BuilderSchema,
 ) -> TokenStream {
+    let resolved = codegen.default_resolved_imports();
     match schema {
         BuilderSchema::Object(obj) => {
             let field_type = &obj.properties[field_name];
             codegen
-                .property_to_rust_type(nsid, type_name, field_name, field_type)
+                .property_to_rust_type(nsid, type_name, field_name, field_type, &resolved)
                 .unwrap_or_else(|_| quote! { () })
         }
         BuilderSchema::Parameters(params) => {
             let field_type = &params.properties[field_name];
-            super::builder_struct::get_params_rust_type(codegen, field_type)
+            super::builder_struct::get_params_rust_type(codegen, field_type, &resolved)
         }
     }
 }

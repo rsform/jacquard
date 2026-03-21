@@ -41,9 +41,9 @@ pub struct TeamScore<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TeamScoreGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -67,9 +67,9 @@ pub struct ScoredAnswer<'a> {
     #[serde(borrow)]
     pub answer: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     ///Optional commentary from the quiz master
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub commentary: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub commentary: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Points awarded for each expected answer in the question
     pub scores: Vec<i64>,
 }
@@ -114,19 +114,19 @@ impl jacquard_common::types::collection::Collection for TeamScoreRecord {
     type Record = TeamScoreRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeamScore<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TeamScore<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.teamScore"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_teamScore()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.answers;
             #[allow(unused_comparisons)]
@@ -144,19 +144,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeamScore<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ScoredAnswer<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.teamScore"
     }
     fn def_name() -> &'static str {
         "scoredAnswer"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_teamScore()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.commentary {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
@@ -228,50 +228,50 @@ pub mod team_score_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Answers;
-        type Team;
         type QuizBegin;
+        type Team;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Answers = Unset;
-        type Team = Unset;
         type QuizBegin = Unset;
+        type Team = Unset;
     }
     ///State transition - sets the `answers` field to Set
     pub struct SetAnswers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswers<S> {}
     impl<S: State> State for SetAnswers<S> {
         type Answers = Set<members::answers>;
+        type QuizBegin = S::QuizBegin;
         type Team = S::Team;
-        type QuizBegin = S::QuizBegin;
-    }
-    ///State transition - sets the `team` field to Set
-    pub struct SetTeam<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeam<S> {}
-    impl<S: State> State for SetTeam<S> {
-        type Answers = S::Answers;
-        type Team = Set<members::team>;
-        type QuizBegin = S::QuizBegin;
     }
     ///State transition - sets the `quiz_begin` field to Set
     pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
     impl<S: State> State for SetQuizBegin<S> {
         type Answers = S::Answers;
-        type Team = S::Team;
         type QuizBegin = Set<members::quiz_begin>;
+        type Team = S::Team;
+    }
+    ///State transition - sets the `team` field to Set
+    pub struct SetTeam<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeam<S> {}
+    impl<S: State> State for SetTeam<S> {
+        type Answers = S::Answers;
+        type QuizBegin = S::QuizBegin;
+        type Team = Set<members::team>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `answers` field
         pub struct answers(());
-        ///Marker type for the `team` field
-        pub struct team(());
         ///Marker type for the `quiz_begin` field
         pub struct quiz_begin(());
+        ///Marker type for the `team` field
+        pub struct team(());
     }
 }
 
@@ -365,8 +365,8 @@ impl<'a, S> TeamScoreBuilder<'a, S>
 where
     S: team_score_state::State,
     S::Answers: team_score_state::IsSet,
-    S::Team: team_score_state::IsSet,
     S::QuizBegin: team_score_state::IsSet,
+    S::Team: team_score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TeamScore<'a> {
@@ -380,7 +380,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -394,9 +394,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_quizzy_teamScore() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_pub_quizzy_teamScore() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pub.quizzy.teamScore"),
@@ -564,37 +562,37 @@ pub mod scored_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Answer;
         type Scores;
+        type Answer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Answer = Unset;
         type Scores = Unset;
-    }
-    ///State transition - sets the `answer` field to Set
-    pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswer<S> {}
-    impl<S: State> State for SetAnswer<S> {
-        type Answer = Set<members::answer>;
-        type Scores = S::Scores;
+        type Answer = Unset;
     }
     ///State transition - sets the `scores` field to Set
     pub struct SetScores<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScores<S> {}
     impl<S: State> State for SetScores<S> {
-        type Answer = S::Answer;
         type Scores = Set<members::scores>;
+        type Answer = S::Answer;
+    }
+    ///State transition - sets the `answer` field to Set
+    pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAnswer<S> {}
+    impl<S: State> State for SetAnswer<S> {
+        type Scores = S::Scores;
+        type Answer = Set<members::answer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `answer` field
-        pub struct answer(());
         ///Marker type for the `scores` field
         pub struct scores(());
+        ///Marker type for the `answer` field
+        pub struct answer(());
     }
 }
 
@@ -687,8 +685,8 @@ where
 impl<'a, S> ScoredAnswerBuilder<'a, S>
 where
     S: scored_answer_state::State,
-    S::Answer: scored_answer_state::IsSet,
     S::Scores: scored_answer_state::IsSet,
+    S::Answer: scored_answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScoredAnswer<'a> {
@@ -702,7 +700,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -36,9 +36,9 @@ pub struct Color<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Profile<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub color: std::option::Option<crate::place_stream::chat::profile::Color<'a>>,
+    pub color: core::option::Option<crate::place_stream::chat::profile::Color<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -53,9 +53,9 @@ pub struct Profile<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -75,19 +75,19 @@ impl<'a> Profile<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Color<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Color<'a> {
     fn nsid() -> &'static str {
         "place.stream.chat.profile"
     }
     fn def_name() -> &'static str {
         "color"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_chat_profile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.blue;
             if *value > 255i64 {
@@ -191,19 +191,19 @@ impl jacquard_common::types::collection::Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Profile<'a> {
     fn nsid() -> &'static str {
         "place.stream.chat.profile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_chat_profile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -218,51 +218,51 @@ pub mod color_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Red;
         type Green;
         type Blue;
-        type Red;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Red = Unset;
         type Green = Unset;
         type Blue = Unset;
-        type Red = Unset;
-    }
-    ///State transition - sets the `green` field to Set
-    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGreen<S> {}
-    impl<S: State> State for SetGreen<S> {
-        type Green = Set<members::green>;
-        type Blue = S::Blue;
-        type Red = S::Red;
-    }
-    ///State transition - sets the `blue` field to Set
-    pub struct SetBlue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlue<S> {}
-    impl<S: State> State for SetBlue<S> {
-        type Green = S::Green;
-        type Blue = Set<members::blue>;
-        type Red = S::Red;
     }
     ///State transition - sets the `red` field to Set
     pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRed<S> {}
     impl<S: State> State for SetRed<S> {
+        type Red = Set<members::red>;
         type Green = S::Green;
         type Blue = S::Blue;
-        type Red = Set<members::red>;
+    }
+    ///State transition - sets the `green` field to Set
+    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGreen<S> {}
+    impl<S: State> State for SetGreen<S> {
+        type Red = S::Red;
+        type Green = Set<members::green>;
+        type Blue = S::Blue;
+    }
+    ///State transition - sets the `blue` field to Set
+    pub struct SetBlue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlue<S> {}
+    impl<S: State> State for SetBlue<S> {
+        type Red = S::Red;
+        type Green = S::Green;
+        type Blue = Set<members::blue>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `red` field
+        pub struct red(());
         ///Marker type for the `green` field
         pub struct green(());
         ///Marker type for the `blue` field
         pub struct blue(());
-        ///Marker type for the `red` field
-        pub struct red(());
     }
 }
 
@@ -355,9 +355,9 @@ where
 impl<'a, S> ColorBuilder<'a, S>
 where
     S: color_state::State,
+    S::Red: color_state::IsSet,
     S::Green: color_state::IsSet,
     S::Blue: color_state::IsSet,
-    S::Red: color_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Color<'a> {
@@ -371,7 +371,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -385,7 +385,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_chat_profile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_chat_profile() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -571,7 +571,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -1,0 +1,115 @@
+{
+  "lexicon": 1,
+  "id": "blue.backyard.richtext.facet",
+  "description": "Annotation of a sub-string within rich text.",
+  "defs": {
+    "bold": {
+      "type": "object",
+      "description": "Facet feature for bold text formatting. Spec candidate per Paul Frazee.",
+      "properties": {}
+    },
+    "byteSlice": {
+      "type": "object",
+      "description": "Specifies a sub-string in a utf-8 string by byte index.",
+      "required": [
+        "byteStart",
+        "byteEnd"
+      ],
+      "properties": {
+        "byteEnd": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "byteStart": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "italic": {
+      "type": "object",
+      "description": "Facet feature for italic text formatting. Spec candidate per Paul Frazee.",
+      "properties": {}
+    },
+    "link": {
+      "type": "object",
+      "description": "Facet feature for a URL link.",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "description": "Annotation of a sub-string within rich text.",
+      "required": [
+        "index",
+        "features"
+      ],
+      "properties": {
+        "features": {
+          "type": "array",
+          "description": "The feature types applied to this text range (e.g. link, mention, formatting).",
+          "items": {
+            "type": "union",
+            "refs": [
+              "#mention",
+              "#link",
+              "#tag",
+              "#bold",
+              "#italic",
+              "#underline",
+              "#strikethrough"
+            ]
+          }
+        },
+        "index": {
+          "type": "ref",
+          "ref": "#byteSlice"
+        }
+      }
+    },
+    "mention": {
+      "type": "object",
+      "description": "Facet feature for mention of another account.",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "strikethrough": {
+      "type": "object",
+      "description": "Facet feature for strikethrough text formatting. Spec candidate per Paul Frazee.",
+      "properties": {}
+    },
+    "tag": {
+      "type": "object",
+      "description": "Facet feature for a hashtag.",
+      "required": [
+        "tag"
+      ],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        }
+      }
+    },
+    "underline": {
+      "type": "object",
+      "description": "Facet feature for underline text formatting. Spec candidate per Paul Frazee.",
+      "properties": {}
+    }
+  }
+}

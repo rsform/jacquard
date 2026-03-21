@@ -21,31 +21,31 @@ pub struct DisplayProfile<'a> {
     ///Client-declared timestamp when this record was originally created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Display name override for this user on hyperboards.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Default hover iframe URL for this user across boards.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_iframe_url: std::option::Option<
+    pub hover_iframe_url: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
     ///Default hover image for this user across boards, as a URI or image blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hover_image: std::option::Option<DisplayProfileHoverImage<'a>>,
+    pub hover_image: core::option::Option<DisplayProfileHoverImage<'a>>,
     ///Avatar or face image override for this user on hyperboards, as a URI or image blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<DisplayProfileImage<'a>>,
+    pub image: core::option::Option<DisplayProfileImage<'a>>,
     ///Default click-through link URL for this user across boards.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Default video for this user across boards, as a URI (embed/direct link) or uploaded video blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub video: std::option::Option<DisplayProfileVideo<'a>>,
+    pub video: core::option::Option<DisplayProfileVideo<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -117,9 +117,9 @@ pub enum DisplayProfileVideo<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisplayProfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -166,19 +166,19 @@ impl jacquard_common::types::collection::Collection for DisplayProfileRecord {
     type Record = DisplayProfileRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisplayProfile<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DisplayProfile<'a> {
     fn nsid() -> &'static str {
         "org.hyperboards.displayProfile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hyperboards_displayProfile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.display_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
@@ -444,7 +444,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -462,7 +462,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hyperboards_displayProfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hyperboards_displayProfile() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

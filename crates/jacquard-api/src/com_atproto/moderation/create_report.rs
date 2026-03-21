@@ -17,15 +17,15 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreateReport<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: std::option::Option<
+    pub mod_tool: core::option::Option<
         crate::com_atproto::moderation::create_report::ModTool<'a>,
     >,
     ///Additional context about the content and violation.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub reason: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Indicates the broad category of violation the report is for.
     #[serde(borrow)]
     pub reason_type: crate::com_atproto::moderation::ReasonType<'a>,
@@ -66,9 +66,9 @@ pub enum CreateReportSubject<'a> {
 pub struct CreateReportOutput<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     pub id: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub reason: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub reason_type: crate::com_atproto::moderation::ReasonType<'a>,
     #[serde(borrow)]
@@ -111,9 +111,9 @@ pub enum CreateReportOutputSubject<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ModTool<'a> {
     ///Additional arbitrary metadata about the source
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub meta: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub meta: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///Name/identifier of the source (e.g., 'bsky-app/android', 'bsky-web/chrome')
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -149,19 +149,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
     type Response = CreateReportResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModTool<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModTool<'a> {
     fn nsid() -> &'static str {
         "com.atproto.moderation.createReport"
     }
     fn def_name() -> &'static str {
         "modTool"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_moderation_createReport()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -336,7 +336,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -351,7 +351,7 @@ where
     }
 }
 
-fn lexicon_doc_com_atproto_moderation_createReport() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atproto_moderation_createReport() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

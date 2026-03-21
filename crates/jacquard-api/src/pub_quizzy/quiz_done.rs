@@ -37,9 +37,9 @@ pub struct QuizDone<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuizDoneGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -86,19 +86,19 @@ impl jacquard_common::types::collection::Collection for QuizDoneRecord {
     type Record = QuizDoneRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuizDone<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for QuizDone<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.quizDone"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_quizDone()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -113,37 +113,37 @@ pub mod quiz_done_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type QuizBegin;
         type Timestamp;
+        type QuizBegin;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type QuizBegin = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `quiz_begin` field to Set
-    pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
-    impl<S: State> State for SetQuizBegin<S> {
-        type QuizBegin = Set<members::quiz_begin>;
-        type Timestamp = S::Timestamp;
+        type QuizBegin = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type QuizBegin = S::QuizBegin;
         type Timestamp = Set<members::timestamp>;
+        type QuizBegin = S::QuizBegin;
+    }
+    ///State transition - sets the `quiz_begin` field to Set
+    pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
+    impl<S: State> State for SetQuizBegin<S> {
+        type Timestamp = S::Timestamp;
+        type QuizBegin = Set<members::quiz_begin>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quiz_begin` field
-        pub struct quiz_begin(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `quiz_begin` field
+        pub struct quiz_begin(());
     }
 }
 
@@ -216,8 +216,8 @@ where
 impl<'a, S> QuizDoneBuilder<'a, S>
 where
     S: quiz_done_state::State,
-    S::QuizBegin: quiz_done_state::IsSet,
     S::Timestamp: quiz_done_state::IsSet,
+    S::QuizBegin: quiz_done_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> QuizDone<'a> {
@@ -230,7 +230,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -243,9 +243,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_quizzy_quizDone() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_pub_quizzy_quizDone() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pub.quizzy.quizDone"),

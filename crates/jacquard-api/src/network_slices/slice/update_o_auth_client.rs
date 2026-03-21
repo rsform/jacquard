@@ -22,35 +22,35 @@ pub struct UpdateOAuthClient<'a> {
     #[serde(borrow)]
     pub client_id: jacquard_common::CowStr<'a>,
     ///New human-readable name of the OAuth client
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub client_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub client_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///New URI of the client application
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub client_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub client_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///New URI of the client logo
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub logo_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub logo_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///New URI of the privacy policy
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub policy_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub policy_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///New allowed redirect URIs for OAuth flow
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub redirect_uris: std::option::Option<
+    pub redirect_uris: core::option::Option<
         Vec<jacquard_common::types::string::UriValue<'a>>,
     >,
     ///New OAuth scope
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub scope: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub scope: core::option::Option<jacquard_common::CowStr<'a>>,
     ///New URI of the terms of service
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tos_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub tos_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 #[jacquard_derive::lexicon]

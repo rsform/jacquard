@@ -24,16 +24,16 @@ pub mod service;
 #[serde(rename_all = "camelCase")]
 pub struct AdaptiveIcon<'a> {
     ///The background color of the adaptive icon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub background_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URL to the foreground image of the adaptive icon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub foreground_image: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub foreground_image: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub foreground_image_blob: std::option::Option<
+    pub foreground_image_blob: core::option::Option<
         jacquard_common::types::blob::BlobRef<'a>,
     >,
 }
@@ -52,12 +52,12 @@ pub struct AdaptiveIcon<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Android<'a> {
     ///Configuration for the adaptive icon on Android.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub adaptive_icon: std::option::Option<crate::app_ocho::plugin::AdaptiveIcon<'a>>,
+    pub adaptive_icon: core::option::Option<crate::app_ocho::plugin::AdaptiveIcon<'a>>,
     ///Whether edge-to-edge mode is enabled for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub edge_to_edge_enabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub edge_to_edge_enabled: core::option::Option<bool>,
 }
 
 /// Android status bar configuration.
@@ -75,9 +75,9 @@ pub struct Android<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct AndroidStatusBar<'a> {
     ///The background color of the Android status bar.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub background_color: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -102,8 +102,8 @@ pub struct Asset<'a> {
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
     ///The date and time when this asset was last updated. Used to reset the jetstream cache, among other things.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::lexicon]
@@ -156,76 +156,76 @@ pub struct Developer<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ExpoClient<'a> {
     ///Android-specific configuration for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub android: std::option::Option<crate::app_ocho::plugin::Android<'a>>,
+    pub android: core::option::Option<crate::app_ocho::plugin::Android<'a>>,
     ///Configuration for the Android status bar.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub android_status_bar: std::option::Option<
+    pub android_status_bar: core::option::Option<
         crate::app_ocho::plugin::AndroidStatusBar<'a>,
     >,
     ///Experimental features enabled for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub expirements: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub expirements: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///Additional configuration for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub extra: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub extra: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The URL to the app icon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub icon: core::option::Option<jacquard_common::CowStr<'a>>,
     ///ios-specific configuration for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ios: std::option::Option<crate::app_ocho::plugin::Ios<'a>>,
+    pub ios: core::option::Option<crate::app_ocho::plugin::Ios<'a>>,
     ///Localization settings for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locales: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub locales: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The name of the Expo client application.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Whether the new architecture is enabled for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub new_arch_enabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub new_arch_enabled: core::option::Option<bool>,
     ///The default orientation of the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub orientation: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub orientation: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The platforms supported by the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub platforms: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub platforms: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///A list of plugins used by the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub plugins: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub plugins: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///The custom URI scheme for deep linking.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub scheme: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub scheme: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The SDK version of the Expo client.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sdk_version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sdk_version: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A URL-friendly identifier for the app.
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
     ///The default user interface style.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub user_interface_style: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub user_interface_style: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The version of the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub version: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Web-specific configuration for the app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub web: std::option::Option<crate::app_ocho::plugin::Web<'a>>,
+    pub web: core::option::Option<crate::app_ocho::plugin::Web<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -259,8 +259,8 @@ pub struct ExpoGo<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Ios<'a> {
     ///Whether the app supports iPad.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub supports_tablet: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub supports_tablet: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -371,246 +371,244 @@ pub type StringId<'a> = jacquard_common::CowStr<'a>;
 #[serde(rename_all = "camelCase")]
 pub struct Web<'a> {
     ///The bundler used for the web app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub bundler: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub bundler: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URL to the favicon for the web app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub favicon: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub favicon: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub favicon_blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub favicon_blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///The output directory for the web app.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub output: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub output: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AdaptiveIcon<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AdaptiveIcon<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "adaptiveIcon"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Android<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Android<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "android"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AndroidStatusBar<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AndroidStatusBar<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "androidStatusBar"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Asset<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Asset<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "asset"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Db<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Db<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "db"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Developer<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Developer<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "developer"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExpoClient<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ExpoClient<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "expoClient"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExpoGo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ExpoGo<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "expoGo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ios<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Ios<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "ios"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LaunchAsset<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LaunchAsset<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "launchAsset"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "manifest"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestExtra<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ManifestExtra<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "manifestExtra"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Web<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Web<'a> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.defs"
     }
     fn def_name() -> &'static str {
         "web"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_ocho_plugin_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_app_ocho_plugin_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_ocho_plugin_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.ocho.plugin.defs"),
@@ -1643,51 +1641,51 @@ pub mod asset_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
         type Type;
         type Hash;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
         type Type = Unset;
         type Hash = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type Blob = Set<members::blob>;
-        type Type = S::Type;
-        type Hash = S::Hash;
+        type Blob = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Blob = S::Blob;
         type Type = Set<members::r#type>;
         type Hash = S::Hash;
+        type Blob = S::Blob;
     }
     ///State transition - sets the `hash` field to Set
     pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHash<S> {}
     impl<S: State> State for SetHash<S> {
-        type Blob = S::Blob;
         type Type = S::Type;
         type Hash = Set<members::hash>;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type Type = S::Type;
+        type Hash = S::Hash;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `hash` field
         pub struct hash(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
@@ -1800,9 +1798,9 @@ impl<'a, S: asset_state::State> AssetBuilder<'a, S> {
 impl<'a, S> AssetBuilder<'a, S>
 where
     S: asset_state::State,
-    S::Blob: asset_state::IsSet,
     S::Type: asset_state::IsSet,
     S::Hash: asset_state::IsSet,
+    S::Blob: asset_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Asset<'a> {
@@ -1817,7 +1815,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1925,7 +1923,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1947,49 +1945,49 @@ pub mod launch_asset_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Key;
+        type Url;
         type ContentType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Key = Unset;
+        type Url = Unset;
         type ContentType = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Key = S::Key;
-        type ContentType = S::ContentType;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Url = S::Url;
         type Key = Set<members::key>;
+        type Url = S::Url;
+        type ContentType = S::ContentType;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Key = S::Key;
+        type Url = Set<members::url>;
         type ContentType = S::ContentType;
     }
     ///State transition - sets the `content_type` field to Set
     pub struct SetContentType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContentType<S> {}
     impl<S: State> State for SetContentType<S> {
-        type Url = S::Url;
         type Key = S::Key;
+        type Url = S::Url;
         type ContentType = Set<members::content_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `content_type` field
         pub struct content_type(());
     }
@@ -2084,8 +2082,8 @@ where
 impl<'a, S> LaunchAssetBuilder<'a, S>
 where
     S: launch_asset_state::State,
-    S::Url: launch_asset_state::IsSet,
     S::Key: launch_asset_state::IsSet,
+    S::Url: launch_asset_state::IsSet,
     S::ContentType: launch_asset_state::IsSet,
 {
     /// Build the final struct
@@ -2100,7 +2098,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2124,105 +2122,105 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type RuntimeVersion;
-        type Metadata;
-        type CreatedAt;
-        type Extra;
         type LaunchAsset;
+        type Id;
+        type CreatedAt;
+        type Metadata;
+        type Extra;
+        type RuntimeVersion;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type RuntimeVersion = Unset;
-        type Metadata = Unset;
-        type CreatedAt = Unset;
-        type Extra = Unset;
         type LaunchAsset = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Metadata = S::Metadata;
-        type CreatedAt = S::CreatedAt;
-        type Extra = S::Extra;
-        type LaunchAsset = S::LaunchAsset;
-    }
-    ///State transition - sets the `runtime_version` field to Set
-    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
-    impl<S: State> State for SetRuntimeVersion<S> {
-        type Id = S::Id;
-        type RuntimeVersion = Set<members::runtime_version>;
-        type Metadata = S::Metadata;
-        type CreatedAt = S::CreatedAt;
-        type Extra = S::Extra;
-        type LaunchAsset = S::LaunchAsset;
-    }
-    ///State transition - sets the `metadata` field to Set
-    pub struct SetMetadata<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetadata<S> {}
-    impl<S: State> State for SetMetadata<S> {
-        type Id = S::Id;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Metadata = Set<members::metadata>;
-        type CreatedAt = S::CreatedAt;
-        type Extra = S::Extra;
-        type LaunchAsset = S::LaunchAsset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Id = S::Id;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Metadata = S::Metadata;
-        type CreatedAt = Set<members::created_at>;
-        type Extra = S::Extra;
-        type LaunchAsset = S::LaunchAsset;
-    }
-    ///State transition - sets the `extra` field to Set
-    pub struct SetExtra<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExtra<S> {}
-    impl<S: State> State for SetExtra<S> {
-        type Id = S::Id;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Metadata = S::Metadata;
-        type CreatedAt = S::CreatedAt;
-        type Extra = Set<members::extra>;
-        type LaunchAsset = S::LaunchAsset;
+        type Id = Unset;
+        type CreatedAt = Unset;
+        type Metadata = Unset;
+        type Extra = Unset;
+        type RuntimeVersion = Unset;
     }
     ///State transition - sets the `launch_asset` field to Set
     pub struct SetLaunchAsset<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLaunchAsset<S> {}
     impl<S: State> State for SetLaunchAsset<S> {
-        type Id = S::Id;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Metadata = S::Metadata;
-        type CreatedAt = S::CreatedAt;
-        type Extra = S::Extra;
         type LaunchAsset = Set<members::launch_asset>;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+        type RuntimeVersion = S::RuntimeVersion;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type LaunchAsset = S::LaunchAsset;
+        type Id = Set<members::id>;
+        type CreatedAt = S::CreatedAt;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+        type RuntimeVersion = S::RuntimeVersion;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type LaunchAsset = S::LaunchAsset;
+        type Id = S::Id;
+        type CreatedAt = Set<members::created_at>;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+        type RuntimeVersion = S::RuntimeVersion;
+    }
+    ///State transition - sets the `metadata` field to Set
+    pub struct SetMetadata<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetadata<S> {}
+    impl<S: State> State for SetMetadata<S> {
+        type LaunchAsset = S::LaunchAsset;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Metadata = Set<members::metadata>;
+        type Extra = S::Extra;
+        type RuntimeVersion = S::RuntimeVersion;
+    }
+    ///State transition - sets the `extra` field to Set
+    pub struct SetExtra<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExtra<S> {}
+    impl<S: State> State for SetExtra<S> {
+        type LaunchAsset = S::LaunchAsset;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Metadata = S::Metadata;
+        type Extra = Set<members::extra>;
+        type RuntimeVersion = S::RuntimeVersion;
+    }
+    ///State transition - sets the `runtime_version` field to Set
+    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
+    impl<S: State> State for SetRuntimeVersion<S> {
+        type LaunchAsset = S::LaunchAsset;
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Metadata = S::Metadata;
+        type Extra = S::Extra;
+        type RuntimeVersion = Set<members::runtime_version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `runtime_version` field
-        pub struct runtime_version(());
-        ///Marker type for the `metadata` field
-        pub struct metadata(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `extra` field
-        pub struct extra(());
         ///Marker type for the `launch_asset` field
         pub struct launch_asset(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `metadata` field
+        pub struct metadata(());
+        ///Marker type for the `extra` field
+        pub struct extra(());
+        ///Marker type for the `runtime_version` field
+        pub struct runtime_version(());
     }
 }
 
@@ -2375,12 +2373,12 @@ where
 impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
-    S::Id: manifest_state::IsSet,
-    S::RuntimeVersion: manifest_state::IsSet,
-    S::Metadata: manifest_state::IsSet,
-    S::CreatedAt: manifest_state::IsSet,
-    S::Extra: manifest_state::IsSet,
     S::LaunchAsset: manifest_state::IsSet,
+    S::Id: manifest_state::IsSet,
+    S::CreatedAt: manifest_state::IsSet,
+    S::Metadata: manifest_state::IsSet,
+    S::Extra: manifest_state::IsSet,
+    S::RuntimeVersion: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {
@@ -2397,7 +2395,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2424,37 +2422,37 @@ pub mod manifest_extra_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ExpoClient;
         type ExpoGo;
+        type ExpoClient;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ExpoClient = Unset;
         type ExpoGo = Unset;
-    }
-    ///State transition - sets the `expo_client` field to Set
-    pub struct SetExpoClient<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpoClient<S> {}
-    impl<S: State> State for SetExpoClient<S> {
-        type ExpoClient = Set<members::expo_client>;
-        type ExpoGo = S::ExpoGo;
+        type ExpoClient = Unset;
     }
     ///State transition - sets the `expo_go` field to Set
     pub struct SetExpoGo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExpoGo<S> {}
     impl<S: State> State for SetExpoGo<S> {
-        type ExpoClient = S::ExpoClient;
         type ExpoGo = Set<members::expo_go>;
+        type ExpoClient = S::ExpoClient;
+    }
+    ///State transition - sets the `expo_client` field to Set
+    pub struct SetExpoClient<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpoClient<S> {}
+    impl<S: State> State for SetExpoClient<S> {
+        type ExpoGo = S::ExpoGo;
+        type ExpoClient = Set<members::expo_client>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `expo_client` field
-        pub struct expo_client(());
         ///Marker type for the `expo_go` field
         pub struct expo_go(());
+        ///Marker type for the `expo_client` field
+        pub struct expo_client(());
     }
 }
 
@@ -2527,8 +2525,8 @@ where
 impl<'a, S> ManifestExtraBuilder<'a, S>
 where
     S: manifest_extra_state::State,
-    S::ExpoClient: manifest_extra_state::IsSet,
     S::ExpoGo: manifest_extra_state::IsSet,
+    S::ExpoClient: manifest_extra_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ManifestExtra<'a> {
@@ -2541,7 +2539,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -19,54 +19,54 @@
 #[serde(rename_all = "camelCase")]
 pub struct Measurement<'a> {
     ///Short comment of this measurement, suitable for previews and list views. Rich text annotations may be provided via `commentFacets`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Rich text annotations for `comment` (mentions, URLs, hashtags, etc).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment_facets: std::option::Option<
+    pub comment_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
     ///The end date and time when the measurement ended. For one-time measurements, this should equal the start date.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub end_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub end_date: core::option::Option<jacquard_common::types::string::Datetime>,
     ///URIs to related evidence or underlying data (e.g. org.hypercerts.claim.evidence records or raw datasets)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub evidence_uri: std::option::Option<
+    pub evidence_uri: core::option::Option<
         Vec<jacquard_common::types::string::UriValue<'a>>,
     >,
     ///Optional geographic references related to where the measurement was taken. Each referenced record must conform with the app.certified.location lexicon.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: std::option::Option<
+    pub locations: core::option::Option<
         Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     >,
     ///DIDs of the entities that performed this measurement
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub measurers: std::option::Option<Vec<crate::app_certified::Did<'a>>>,
+    pub measurers: core::option::Option<Vec<crate::app_certified::Did<'a>>>,
     ///Short identifier for the measurement methodology
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub method_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub method_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URI to methodology documentation, standard protocol, or measurement procedure
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub method_uri: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub method_uri: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The metric being measured, e.g. forest area restored, number of users, etc.
     #[serde(borrow)]
     pub metric: jacquard_common::CowStr<'a>,
     ///The start date and time when the measurement began.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub start_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub start_date: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Strong references to the records this measurement refers to (e.g. activities, projects, or claims).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subjects: std::option::Option<
+    pub subjects: core::option::Option<
         Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     >,
     ///The unit of the measured value (e.g. kg CO₂e, hectares, %, index score).
@@ -89,9 +89,9 @@ pub struct Measurement<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MeasurementGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -138,19 +138,19 @@ impl jacquard_common::types::collection::Collection for MeasurementRecord {
     type Record = MeasurementRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Measurement<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.measurement"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_context_measurement()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.comment {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -294,67 +294,67 @@ pub mod measurement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Unit;
-        type Metric;
-        type Value;
         type CreatedAt;
+        type Value;
+        type Metric;
+        type Unit;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Unit = Unset;
-        type Metric = Unset;
-        type Value = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `unit` field to Set
-    pub struct SetUnit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnit<S> {}
-    impl<S: State> State for SetUnit<S> {
-        type Unit = Set<members::unit>;
-        type Metric = S::Metric;
-        type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `metric` field to Set
-    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetric<S> {}
-    impl<S: State> State for SetMetric<S> {
-        type Unit = S::Unit;
-        type Metric = Set<members::metric>;
-        type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Unit = S::Unit;
-        type Metric = S::Metric;
-        type Value = Set<members::value>;
-        type CreatedAt = S::CreatedAt;
+        type Value = Unset;
+        type Metric = Unset;
+        type Unit = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Unit = S::Unit;
-        type Metric = S::Metric;
-        type Value = S::Value;
         type CreatedAt = Set<members::created_at>;
+        type Value = S::Value;
+        type Metric = S::Metric;
+        type Unit = S::Unit;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type CreatedAt = S::CreatedAt;
+        type Value = Set<members::value>;
+        type Metric = S::Metric;
+        type Unit = S::Unit;
+    }
+    ///State transition - sets the `metric` field to Set
+    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetric<S> {}
+    impl<S: State> State for SetMetric<S> {
+        type CreatedAt = S::CreatedAt;
+        type Value = S::Value;
+        type Metric = Set<members::metric>;
+        type Unit = S::Unit;
+    }
+    ///State transition - sets the `unit` field to Set
+    pub struct SetUnit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnit<S> {}
+    impl<S: State> State for SetUnit<S> {
+        type CreatedAt = S::CreatedAt;
+        type Value = S::Value;
+        type Metric = S::Metric;
+        type Unit = Set<members::unit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `unit` field
-        pub struct unit(());
-        ///Marker type for the `metric` field
-        pub struct metric(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `metric` field
+        pub struct metric(());
+        ///Marker type for the `unit` field
+        pub struct unit(());
     }
 }
 
@@ -683,10 +683,10 @@ where
 impl<'a, S> MeasurementBuilder<'a, S>
 where
     S: measurement_state::State,
-    S::Unit: measurement_state::IsSet,
-    S::Metric: measurement_state::IsSet,
-    S::Value: measurement_state::IsSet,
     S::CreatedAt: measurement_state::IsSet,
+    S::Value: measurement_state::IsSet,
+    S::Metric: measurement_state::IsSet,
+    S::Unit: measurement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Measurement<'a> {
@@ -711,7 +711,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -736,7 +736,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_context_measurement() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hypercerts_context_measurement() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

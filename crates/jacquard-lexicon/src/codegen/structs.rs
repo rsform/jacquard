@@ -34,6 +34,7 @@ impl<'c> CodeGenerator<'c> {
         parent_type_name: &str,
         properties: &BTreeMap<SmolStr, LexObjectProperty<'static>>,
         include_nested_objects: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<Vec<GeneratedCode>> {
         let mut nested = Vec::new();
 
@@ -49,14 +50,14 @@ impl<'c> CodeGenerator<'c> {
                             self.generate_field_type_name(nsid, parent_type_name, field_name, "");
                         let refs: Vec<_> = union.refs.iter().cloned().collect();
                         nested.push(
-                            self.generate_union(nsid, &union_name, &refs, None, union.closed)?,
+                            self.generate_union(nsid, &union_name, &refs, None, union.closed, resolved)?,
                         );
                     }
                 }
                 LexObjectProperty::Object(nested_obj) if include_nested_objects => {
                     let object_name =
                         self.generate_field_type_name(nsid, parent_type_name, field_name, "");
-                    nested.push(self.generate_object(nsid, &object_name, &nested_obj)?);
+                    nested.push(self.generate_object(nsid, &object_name, &nested_obj, resolved)?);
                 }
                 LexObjectProperty::Array(array) => {
                     if let LexArrayItem::Union(union) = &array.items {
@@ -70,7 +71,7 @@ impl<'c> CodeGenerator<'c> {
                             );
                             let refs: Vec<_> = union.refs.iter().cloned().collect();
                             nested.push(
-                                self.generate_union(nsid, &union_name, &refs, None, union.closed)?,
+                                self.generate_union(nsid, &union_name, &refs, None, union.closed, resolved)?,
                             );
                         }
                     }
@@ -78,7 +79,7 @@ impl<'c> CodeGenerator<'c> {
                 LexObjectProperty::String(s) if s.known_values.is_some() => {
                     let enum_name =
                         self.generate_field_type_name(nsid, parent_type_name, field_name, "");
-                    nested.push(self.generate_inline_known_values_enum(&enum_name, s)?);
+                    nested.push(self.generate_inline_known_values_enum(&enum_name, s, resolved)?);
                 }
                 _ => {}
             }
@@ -92,6 +93,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         record: &LexRecord<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<GeneratedCode> {
         match &record.record {
             crate::lexicon::LexRecordRecord::Object(obj) => {
@@ -104,16 +106,18 @@ impl<'c> CodeGenerator<'c> {
                 let has_builder =
                     !super::builder_heuristics::conflicts_with_builder_macro(&type_name);
 
-                // Generate main struct fields
+                // Generate main struct fields.
                 let (fields, default_fns) =
-                    self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
+                    self.generate_object_fields(nsid, &type_name, obj, has_builder, resolved)?;
                 let doc = self.generate_doc_comment(record.description.as_ref());
-                let manual_default = self.generate_manual_default(&type_name, obj);
+                let manual_default = self.generate_manual_default(&type_name, obj, resolved);
 
+                let derive_attr = resolved.derive_standard();
+                let lexicon_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::LexiconAttr);
                 let struct_def = quote! {
                     #doc
-                    #[jacquard_derive::lexicon]
-                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                    #lexicon_attr
+                    #derive_attr
                     #[serde(rename_all = "camelCase")]
                     pub struct #ident<'a> {
                         #fields
@@ -131,36 +135,41 @@ impl<'c> CodeGenerator<'c> {
                 };
 
                 // Generate union types and nested object types for this record
-                let unions = self.generate_nested_types(nsid, &type_name, &obj.properties, true)?;
+                let unions = self.generate_nested_types(nsid, &type_name, &obj.properties, true, resolved)?;
 
                 // Generate typed GetRecordOutput wrapper
                 let output_type_name = format!("{}GetRecordOutput", type_name);
                 let output_type_ident =
                     syn::Ident::new(&output_type_name, proc_macro2::Span::call_site());
 
+                let is_none_path = resolved.option_is_none_path();
+                let cid_type = resolved.type_tokens(&super::prettify::CommonType::Cid);
+                let at_uri_type = resolved.type_tokens(&super::prettify::CommonType::AtUri);
                 let output_wrapper = quote! {
                     /// Typed wrapper for GetRecord response with this collection's record type.
-                    #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                    #derive_attr
                     #[serde(rename_all = "camelCase")]
                     pub struct #output_type_ident<'a> {
-                        #[serde(skip_serializing_if = "std::option::Option::is_none")]
+                        #[serde(skip_serializing_if = #is_none_path)]
                         #[serde(borrow)]
-                        pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+                        pub cid: core::option::Option<#cid_type>,
                         #[serde(borrow)]
-                        pub uri: jacquard_common::types::string::AtUri<'a>,
+                        pub uri: #at_uri_type,
                         #[serde(borrow)]
                         pub value: #ident<'a>,
                     }
                 };
 
-                // Generate marker struct for XrpcResp
+                // Generate marker struct for XrpcResp.
                 let record_marker_name = format!("{}Record", type_name);
                 let record_marker_ident =
                     syn::Ident::new(&record_marker_name, proc_macro2::Span::call_site());
 
+                let ser_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Serialize);
+                let de_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Deserialize);
                 let record_marker = quote! {
                     /// Marker type for deserializing records from this collection.
-                    #[derive(Debug, serde::Serialize, serde::Deserialize)]
+                    #[derive(Debug, #ser_path, #de_path)]
                     pub struct #record_marker_ident;
 
                     impl jacquard_common::xrpc::XrpcResp for #record_marker_ident {
@@ -181,7 +190,7 @@ impl<'c> CodeGenerator<'c> {
                     }
                 };
 
-                // Generate Collection trait impl
+                // Generate Collection trait impl.
                 let collection_impl = quote! {
                     impl jacquard_common::types::collection::Collection for #ident<'_> {
                         const NSID: &'static str = #nsid;
@@ -189,7 +198,7 @@ impl<'c> CodeGenerator<'c> {
                     }
                 };
 
-                // Generate collection impl for the marker struct to drive fetch_record()
+                // Generate collection impl for the marker struct to drive fetch_record().
                 let collection_marker_impl = quote! {
                     impl jacquard_common::types::collection::Collection for #record_marker_ident {
                         const NSID: &'static str = #nsid;
@@ -199,7 +208,7 @@ impl<'c> CodeGenerator<'c> {
 
                 // Generate LexiconSchema impl with shared lexicon_doc function
                 let (shared_fn, schema_impl) =
-                    self.generate_schema_impl_with_shared(&type_name, nsid, "main", true);
+                    self.generate_schema_impl_with_shared(&type_name, nsid, "main", true, resolved);
 
                 // Merge nested type buckets into parent buckets.
                 let mut nested_type_defs = TokenStream::new();
@@ -218,10 +227,12 @@ impl<'c> CodeGenerator<'c> {
                     #output_wrapper
                 };
 
+                let cowstr_type = resolved.type_tokens(&super::prettify::CommonType::CowStr);
+                let at_uri_path = resolved.type_path(&super::prettify::CommonType::AtUri);
                 let inherent_impls = quote! {
                     impl<'a> #ident<'a> {
-                        pub fn uri(uri: impl Into<jacquard_common::CowStr<'a>>) -> Result<jacquard_common::types::uri::RecordUri<'a, #record_marker_ident>, jacquard_common::types::uri::UriError> {
-                            jacquard_common::types::uri::RecordUri::try_from_uri(jacquard_common::types::string::AtUri::new_cow(uri.into())?)
+                        pub fn uri(uri: impl Into<#cowstr_type>) -> Result<jacquard_common::types::uri::RecordUri<'a, #record_marker_ident>, jacquard_common::types::uri::UriError> {
+                            jacquard_common::types::uri::RecordUri::try_from_uri(#at_uri_path::new_cow(uri.into())?)
                         }
                     }
                 };
@@ -259,6 +270,7 @@ impl<'c> CodeGenerator<'c> {
         nsid: &str,
         def_name: &str,
         obj: &LexObject<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<GeneratedCode> {
         let type_name = self.def_to_type_name(nsid, def_name);
         let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
@@ -274,35 +286,29 @@ impl<'c> CodeGenerator<'c> {
         let has_builder = decision.has_builder;
 
         let (fields, default_fns) =
-            self.generate_object_fields(nsid, &type_name, obj, has_builder)?;
+            self.generate_object_fields(nsid, &type_name, obj, has_builder, resolved)?;
         let doc = self.generate_doc_comment(obj.description.as_ref());
 
         // Determine Default strategy:
-        // 1. Manual impl if schema defaults cover all required fields
-        // 2. derive(Default) if heuristic says so (0 required, or all-string required)
-        // 3. No Default otherwise
-        let manual_default = self.generate_manual_default(&type_name, obj);
+        // 1. Manual impl if schema defaults cover all required fields.
+        // 2. derive(Default) if heuristic says so (0 required, or all-string required).
+        // 3. No Default otherwise.
+        let manual_default = self.generate_manual_default(&type_name, obj, resolved);
         let use_derive_default = manual_default.is_none() && decision.has_default;
 
-        let struct_def = if use_derive_default {
-            quote! {
-                #doc
-                #[jacquard_derive::lexicon]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic, Default)]
-                #[serde(rename_all = "camelCase")]
-                pub struct #ident<'a> {
-                    #fields
-                }
-            }
+        let lexicon_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::LexiconAttr);
+        let derive_attr = if use_derive_default {
+            resolved.derive_standard_with(quote! { Default })
         } else {
-            quote! {
-                #doc
-                #[jacquard_derive::lexicon]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
-                #[serde(rename_all = "camelCase")]
-                pub struct #ident<'a> {
-                    #fields
-                }
+            resolved.derive_standard()
+        };
+        let struct_def = quote! {
+            #doc
+            #lexicon_attr
+            #derive_attr
+            #[serde(rename_all = "camelCase")]
+            pub struct #ident<'a> {
+                #fields
             }
         };
 
@@ -317,7 +323,7 @@ impl<'c> CodeGenerator<'c> {
         };
 
         // Generate union types and nested object types for this object.
-        let nested_items = self.generate_nested_types(nsid, &type_name, &obj.properties, true)?;
+        let nested_items = self.generate_nested_types(nsid, &type_name, &obj.properties, true, resolved)?;
 
         // Merge nested type buckets into parent buckets.
         let mut nested_type_defs = TokenStream::new();
@@ -331,7 +337,7 @@ impl<'c> CodeGenerator<'c> {
 
         // Generate LexiconSchema impl with shared lexicon_doc function.
         let (shared_fn, schema_impl) =
-            self.generate_schema_impl_with_shared(&type_name, nsid, def_name, true);
+            self.generate_schema_impl_with_shared(&type_name, nsid, def_name, true, resolved);
 
         // Categorize tokens into buckets.
         let type_defs = quote! {
@@ -368,6 +374,7 @@ impl<'c> CodeGenerator<'c> {
         parent_type_name: &str,
         obj: &LexObject<'static>,
         _is_builder: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<(TokenStream, Vec<TokenStream>)> {
         let required = obj.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
         let nullable = obj.nullable.as_ref().map(|n| n.as_slice()).unwrap_or(&[]);
@@ -384,6 +391,7 @@ impl<'c> CodeGenerator<'c> {
                 field_type,
                 is_required,
                 is_nullable,
+                resolved,
             )?;
             fields.push(field_tokens);
             if let Some(f) = default_fn {
@@ -404,6 +412,7 @@ impl<'c> CodeGenerator<'c> {
         field_type: &LexObjectProperty<'static>,
         is_required: bool,
         is_nullable: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<(TokenStream, Option<TokenStream>)> {
         if field_name.is_empty() {
             eprintln!(
@@ -414,14 +423,14 @@ impl<'c> CodeGenerator<'c> {
         let field_ident = make_ident(&field_name.to_snake_case());
 
         let rust_type =
-            self.property_to_rust_type(nsid, parent_type_name, field_name, field_type)?;
+            self.property_to_rust_type(nsid, parent_type_name, field_name, field_type, resolved)?;
         let needs_lifetime = self.property_needs_lifetime(field_type);
 
         let is_optional = !is_required || is_nullable;
         let rust_type = if !is_optional {
             rust_type
         } else {
-            quote! { std::option::Option<#rust_type> }
+            quote! { core::option::Option<#rust_type> }
         };
 
         // Extract description from field type.
@@ -441,7 +450,7 @@ impl<'c> CodeGenerator<'c> {
 
         // Extract schema default and generate companion function + serde attr.
         let (default_doc, serde_default_attr, default_fn) =
-            self.extract_field_default(parent_type_name, field_name, field_type, is_optional);
+            self.extract_field_default(parent_type_name, field_name, field_type, is_optional, resolved);
 
         // Combine description with default doc suffix.
         let combined_desc = match (description, &default_doc) {
@@ -463,7 +472,8 @@ impl<'c> CodeGenerator<'c> {
         let mut attrs = Vec::new();
 
         if is_optional {
-            attrs.push(quote! { #[serde(skip_serializing_if = "std::option::Option::is_none")] });
+            let is_none_path = resolved.option_is_none_path();
+            attrs.push(quote! { #[serde(skip_serializing_if = #is_none_path)] });
         }
 
         if let Some(serde_attr) = serde_default_attr {
@@ -505,6 +515,7 @@ impl<'c> CodeGenerator<'c> {
         field_name: &str,
         field_type: &LexObjectProperty<'static>,
         is_optional: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> (Option<String>, Option<TokenStream>, Option<TokenStream>) {
         let fn_name = format!(
             "_default_{}_{}",
@@ -523,7 +534,7 @@ impl<'c> CodeGenerator<'c> {
                         Some(doc),
                         Some(serde_attr),
                         Some(quote! {
-                            fn #fn_ident() -> std::option::Option<bool> { Some(#v) }
+                            fn #fn_ident() -> core::option::Option<bool> { Some(#v) }
                         }),
                     )
                 } else {
@@ -544,7 +555,7 @@ impl<'c> CodeGenerator<'c> {
                         Some(doc),
                         Some(serde_attr),
                         Some(quote! {
-                            fn #fn_ident() -> std::option::Option<i64> { Some(#v) }
+                            fn #fn_ident() -> core::option::Option<i64> { Some(#v) }
                         }),
                     )
                 } else {
@@ -560,13 +571,14 @@ impl<'c> CodeGenerator<'c> {
             LexObjectProperty::String(s) if s.default.is_some() && s.known_values.is_none() => {
                 let v = s.default.as_ref().unwrap().as_ref();
                 let doc = format!("Defaults to `\"{}\"`.", v);
+                let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
                 if is_optional {
                     (
                         Some(doc),
                         Some(serde_attr),
                         Some(quote! {
-                            fn #fn_ident() -> std::option::Option<jacquard_common::CowStr<'static>> {
-                                Some(jacquard_common::CowStr::from(#v))
+                            fn #fn_ident() -> core::option::Option<#cowstr_path<'static>> {
+                                Some(#cowstr_path::from(#v))
                             }
                         }),
                     )
@@ -575,8 +587,8 @@ impl<'c> CodeGenerator<'c> {
                         Some(doc),
                         Some(serde_attr),
                         Some(quote! {
-                            fn #fn_ident() -> jacquard_common::CowStr<'static> {
-                                jacquard_common::CowStr::from(#v)
+                            fn #fn_ident() -> #cowstr_path<'static> {
+                                #cowstr_path::from(#v)
                             }
                         }),
                     )
@@ -592,6 +604,7 @@ impl<'c> CodeGenerator<'c> {
         &self,
         type_name: &str,
         obj: &LexObject<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Option<TokenStream> {
         if !super::builder_heuristics::eligible_for_schema_default(obj) {
             return None;
@@ -619,7 +632,7 @@ impl<'c> CodeGenerator<'c> {
                 let is_nullable = nullable.contains(field_name);
                 let is_optional = !is_required || is_nullable;
 
-                let value = self.schema_default_value(field_type, is_optional);
+                let value = self.schema_default_value(field_type, is_optional, resolved);
                 quote! { #field_ident: #value }
             })
             .collect();
@@ -641,6 +654,7 @@ impl<'c> CodeGenerator<'c> {
         &self,
         field_type: &LexObjectProperty<'static>,
         is_optional: bool,
+        resolved: &super::prettify::ResolvedImports,
     ) -> TokenStream {
         let inner = match field_type {
             LexObjectProperty::Boolean(b) if b.default.is_some() => {
@@ -653,7 +667,8 @@ impl<'c> CodeGenerator<'c> {
             }
             LexObjectProperty::String(s) if s.default.is_some() && s.known_values.is_none() => {
                 let v = s.default.as_ref().unwrap().as_ref();
-                Some(quote! { jacquard_common::CowStr::from(#v) })
+                let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
+                Some(quote! { #cowstr_path::from(#v) })
             }
             _ => None,
         };
@@ -674,6 +689,7 @@ impl<'c> CodeGenerator<'c> {
         refs: &[jacquard_common::CowStr<'static>],
         description: Option<&str>,
         closed: Option<bool>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<GeneratedCode> {
         let enum_ident = syn::Ident::new(union_name, proc_macro2::Span::call_site());
 
@@ -685,21 +701,23 @@ impl<'c> CodeGenerator<'c> {
         };
 
         let union_variants =
-            ctx.build_union_variants(refs, |ref_str| self.ref_to_rust_type(ref_str))?;
+            ctx.build_union_variants(refs, |ref_str| self.ref_to_rust_type(ref_str, resolved))?;
         let variants = super::union_codegen::generate_variant_tokens(&union_variants);
 
         let doc = description
             .map(|d| quote! { #[doc = #d] })
             .unwrap_or_else(|| quote! {});
 
-        // Only add open_union if not closed
+        // Only add open_union if not closed.
         let is_open = closed != Some(true);
+        let derive_attr = resolved.derive_standard();
 
         let enum_def = if is_open {
+            let open_union_attr = resolved.attribute_tokens(&super::prettify::ExternalImport::OpenUnion);
             quote! {
                 #doc
-                #[jacquard_derive::open_union]
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                #open_union_attr
+                #derive_attr
                 #[serde(tag = "$type")]
                 #[serde(bound(deserialize = "'de: 'a"))]
                 pub enum #enum_ident<'a> {
@@ -709,7 +727,7 @@ impl<'c> CodeGenerator<'c> {
         } else {
             quote! {
                 #doc
-                #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic)]
+                #derive_attr
                 #[serde(tag = "$type")]
                 #[serde(bound(deserialize = "'de: 'a"))]
                 pub enum #enum_ident<'a> {
@@ -721,12 +739,13 @@ impl<'c> CodeGenerator<'c> {
         Ok(GeneratedCode::type_only(enum_def))
     }
 
-    /// Generate enum for string with known values
+    /// Generate enum for string with known values.
     pub(super) fn generate_known_values_enum(
         &self,
         nsid: &str,
         def_name: &str,
         string: &LexString<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<GeneratedCode> {
         let type_name = self.def_to_type_name(nsid, def_name);
         let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
@@ -782,12 +801,14 @@ impl<'c> CodeGenerator<'c> {
         let into_static_impl =
             self.generate_into_static_for_enum(&type_name, &variant_info, true, false);
 
+        let cowstr_type = resolved.type_tokens(&super::prettify::CommonType::CowStr);
+        let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
         let enum_def = quote! {
             #doc
             #[derive(Debug, Clone, PartialEq, Eq, Hash)]
             pub enum #ident<'a> {
                 #(#variants,)*
-                #catchall_ident(jacquard_common::CowStr<'a>),
+                #catchall_ident(#cowstr_type),
             }
 
             impl<'a> #ident<'a> {
@@ -803,7 +824,7 @@ impl<'c> CodeGenerator<'c> {
                 fn from(s: &'a str) -> Self {
                     match s {
                         #(#from_str_arms,)*
-                        _ => Self::#catchall_ident(jacquard_common::CowStr::from(s)),
+                        _ => Self::#catchall_ident(#cowstr_path::from(s)),
                     }
                 }
             }
@@ -812,7 +833,7 @@ impl<'c> CodeGenerator<'c> {
                 fn from(s: String) -> Self {
                     match s.as_str() {
                         #(#from_str_arms,)*
-                        _ => Self::#catchall_ident(jacquard_common::CowStr::from(s)),
+                        _ => Self::#catchall_ident(#cowstr_path::from(s)),
                     }
                 }
             }
@@ -864,6 +885,7 @@ impl<'c> CodeGenerator<'c> {
         &self,
         type_name: &str,
         string: &LexString<'static>,
+        resolved: &super::prettify::ResolvedImports,
     ) -> Result<GeneratedCode> {
         let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
 
@@ -918,12 +940,14 @@ impl<'c> CodeGenerator<'c> {
         let into_static_impl =
             self.generate_into_static_for_enum(type_name, &variant_info, true, false);
 
+        let cowstr_type = resolved.type_tokens(&super::prettify::CommonType::CowStr);
+        let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
         let enum_def = quote! {
             #doc
             #[derive(Debug, Clone, PartialEq, Eq, Hash)]
             pub enum #ident<'a> {
                 #(#variants,)*
-                #catchall_ident(jacquard_common::CowStr<'a>),
+                #catchall_ident(#cowstr_type),
             }
 
             impl<'a> #ident<'a> {
@@ -939,7 +963,7 @@ impl<'c> CodeGenerator<'c> {
                 fn from(s: &'a str) -> Self {
                     match s {
                         #(#from_str_arms,)*
-                        _ => Self::#catchall_ident(jacquard_common::CowStr::from(s)),
+                        _ => Self::#catchall_ident(#cowstr_path::from(s)),
                     }
                 }
             }
@@ -948,7 +972,7 @@ impl<'c> CodeGenerator<'c> {
                 fn from(s: String) -> Self {
                     match s.as_str() {
                         #(#from_str_arms,)*
-                        _ => Self::#catchall_ident(jacquard_common::CowStr::from(s)),
+                        _ => Self::#catchall_ident(#cowstr_path::from(s)),
                     }
                 }
             }

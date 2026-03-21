@@ -18,33 +18,33 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecommendedDidCredentialsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub also_known_as: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub also_known_as: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Recommended rotation keys for PLC dids. Should be undefined (or ignored) for did:webs.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rotation_keys: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub rotation_keys: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub services: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub services: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification_methods: std::option::Option<
+    pub verification_methods: core::option::Option<
         jacquard_common::types::value::Data<'a>,
     >,
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct GetRecommendedDidCredentials;
 /// Response type for

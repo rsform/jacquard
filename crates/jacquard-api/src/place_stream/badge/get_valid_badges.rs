@@ -16,9 +16,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetValidBadges<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub streamer: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub streamer: core::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 #[jacquard_derive::lexicon]

@@ -16,11 +16,11 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CheckHandleAvailability<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub birth_date: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub birth_date: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
 }
@@ -84,7 +84,7 @@ pub enum CheckHandleAvailabilityOutputResult<'a> {
 pub enum CheckHandleAvailabilityError<'a> {
     /// An invalid email was provided.
     #[serde(rename = "InvalidEmail")]
-    InvalidEmail(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidEmail(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for CheckHandleAvailabilityError<'_> {
@@ -181,53 +181,53 @@ impl jacquard_common::xrpc::XrpcEndpoint for CheckHandleAvailabilityRequest {
     type Response = CheckHandleAvailabilityResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultAvailable<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ResultAvailable<'a> {
     fn nsid() -> &'static str {
         "com.atproto.temp.checkHandleAvailability"
     }
     fn def_name() -> &'static str {
         "resultAvailable"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_temp_checkHandleAvailability()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResultUnavailable<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ResultUnavailable<'a> {
     fn nsid() -> &'static str {
         "com.atproto.temp.checkHandleAvailability"
     }
     fn def_name() -> &'static str {
         "resultUnavailable"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_temp_checkHandleAvailability()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {
     fn nsid() -> &'static str {
         "com.atproto.temp.checkHandleAvailability"
     }
     fn def_name() -> &'static str {
         "suggestion"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_temp_checkHandleAvailability()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -377,7 +377,7 @@ where
     }
 }
 
-fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atproto_temp_checkHandleAvailability() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -699,7 +699,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -721,37 +721,37 @@ pub mod suggestion_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Method;
         type Handle;
+        type Method;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Method = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `method` field to Set
-    pub struct SetMethod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMethod<S> {}
-    impl<S: State> State for SetMethod<S> {
-        type Method = Set<members::method>;
-        type Handle = S::Handle;
+        type Method = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Method = S::Method;
         type Handle = Set<members::handle>;
+        type Method = S::Method;
+    }
+    ///State transition - sets the `method` field to Set
+    pub struct SetMethod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMethod<S> {}
+    impl<S: State> State for SetMethod<S> {
+        type Handle = S::Handle;
+        type Method = Set<members::method>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `method` field
-        pub struct method(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `method` field
+        pub struct method(());
     }
 }
 
@@ -824,8 +824,8 @@ where
 impl<'a, S> SuggestionBuilder<'a, S>
 where
     S: suggestion_state::State,
-    S::Method: suggestion_state::IsSet,
     S::Handle: suggestion_state::IsSet,
+    S::Method: suggestion_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Suggestion<'a> {
@@ -838,7 +838,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

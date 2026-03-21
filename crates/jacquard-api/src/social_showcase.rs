@@ -146,10 +146,10 @@ impl jacquard_common::IntoStatic for ActivitySettingsShareActivity<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AspectRatio<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub height: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub width: core::option::Option<i64>,
 }
 
 /// Reference to an item in a collection
@@ -190,26 +190,26 @@ pub struct CollectionView<'a> {
     pub author: crate::social_showcase::ProfileView<'a>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub cover_image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub item_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub item_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub items: std::option::Option<Vec<crate::social_showcase::ItemView<'a>>>,
+    pub items: core::option::Option<Vec<crate::social_showcase::ItemView<'a>>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub tags: Vec<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub r#type: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -230,12 +230,12 @@ pub struct CollectionView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DisplaySettings<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub grid_layout: std::option::Option<DisplaySettingsGridLayout<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub grid_layout: core::option::Option<DisplaySettingsGridLayout<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: std::option::Option<DisplaySettingsTheme<'a>>,
+    pub theme: core::option::Option<DisplaySettingsTheme<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -437,12 +437,12 @@ impl jacquard_common::IntoStatic for DisplaySettingsTheme<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct ItemImage<'a> {
     ///Alt text for accessibility
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aspect_ratio: std::option::Option<crate::social_showcase::AspectRatio<'a>>,
+    pub aspect_ratio: core::option::Option<crate::social_showcase::AspectRatio<'a>>,
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
 }
@@ -462,31 +462,33 @@ pub struct ItemImage<'a> {
 pub struct ItemView<'a> {
     #[serde(borrow)]
     pub author: crate::social_showcase::ProfileView<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub external_link: core::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
     #[serde(borrow)]
     pub images: Vec<crate::social_showcase::ItemImage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub metadata: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reaction_count: std::option::Option<i64>,
+    pub metadata: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reaction_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub tags: Vec<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -546,22 +548,22 @@ pub struct PrivacySettings<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub banner: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Subject of a reaction
@@ -948,19 +950,19 @@ impl jacquard_common::IntoStatic for VisibilitySettingsProfileVisibility<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ActivitySettings<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "activitySettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.share_activity;
             #[allow(unused_comparisons)]
@@ -978,19 +980,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActivitySettings<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "aspectRatio"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.height {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -1017,19 +1019,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AspectRatio<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "collectionItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.uri;
             #[allow(unused_comparisons)]
@@ -1047,19 +1049,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionView<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "collectionView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -1115,19 +1117,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisplaySettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DisplaySettings<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "displaySettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.grid_layout {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
@@ -1156,19 +1158,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisplaySettings<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemImage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ItemImage<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "itemImage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 300usize {
@@ -1232,19 +1234,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemImage<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ItemView<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "itemView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.category {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -1311,53 +1313,53 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItemView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "notificationSettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PrivacySettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PrivacySettings<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "privacySettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "profileView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.did;
             #[allow(unused_comparisons)]
@@ -1400,36 +1402,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionSubject<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReactionSubject<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "reactionSubject"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReactionView<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "reactionView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.r#type;
             #[allow(unused_comparisons)]
@@ -1447,36 +1449,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ShowcaseItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ShowcaseItem<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "showcaseItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for VisibilitySettings<'a> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
     fn def_name() -> &'static str {
         "visibilitySettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_showcase_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.default_collection_visibility;
             #[allow(unused_comparisons)]
@@ -1534,51 +1536,51 @@ pub mod activity_settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShareNewItems;
-        type ShareActivity;
         type RetentionDays;
+        type ShareActivity;
+        type ShareNewItems;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShareNewItems = Unset;
-        type ShareActivity = Unset;
         type RetentionDays = Unset;
-    }
-    ///State transition - sets the `share_new_items` field to Set
-    pub struct SetShareNewItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShareNewItems<S> {}
-    impl<S: State> State for SetShareNewItems<S> {
-        type ShareNewItems = Set<members::share_new_items>;
-        type ShareActivity = S::ShareActivity;
-        type RetentionDays = S::RetentionDays;
-    }
-    ///State transition - sets the `share_activity` field to Set
-    pub struct SetShareActivity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShareActivity<S> {}
-    impl<S: State> State for SetShareActivity<S> {
-        type ShareNewItems = S::ShareNewItems;
-        type ShareActivity = Set<members::share_activity>;
-        type RetentionDays = S::RetentionDays;
+        type ShareActivity = Unset;
+        type ShareNewItems = Unset;
     }
     ///State transition - sets the `retention_days` field to Set
     pub struct SetRetentionDays<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRetentionDays<S> {}
     impl<S: State> State for SetRetentionDays<S> {
-        type ShareNewItems = S::ShareNewItems;
-        type ShareActivity = S::ShareActivity;
         type RetentionDays = Set<members::retention_days>;
+        type ShareActivity = S::ShareActivity;
+        type ShareNewItems = S::ShareNewItems;
+    }
+    ///State transition - sets the `share_activity` field to Set
+    pub struct SetShareActivity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShareActivity<S> {}
+    impl<S: State> State for SetShareActivity<S> {
+        type RetentionDays = S::RetentionDays;
+        type ShareActivity = Set<members::share_activity>;
+        type ShareNewItems = S::ShareNewItems;
+    }
+    ///State transition - sets the `share_new_items` field to Set
+    pub struct SetShareNewItems<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShareNewItems<S> {}
+    impl<S: State> State for SetShareNewItems<S> {
+        type RetentionDays = S::RetentionDays;
+        type ShareActivity = S::ShareActivity;
+        type ShareNewItems = Set<members::share_new_items>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `share_new_items` field
-        pub struct share_new_items(());
-        ///Marker type for the `share_activity` field
-        pub struct share_activity(());
         ///Marker type for the `retention_days` field
         pub struct retention_days(());
+        ///Marker type for the `share_activity` field
+        pub struct share_activity(());
+        ///Marker type for the `share_new_items` field
+        pub struct share_new_items(());
     }
 }
 
@@ -1671,9 +1673,9 @@ where
 impl<'a, S> ActivitySettingsBuilder<'a, S>
 where
     S: activity_settings_state::State,
-    S::ShareNewItems: activity_settings_state::IsSet,
-    S::ShareActivity: activity_settings_state::IsSet,
     S::RetentionDays: activity_settings_state::IsSet,
+    S::ShareActivity: activity_settings_state::IsSet,
+    S::ShareNewItems: activity_settings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ActivitySettings<'a> {
@@ -1687,7 +1689,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1701,9 +1703,7 @@ where
     }
 }
 
-fn lexicon_doc_social_showcase_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_showcase_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.showcase.defs"),
@@ -3054,51 +3054,51 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Order;
         type Uri;
         type AddedAt;
+        type Order;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Order = Unset;
         type Uri = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `order` field to Set
-    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrder<S> {}
-    impl<S: State> State for SetOrder<S> {
-        type Order = Set<members::order>;
-        type Uri = S::Uri;
-        type AddedAt = S::AddedAt;
+        type Order = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Order = S::Order;
         type Uri = Set<members::uri>;
         type AddedAt = S::AddedAt;
+        type Order = S::Order;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Order = S::Order;
         type Uri = S::Uri;
         type AddedAt = Set<members::added_at>;
+        type Order = S::Order;
+    }
+    ///State transition - sets the `order` field to Set
+    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOrder<S> {}
+    impl<S: State> State for SetOrder<S> {
+        type Uri = S::Uri;
+        type AddedAt = S::AddedAt;
+        type Order = Set<members::order>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `order` field
-        pub struct order(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `order` field
+        pub struct order(());
     }
 }
 
@@ -3191,9 +3191,9 @@ where
 impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
-    S::Order: collection_item_state::IsSet,
     S::Uri: collection_item_state::IsSet,
     S::AddedAt: collection_item_state::IsSet,
+    S::Order: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {
@@ -3207,7 +3207,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3232,12 +3232,12 @@ pub mod collection_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Type;
+        type CreatedAt;
+        type Tags;
         type Visibility;
+        type Type;
         type Uri;
         type Cid;
-        type Tags;
-        type CreatedAt;
         type Author;
     }
     /// Empty state - all required fields are unset
@@ -3245,12 +3245,12 @@ pub mod collection_view_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Type = Unset;
+        type CreatedAt = Unset;
+        type Tags = Unset;
         type Visibility = Unset;
+        type Type = Unset;
         type Uri = Unset;
         type Cid = Unset;
-        type Tags = Unset;
-        type CreatedAt = Unset;
         type Author = Unset;
     }
     ///State transition - sets the `name` field to Set
@@ -3258,77 +3258,12 @@ pub mod collection_view_state {
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
-        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
         type Visibility = S::Visibility;
+        type Type = S::Type;
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Name = S::Name;
-        type Type = Set<members::r#type>;
-        type Visibility = S::Visibility;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Name = S::Name;
-        type Type = S::Type;
-        type Visibility = Set<members::visibility>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
-        type Type = S::Type;
-        type Visibility = S::Visibility;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Name = S::Name;
-        type Type = S::Type;
-        type Visibility = S::Visibility;
-        type Uri = S::Uri;
-        type Cid = Set<members::cid>;
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Name = S::Name;
-        type Type = S::Type;
-        type Visibility = S::Visibility;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Tags = Set<members::tags>;
-        type CreatedAt = S::CreatedAt;
         type Author = S::Author;
     }
     ///State transition - sets the `created_at` field to Set
@@ -3336,12 +3271,77 @@ pub mod collection_view_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Name = S::Name;
-        type Type = S::Type;
+        type CreatedAt = Set<members::created_at>;
+        type Tags = S::Tags;
         type Visibility = S::Visibility;
+        type Type = S::Type;
         type Uri = S::Uri;
         type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Tags = Set<members::tags>;
+        type Visibility = S::Visibility;
+        type Type = S::Type;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type Tags = S::Tags;
-        type CreatedAt = Set<members::created_at>;
+        type Visibility = Set<members::visibility>;
+        type Type = S::Type;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type Visibility = S::Visibility;
+        type Type = Set<members::r#type>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type Visibility = S::Visibility;
+        type Type = S::Type;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type Visibility = S::Visibility;
+        type Type = S::Type;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
         type Author = S::Author;
     }
     ///State transition - sets the `author` field to Set
@@ -3349,12 +3349,12 @@ pub mod collection_view_state {
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
         type Name = S::Name;
-        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
         type Visibility = S::Visibility;
+        type Type = S::Type;
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
         type Author = Set<members::author>;
     }
     /// Marker types for field names
@@ -3362,18 +3362,18 @@ pub mod collection_view_state {
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `author` field
         pub struct author(());
     }
@@ -3677,12 +3677,12 @@ impl<'a, S> CollectionViewBuilder<'a, S>
 where
     S: collection_view_state::State,
     S::Name: collection_view_state::IsSet,
-    S::Type: collection_view_state::IsSet,
+    S::CreatedAt: collection_view_state::IsSet,
+    S::Tags: collection_view_state::IsSet,
     S::Visibility: collection_view_state::IsSet,
+    S::Type: collection_view_state::IsSet,
     S::Uri: collection_view_state::IsSet,
     S::Cid: collection_view_state::IsSet,
-    S::Tags: collection_view_state::IsSet,
-    S::CreatedAt: collection_view_state::IsSet,
     S::Author: collection_view_state::IsSet,
 {
     /// Build the final struct
@@ -3707,7 +3707,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3860,7 +3860,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3884,149 +3884,149 @@ pub mod item_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tags;
-        type CreatedAt;
-        type Uri;
-        type Images;
         type Title;
+        type Images;
         type Visibility;
         type Author;
+        type CreatedAt;
+        type Uri;
+        type Tags;
         type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tags = Unset;
-        type CreatedAt = Unset;
-        type Uri = Unset;
-        type Images = Unset;
         type Title = Unset;
+        type Images = Unset;
         type Visibility = Unset;
         type Author = Unset;
+        type CreatedAt = Unset;
+        type Uri = Unset;
+        type Tags = Unset;
         type Cid = Unset;
     }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Tags = Set<members::tags>;
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
+        type Images = S::Images;
+        type Visibility = S::Visibility;
+        type Author = S::Author;
         type CreatedAt = S::CreatedAt;
         type Uri = S::Uri;
-        type Images = S::Images;
-        type Title = S::Title;
-        type Visibility = S::Visibility;
-        type Author = S::Author;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Tags = S::Tags;
-        type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
-        type Images = S::Images;
-        type Title = S::Title;
-        type Visibility = S::Visibility;
-        type Author = S::Author;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-        type Uri = Set<members::uri>;
-        type Images = S::Images;
-        type Title = S::Title;
-        type Visibility = S::Visibility;
-        type Author = S::Author;
         type Cid = S::Cid;
     }
     ///State transition - sets the `images` field to Set
     pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImages<S> {}
     impl<S: State> State for SetImages<S> {
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Images = Set<members::images>;
         type Title = S::Title;
+        type Images = Set<members::images>;
         type Visibility = S::Visibility;
         type Author = S::Author;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Tags = S::Tags;
         type CreatedAt = S::CreatedAt;
         type Uri = S::Uri;
-        type Images = S::Images;
-        type Title = Set<members::title>;
-        type Visibility = S::Visibility;
-        type Author = S::Author;
+        type Tags = S::Tags;
         type Cid = S::Cid;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Images = S::Images;
         type Title = S::Title;
+        type Images = S::Images;
         type Visibility = Set<members::visibility>;
         type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Tags = S::Tags;
         type Cid = S::Cid;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Images = S::Images;
         type Title = S::Title;
+        type Images = S::Images;
         type Visibility = S::Visibility;
         type Author = Set<members::author>;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Tags = S::Tags;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Images = S::Images;
+        type Visibility = S::Visibility;
+        type Author = S::Author;
+        type CreatedAt = Set<members::created_at>;
+        type Uri = S::Uri;
+        type Tags = S::Tags;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Title = S::Title;
+        type Images = S::Images;
+        type Visibility = S::Visibility;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type Uri = Set<members::uri>;
+        type Tags = S::Tags;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type Title = S::Title;
+        type Images = S::Images;
+        type Visibility = S::Visibility;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Tags = Set<members::tags>;
         type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Tags = S::Tags;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Images = S::Images;
         type Title = S::Title;
+        type Images = S::Images;
         type Visibility = S::Visibility;
         type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Tags = S::Tags;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tags` field
-        pub struct tags(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `images` field
-        pub struct images(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `images` field
+        pub struct images(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
         ///Marker type for the `cid` field
         pub struct cid(());
     }
@@ -4347,13 +4347,13 @@ where
 impl<'a, S> ItemViewBuilder<'a, S>
 where
     S: item_view_state::State,
-    S::Tags: item_view_state::IsSet,
-    S::CreatedAt: item_view_state::IsSet,
-    S::Uri: item_view_state::IsSet,
-    S::Images: item_view_state::IsSet,
     S::Title: item_view_state::IsSet,
+    S::Images: item_view_state::IsSet,
     S::Visibility: item_view_state::IsSet,
     S::Author: item_view_state::IsSet,
+    S::CreatedAt: item_view_state::IsSet,
+    S::Uri: item_view_state::IsSet,
+    S::Tags: item_view_state::IsSet,
     S::Cid: item_view_state::IsSet,
 {
     /// Build the final struct
@@ -4379,7 +4379,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4414,49 +4414,49 @@ pub mod notification_settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Comments;
         type Reactions;
+        type Comments;
         type Follows;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Comments = Unset;
         type Reactions = Unset;
+        type Comments = Unset;
         type Follows = Unset;
-    }
-    ///State transition - sets the `comments` field to Set
-    pub struct SetComments<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComments<S> {}
-    impl<S: State> State for SetComments<S> {
-        type Comments = Set<members::comments>;
-        type Reactions = S::Reactions;
-        type Follows = S::Follows;
     }
     ///State transition - sets the `reactions` field to Set
     pub struct SetReactions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReactions<S> {}
     impl<S: State> State for SetReactions<S> {
-        type Comments = S::Comments;
         type Reactions = Set<members::reactions>;
+        type Comments = S::Comments;
+        type Follows = S::Follows;
+    }
+    ///State transition - sets the `comments` field to Set
+    pub struct SetComments<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComments<S> {}
+    impl<S: State> State for SetComments<S> {
+        type Reactions = S::Reactions;
+        type Comments = Set<members::comments>;
         type Follows = S::Follows;
     }
     ///State transition - sets the `follows` field to Set
     pub struct SetFollows<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFollows<S> {}
     impl<S: State> State for SetFollows<S> {
-        type Comments = S::Comments;
         type Reactions = S::Reactions;
+        type Comments = S::Comments;
         type Follows = Set<members::follows>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `comments` field
-        pub struct comments(());
         ///Marker type for the `reactions` field
         pub struct reactions(());
+        ///Marker type for the `comments` field
+        pub struct comments(());
         ///Marker type for the `follows` field
         pub struct follows(());
     }
@@ -4551,8 +4551,8 @@ where
 impl<'a, S> NotificationSettingsBuilder<'a, S>
 where
     S: notification_settings_state::State,
-    S::Comments: notification_settings_state::IsSet,
     S::Reactions: notification_settings_state::IsSet,
+    S::Comments: notification_settings_state::IsSet,
     S::Follows: notification_settings_state::IsSet,
 {
     /// Build the final struct
@@ -4567,7 +4567,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4591,51 +4591,51 @@ pub mod privacy_settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type AllowReactions;
         type AllowComments;
         type Indexable;
-        type AllowReactions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type AllowReactions = Unset;
         type AllowComments = Unset;
         type Indexable = Unset;
-        type AllowReactions = Unset;
-    }
-    ///State transition - sets the `allow_comments` field to Set
-    pub struct SetAllowComments<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowComments<S> {}
-    impl<S: State> State for SetAllowComments<S> {
-        type AllowComments = Set<members::allow_comments>;
-        type Indexable = S::Indexable;
-        type AllowReactions = S::AllowReactions;
-    }
-    ///State transition - sets the `indexable` field to Set
-    pub struct SetIndexable<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexable<S> {}
-    impl<S: State> State for SetIndexable<S> {
-        type AllowComments = S::AllowComments;
-        type Indexable = Set<members::indexable>;
-        type AllowReactions = S::AllowReactions;
     }
     ///State transition - sets the `allow_reactions` field to Set
     pub struct SetAllowReactions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAllowReactions<S> {}
     impl<S: State> State for SetAllowReactions<S> {
+        type AllowReactions = Set<members::allow_reactions>;
         type AllowComments = S::AllowComments;
         type Indexable = S::Indexable;
-        type AllowReactions = Set<members::allow_reactions>;
+    }
+    ///State transition - sets the `allow_comments` field to Set
+    pub struct SetAllowComments<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAllowComments<S> {}
+    impl<S: State> State for SetAllowComments<S> {
+        type AllowReactions = S::AllowReactions;
+        type AllowComments = Set<members::allow_comments>;
+        type Indexable = S::Indexable;
+    }
+    ///State transition - sets the `indexable` field to Set
+    pub struct SetIndexable<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexable<S> {}
+    impl<S: State> State for SetIndexable<S> {
+        type AllowReactions = S::AllowReactions;
+        type AllowComments = S::AllowComments;
+        type Indexable = Set<members::indexable>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `allow_reactions` field
+        pub struct allow_reactions(());
         ///Marker type for the `allow_comments` field
         pub struct allow_comments(());
         ///Marker type for the `indexable` field
         pub struct indexable(());
-        ///Marker type for the `allow_reactions` field
-        pub struct allow_reactions(());
     }
 }
 
@@ -4728,9 +4728,9 @@ where
 impl<'a, S> PrivacySettingsBuilder<'a, S>
 where
     S: privacy_settings_state::State,
+    S::AllowReactions: privacy_settings_state::IsSet,
     S::AllowComments: privacy_settings_state::IsSet,
     S::Indexable: privacy_settings_state::IsSet,
-    S::AllowReactions: privacy_settings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PrivacySettings<'a> {
@@ -4744,7 +4744,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4885,7 +4885,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4908,85 +4908,85 @@ pub mod reaction_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Type;
-        type Actor;
-        type Uri;
         type Subject;
+        type CreatedAt;
+        type Actor;
+        type Type;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Type = Unset;
-        type Actor = Unset;
-        type Uri = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Type = S::Type;
-        type Actor = S::Actor;
-        type Uri = S::Uri;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = Set<members::r#type>;
-        type Actor = S::Actor;
-        type Uri = S::Uri;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type Actor = Set<members::actor>;
-        type Uri = S::Uri;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type Actor = S::Actor;
-        type Uri = Set<members::uri>;
-        type Subject = S::Subject;
+        type CreatedAt = Unset;
+        type Actor = Unset;
+        type Type = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
-        type Type = S::Type;
-        type Actor = S::Actor;
-        type Uri = S::Uri;
         type Subject = Set<members::subject>;
+        type CreatedAt = S::CreatedAt;
+        type Actor = S::Actor;
+        type Type = S::Type;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
+        type Actor = S::Actor;
+        type Type = S::Type;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+        type Actor = Set<members::actor>;
+        type Type = S::Type;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+        type Actor = S::Actor;
+        type Type = Set<members::r#type>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+        type Actor = S::Actor;
+        type Type = S::Type;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `actor` field
-        pub struct actor(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `actor` field
+        pub struct actor(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -5119,11 +5119,11 @@ where
 impl<'a, S> ReactionViewBuilder<'a, S>
 where
     S: reaction_view_state::State,
-    S::CreatedAt: reaction_view_state::IsSet,
-    S::Type: reaction_view_state::IsSet,
-    S::Actor: reaction_view_state::IsSet,
-    S::Uri: reaction_view_state::IsSet,
     S::Subject: reaction_view_state::IsSet,
+    S::CreatedAt: reaction_view_state::IsSet,
+    S::Actor: reaction_view_state::IsSet,
+    S::Type: reaction_view_state::IsSet,
+    S::Uri: reaction_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReactionView<'a> {
@@ -5139,7 +5139,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -5165,51 +5165,51 @@ pub mod showcase_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AddedAt;
-        type Order;
         type Uri;
+        type Order;
+        type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AddedAt = Unset;
-        type Order = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type AddedAt = Set<members::added_at>;
-        type Order = S::Order;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `order` field to Set
-    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrder<S> {}
-    impl<S: State> State for SetOrder<S> {
-        type AddedAt = S::AddedAt;
-        type Order = Set<members::order>;
-        type Uri = S::Uri;
+        type Order = Unset;
+        type AddedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type AddedAt = S::AddedAt;
-        type Order = S::Order;
         type Uri = Set<members::uri>;
+        type Order = S::Order;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `order` field to Set
+    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOrder<S> {}
+    impl<S: State> State for SetOrder<S> {
+        type Uri = S::Uri;
+        type Order = Set<members::order>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Uri = S::Uri;
+        type Order = S::Order;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
-        ///Marker type for the `order` field
-        pub struct order(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `order` field
+        pub struct order(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
     }
 }
 
@@ -5302,9 +5302,9 @@ where
 impl<'a, S> ShowcaseItemBuilder<'a, S>
 where
     S: showcase_item_state::State,
-    S::AddedAt: showcase_item_state::IsSet,
-    S::Order: showcase_item_state::IsSet,
     S::Uri: showcase_item_state::IsSet,
+    S::Order: showcase_item_state::IsSet,
+    S::AddedAt: showcase_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ShowcaseItem<'a> {
@@ -5318,7 +5318,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

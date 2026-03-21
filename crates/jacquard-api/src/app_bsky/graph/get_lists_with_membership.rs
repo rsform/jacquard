@@ -20,9 +20,9 @@
 pub struct ListWithMembership<'a> {
     #[serde(borrow)]
     pub list: crate::app_bsky::graph::ListView<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub list_item: std::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
+    pub list_item: core::option::Option<crate::app_bsky::graph::ListItemView<'a>>,
 }
 
 #[derive(
@@ -38,16 +38,16 @@ pub struct ListWithMembership<'a> {
 pub struct GetListsWithMembership<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub purposes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub purposes: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -62,28 +62,28 @@ pub struct GetListsWithMembership<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetListsWithMembershipOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub lists_with_membership: Vec<
         crate::app_bsky::graph::get_lists_with_membership::ListWithMembership<'a>,
     >,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListWithMembership<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ListWithMembership<'a> {
     fn nsid() -> &'static str {
         "app.bsky.graph.getListsWithMembership"
     }
     fn def_name() -> &'static str {
         "listWithMembership"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_graph_getListsWithMembership()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -228,7 +228,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -241,7 +241,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -401,7 +401,7 @@ fn lexicon_doc_app_bsky_graph_getListsWithMembership() -> ::jacquard_lexicon::le
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 

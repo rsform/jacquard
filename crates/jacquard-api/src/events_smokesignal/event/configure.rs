@@ -18,18 +18,18 @@
 #[serde(rename_all = "camelCase")]
 pub struct Configure<'a> {
     ///When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disable_direct_rsvp: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disable_direct_rsvp: core::option::Option<bool>,
     ///AT-URI of the event to configure.
     #[serde(borrow)]
     pub event: jacquard_common::types::string::AtUri<'a>,
     ///When true, RSVPs require a confirmed email address.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub require_confirmed_email: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub require_confirmed_email: core::option::Option<bool>,
     ///URL to redirect users to for external ticketing (e.g., ti.to, eventbrite).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rsvp_redirect_url: std::option::Option<
+    pub rsvp_redirect_url: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
 }
@@ -64,13 +64,13 @@ pub struct ConfigureOutput<'a> {}
 pub enum ConfigureError<'a> {
     /// The specified event does not exist.
     #[serde(rename = "EventNotFound")]
-    EventNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    EventNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The authenticated user does not own this event.
     #[serde(rename = "NotAuthorized")]
-    NotAuthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotAuthorized(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The provided redirect URL is invalid or not allowed.
     #[serde(rename = "InvalidRedirectUrl")]
-    InvalidRedirectUrl(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRedirectUrl(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ConfigureError<'_> {
@@ -276,7 +276,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

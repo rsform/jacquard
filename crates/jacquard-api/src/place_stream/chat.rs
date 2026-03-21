@@ -23,22 +23,22 @@ pub mod profile;
 pub struct MessageView<'a> {
     #[serde(borrow)]
     pub author: crate::app_bsky::actor::ProfileViewBasic<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub chat_profile: std::option::Option<
+    pub chat_profile: core::option::Option<
         crate::place_stream::chat::profile::Profile<'a>,
     >,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     ///If true, this message has been deleted or labeled and should be cleared from the cache
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deleted: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub deleted: core::option::Option<bool>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reply_to: std::option::Option<MessageViewReplyTo<'a>>,
+    pub reply_to: core::option::Option<MessageViewReplyTo<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -60,19 +60,19 @@ pub enum MessageViewReplyTo<'a> {
     MessageView(Box<crate::place_stream::chat::MessageView<'a>>),
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageView<'a> {
     fn nsid() -> &'static str {
         "place.stream.chat.defs"
     }
     fn def_name() -> &'static str {
         "messageView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_chat_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -87,85 +87,85 @@ pub mod message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
-        type Cid;
         type IndexedAt;
         type Author;
         type Uri;
+        type Cid;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
-        type Cid = Unset;
         type IndexedAt = Unset;
         type Author = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Cid = S::Cid;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Record = S::Record;
-        type Cid = Set<members::cid>;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Uri = S::Uri;
+        type Cid = Unset;
+        type Record = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Record = S::Record;
-        type Cid = S::Cid;
         type IndexedAt = Set<members::indexed_at>;
         type Author = S::Author;
         type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Record = S::Record;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Record = S::Record;
-        type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
         type Author = Set<members::author>;
         type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Record = S::Record;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Record = S::Record;
-        type Cid = S::Cid;
         type IndexedAt = S::IndexedAt;
         type Author = S::Author;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -346,11 +346,11 @@ where
 impl<'a, S> MessageViewBuilder<'a, S>
 where
     S: message_view_state::State,
-    S::Record: message_view_state::IsSet,
-    S::Cid: message_view_state::IsSet,
     S::IndexedAt: message_view_state::IsSet,
     S::Author: message_view_state::IsSet,
     S::Uri: message_view_state::IsSet,
+    S::Cid: message_view_state::IsSet,
+    S::Record: message_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageView<'a> {
@@ -369,7 +369,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -388,7 +388,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_chat_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_chat_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -24,36 +24,36 @@ pub mod get_artists;
 #[serde(rename_all = "camelCase")]
 pub struct Artist<'a> {
     ///The biography of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub bio: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub bio: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The birth date of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub born: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub born: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The birth place of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub born_in: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub born_in: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The date when the artist was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///The death date of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub died: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub died: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The name of the artist.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///The picture of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub picture: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub picture: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///The URL of the picture of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub picture_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub picture_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The tags of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -68,9 +68,9 @@ pub struct Artist<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ArtistGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -91,13 +91,13 @@ pub struct ArtistGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ArtistMbid<'a> {
     ///The MusicBrainz Identifier (MBID) of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mbid: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub mbid: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -114,34 +114,34 @@ pub struct ArtistMbid<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ArtistViewBasic<'a> {
     ///The unique identifier of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The picture of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub picture: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub picture: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The number of times the artist has been played.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub play_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub play_count: core::option::Option<i64>,
     ///The SHA256 hash of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sha256: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sha256: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///The number of unique listeners who have played the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub unique_listeners: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub unique_listeners: core::option::Option<i64>,
     ///The URI of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -158,34 +158,34 @@ pub struct ArtistViewBasic<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ArtistViewDetailed<'a> {
     ///The unique identifier of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The picture of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub picture: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub picture: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The number of times the artist has been played.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub play_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub play_count: core::option::Option<i64>,
     ///The SHA256 hash of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sha256: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sha256: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///The number of unique listeners who have played the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub unique_listeners: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub unique_listeners: core::option::Option<i64>,
     ///The URI of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -202,36 +202,36 @@ pub struct ArtistViewDetailed<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ListenerViewBasic<'a> {
     ///The URL of the listener's avatar image.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The DID of the listener.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub did: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The display name of the listener.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The handle of the listener.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub handle: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The unique identifier of the actor.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub most_listened_song: std::option::Option<
+    pub most_listened_song: core::option::Option<
         crate::app_rocksky::artist::SongViewBasic<'a>,
     >,
     ///The rank of the listener among all listeners of the artist.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rank: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rank: core::option::Option<i64>,
     ///The total number of plays by the listener.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_plays: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub total_plays: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -248,16 +248,16 @@ pub struct ListenerViewBasic<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SongViewBasic<'a> {
     ///The number of times the song has been played.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub play_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub play_count: core::option::Option<i64>,
     ///The title of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URI of the song.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 impl<'a> Artist<'a> {
@@ -300,19 +300,19 @@ impl jacquard_common::types::collection::Collection for ArtistRecord {
     type Record = ArtistRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.artist"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_artist()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.bio {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -411,19 +411,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistMbid<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ArtistMbid<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.artist.defs"
     }
     fn def_name() -> &'static str {
         "artistMbid"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_artist_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
@@ -452,19 +452,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistMbid<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistViewBasic<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ArtistViewBasic<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.artist.defs"
     }
     fn def_name() -> &'static str {
         "artistViewBasic"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_artist_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.play_count {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -491,19 +491,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistViewBasic<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistViewDetailed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ArtistViewDetailed<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.artist.defs"
     }
     fn def_name() -> &'static str {
         "artistViewDetailed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_artist_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.play_count {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -530,19 +530,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ArtistViewDetailed<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListenerViewBasic<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ListenerViewBasic<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.artist.defs"
     }
     fn def_name() -> &'static str {
         "listenerViewBasic"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_artist_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.rank {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -569,19 +569,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListenerViewBasic<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SongViewBasic<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SongViewBasic<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.artist.defs"
     }
     fn def_name() -> &'static str {
         "songViewBasic"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_artist_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.play_count {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -607,37 +607,37 @@ pub mod artist_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -851,8 +851,8 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 impl<'a, S> ArtistBuilder<'a, S>
 where
     S: artist_state::State,
-    S::CreatedAt: artist_state::IsSet,
     S::Name: artist_state::IsSet,
+    S::CreatedAt: artist_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Artist<'a> {
@@ -872,7 +872,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -892,7 +892,7 @@ where
     }
 }
 
-fn lexicon_doc_app_rocksky_artist() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_rocksky_artist() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.rocksky.artist"),
@@ -1122,7 +1122,7 @@ fn lexicon_doc_app_rocksky_artist() -> ::jacquard_lexicon::lexicon::LexiconDoc<'
     }
 }
 
-fn lexicon_doc_app_rocksky_artist_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_rocksky_artist_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

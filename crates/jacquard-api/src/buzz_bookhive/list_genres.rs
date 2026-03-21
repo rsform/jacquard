@@ -37,14 +37,14 @@ pub struct GenreWithCount<'a> {
 pub struct ListGenres {
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///Defaults to `0`. Min: 0.
     #[serde(default = "_default_min_books")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub min_books: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub min_books: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offset: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -62,23 +62,23 @@ pub struct ListGenresOutput<'a> {
     #[serde(borrow)]
     pub genres: Vec<crate::buzz_bookhive::list_genres::GenreWithCount<'a>>,
     ///Next offset for pagination
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offset: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offset: core::option::Option<i64>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GenreWithCount<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GenreWithCount<'a> {
     fn nsid() -> &'static str {
         "buzz.bookhive.listGenres"
     }
     fn def_name() -> &'static str {
         "genreWithCount"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_buzz_bookhive_listGenres()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -119,37 +119,37 @@ pub mod genre_with_count_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Genre;
         type Count;
+        type Genre;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Genre = Unset;
         type Count = Unset;
-    }
-    ///State transition - sets the `genre` field to Set
-    pub struct SetGenre<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGenre<S> {}
-    impl<S: State> State for SetGenre<S> {
-        type Genre = Set<members::genre>;
-        type Count = S::Count;
+        type Genre = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type Genre = S::Genre;
         type Count = Set<members::count>;
+        type Genre = S::Genre;
+    }
+    ///State transition - sets the `genre` field to Set
+    pub struct SetGenre<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGenre<S> {}
+    impl<S: State> State for SetGenre<S> {
+        type Count = S::Count;
+        type Genre = Set<members::genre>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `genre` field
-        pub struct genre(());
         ///Marker type for the `count` field
         pub struct count(());
+        ///Marker type for the `genre` field
+        pub struct genre(());
     }
 }
 
@@ -222,8 +222,8 @@ where
 impl<'a, S> GenreWithCountBuilder<'a, S>
 where
     S: genre_with_count_state::State,
-    S::Genre: genre_with_count_state::IsSet,
     S::Count: genre_with_count_state::IsSet,
+    S::Genre: genre_with_count_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GenreWithCount<'a> {
@@ -236,7 +236,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -249,7 +249,7 @@ where
     }
 }
 
-fn lexicon_doc_buzz_bookhive_listGenres() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_buzz_bookhive_listGenres() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -372,11 +372,11 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> ::jacquard_lexicon::lexicon::Lexico
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
-fn _default_min_books() -> std::option::Option<i64> {
+fn _default_min_books() -> core::option::Option<i64> {
     Some(0i64)
 }
 

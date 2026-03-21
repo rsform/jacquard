@@ -18,9 +18,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct Image<'a> {
     ///Alt text for the image.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::BlobRef<'a>,
 }
@@ -41,32 +41,32 @@ pub struct Note<'a> {
     ///Markdown content. Local image paths are replaced with blob CIDs at publish time.
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Whether the note can be discovered by others in public listings. Defaults to true.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub discoverable: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub discoverable: core::option::Option<bool>,
     ///Font family name available from Coollabs.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub font_family: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub font_family: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Font size in points. Recommended range: 9–21, but clients may allow larger sizes for accessibility.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub font_size: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub font_size: core::option::Option<i64>,
     ///Blob references for images embedded in the markdown content.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub images: std::option::Option<Vec<crate::space_remanso::note::Image<'a>>>,
+    pub images: core::option::Option<Vec<crate::space_remanso::note::Image<'a>>>,
     ///Most used language in the note. In ISO 639-3 code.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub language: std::option::Option<NoteLanguage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub language: core::option::Option<NoteLanguage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub published_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Display theme for the note.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: std::option::Option<NoteTheme<'a>>,
+    pub theme: core::option::Option<NoteTheme<'a>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
@@ -501,9 +501,9 @@ impl jacquard_common::IntoStatic for NoteTheme<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct NoteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -523,19 +523,19 @@ impl<'a> Note<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Image<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Image<'a> {
     fn nsid() -> &'static str {
         "space.remanso.note"
     }
     fn def_name() -> &'static str {
         "image"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_space_remanso_note()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -623,19 +623,19 @@ impl jacquard_common::types::collection::Collection for NoteRecord {
     type Record = NoteRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Note<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Note<'a> {
     fn nsid() -> &'static str {
         "space.remanso.note"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_space_remanso_note()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
@@ -810,7 +810,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -823,7 +823,7 @@ where
     }
 }
 
-fn lexicon_doc_space_remanso_note() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_space_remanso_note() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("space.remanso.note"),
@@ -1372,7 +1372,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

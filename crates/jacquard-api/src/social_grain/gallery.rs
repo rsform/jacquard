@@ -20,13 +20,13 @@ pub mod item;
 #[serde(rename_all = "camelCase")]
 pub struct Gallery<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Self-label values for this post. Effectively content warnings.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
@@ -43,9 +43,9 @@ pub struct Gallery<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GalleryGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -69,12 +69,12 @@ pub struct GalleryView<'a> {
     #[serde(borrow)]
     pub creator: crate::social_grain::actor::ProfileView<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub items: std::option::Option<Vec<crate::social_grain::photo::PhotoView<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub items: core::option::Option<Vec<crate::social_grain::photo::PhotoView<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     #[serde(borrow)]
@@ -121,19 +121,19 @@ impl jacquard_common::types::collection::Collection for GalleryRecord {
     type Record = GalleryRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
     fn nsid() -> &'static str {
         "social.grain.gallery"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_grain_gallery()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -163,19 +163,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Gallery<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GalleryView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GalleryView<'a> {
     fn nsid() -> &'static str {
         "social.grain.gallery.defs"
     }
     fn def_name() -> &'static str {
         "galleryView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_grain_gallery_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -349,7 +349,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -364,9 +364,7 @@ where
     }
 }
 
-fn lexicon_doc_social_grain_gallery() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_social_grain_gallery() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.grain.gallery"),
@@ -481,84 +479,84 @@ pub mod gallery_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Cid;
-        type Creator;
-        type IndexedAt;
         type Record;
         type Uri;
+        type IndexedAt;
+        type Creator;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Cid = Unset;
-        type Creator = Unset;
-        type IndexedAt = Unset;
         type Record = Unset;
         type Uri = Unset;
+        type IndexedAt = Unset;
+        type Creator = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
         type Cid = Set<members::cid>;
-        type Creator = S::Creator;
+        type Record = S::Record;
+        type Uri = S::Uri;
         type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Cid = S::Cid;
-        type Creator = Set<members::creator>;
-        type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Cid = S::Cid;
         type Creator = S::Creator;
-        type IndexedAt = Set<members::indexed_at>;
-        type Record = S::Record;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
         type Cid = S::Cid;
-        type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
         type Record = Set<members::record>;
         type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Creator = S::Creator;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Cid = S::Cid;
-        type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
         type Record = S::Record;
         type Uri = Set<members::uri>;
+        type IndexedAt = S::IndexedAt;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Cid = S::Cid;
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type IndexedAt = Set<members::indexed_at>;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Cid = S::Cid;
+        type Record = S::Record;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Creator = Set<members::creator>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `creator` field
-        pub struct creator(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `record` field
         pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
     }
 }
 
@@ -732,10 +730,10 @@ impl<'a, S> GalleryViewBuilder<'a, S>
 where
     S: gallery_view_state::State,
     S::Cid: gallery_view_state::IsSet,
-    S::Creator: gallery_view_state::IsSet,
-    S::IndexedAt: gallery_view_state::IsSet,
     S::Record: gallery_view_state::IsSet,
     S::Uri: gallery_view_state::IsSet,
+    S::IndexedAt: gallery_view_state::IsSet,
+    S::Creator: gallery_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GalleryView<'a> {
@@ -753,7 +751,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -771,7 +769,7 @@ where
     }
 }
 
-fn lexicon_doc_social_grain_gallery_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_grain_gallery_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

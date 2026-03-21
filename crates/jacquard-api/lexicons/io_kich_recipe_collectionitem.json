@@ -24,6 +24,10 @@
             "description": "When this item was added to the collection",
             "format": "datetime"
           },
+          "group": {
+            "type": "string",
+            "description": "Optional group/section name for organizing recipes within the collection"
+          },
           "position": {
             "type": "integer",
             "description": "Optional position for ordering items within the collection"

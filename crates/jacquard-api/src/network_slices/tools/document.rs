@@ -21,9 +21,9 @@
 pub struct CodeBlock<'a> {
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lang: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub lang: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// A heading block (h1-h3) with optional inline formatting
@@ -39,9 +39,9 @@ pub struct CodeBlock<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Heading<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<
+    pub facets: core::option::Option<
         Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
     >,
     pub level: i64,
@@ -63,9 +63,9 @@ pub struct Heading<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ImageEmbed<'a> {
     ///Alt text for accessibility
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub image: jacquard_common::types::blob::BlobRef<'a>,
 }
@@ -92,8 +92,8 @@ pub struct Document<'a> {
     ///Document title
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::open_union]
@@ -135,9 +135,9 @@ pub enum DocumentBlocksItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DocumentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -158,9 +158,9 @@ pub struct DocumentGetRecordOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Paragraph<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<
+    pub facets: core::option::Option<
         Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
     >,
     #[serde(borrow)]
@@ -181,9 +181,9 @@ pub struct Paragraph<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Quote<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<
+    pub facets: core::option::Option<
         Vec<crate::network_slices::tools::richtext::facet::Facet<'a>>,
     >,
     #[serde(borrow)]
@@ -225,19 +225,19 @@ impl<'a> Document<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
     fn def_name() -> &'static str {
         "codeBlock"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_tools_document()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.code;
             #[allow(unused_comparisons)]
@@ -267,19 +267,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
     fn def_name() -> &'static str {
         "heading"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_tools_document()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.level;
             if *value > 3i64 {
@@ -321,19 +321,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageEmbed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageEmbed<'a> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
     fn def_name() -> &'static str {
         "imageEmbed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_tools_document()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -421,19 +421,19 @@ impl jacquard_common::types::collection::Collection for DocumentRecord {
     type Record = DocumentRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Document<'a> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_tools_document()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.slug;
             #[allow(unused_comparisons)]
@@ -464,19 +464,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Paragraph<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Paragraph<'a> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
     fn def_name() -> &'static str {
         "paragraph"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_tools_document()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -494,19 +494,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Paragraph<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
     fn def_name() -> &'static str {
         "quote"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_tools_document()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -524,19 +524,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Quote<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledEmbed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TangledEmbed<'a> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
     fn def_name() -> &'static str {
         "tangledEmbed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_tools_document()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.handle;
             #[allow(unused_comparisons)]
@@ -567,7 +567,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TangledEmbed<'a> {
     }
 }
 
-fn lexicon_doc_network_slices_tools_document() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_network_slices_tools_document() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1063,37 +1063,37 @@ pub mod heading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type Level;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type Level = S::Level;
+        type Text = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Text = S::Text;
         type Level = Set<members::level>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Level = S::Level;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -1190,8 +1190,8 @@ where
 impl<'a, S> HeadingBuilder<'a, S>
 where
     S: heading_state::State,
-    S::Text: heading_state::IsSet,
     S::Level: heading_state::IsSet,
+    S::Text: heading_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Heading<'a> {
@@ -1205,7 +1205,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1327,7 +1327,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1350,67 +1350,67 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Blocks;
+        type Title;
         type CreatedAt;
         type Slug;
-        type Title;
-        type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Blocks = Unset;
+        type Title = Unset;
         type CreatedAt = Unset;
         type Slug = Unset;
-        type Title = Unset;
-        type Blocks = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Slug = S::Slug;
-        type Title = S::Title;
-        type Blocks = S::Blocks;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type CreatedAt = S::CreatedAt;
-        type Slug = Set<members::slug>;
-        type Title = S::Title;
-        type Blocks = S::Blocks;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Slug = S::Slug;
-        type Title = Set<members::title>;
-        type Blocks = S::Blocks;
     }
     ///State transition - sets the `blocks` field to Set
     pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocks<S> {}
     impl<S: State> State for SetBlocks<S> {
+        type Blocks = Set<members::blocks>;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
         type Slug = S::Slug;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Blocks = S::Blocks;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Blocks = S::Blocks;
         type Title = S::Title;
-        type Blocks = Set<members::blocks>;
+        type CreatedAt = Set<members::created_at>;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Blocks = S::Blocks;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `slug` field
         pub struct slug(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
     }
 }
 
@@ -1543,10 +1543,10 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
+    S::Blocks: document_state::IsSet,
+    S::Title: document_state::IsSet,
     S::CreatedAt: document_state::IsSet,
     S::Slug: document_state::IsSet,
-    S::Title: document_state::IsSet,
-    S::Blocks: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
@@ -1562,7 +1562,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

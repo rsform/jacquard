@@ -18,27 +18,27 @@
 #[serde(rename_all = "camelCase")]
 pub struct Proposal<'a> {
     ///The persistent, anonymous identifier for the user creating the proposal.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aid: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub aid: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optionally, CID specifying the specific version of 'uri' resource this proposal applies to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///Timestamp when this proposal was created.
     pub cts: jacquard_common::types::string::Datetime,
     ///For 'label' proposals where 'val' is 'needs-context', the full text of any proposed annotation (e.g. community note) to be shown below the post.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
     ///An optional array of predefined reasons justifying the moderation action.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reasons: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub reasons: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Signature of dag-cbor encoded proposal.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub sig: std::option::Option<jacquard_common::deps::bytes::Bytes>,
+    pub sig: core::option::Option<jacquard_common::deps::bytes::Bytes>,
     ///DID of the actor who created this proposal.
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Did<'a>,
@@ -52,8 +52,8 @@ pub struct Proposal<'a> {
     #[serde(borrow)]
     pub val: jacquard_common::CowStr<'a>,
     ///The AT Protocol version of the proposal object.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ver: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ver: core::option::Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -68,9 +68,9 @@ pub struct Proposal<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProposalGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -117,19 +117,19 @@ impl jacquard_common::types::collection::Collection for ProposalRecord {
     type Record = ProposalRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Proposal<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Proposal<'a> {
     fn nsid() -> &'static str {
         "social.pmsky.proposal"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_pmsky_proposal()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.val;
             #[allow(unused_comparisons)]
@@ -157,85 +157,85 @@ pub mod proposal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Val;
-        type Typ;
         type Cts;
+        type Typ;
+        type Uri;
         type Src;
+        type Val;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Val = Unset;
-        type Typ = Unset;
         type Cts = Unset;
+        type Typ = Unset;
+        type Uri = Unset;
         type Src = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Val = S::Val;
-        type Typ = S::Typ;
-        type Cts = S::Cts;
-        type Src = S::Src;
-    }
-    ///State transition - sets the `val` field to Set
-    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVal<S> {}
-    impl<S: State> State for SetVal<S> {
-        type Uri = S::Uri;
-        type Val = Set<members::val>;
-        type Typ = S::Typ;
-        type Cts = S::Cts;
-        type Src = S::Src;
-    }
-    ///State transition - sets the `typ` field to Set
-    pub struct SetTyp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTyp<S> {}
-    impl<S: State> State for SetTyp<S> {
-        type Uri = S::Uri;
-        type Val = S::Val;
-        type Typ = Set<members::typ>;
-        type Cts = S::Cts;
-        type Src = S::Src;
+        type Val = Unset;
     }
     ///State transition - sets the `cts` field to Set
     pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCts<S> {}
     impl<S: State> State for SetCts<S> {
-        type Uri = S::Uri;
-        type Val = S::Val;
-        type Typ = S::Typ;
         type Cts = Set<members::cts>;
+        type Typ = S::Typ;
+        type Uri = S::Uri;
         type Src = S::Src;
+        type Val = S::Val;
+    }
+    ///State transition - sets the `typ` field to Set
+    pub struct SetTyp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTyp<S> {}
+    impl<S: State> State for SetTyp<S> {
+        type Cts = S::Cts;
+        type Typ = Set<members::typ>;
+        type Uri = S::Uri;
+        type Src = S::Src;
+        type Val = S::Val;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cts = S::Cts;
+        type Typ = S::Typ;
+        type Uri = Set<members::uri>;
+        type Src = S::Src;
+        type Val = S::Val;
     }
     ///State transition - sets the `src` field to Set
     pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSrc<S> {}
     impl<S: State> State for SetSrc<S> {
-        type Uri = S::Uri;
-        type Val = S::Val;
-        type Typ = S::Typ;
         type Cts = S::Cts;
+        type Typ = S::Typ;
+        type Uri = S::Uri;
         type Src = Set<members::src>;
+        type Val = S::Val;
+    }
+    ///State transition - sets the `val` field to Set
+    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVal<S> {}
+    impl<S: State> State for SetVal<S> {
+        type Cts = S::Cts;
+        type Typ = S::Typ;
+        type Uri = S::Uri;
+        type Src = S::Src;
+        type Val = Set<members::val>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `val` field
-        pub struct val(());
-        ///Marker type for the `typ` field
-        pub struct typ(());
         ///Marker type for the `cts` field
         pub struct cts(());
+        ///Marker type for the `typ` field
+        pub struct typ(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `src` field
         pub struct src(());
+        ///Marker type for the `val` field
+        pub struct val(());
     }
 }
 
@@ -485,11 +485,11 @@ impl<'a, S: proposal_state::State> ProposalBuilder<'a, S> {
 impl<'a, S> ProposalBuilder<'a, S>
 where
     S: proposal_state::State,
-    S::Uri: proposal_state::IsSet,
-    S::Val: proposal_state::IsSet,
-    S::Typ: proposal_state::IsSet,
     S::Cts: proposal_state::IsSet,
+    S::Typ: proposal_state::IsSet,
+    S::Uri: proposal_state::IsSet,
     S::Src: proposal_state::IsSet,
+    S::Val: proposal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Proposal<'a> {
@@ -511,7 +511,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -533,7 +533,7 @@ where
     }
 }
 
-fn lexicon_doc_social_pmsky_proposal() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_pmsky_proposal() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

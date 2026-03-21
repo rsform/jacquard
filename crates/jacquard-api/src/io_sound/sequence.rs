@@ -19,46 +19,46 @@
 #[serde(rename_all = "camelCase")]
 pub struct Sequence<'a> {
     ///Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub bsky_post_ref: std::option::Option<
+    pub bsky_post_ref: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Attribution for composers, arrangers, etc
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub credits: std::option::Option<Vec<crate::io_sound::credit::Credit<'a>>>,
+    pub credits: core::option::Option<Vec<crate::io_sound::credit::Credit<'a>>>,
     ///Serialised and binary encoded array of events of the form `[beat, type, data...]`, where `data` parameters depend on `type` and the byte layout of the serialised data conforms to the Sequence spec at https://github.com/soundio/sequence.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub events: jacquard_common::deps::bytes::Bytes,
     ///Identifies this sequence for playback by a "sequence" event.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub id: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub id: core::option::Option<i64>,
     ///Name of the sequence
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp of the time of publication.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub published_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///A collection of sequences that may be played back by "sequence" events.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sequences: std::option::Option<Vec<crate::io_sound::sequence::Sequence<'a>>>,
+    pub sequences: core::option::Option<Vec<crate::io_sound::sequence::Sequence<'a>>>,
     ///Array of strings used to tag the sequence.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Timestamp of the time of last edit.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Canonical location of this sequence. May be an `at://` URI or an `https://` URL to a JSON endpoint.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Version number for the byte array encoding of the events field.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub version: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub version: core::option::Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -73,9 +73,9 @@ pub struct Sequence<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SequenceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -122,19 +122,19 @@ impl jacquard_common::types::collection::Collection for SequenceRecord {
     type Record = SequenceRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Sequence<'a> {
     fn nsid() -> &'static str {
         "io.sound.sequence"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_sound_sequence()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.credits {
             #[allow(unused_comparisons)]
             if value.len() > 60usize {
@@ -492,7 +492,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -514,7 +514,7 @@ where
     }
 }
 
-fn lexicon_doc_io_sound_sequence() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_sound_sequence() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.sound.sequence"),

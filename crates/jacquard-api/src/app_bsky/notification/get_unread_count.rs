@@ -16,10 +16,10 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetUnreadCount {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub priority: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub priority: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub seen_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[jacquard_derive::lexicon]

@@ -60,15 +60,15 @@ pub struct ImportContactsOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ImportContactsError<'a> {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDid(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidContacts")]
-    InvalidContacts(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidContacts(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "TooManyContacts")]
-    TooManyContacts(std::option::Option<jacquard_common::CowStr<'a>>),
+    TooManyContacts(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InternalError")]
-    InternalError(std::option::Option<jacquard_common::CowStr<'a>>),
+    InternalError(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ImportContactsError<'_> {
@@ -271,7 +271,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

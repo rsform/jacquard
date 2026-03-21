@@ -18,16 +18,16 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Credit<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub actor: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub actor: core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ///The roles this profile played in the creation of the game.
     #[serde(borrow)]
     pub credits: Vec<crate::games_gamesgamesgamesgames::CreditEntry<'a>>,
     ///The name to be used if there is no profile associated with this credit, or the profile is inaccessible.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The game to which this profile is being credited.
     #[serde(borrow)]
     pub game: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -45,9 +45,9 @@ pub struct Credit<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreditGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -94,19 +94,19 @@ impl jacquard_common::types::collection::Collection for CreditRecord {
     type Record = CreditRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.actor.credit"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_actor_credit()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.display_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
@@ -292,7 +292,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -307,7 +307,7 @@ where
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_actor_credit() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_games_gamesgamesgamesgames_actor_credit() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

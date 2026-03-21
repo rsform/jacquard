@@ -30,9 +30,9 @@ pub struct Crew<'a> {
     #[serde(borrow)]
     pub role: CrewRole<'a>,
     ///Optional tier for quota limits (e.g., 'deckhand', 'bosun', 'quartermaster'). If empty, uses defaults.new_crew_tier from quotas.yaml.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tier: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub tier: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Member's role in the hold
@@ -146,9 +146,9 @@ impl jacquard_common::IntoStatic for CrewRole<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CrewGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -195,19 +195,19 @@ impl jacquard_common::types::collection::Collection for CrewRecord {
     type Record = CrewRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Crew<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Crew<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.crew"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_crew()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.role;
             #[allow(unused_comparisons)]
@@ -247,65 +247,65 @@ pub mod crew_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Role;
         type AddedAt;
         type Member;
-        type Role;
         type Permissions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Role = Unset;
         type AddedAt = Unset;
         type Member = Unset;
-        type Role = Unset;
         type Permissions = Unset;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type Role = Set<members::role>;
+        type AddedAt = S::AddedAt;
+        type Member = S::Member;
+        type Permissions = S::Permissions;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
+        type Role = S::Role;
         type AddedAt = Set<members::added_at>;
         type Member = S::Member;
-        type Role = S::Role;
         type Permissions = S::Permissions;
     }
     ///State transition - sets the `member` field to Set
     pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMember<S> {}
     impl<S: State> State for SetMember<S> {
+        type Role = S::Role;
         type AddedAt = S::AddedAt;
         type Member = Set<members::member>;
-        type Role = S::Role;
-        type Permissions = S::Permissions;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type AddedAt = S::AddedAt;
-        type Member = S::Member;
-        type Role = Set<members::role>;
         type Permissions = S::Permissions;
     }
     ///State transition - sets the `permissions` field to Set
     pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPermissions<S> {}
     impl<S: State> State for SetPermissions<S> {
+        type Role = S::Role;
         type AddedAt = S::AddedAt;
         type Member = S::Member;
-        type Role = S::Role;
         type Permissions = Set<members::permissions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `role` field
+        pub struct role(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
         ///Marker type for the `member` field
         pub struct member(());
-        ///Marker type for the `role` field
-        pub struct role(());
         ///Marker type for the `permissions` field
         pub struct permissions(());
     }
@@ -437,9 +437,9 @@ impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
 impl<'a, S> CrewBuilder<'a, S>
 where
     S: crew_state::State,
+    S::Role: crew_state::IsSet,
     S::AddedAt: crew_state::IsSet,
     S::Member: crew_state::IsSet,
-    S::Role: crew_state::IsSet,
     S::Permissions: crew_state::IsSet,
 {
     /// Build the final struct
@@ -456,7 +456,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -472,7 +472,7 @@ where
     }
 }
 
-fn lexicon_doc_io_atcr_hold_crew() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_atcr_hold_crew() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.atcr.hold.crew"),

@@ -24,16 +24,16 @@ pub struct Clip<'a> {
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
     ///Indicates human language of the given URL
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub languages: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub languages: core::option::Option<Vec<jacquard_common::types::string::Language>>,
     ///User-written notes for the bookmark. Public and personal.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
     ///An array of tags. A format of solely alphanumeric characters and dashes should be used.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<
+    pub tags: core::option::Option<
         Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     >,
     ///The title of the bookmark. If left empty, reuse the URL.
@@ -43,9 +43,9 @@ pub struct Clip<'a> {
     #[serde(default = "_default_clip_unlisted")]
     pub unlisted: bool,
     ///Whether the bookmark has been read by the user Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_clip_unread")]
-    pub unread: std::option::Option<bool>,
+    pub unread: core::option::Option<bool>,
     ///The URL of the bookmark. Cannot be left empty or be modified after creation.
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
@@ -63,9 +63,9 @@ pub struct Clip<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ClipGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -112,19 +112,19 @@ impl jacquard_common::types::collection::Collection for ClipRecord {
     type Record = ClipRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Clip<'a> {
     fn nsid() -> &'static str {
         "social.clippr.feed.clip"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_clippr_feed_clip()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.description;
             #[allow(unused_comparisons)]
@@ -271,7 +271,7 @@ fn _default_clip_unlisted() -> bool {
     false
 }
 
-fn _default_clip_unread() -> std::option::Option<bool> {
+fn _default_clip_unread() -> core::option::Option<bool> {
     Some(true)
 }
 
@@ -285,85 +285,85 @@ pub mod clip_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Title;
-        type Description;
         type Unlisted;
+        type Url;
         type CreatedAt;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Title = Unset;
-        type Description = Unset;
         type Unlisted = Unset;
+        type Url = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Title = S::Title;
-        type Description = S::Description;
-        type Unlisted = S::Unlisted;
-        type CreatedAt = S::CreatedAt;
+        type Description = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Url = S::Url;
         type Title = Set<members::title>;
-        type Description = S::Description;
         type Unlisted = S::Unlisted;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
         type Url = S::Url;
-        type Title = S::Title;
-        type Description = Set<members::description>;
-        type Unlisted = S::Unlisted;
         type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
     }
     ///State transition - sets the `unlisted` field to Set
     pub struct SetUnlisted<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnlisted<S> {}
     impl<S: State> State for SetUnlisted<S> {
-        type Url = S::Url;
         type Title = S::Title;
-        type Description = S::Description;
         type Unlisted = Set<members::unlisted>;
+        type Url = S::Url;
         type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Title = S::Title;
+        type Unlisted = S::Unlisted;
+        type Url = Set<members::url>;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Url = S::Url;
         type Title = S::Title;
-        type Description = S::Description;
         type Unlisted = S::Unlisted;
+        type Url = S::Url;
         type CreatedAt = Set<members::created_at>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Title = S::Title;
+        type Unlisted = S::Unlisted;
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `unlisted` field
         pub struct unlisted(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
@@ -579,11 +579,11 @@ where
 impl<'a, S> ClipBuilder<'a, S>
 where
     S: clip_state::State,
-    S::Url: clip_state::IsSet,
     S::Title: clip_state::IsSet,
-    S::Description: clip_state::IsSet,
     S::Unlisted: clip_state::IsSet,
+    S::Url: clip_state::IsSet,
     S::CreatedAt: clip_state::IsSet,
+    S::Description: clip_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Clip<'a> {
@@ -603,7 +603,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -623,7 +623,7 @@ where
     }
 }
 
-fn lexicon_doc_social_clippr_feed_clip() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_clippr_feed_clip() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

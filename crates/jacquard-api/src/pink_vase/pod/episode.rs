@@ -22,26 +22,26 @@ pub struct Episode<'a> {
     #[serde(borrow)]
     pub audio_url: jacquard_common::types::string::UriValue<'a>,
     ///Optional per-episode cover art, overrides show art.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_art: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub cover_art: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Episode duration in seconds.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_seconds: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub episode_number: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration_seconds: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub episode_number: core::option::Option<i64>,
     ///Follows podcast RSS spec episode types.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub episode_type: std::option::Option<EpisodeEpisodeType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub explicit: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub season_number: std::option::Option<i64>,
+    pub episode_type: core::option::Option<EpisodeEpisodeType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub explicit: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub season_number: core::option::Option<i64>,
     ///The show this episode belongs to.
     #[serde(borrow)]
     pub show: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -155,9 +155,9 @@ impl jacquard_common::IntoStatic for EpisodeEpisodeType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EpisodeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -204,19 +204,19 @@ impl jacquard_common::types::collection::Collection for EpisodeRecord {
     type Record = EpisodeRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Episode<'a> {
     fn nsid() -> &'static str {
         "pink.vase.pod.episode"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pink_vase_pod_episode()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cover_art {
             {
                 let size = value.blob().size;
@@ -301,65 +301,65 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Show;
         type AudioUrl;
+        type Show;
+        type Title;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Show = Unset;
         type AudioUrl = Unset;
+        type Show = Unset;
+        type Title = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
+    ///State transition - sets the `audio_url` field to Set
+    pub struct SetAudioUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAudioUrl<S> {}
+    impl<S: State> State for SetAudioUrl<S> {
+        type AudioUrl = Set<members::audio_url>;
         type Show = S::Show;
-        type AudioUrl = S::AudioUrl;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `show` field to Set
     pub struct SetShow<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShow<S> {}
     impl<S: State> State for SetShow<S> {
-        type Title = S::Title;
-        type Show = Set<members::show>;
         type AudioUrl = S::AudioUrl;
+        type Show = Set<members::show>;
+        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `audio_url` field to Set
-    pub struct SetAudioUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAudioUrl<S> {}
-    impl<S: State> State for SetAudioUrl<S> {
-        type Title = S::Title;
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type AudioUrl = S::AudioUrl;
         type Show = S::Show;
-        type AudioUrl = Set<members::audio_url>;
+        type Title = Set<members::title>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Show = S::Show;
         type AudioUrl = S::AudioUrl;
+        type Show = S::Show;
+        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `show` field
-        pub struct show(());
         ///Marker type for the `audio_url` field
         pub struct audio_url(());
+        ///Marker type for the `show` field
+        pub struct show(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -599,9 +599,9 @@ where
 impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
-    S::Title: episode_state::IsSet,
-    S::Show: episode_state::IsSet,
     S::AudioUrl: episode_state::IsSet,
+    S::Show: episode_state::IsSet,
+    S::Title: episode_state::IsSet,
     S::CreatedAt: episode_state::IsSet,
 {
     /// Build the final struct
@@ -624,7 +624,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -646,7 +646,7 @@ where
     }
 }
 
-fn lexicon_doc_pink_vase_pod_episode() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_pink_vase_pod_episode() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

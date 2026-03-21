@@ -40,9 +40,9 @@ pub struct BulletListBlock<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CodeBlock<'a> {
     ///Optional language identifier for syntax highlighting.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub language: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub language: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The code content (plain text, no facets).
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
@@ -108,17 +108,17 @@ pub enum DocumentContentItem<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct HeadingBlock<'a> {
     ///Annotations of text (formatting, mentions, links, etc).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<
+    pub facets: core::option::Option<
         Vec<crate::com_deckbelcher::richtext::facet::Facet<'a>>,
     >,
     ///Heading level (1-6).
     pub level: i64,
     ///The plain text content (no markdown symbols).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// A horizontal rule (thematic break).
@@ -150,19 +150,19 @@ pub struct HorizontalRuleBlock<'a> {}
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
     ///Annotations of text (formatting, mentions, links, etc).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<
+    pub facets: core::option::Option<
         Vec<crate::com_deckbelcher::richtext::facet::Facet<'a>>,
     >,
     ///Optional nested sublist (bullet or ordered).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sublist: std::option::Option<ListItemSublist<'a>>,
+    pub sublist: core::option::Option<ListItemSublist<'a>>,
     ///The plain text content (no markdown symbols).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -200,15 +200,15 @@ Used for descriptions and other short formatted text.*/
 #[serde(rename_all = "camelCase")]
 pub struct Richtext<'a> {
     ///Annotations of text (mentions, URLs, hashtags, formatting, etc).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<
+    pub facets: core::option::Option<
         Vec<crate::com_deckbelcher::richtext::facet::Facet<'a>>,
     >,
     ///The plain text content (no markdown symbols).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// An ordered (numbered) list.
@@ -228,8 +228,8 @@ pub struct OrderedListBlock<'a> {
     #[serde(borrow)]
     pub items: Vec<crate::com_deckbelcher::richtext::ListItem<'a>>,
     ///Starting number (default 1).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub start: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub start: core::option::Option<i64>,
 }
 
 /// A paragraph block with text and optional facets.
@@ -247,47 +247,47 @@ pub struct OrderedListBlock<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ParagraphBlock<'a> {
     ///Annotations of text (formatting, mentions, links, etc).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<
+    pub facets: core::option::Option<
         Vec<crate::com_deckbelcher::richtext::facet::Facet<'a>>,
     >,
     ///The plain text content (no markdown symbols).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BulletListBlock<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BulletListBlock<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
     fn def_name() -> &'static str {
         "bulletListBlock"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_richtext()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
     fn def_name() -> &'static str {
         "codeBlock"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_richtext()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.language {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -317,36 +317,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CodeBlock<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Document<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
     fn def_name() -> &'static str {
         "document"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_richtext()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HeadingBlock<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for HeadingBlock<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
     fn def_name() -> &'static str {
         "headingBlock"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_richtext()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.level;
             if *value > 6i64 {
@@ -405,36 +405,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HeadingBlock<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HorizontalRuleBlock<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for HorizontalRuleBlock<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
     fn def_name() -> &'static str {
         "horizontalRuleBlock"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_richtext()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
     fn def_name() -> &'static str {
         "listItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_richtext()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.text {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
@@ -469,19 +469,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Richtext<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Richtext<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_richtext()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.text {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500000usize {
@@ -516,36 +516,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Richtext<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrderedListBlock<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for OrderedListBlock<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
     fn def_name() -> &'static str {
         "orderedListBlock"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_richtext()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ParagraphBlock<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ParagraphBlock<'a> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
     fn def_name() -> &'static str {
         "paragraphBlock"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_deckbelcher_richtext()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.text {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500000usize {
@@ -673,7 +673,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -685,7 +685,7 @@ where
     }
 }
 
-fn lexicon_doc_com_deckbelcher_richtext() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_deckbelcher_richtext() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1277,7 +1277,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1421,7 +1421,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1543,7 +1543,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

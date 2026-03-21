@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "test.collision.option",
+  "description": "Test fixture that defines a local type named Option, which collides with std Option in serde skip_serializing_if paths.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "An object with optional fields, exercising the Option::is_none path collision.",
+      "required": ["choice"],
+      "properties": {
+        "choice": {
+          "type": "ref",
+          "ref": "#option"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    },
+    "option": {
+      "type": "object",
+      "description": "A locally-defined type named Option, colliding with std::option::Option.",
+      "required": ["key", "value"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "value": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    }
+  }
+}

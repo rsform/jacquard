@@ -30,8 +30,8 @@ pub struct Podcast<'a> {
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
     ///Whether the podcast contains explicit content. Defaults to false.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub explicit: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub explicit: core::option::Option<bool>,
     ///URL of the podcast's RSS feed.
     #[serde(borrow)]
     pub feed_url: jacquard_common::types::string::UriValue<'a>,
@@ -41,13 +41,13 @@ pub struct Podcast<'a> {
     ///Primary language of the podcast (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
     pub language: jacquard_common::types::string::Language,
     ///URL of the podcast's homepage or companion website.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///AT URI of the new canonical podcast record after an ownership transfer. When set, consumers should follow this reference to the current record.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub moved_to: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub moved_to: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///The name of the podcast.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -65,9 +65,9 @@ pub struct Podcast<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PodcastGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -114,19 +114,19 @@ impl jacquard_common::types::collection::Collection for PodcastRecord {
     type Record = PodcastRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podcast<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Podcast<'a> {
     fn nsid() -> &'static str {
         "org.atpodcasting.podcast"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_atpodcasting_podcast()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.artwork;
             {
@@ -239,12 +239,12 @@ pub mod podcast_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artwork;
         type Guid;
+        type Language;
         type CreatedAt;
         type Description;
-        type Language;
+        type Title;
         type FeedUrl;
         type Categories;
     }
@@ -252,38 +252,25 @@ pub mod podcast_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artwork = Unset;
         type Guid = Unset;
+        type Language = Unset;
         type CreatedAt = Unset;
         type Description = Unset;
-        type Language = Unset;
+        type Title = Unset;
         type FeedUrl = Unset;
         type Categories = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-        type Language = S::Language;
-        type FeedUrl = S::FeedUrl;
-        type Categories = S::Categories;
     }
     ///State transition - sets the `artwork` field to Set
     pub struct SetArtwork<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtwork<S> {}
     impl<S: State> State for SetArtwork<S> {
-        type Title = S::Title;
         type Artwork = Set<members::artwork>;
         type Guid = S::Guid;
+        type Language = S::Language;
         type CreatedAt = S::CreatedAt;
         type Description = S::Description;
-        type Language = S::Language;
+        type Title = S::Title;
         type FeedUrl = S::FeedUrl;
         type Categories = S::Categories;
     }
@@ -291,38 +278,12 @@ pub mod podcast_state {
     pub struct SetGuid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGuid<S> {}
     impl<S: State> State for SetGuid<S> {
-        type Title = S::Title;
         type Artwork = S::Artwork;
         type Guid = Set<members::guid>;
+        type Language = S::Language;
         type CreatedAt = S::CreatedAt;
         type Description = S::Description;
-        type Language = S::Language;
-        type FeedUrl = S::FeedUrl;
-        type Categories = S::Categories;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Title = S::Title;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-        type CreatedAt = Set<members::created_at>;
-        type Description = S::Description;
-        type Language = S::Language;
-        type FeedUrl = S::FeedUrl;
-        type Categories = S::Categories;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
-        type Artwork = S::Artwork;
-        type Guid = S::Guid;
-        type CreatedAt = S::CreatedAt;
-        type Description = Set<members::description>;
-        type Language = S::Language;
         type FeedUrl = S::FeedUrl;
         type Categories = S::Categories;
     }
@@ -330,12 +291,51 @@ pub mod podcast_state {
     pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLanguage<S> {}
     impl<S: State> State for SetLanguage<S> {
-        type Title = S::Title;
         type Artwork = S::Artwork;
         type Guid = S::Guid;
+        type Language = Set<members::language>;
         type CreatedAt = S::CreatedAt;
         type Description = S::Description;
-        type Language = Set<members::language>;
+        type Title = S::Title;
+        type FeedUrl = S::FeedUrl;
+        type Categories = S::Categories;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Artwork = S::Artwork;
+        type Guid = S::Guid;
+        type Language = S::Language;
+        type CreatedAt = Set<members::created_at>;
+        type Description = S::Description;
+        type Title = S::Title;
+        type FeedUrl = S::FeedUrl;
+        type Categories = S::Categories;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Artwork = S::Artwork;
+        type Guid = S::Guid;
+        type Language = S::Language;
+        type CreatedAt = S::CreatedAt;
+        type Description = Set<members::description>;
+        type Title = S::Title;
+        type FeedUrl = S::FeedUrl;
+        type Categories = S::Categories;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Artwork = S::Artwork;
+        type Guid = S::Guid;
+        type Language = S::Language;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+        type Title = Set<members::title>;
         type FeedUrl = S::FeedUrl;
         type Categories = S::Categories;
     }
@@ -343,12 +343,12 @@ pub mod podcast_state {
     pub struct SetFeedUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeedUrl<S> {}
     impl<S: State> State for SetFeedUrl<S> {
-        type Title = S::Title;
         type Artwork = S::Artwork;
         type Guid = S::Guid;
+        type Language = S::Language;
         type CreatedAt = S::CreatedAt;
         type Description = S::Description;
-        type Language = S::Language;
+        type Title = S::Title;
         type FeedUrl = Set<members::feed_url>;
         type Categories = S::Categories;
     }
@@ -356,30 +356,30 @@ pub mod podcast_state {
     pub struct SetCategories<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCategories<S> {}
     impl<S: State> State for SetCategories<S> {
-        type Title = S::Title;
         type Artwork = S::Artwork;
         type Guid = S::Guid;
+        type Language = S::Language;
         type CreatedAt = S::CreatedAt;
         type Description = S::Description;
-        type Language = S::Language;
+        type Title = S::Title;
         type FeedUrl = S::FeedUrl;
         type Categories = Set<members::categories>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artwork` field
         pub struct artwork(());
         ///Marker type for the `guid` field
         pub struct guid(());
+        ///Marker type for the `language` field
+        pub struct language(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `language` field
-        pub struct language(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `feed_url` field
         pub struct feed_url(());
         ///Marker type for the `categories` field
@@ -642,12 +642,12 @@ where
 impl<'a, S> PodcastBuilder<'a, S>
 where
     S: podcast_state::State,
-    S::Title: podcast_state::IsSet,
     S::Artwork: podcast_state::IsSet,
     S::Guid: podcast_state::IsSet,
+    S::Language: podcast_state::IsSet,
     S::CreatedAt: podcast_state::IsSet,
     S::Description: podcast_state::IsSet,
-    S::Language: podcast_state::IsSet,
+    S::Title: podcast_state::IsSet,
     S::FeedUrl: podcast_state::IsSet,
     S::Categories: podcast_state::IsSet,
 {
@@ -671,7 +671,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -693,7 +693,7 @@ where
     }
 }
 
-fn lexicon_doc_org_atpodcasting_podcast() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_atpodcasting_podcast() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

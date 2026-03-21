@@ -21,20 +21,20 @@ pub mod entry;
 #[serde(rename_all = "camelCase")]
 pub struct BlobMetadata<'a> {
     ///Alt text for accessibility
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alt: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Reference to the blob
     #[serde(borrow)]
     pub blobref: jacquard_common::types::blob::BlobRef<'a>,
     ///Content labels (self-labels) for this image
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::app_greengale::blog::SelfLabels<'a>>,
+    pub labels: core::option::Option<crate::app_greengale::blog::SelfLabels<'a>>,
     ///Original filename
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Custom color values (CSS color strings)
@@ -52,21 +52,21 @@ pub struct BlobMetadata<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CustomColors<'a> {
     ///Accent/link color
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accent: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub accent: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Background color
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub background: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Code block background color
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub code_background: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub code_background: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Primary text color
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Open Graph Protocol metadata for social sharing
@@ -83,14 +83,14 @@ pub struct CustomColors<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Ogp<'a> {
     ///Image height in pixels
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub height: core::option::Option<i64>,
     ///URL of the OGP image
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
     ///Image width in pixels
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub width: core::option::Option<i64>,
 }
 
 /// Metadata tag on an atproto resource, published by the author
@@ -144,13 +144,13 @@ pub struct SelfLabels<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Theme<'a> {
     ///Custom color overrides
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub custom: std::option::Option<crate::app_greengale::blog::CustomColors<'a>>,
+    pub custom: core::option::Option<crate::app_greengale::blog::CustomColors<'a>>,
     ///Predefined color theme
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub preset: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub preset: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Voice theme configuration for TTS playback
@@ -168,30 +168,30 @@ pub struct Theme<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct VoiceTheme<'a> {
     ///Pitch multiplier x100 (100 = normal, range 50-150)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pitch: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pitch: core::option::Option<i64>,
     ///Playback speed multiplier x100 (100 = normal, range 50-200)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub speed: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub speed: core::option::Option<i64>,
     ///Voice ID for TTS (e.g., 'af_heart', 'am_adam')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub voice: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub voice: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobMetadata<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobMetadata<'a> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
     fn def_name() -> &'static str {
         "blobMetadata"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alt {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -249,19 +249,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobMetadata<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomColors<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CustomColors<'a> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
     fn def_name() -> &'static str {
         "customColors"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.accent {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
@@ -314,19 +314,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomColors<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ogp<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Ogp<'a> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
     fn def_name() -> &'static str {
         "ogp"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.url;
             #[allow(unused_comparisons)]
@@ -344,19 +344,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Ogp<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabel<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SelfLabel<'a> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
     fn def_name() -> &'static str {
         "selfLabel"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.val;
             #[allow(unused_comparisons)]
@@ -374,19 +374,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabel<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabels<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SelfLabels<'a> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
     fn def_name() -> &'static str {
         "selfLabels"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.values;
             #[allow(unused_comparisons)]
@@ -404,19 +404,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SelfLabels<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
     fn def_name() -> &'static str {
         "theme"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.preset {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
@@ -433,19 +433,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VoiceTheme<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for VoiceTheme<'a> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
     fn def_name() -> &'static str {
         "voiceTheme"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_blog_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.voice {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
@@ -609,7 +609,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -624,7 +624,7 @@ where
     }
 }
 
-fn lexicon_doc_app_greengale_blog_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_greengale_blog_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1197,7 +1197,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1304,7 +1304,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

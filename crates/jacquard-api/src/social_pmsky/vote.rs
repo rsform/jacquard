@@ -18,23 +18,23 @@
 #[serde(rename_all = "camelCase")]
 pub struct Vote<'a> {
     ///The persistent, anonymous identifier for the user casting the vote.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aid: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub aid: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optionally, CID specifying the specific version of 'uri' resource this vote applies to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///Timestamp when this vote was created.
     pub cts: jacquard_common::types::string::Datetime,
     ///An optional array of predefined reasons justifying the vote.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reasons: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub reasons: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Signature of dag-cbor encoded vote.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub sig: std::option::Option<jacquard_common::deps::bytes::Bytes>,
+    pub sig: core::option::Option<jacquard_common::deps::bytes::Bytes>,
     ///the account creating the vote, not necessarily the same as the user who voted
     #[serde(borrow)]
     pub src: jacquard_common::types::string::Did<'a>,
@@ -57,9 +57,9 @@ pub struct Vote<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct VoteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -106,19 +106,19 @@ impl jacquard_common::types::collection::Collection for VoteRecord {
     type Record = VoteRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Vote<'a> {
     fn nsid() -> &'static str {
         "social.pmsky.vote"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_pmsky_vote()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -133,65 +133,65 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Val;
-        type Src;
         type Uri;
+        type Src;
+        type Val;
         type Cts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Val = Unset;
-        type Src = Unset;
         type Uri = Unset;
+        type Src = Unset;
+        type Val = Unset;
         type Cts = Unset;
     }
-    ///State transition - sets the `val` field to Set
-    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVal<S> {}
-    impl<S: State> State for SetVal<S> {
-        type Val = Set<members::val>;
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
         type Src = S::Src;
-        type Uri = S::Uri;
+        type Val = S::Val;
         type Cts = S::Cts;
     }
     ///State transition - sets the `src` field to Set
     pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSrc<S> {}
     impl<S: State> State for SetSrc<S> {
-        type Val = S::Val;
-        type Src = Set<members::src>;
         type Uri = S::Uri;
+        type Src = Set<members::src>;
+        type Val = S::Val;
         type Cts = S::Cts;
     }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Val = S::Val;
+    ///State transition - sets the `val` field to Set
+    pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVal<S> {}
+    impl<S: State> State for SetVal<S> {
+        type Uri = S::Uri;
         type Src = S::Src;
-        type Uri = Set<members::uri>;
+        type Val = Set<members::val>;
         type Cts = S::Cts;
     }
     ///State transition - sets the `cts` field to Set
     pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCts<S> {}
     impl<S: State> State for SetCts<S> {
-        type Val = S::Val;
-        type Src = S::Src;
         type Uri = S::Uri;
+        type Src = S::Src;
+        type Val = S::Val;
         type Cts = Set<members::cts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `val` field
-        pub struct val(());
-        ///Marker type for the `src` field
-        pub struct src(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `src` field
+        pub struct src(());
+        ///Marker type for the `val` field
+        pub struct val(());
         ///Marker type for the `cts` field
         pub struct cts(());
     }
@@ -380,9 +380,9 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::Val: vote_state::IsSet,
-    S::Src: vote_state::IsSet,
     S::Uri: vote_state::IsSet,
+    S::Src: vote_state::IsSet,
+    S::Val: vote_state::IsSet,
     S::Cts: vote_state::IsSet,
 {
     /// Build the final struct
@@ -402,7 +402,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -421,7 +421,7 @@ where
     }
 }
 
-fn lexicon_doc_social_pmsky_vote() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_social_pmsky_vote() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("social.pmsky.vote"),

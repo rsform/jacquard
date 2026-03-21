@@ -26,26 +26,26 @@ pub struct Tool<'a> {
     ///JSON Schema for tool input
     #[serde(borrow)]
     pub input_schema: jacquard_common::types::value::Data<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_updated: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_updated: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub required_commands: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub required_commands: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub required_secrets: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub required_secrets: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Tools this tool chains to (AT URIs or built-in names)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub required_tools: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub requires_network: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub requires_workspace: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub version: std::option::Option<i64>,
+    pub required_tools: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub requires_network: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub requires_workspace: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub version: core::option::Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -60,9 +60,9 @@ pub struct Tool<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ToolGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -109,19 +109,19 @@ impl jacquard_common::types::collection::Collection for ToolRecord {
     type Record = ToolRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tool<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Tool<'a> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.tool"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_diy_razorgirl_winter_tool()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.code;
             #[allow(unused_comparisons)]
@@ -176,8 +176,8 @@ pub mod tool_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Code;
-        type CreatedAt;
         type Name;
+        type CreatedAt;
         type Description;
         type InputSchema;
     }
@@ -186,8 +186,8 @@ pub mod tool_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Code = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
         type Description = Unset;
         type InputSchema = Unset;
     }
@@ -196,18 +196,8 @@ pub mod tool_state {
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
         type Code = Set<members::code>;
+        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Description = S::Description;
-        type InputSchema = S::InputSchema;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Code = S::Code;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
         type Description = S::Description;
         type InputSchema = S::InputSchema;
     }
@@ -216,8 +206,18 @@ pub mod tool_state {
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Code = S::Code;
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+        type InputSchema = S::InputSchema;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Code = S::Code;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
         type Description = S::Description;
         type InputSchema = S::InputSchema;
     }
@@ -226,8 +226,8 @@ pub mod tool_state {
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
         type Code = S::Code;
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type Description = Set<members::description>;
         type InputSchema = S::InputSchema;
     }
@@ -236,8 +236,8 @@ pub mod tool_state {
     impl<S: State> sealed::Sealed for SetInputSchema<S> {}
     impl<S: State> State for SetInputSchema<S> {
         type Code = S::Code;
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type Description = S::Description;
         type InputSchema = Set<members::input_schema>;
     }
@@ -246,10 +246,10 @@ pub mod tool_state {
     pub mod members {
         ///Marker type for the `code` field
         pub struct code(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `description` field
         pub struct description(());
         ///Marker type for the `input_schema` field
@@ -522,8 +522,8 @@ impl<'a, S> ToolBuilder<'a, S>
 where
     S: tool_state::State,
     S::Code: tool_state::IsSet,
-    S::CreatedAt: tool_state::IsSet,
     S::Name: tool_state::IsSet,
+    S::CreatedAt: tool_state::IsSet,
     S::Description: tool_state::IsSet,
     S::InputSchema: tool_state::IsSet,
 {
@@ -548,7 +548,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -571,7 +571,7 @@ where
     }
 }
 
-fn lexicon_doc_diy_razorgirl_winter_tool() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_diy_razorgirl_winter_tool() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

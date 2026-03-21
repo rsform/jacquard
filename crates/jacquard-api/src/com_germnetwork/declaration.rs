@@ -19,19 +19,21 @@
 #[serde(rename_all = "camelCase")]
 pub struct Declaration<'a> {
     ///Array of opaque values to allow for key rolling
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub continuity_proofs: std::option::Option<Vec<jacquard_common::deps::bytes::Bytes>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub continuity_proofs: core::option::Option<
+        Vec<jacquard_common::deps::bytes::Bytes>,
+    >,
     ///Opaque value, an ed25519 public key prefixed with a byte enum
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub current_key: jacquard_common::deps::bytes::Bytes,
     ///Opaque value, contains MLS KeyPackage(s), and other signature data, and is signed by the currentKey
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
-    pub key_package: std::option::Option<jacquard_common::deps::bytes::Bytes>,
+    pub key_package: core::option::Option<jacquard_common::deps::bytes::Bytes>,
     ///Controls who can message this account
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message_me: std::option::Option<
+    pub message_me: core::option::Option<
         crate::com_germnetwork::declaration::MessageMe<'a>,
     >,
     ///Semver version number, without pre-release or build information, for the format of opaque content
@@ -51,9 +53,9 @@ pub struct Declaration<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeclarationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -216,19 +218,19 @@ impl jacquard_common::types::collection::Collection for DeclarationRecord {
     type Record = DeclarationRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
     fn nsid() -> &'static str {
         "com.germnetwork.declaration"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_germnetwork_declaration()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.continuity_proofs {
             #[allow(unused_comparisons)]
             if value.len() > 1000usize {
@@ -271,19 +273,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Declaration<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageMe<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageMe<'a> {
     fn nsid() -> &'static str {
         "com.germnetwork.declaration"
     }
     fn def_name() -> &'static str {
         "messageMe"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_germnetwork_declaration()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.message_me_url;
             #[allow(unused_comparisons)]
@@ -350,37 +352,37 @@ pub mod declaration_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Version;
         type CurrentKey;
+        type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Version = Unset;
         type CurrentKey = Unset;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Version = Set<members::version>;
-        type CurrentKey = S::CurrentKey;
+        type Version = Unset;
     }
     ///State transition - sets the `current_key` field to Set
     pub struct SetCurrentKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCurrentKey<S> {}
     impl<S: State> State for SetCurrentKey<S> {
-        type Version = S::Version;
         type CurrentKey = Set<members::current_key>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type CurrentKey = S::CurrentKey;
+        type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `current_key` field
         pub struct current_key(());
+        ///Marker type for the `version` field
+        pub struct version(());
     }
 }
 
@@ -513,8 +515,8 @@ where
 impl<'a, S> DeclarationBuilder<'a, S>
 where
     S: declaration_state::State,
-    S::Version: declaration_state::IsSet,
     S::CurrentKey: declaration_state::IsSet,
+    S::Version: declaration_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Declaration<'a> {
@@ -530,7 +532,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -546,7 +548,7 @@ where
     }
 }
 
-fn lexicon_doc_com_germnetwork_declaration() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_germnetwork_declaration() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -728,37 +730,37 @@ pub mod message_me_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MessageMeUrl;
         type ShowButtonTo;
+        type MessageMeUrl;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MessageMeUrl = Unset;
         type ShowButtonTo = Unset;
-    }
-    ///State transition - sets the `message_me_url` field to Set
-    pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
-    impl<S: State> State for SetMessageMeUrl<S> {
-        type MessageMeUrl = Set<members::message_me_url>;
-        type ShowButtonTo = S::ShowButtonTo;
+        type MessageMeUrl = Unset;
     }
     ///State transition - sets the `show_button_to` field to Set
     pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
     impl<S: State> State for SetShowButtonTo<S> {
-        type MessageMeUrl = S::MessageMeUrl;
         type ShowButtonTo = Set<members::show_button_to>;
+        type MessageMeUrl = S::MessageMeUrl;
+    }
+    ///State transition - sets the `message_me_url` field to Set
+    pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
+    impl<S: State> State for SetMessageMeUrl<S> {
+        type ShowButtonTo = S::ShowButtonTo;
+        type MessageMeUrl = Set<members::message_me_url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message_me_url` field
-        pub struct message_me_url(());
         ///Marker type for the `show_button_to` field
         pub struct show_button_to(());
+        ///Marker type for the `message_me_url` field
+        pub struct message_me_url(());
     }
 }
 
@@ -831,8 +833,8 @@ where
 impl<'a, S> MessageMeBuilder<'a, S>
 where
     S: message_me_state::State,
-    S::MessageMeUrl: message_me_state::IsSet,
     S::ShowButtonTo: message_me_state::IsSet,
+    S::MessageMeUrl: message_me_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageMe<'a> {
@@ -845,7 +847,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

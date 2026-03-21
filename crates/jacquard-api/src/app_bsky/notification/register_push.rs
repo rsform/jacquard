@@ -18,8 +18,8 @@
 #[serde(rename_all = "camelCase")]
 pub struct RegisterPush<'a> {
     ///Set to true when the actor is age restricted
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub age_restricted: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub age_restricted: core::option::Option<bool>,
     #[serde(borrow)]
     pub app_id: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -165,67 +165,67 @@ pub mod register_push_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Platform;
-        type Token;
         type ServiceDid;
         type AppId;
+        type Token;
+        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Platform = Unset;
-        type Token = Unset;
         type ServiceDid = Unset;
         type AppId = Unset;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type Platform = Set<members::platform>;
-        type Token = S::Token;
-        type ServiceDid = S::ServiceDid;
-        type AppId = S::AppId;
-    }
-    ///State transition - sets the `token` field to Set
-    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetToken<S> {}
-    impl<S: State> State for SetToken<S> {
-        type Platform = S::Platform;
-        type Token = Set<members::token>;
-        type ServiceDid = S::ServiceDid;
-        type AppId = S::AppId;
+        type Token = Unset;
+        type Platform = Unset;
     }
     ///State transition - sets the `service_did` field to Set
     pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServiceDid<S> {}
     impl<S: State> State for SetServiceDid<S> {
-        type Platform = S::Platform;
-        type Token = S::Token;
         type ServiceDid = Set<members::service_did>;
         type AppId = S::AppId;
+        type Token = S::Token;
+        type Platform = S::Platform;
     }
     ///State transition - sets the `app_id` field to Set
     pub struct SetAppId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAppId<S> {}
     impl<S: State> State for SetAppId<S> {
-        type Platform = S::Platform;
-        type Token = S::Token;
         type ServiceDid = S::ServiceDid;
         type AppId = Set<members::app_id>;
+        type Token = S::Token;
+        type Platform = S::Platform;
+    }
+    ///State transition - sets the `token` field to Set
+    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetToken<S> {}
+    impl<S: State> State for SetToken<S> {
+        type ServiceDid = S::ServiceDid;
+        type AppId = S::AppId;
+        type Token = Set<members::token>;
+        type Platform = S::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlatform<S> {}
+    impl<S: State> State for SetPlatform<S> {
+        type ServiceDid = S::ServiceDid;
+        type AppId = S::AppId;
+        type Token = S::Token;
+        type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `platform` field
-        pub struct platform(());
-        ///Marker type for the `token` field
-        pub struct token(());
         ///Marker type for the `service_did` field
         pub struct service_did(());
         ///Marker type for the `app_id` field
         pub struct app_id(());
+        ///Marker type for the `token` field
+        pub struct token(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
     }
 }
 
@@ -352,10 +352,10 @@ where
 impl<'a, S> RegisterPushBuilder<'a, S>
 where
     S: register_push_state::State,
-    S::Platform: register_push_state::IsSet,
-    S::Token: register_push_state::IsSet,
     S::ServiceDid: register_push_state::IsSet,
     S::AppId: register_push_state::IsSet,
+    S::Token: register_push_state::IsSet,
+    S::Platform: register_push_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RegisterPush<'a> {
@@ -371,7 +371,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

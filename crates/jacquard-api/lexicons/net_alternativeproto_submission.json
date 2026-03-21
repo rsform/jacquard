@@ -1,0 +1,90 @@
+{
+  "lexicon": 1,
+  "id": "net.alternativeproto.submission",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A user submission of a project to AlternativeProto",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "url",
+          "authType",
+          "createdAt"
+        ],
+        "properties": {
+          "alternativeTo": {
+            "type": "array",
+            "description": "Services this project is an alternative to",
+            "items": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          "authType": {
+            "type": "string",
+            "description": "Authentication method used by the project",
+            "knownValues": [
+              "oauth",
+              "app-password",
+              "none"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the submission was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the project",
+            "maxLength": 5000
+          },
+          "icon": {
+            "type": "blob",
+            "description": "Project icon image blob",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp",
+              "image/svg+xml",
+              "image/x-icon",
+              "image/vnd.microsoft.icon"
+            ],
+            "maxSize": 1000000
+          },
+          "isOpenSource": {
+            "type": "boolean",
+            "description": "Whether the project is open source"
+          },
+          "name": {
+            "type": "string",
+            "description": "The project name",
+            "maxLength": 200
+          },
+          "repositoryUrl": {
+            "type": "string",
+            "description": "Source code repository URL",
+            "format": "uri"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Tags for categorization",
+            "items": {
+              "type": "string",
+              "maxLength": 50
+            }
+          },
+          "url": {
+            "type": "string",
+            "description": "The project URL",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

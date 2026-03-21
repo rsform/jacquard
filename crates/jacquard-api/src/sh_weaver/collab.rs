@@ -21,12 +21,12 @@ pub mod session;
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Chapter;
-impl std::fmt::Display for Chapter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Chapter {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "chapter")
     }
 }
@@ -45,36 +45,36 @@ impl std::fmt::Display for Chapter {
 #[serde(rename_all = "camelCase")]
 pub struct CollaborationStateView<'a> {
     ///The 'canonical' version URI (usually owner's)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub canonical_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub first_collaborator_added_at: std::option::Option<
+    pub canonical_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub first_collaborator_added_at: core::option::Option<
         jacquard_common::types::string::Datetime,
     >,
     ///People who used to collaborate but relationship ended
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub former_participants: std::option::Option<
+    pub former_participants: core::option::Option<
         Vec<crate::sh_weaver::collab::FormerCollaboratorView<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_divergence: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_former_collaborators: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_divergence: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_former_collaborators: core::option::Option<bool>,
     ///Published versions from former collaborators still exist
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_orphaned_versions: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_synced_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_orphaned_versions: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_synced_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Current active + invited participants
     #[serde(borrow)]
     pub participants: Vec<crate::sh_weaver::collab::ParticipantStateView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub published_versions: std::option::Option<
+    pub published_versions: core::option::Option<
         Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
     >,
     #[serde(borrow)]
@@ -197,12 +197,12 @@ impl jacquard_common::IntoStatic for CollaborationStateViewStatus<'_> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Entry;
-impl std::fmt::Display for Entry {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Entry {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "entry")
     }
 }
@@ -221,15 +221,15 @@ impl std::fmt::Display for Entry {
 #[serde(rename_all = "camelCase")]
 pub struct FormerCollaboratorView<'a> {
     ///Number of diffs they created while active
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub contribution_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub contribution_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub end_reason: FormerCollaboratorViewEndReason<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_published_version: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_published_version: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub published_version_uri: std::option::Option<
+    pub published_version_uri: core::option::Option<
         jacquard_common::types::string::AtUri<'a>,
     >,
     #[serde(borrow)]
@@ -359,31 +359,31 @@ impl jacquard_common::IntoStatic for FormerCollaboratorViewEndReason<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InviteView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accept_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub accepted_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub accept_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub accepted_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub invitee: crate::sh_weaver::actor::ProfileViewBasic<'a>,
     #[serde(borrow)]
     pub inviter: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub resource_title: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub resource_title: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub scope: std::option::Option<InviteViewScope<'a>>,
+    pub scope: core::option::Option<InviteViewScope<'a>>,
     #[serde(borrow)]
     pub status: InviteViewStatus<'a>,
     #[serde(borrow)]
@@ -589,12 +589,12 @@ impl jacquard_common::IntoStatic for InviteViewStatus<'_> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Notebook;
-impl std::fmt::Display for Notebook {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Notebook {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "notebook")
     }
 }
@@ -613,30 +613,30 @@ impl std::fmt::Display for Notebook {
 #[serde(rename_all = "camelCase")]
 pub struct ParticipantStateView<'a> {
     ///If they accepted (even if later broken)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accept_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub accept_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///Why the relationship ended, if applicable
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub end_reason: std::option::Option<ParticipantStateViewEndReason<'a>>,
+    pub end_reason: core::option::Option<ParticipantStateViewEndReason<'a>>,
     ///When they first contributed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub first_edit_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub first_edit_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub invite_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_edit_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub invite_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_edit_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Their published copy if any
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub published_version: std::option::Option<
+    pub published_version: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///When left/removed/expired
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub relationship_ended_at: std::option::Option<
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub relationship_ended_at: core::option::Option<
         jacquard_common::types::string::Datetime,
     >,
     #[serde(borrow)]
@@ -647,8 +647,8 @@ pub struct ParticipantStateView<'a> {
     #[serde(borrow)]
     pub user: crate::sh_weaver::actor::ProfileViewBasic<'a>,
     ///True if they ever had active collaboration status
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub was_collaborator: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub was_collaborator: core::option::Option<bool>,
 }
 
 /// Why the relationship ended, if applicable
@@ -979,13 +979,13 @@ impl jacquard_common::IntoStatic for ParticipantStateViewStatus<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct SessionView<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub node_id: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub relay_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub relay_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     #[serde(borrow)]
     pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     #[serde(borrow)]
@@ -994,87 +994,87 @@ pub struct SessionView<'a> {
     pub user: crate::sh_weaver::actor::ProfileViewBasic<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollaborationStateView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CollaborationStateView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
     fn def_name() -> &'static str {
         "collaborationStateView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FormerCollaboratorView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FormerCollaboratorView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
     fn def_name() -> &'static str {
         "formerCollaboratorView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InviteView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for InviteView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
     fn def_name() -> &'static str {
         "inviteView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ParticipantStateView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ParticipantStateView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
     fn def_name() -> &'static str {
         "participantStateView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SessionView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SessionView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
     fn def_name() -> &'static str {
         "sessionView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_collab_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1089,51 +1089,51 @@ pub mod collaboration_state_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Participants;
         type Status;
         type Resource;
-        type Participants;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Participants = Unset;
         type Status = Unset;
         type Resource = Unset;
-        type Participants = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Resource = S::Resource;
-        type Participants = S::Participants;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Status = S::Status;
-        type Resource = Set<members::resource>;
-        type Participants = S::Participants;
     }
     ///State transition - sets the `participants` field to Set
     pub struct SetParticipants<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParticipants<S> {}
     impl<S: State> State for SetParticipants<S> {
+        type Participants = Set<members::participants>;
         type Status = S::Status;
         type Resource = S::Resource;
-        type Participants = Set<members::participants>;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Participants = S::Participants;
+        type Status = Set<members::status>;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type Participants = S::Participants;
+        type Status = S::Status;
+        type Resource = Set<members::resource>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `participants` field
+        pub struct participants(());
         ///Marker type for the `status` field
         pub struct status(());
         ///Marker type for the `resource` field
         pub struct resource(());
-        ///Marker type for the `participants` field
-        pub struct participants(());
     }
 }
 
@@ -1421,9 +1421,9 @@ where
 impl<'a, S> CollaborationStateViewBuilder<'a, S>
 where
     S: collaboration_state_view_state::State,
+    S::Participants: collaboration_state_view_state::IsSet,
     S::Status: collaboration_state_view_state::IsSet,
     S::Resource: collaboration_state_view_state::IsSet,
-    S::Participants: collaboration_state_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollaborationStateView<'a> {
@@ -1446,7 +1446,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1469,7 +1469,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_collab_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_collab_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -2474,67 +2474,67 @@ pub mod former_collaborator_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WasActiveUntil;
         type EndReason;
         type User;
         type WasActiveFrom;
+        type WasActiveUntil;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WasActiveUntil = Unset;
         type EndReason = Unset;
         type User = Unset;
         type WasActiveFrom = Unset;
-    }
-    ///State transition - sets the `was_active_until` field to Set
-    pub struct SetWasActiveUntil<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWasActiveUntil<S> {}
-    impl<S: State> State for SetWasActiveUntil<S> {
-        type WasActiveUntil = Set<members::was_active_until>;
-        type EndReason = S::EndReason;
-        type User = S::User;
-        type WasActiveFrom = S::WasActiveFrom;
+        type WasActiveUntil = Unset;
     }
     ///State transition - sets the `end_reason` field to Set
     pub struct SetEndReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndReason<S> {}
     impl<S: State> State for SetEndReason<S> {
-        type WasActiveUntil = S::WasActiveUntil;
         type EndReason = Set<members::end_reason>;
         type User = S::User;
         type WasActiveFrom = S::WasActiveFrom;
+        type WasActiveUntil = S::WasActiveUntil;
     }
     ///State transition - sets the `user` field to Set
     pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUser<S> {}
     impl<S: State> State for SetUser<S> {
-        type WasActiveUntil = S::WasActiveUntil;
         type EndReason = S::EndReason;
         type User = Set<members::user>;
         type WasActiveFrom = S::WasActiveFrom;
+        type WasActiveUntil = S::WasActiveUntil;
     }
     ///State transition - sets the `was_active_from` field to Set
     pub struct SetWasActiveFrom<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWasActiveFrom<S> {}
     impl<S: State> State for SetWasActiveFrom<S> {
-        type WasActiveUntil = S::WasActiveUntil;
         type EndReason = S::EndReason;
         type User = S::User;
         type WasActiveFrom = Set<members::was_active_from>;
+        type WasActiveUntil = S::WasActiveUntil;
+    }
+    ///State transition - sets the `was_active_until` field to Set
+    pub struct SetWasActiveUntil<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWasActiveUntil<S> {}
+    impl<S: State> State for SetWasActiveUntil<S> {
+        type EndReason = S::EndReason;
+        type User = S::User;
+        type WasActiveFrom = S::WasActiveFrom;
+        type WasActiveUntil = Set<members::was_active_until>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `was_active_until` field
-        pub struct was_active_until(());
         ///Marker type for the `end_reason` field
         pub struct end_reason(());
         ///Marker type for the `user` field
         pub struct user(());
         ///Marker type for the `was_active_from` field
         pub struct was_active_from(());
+        ///Marker type for the `was_active_until` field
+        pub struct was_active_until(());
     }
 }
 
@@ -2707,10 +2707,10 @@ where
 impl<'a, S> FormerCollaboratorViewBuilder<'a, S>
 where
     S: former_collaborator_view_state::State,
-    S::WasActiveUntil: former_collaborator_view_state::IsSet,
     S::EndReason: former_collaborator_view_state::IsSet,
     S::User: former_collaborator_view_state::IsSet,
     S::WasActiveFrom: former_collaborator_view_state::IsSet,
+    S::WasActiveUntil: former_collaborator_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FormerCollaboratorView<'a> {
@@ -2728,7 +2728,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2756,127 +2756,127 @@ pub mod invite_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Inviter;
-        type Resource;
+        type Status;
         type Cid;
         type Uri;
-        type Status;
-        type CreatedAt;
+        type Inviter;
         type Invitee;
+        type CreatedAt;
+        type Resource;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Inviter = Unset;
-        type Resource = Unset;
+        type Status = Unset;
         type Cid = Unset;
         type Uri = Unset;
-        type Status = Unset;
-        type CreatedAt = Unset;
+        type Inviter = Unset;
         type Invitee = Unset;
-    }
-    ///State transition - sets the `inviter` field to Set
-    pub struct SetInviter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInviter<S> {}
-    impl<S: State> State for SetInviter<S> {
-        type Inviter = Set<members::inviter>;
-        type Resource = S::Resource;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type Invitee = S::Invitee;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Inviter = S::Inviter;
-        type Resource = Set<members::resource>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type Invitee = S::Invitee;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Inviter = S::Inviter;
-        type Resource = S::Resource;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type Invitee = S::Invitee;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Inviter = S::Inviter;
-        type Resource = S::Resource;
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type Invitee = S::Invitee;
+        type CreatedAt = Unset;
+        type Resource = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Inviter = S::Inviter;
-        type Resource = S::Resource;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Status = Set<members::status>;
-        type CreatedAt = S::CreatedAt;
-        type Invitee = S::Invitee;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Inviter = S::Inviter;
-        type Resource = S::Resource;
         type Cid = S::Cid;
         type Uri = S::Uri;
-        type Status = S::Status;
-        type CreatedAt = Set<members::created_at>;
+        type Inviter = S::Inviter;
         type Invitee = S::Invitee;
+        type CreatedAt = S::CreatedAt;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Status = S::Status;
+        type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+        type Inviter = S::Inviter;
+        type Invitee = S::Invitee;
+        type CreatedAt = S::CreatedAt;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Status = S::Status;
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
+        type Inviter = S::Inviter;
+        type Invitee = S::Invitee;
+        type CreatedAt = S::CreatedAt;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `inviter` field to Set
+    pub struct SetInviter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInviter<S> {}
+    impl<S: State> State for SetInviter<S> {
+        type Status = S::Status;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Inviter = Set<members::inviter>;
+        type Invitee = S::Invitee;
+        type CreatedAt = S::CreatedAt;
+        type Resource = S::Resource;
     }
     ///State transition - sets the `invitee` field to Set
     pub struct SetInvitee<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInvitee<S> {}
     impl<S: State> State for SetInvitee<S> {
-        type Inviter = S::Inviter;
-        type Resource = S::Resource;
+        type Status = S::Status;
         type Cid = S::Cid;
         type Uri = S::Uri;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
+        type Inviter = S::Inviter;
         type Invitee = Set<members::invitee>;
+        type CreatedAt = S::CreatedAt;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Status = S::Status;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Inviter = S::Inviter;
+        type Invitee = S::Invitee;
+        type CreatedAt = Set<members::created_at>;
+        type Resource = S::Resource;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type Status = S::Status;
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Inviter = S::Inviter;
+        type Invitee = S::Invitee;
+        type CreatedAt = S::CreatedAt;
+        type Resource = Set<members::resource>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `inviter` field
-        pub struct inviter(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `inviter` field
+        pub struct inviter(());
         ///Marker type for the `invitee` field
         pub struct invitee(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
     }
 }
 
@@ -3174,13 +3174,13 @@ where
 impl<'a, S> InviteViewBuilder<'a, S>
 where
     S: invite_view_state::State,
-    S::Inviter: invite_view_state::IsSet,
-    S::Resource: invite_view_state::IsSet,
+    S::Status: invite_view_state::IsSet,
     S::Cid: invite_view_state::IsSet,
     S::Uri: invite_view_state::IsSet,
-    S::Status: invite_view_state::IsSet,
-    S::CreatedAt: invite_view_state::IsSet,
+    S::Inviter: invite_view_state::IsSet,
     S::Invitee: invite_view_state::IsSet,
+    S::CreatedAt: invite_view_state::IsSet,
+    S::Resource: invite_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> InviteView<'a> {
@@ -3204,7 +3204,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3568,7 +3568,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3600,85 +3600,85 @@ pub mod session_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Resource;
-        type NodeId;
         type Uri;
-        type User;
+        type Resource;
         type CreatedAt;
+        type NodeId;
+        type User;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Resource = Unset;
-        type NodeId = Unset;
         type Uri = Unset;
-        type User = Unset;
+        type Resource = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Resource = Set<members::resource>;
-        type NodeId = S::NodeId;
-        type Uri = S::Uri;
-        type User = S::User;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `node_id` field to Set
-    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNodeId<S> {}
-    impl<S: State> State for SetNodeId<S> {
-        type Resource = S::Resource;
-        type NodeId = Set<members::node_id>;
-        type Uri = S::Uri;
-        type User = S::User;
-        type CreatedAt = S::CreatedAt;
+        type NodeId = Unset;
+        type User = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Resource = S::Resource;
-        type NodeId = S::NodeId;
         type Uri = Set<members::uri>;
-        type User = S::User;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `user` field to Set
-    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUser<S> {}
-    impl<S: State> State for SetUser<S> {
         type Resource = S::Resource;
-        type NodeId = S::NodeId;
-        type Uri = S::Uri;
-        type User = Set<members::user>;
         type CreatedAt = S::CreatedAt;
+        type NodeId = S::NodeId;
+        type User = S::User;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type Uri = S::Uri;
+        type Resource = Set<members::resource>;
+        type CreatedAt = S::CreatedAt;
+        type NodeId = S::NodeId;
+        type User = S::User;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Resource = S::Resource;
-        type NodeId = S::NodeId;
         type Uri = S::Uri;
-        type User = S::User;
+        type Resource = S::Resource;
         type CreatedAt = Set<members::created_at>;
+        type NodeId = S::NodeId;
+        type User = S::User;
+    }
+    ///State transition - sets the `node_id` field to Set
+    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNodeId<S> {}
+    impl<S: State> State for SetNodeId<S> {
+        type Uri = S::Uri;
+        type Resource = S::Resource;
+        type CreatedAt = S::CreatedAt;
+        type NodeId = Set<members::node_id>;
+        type User = S::User;
+    }
+    ///State transition - sets the `user` field to Set
+    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUser<S> {}
+    impl<S: State> State for SetUser<S> {
+        type Uri = S::Uri;
+        type Resource = S::Resource;
+        type CreatedAt = S::CreatedAt;
+        type NodeId = S::NodeId;
+        type User = Set<members::user>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `resource` field
-        pub struct resource(());
-        ///Marker type for the `node_id` field
-        pub struct node_id(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `user` field
-        pub struct user(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `node_id` field
+        pub struct node_id(());
+        ///Marker type for the `user` field
+        pub struct user(());
     }
 }
 
@@ -3851,11 +3851,11 @@ where
 impl<'a, S> SessionViewBuilder<'a, S>
 where
     S: session_view_state::State,
-    S::Resource: session_view_state::IsSet,
-    S::NodeId: session_view_state::IsSet,
     S::Uri: session_view_state::IsSet,
-    S::User: session_view_state::IsSet,
+    S::Resource: session_view_state::IsSet,
     S::CreatedAt: session_view_state::IsSet,
+    S::NodeId: session_view_state::IsSet,
+    S::User: session_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SessionView<'a> {
@@ -3873,7 +3873,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

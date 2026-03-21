@@ -20,9 +20,9 @@
 pub struct RequestResponse<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional message to the requester
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Reference to the post created as response
     #[serde(borrow)]
     pub post: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -43,9 +43,9 @@ pub struct RequestResponse<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestResponseGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -92,19 +92,19 @@ impl jacquard_common::types::collection::Collection for RequestResponseRecord {
     type Record = RequestResponseRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RequestResponse<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RequestResponse<'a> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.requestResponse"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tech_tokimeki_kaku_requestResponse()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.message {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
@@ -150,50 +150,50 @@ pub mod request_response_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Request;
         type Post;
+        type Request;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Request = Unset;
         type Post = Unset;
+        type Request = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Post = S::Post;
         type Request = S::Request;
-        type Post = S::Post;
-    }
-    ///State transition - sets the `request` field to Set
-    pub struct SetRequest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRequest<S> {}
-    impl<S: State> State for SetRequest<S> {
-        type CreatedAt = S::CreatedAt;
-        type Request = Set<members::request>;
-        type Post = S::Post;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPost<S> {}
     impl<S: State> State for SetPost<S> {
         type CreatedAt = S::CreatedAt;
-        type Request = S::Request;
         type Post = Set<members::post>;
+        type Request = S::Request;
+    }
+    ///State transition - sets the `request` field to Set
+    pub struct SetRequest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRequest<S> {}
+    impl<S: State> State for SetRequest<S> {
+        type CreatedAt = S::CreatedAt;
+        type Post = S::Post;
+        type Request = Set<members::request>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `request` field
-        pub struct request(());
         ///Marker type for the `post` field
         pub struct post(());
+        ///Marker type for the `request` field
+        pub struct request(());
     }
 }
 
@@ -304,8 +304,8 @@ impl<'a, S> RequestResponseBuilder<'a, S>
 where
     S: request_response_state::State,
     S::CreatedAt: request_response_state::IsSet,
-    S::Request: request_response_state::IsSet,
     S::Post: request_response_state::IsSet,
+    S::Request: request_response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RequestResponse<'a> {
@@ -320,7 +320,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -335,7 +335,7 @@ where
     }
 }
 
-fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tech_tokimeki_kaku_requestResponse() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

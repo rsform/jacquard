@@ -19,30 +19,30 @@
 #[serde(rename_all = "camelCase")]
 pub struct Event<'a> {
     ///Uncertainty radius in meters around the coordinates.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub coordinate_uncertainty_in_meters: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub coordinate_uncertainty_in_meters: core::option::Option<i64>,
     ///The name of the country.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub country: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub country: core::option::Option<jacquard_common::CowStr<'a>>,
     ///ISO 3166-1 alpha-2 country code.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub country_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub country_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Second-level administrative division.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub county: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub county: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp of record creation in the ATProto PDS.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Geographic latitude in decimal degrees (WGS84). Range: -90 to 90.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub decimal_latitude: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub decimal_latitude: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Geographic longitude in decimal degrees (WGS84). Range: -180 to 180.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub decimal_longitude: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub decimal_longitude: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The date or date range during which the event occurred. ISO 8601 format (e.g., '2024-03-15', '2024-03-15/2024-03-17').
     #[serde(borrow)]
     pub event_date: jacquard_common::CowStr<'a>,
@@ -50,75 +50,77 @@ pub struct Event<'a> {
     #[serde(borrow)]
     pub event_id: jacquard_common::CowStr<'a>,
     ///Comments or notes about the event.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub event_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub event_remarks: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The time or time range during which the event occurred. ISO 8601 format (e.g., '06:30:00', '06:30:00/09:00:00').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub event_time: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub event_time: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Notes or a reference to notes taken in the field about the event.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub field_notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub field_notes: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The spatial reference system. Recommended: 'EPSG:4326'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub geodetic_datum: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub geodetic_datum: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A category or description of the habitat in which the event occurred (e.g., 'primary tropical rainforest', 'degraded pasture', 'riparian zone').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub habitat: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub habitat: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Specific locality description.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locality: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub locality: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Identifier for the location where the event occurred.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub location_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Comments about the location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub location_remarks: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Upper limit of elevation range in meters above sea level.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub maximum_elevation_in_meters: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub maximum_elevation_in_meters: core::option::Option<i64>,
     ///Lower limit of elevation range in meters above sea level.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub minimum_elevation_in_meters: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub minimum_elevation_in_meters: core::option::Option<i64>,
     ///Third-level administrative division.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub municipality: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub municipality: core::option::Option<jacquard_common::CowStr<'a>>,
     ///An identifier for the broader event that this event is part of (e.g., a survey campaign that contains multiple transects).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_event_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub parent_event_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///AT-URI reference to the parent app.gainforest.dwc.event record.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_event_ref: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub parent_event_ref: core::option::Option<
+        jacquard_common::types::string::AtUri<'a>,
+    >,
     ///The unit of measurement for the sampleSizeValue (e.g., 'square meters', 'hectares', 'trap-nights').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sample_size_unit: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sample_size_unit: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A numeric value for a measurement of the size of a sample in the event (e.g., '20', '0.25').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sample_size_value: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sample_size_value: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The amount of effort expended during the event (e.g., '3 person-hours', '14 trap-nights', '2 km transect walked').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sampling_effort: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sampling_effort: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The names of, references to, or descriptions of the methods used during the event (e.g., 'camera trap array', 'line transect distance sampling', 'audio point count 10-min').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sampling_protocol: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sampling_protocol: core::option::Option<jacquard_common::CowStr<'a>>,
     ///First-level administrative division.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub state_province: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub state_province: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -133,9 +135,9 @@ pub struct Event<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EventGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -182,19 +184,19 @@ impl jacquard_common::types::collection::Collection for EventRecord {
     type Record = EventRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Event<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Event<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.event"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_dwc_event()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.coordinate_uncertainty_in_meters {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -624,51 +626,51 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EventId;
-        type CreatedAt;
         type EventDate;
+        type CreatedAt;
+        type EventId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EventId = Unset;
-        type CreatedAt = Unset;
         type EventDate = Unset;
-    }
-    ///State transition - sets the `event_id` field to Set
-    pub struct SetEventId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventId<S> {}
-    impl<S: State> State for SetEventId<S> {
-        type EventId = Set<members::event_id>;
-        type CreatedAt = S::CreatedAt;
-        type EventDate = S::EventDate;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type EventId = S::EventId;
-        type CreatedAt = Set<members::created_at>;
-        type EventDate = S::EventDate;
+        type CreatedAt = Unset;
+        type EventId = Unset;
     }
     ///State transition - sets the `event_date` field to Set
     pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventDate<S> {}
     impl<S: State> State for SetEventDate<S> {
-        type EventId = S::EventId;
-        type CreatedAt = S::CreatedAt;
         type EventDate = Set<members::event_date>;
+        type CreatedAt = S::CreatedAt;
+        type EventId = S::EventId;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type EventDate = S::EventDate;
+        type CreatedAt = Set<members::created_at>;
+        type EventId = S::EventId;
+    }
+    ///State transition - sets the `event_id` field to Set
+    pub struct SetEventId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventId<S> {}
+    impl<S: State> State for SetEventId<S> {
+        type EventDate = S::EventDate;
+        type CreatedAt = S::CreatedAt;
+        type EventId = Set<members::event_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event_id` field
-        pub struct event_id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `event_date` field
         pub struct event_date(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `event_id` field
+        pub struct event_id(());
     }
 }
 
@@ -1242,9 +1244,9 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::EventId: event_state::IsSet,
-    S::CreatedAt: event_state::IsSet,
     S::EventDate: event_state::IsSet,
+    S::CreatedAt: event_state::IsSet,
+    S::EventId: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
@@ -1282,7 +1284,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1320,7 +1322,7 @@ where
     }
 }
 
-fn lexicon_doc_app_gainforest_dwc_event() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_gainforest_dwc_event() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

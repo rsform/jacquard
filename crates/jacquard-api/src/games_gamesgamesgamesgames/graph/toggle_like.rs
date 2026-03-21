@@ -39,13 +39,13 @@ pub struct ToggleLikeOutput<'a> {
     #[serde(borrow)]
     pub action: ToggleLikeOutputAction<'a>,
     ///CID of the created like record. Present when action is 'liked'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cid: core::option::Option<jacquard_common::CowStr<'a>>,
     ///AT URI of the created like record. Present when action is 'liked'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 /// Whether the game was liked or unliked.
@@ -262,7 +262,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

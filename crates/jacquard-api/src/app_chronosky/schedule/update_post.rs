@@ -23,13 +23,13 @@ pub struct ImageRef<'a> {
     #[serde(borrow)]
     pub alt: jacquard_common::CowStr<'a>,
     ///CID of an image blob. Can reference an existing image in the post or a newly uploaded image via media.uploadBlob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cid: core::option::Option<jacquard_common::CowStr<'a>>,
     ///New image blob (for newly uploaded images).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
 }
 
 /// Images embed that supports CID references for existing images.
@@ -63,37 +63,37 @@ pub struct ImagesEmbed<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct UpdatePost<'a> {
     ///Whether to disable quote posts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disable_quote_posts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disable_quote_posts: core::option::Option<bool>,
     ///Embedded content (images, external links, records). Use #imagesEmbed to reference existing images by CID.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<UpdatePostEmbed<'a>>,
+    pub embed: core::option::Option<UpdatePostEmbed<'a>>,
     ///Rich text facets (links, mentions, tags).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     ///Post ID to update.
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///Self-applied content labels for content warnings (AT Protocol standard).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
+    pub labels: core::option::Option<crate::com_atproto::label::SelfLabels<'a>>,
     ///Language codes (ISO 639-1).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub langs: core::option::Option<Vec<jacquard_common::types::string::Language>>,
     ///New scheduled publication datetime (ISO 8601).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub scheduled_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub scheduled_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///New post text content.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Thread gate rules to control who can reply
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub threadgate_rules: std::option::Option<Vec<UpdatePostThreadgateRulesItem<'a>>>,
+    pub threadgate_rules: core::option::Option<Vec<UpdatePostThreadgateRulesItem<'a>>>,
 }
 
 #[jacquard_derive::open_union]
@@ -178,11 +178,11 @@ pub struct UpdatePostOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdatePostError<'a> {
     #[serde(rename = "PostNotFound")]
-    PostNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    PostNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "PostNotPending")]
-    PostNotPending(std::option::Option<jacquard_common::CowStr<'a>>),
+    PostNotPending(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "NoFieldsProvided")]
-    NoFieldsProvided(std::option::Option<jacquard_common::CowStr<'a>>),
+    NoFieldsProvided(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdatePostError<'_> {
@@ -214,19 +214,19 @@ impl core::fmt::Display for UpdatePostError<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageRef<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.updatePost"
     }
     fn def_name() -> &'static str {
         "imageRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_chronosky_schedule_updatePost()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.alt;
             #[allow(unused_comparisons)]
@@ -306,19 +306,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageRef<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImagesEmbed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ImagesEmbed<'a> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.updatePost"
     }
     fn def_name() -> &'static str {
         "imagesEmbed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_chronosky_schedule_updatePost()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.images;
             #[allow(unused_comparisons)]
@@ -366,7 +366,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdatePostRequest {
     type Response = UpdatePostResponse;
 }
 
-fn lexicon_doc_app_chronosky_schedule_updatePost() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_chronosky_schedule_updatePost() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -792,7 +792,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

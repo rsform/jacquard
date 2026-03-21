@@ -19,30 +19,30 @@
 #[serde(rename_all = "camelCase")]
 pub struct Heading<'a> {
     ///Facets for text formatting and features
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::blog_pckt::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<Vec<crate::blog_pckt::richtext::facet::Facet<'a>>>,
     ///Heading level from 1 (most important) to 6 (least important)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub level: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub level: core::option::Option<i64>,
     ///The plain text content of the heading
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.block.heading"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_block_heading()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.level {
             if *value > 6i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -69,7 +69,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Heading<'a> {
     }
 }
 
-fn lexicon_doc_blog_pckt_block_heading() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blog_pckt_block_heading() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

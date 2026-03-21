@@ -23,9 +23,9 @@ pub struct CustomHeader<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Optional glob pattern to apply this header to specific paths (e.g., '*.html', '/assets/*'). If not specified, applies to all paths.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub path: core::option::Option<jacquard_common::CowStr<'a>>,
     ///HTTP header value
     #[serde(borrow)]
     pub value: jacquard_common::CowStr<'a>,
@@ -45,29 +45,31 @@ pub struct CustomHeader<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Settings<'a> {
     ///Enable clean URL routing. When enabled, '/about' will attempt to serve '/about.html' or '/about/index.html' automatically. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_settings_clean_urls")]
-    pub clean_urls: std::option::Option<bool>,
+    pub clean_urls: core::option::Option<bool>,
     ///Custom 404 error page file path. Incompatible with directoryListing and spaMode.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub custom404: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub custom404: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Enable directory listing mode for paths that resolve to directories without an index file. Incompatible with spaMode. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_settings_directory_listing")]
-    pub directory_listing: std::option::Option<bool>,
+    pub directory_listing: core::option::Option<bool>,
     ///Custom HTTP headers to set on responses
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub headers: std::option::Option<Vec<crate::place_wisp::settings::CustomHeader<'a>>>,
+    pub headers: core::option::Option<
+        Vec<crate::place_wisp::settings::CustomHeader<'a>>,
+    >,
     ///Ordered list of files to try when serving a directory. Defaults to ['index.html'] if not specified.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub index_files: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub index_files: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///File to serve for all routes (e.g., 'index.html'). When set, enables SPA mode where all non-file requests are routed to this file. Incompatible with directoryListing and custom404.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub spa_mode: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub spa_mode: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -82,9 +84,9 @@ pub struct Settings<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -104,19 +106,19 @@ impl<'a> Settings<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CustomHeader<'a> {
     fn nsid() -> &'static str {
         "place.wisp.settings"
     }
     fn def_name() -> &'static str {
         "customHeader"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_wisp_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -186,19 +188,19 @@ impl jacquard_common::types::collection::Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     fn nsid() -> &'static str {
         "place.wisp.settings"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_wisp_settings()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.custom404 {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
@@ -251,9 +253,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Settings<'a> {
     }
 }
 
-fn lexicon_doc_place_wisp_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_wisp_settings() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.wisp.settings"),
@@ -478,11 +478,11 @@ fn lexicon_doc_place_wisp_settings() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     }
 }
 
-fn _default_settings_clean_urls() -> std::option::Option<bool> {
+fn _default_settings_clean_urls() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_settings_directory_listing() -> std::option::Option<bool> {
+fn _default_settings_directory_listing() -> core::option::Option<bool> {
     Some(false)
 }
 
@@ -669,7 +669,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

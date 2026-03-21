@@ -22,9 +22,9 @@ pub struct Throw<'a> {
     #[serde(borrow)]
     pub message: jacquard_common::CowStr<'a>,
     ///Stack trace, if available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub stack: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub stack: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]

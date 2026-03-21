@@ -53,13 +53,13 @@ pub struct UploadBlobOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UploadBlobError<'a> {
     #[serde(rename = "InvalidContentType")]
-    InvalidContentType(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidContentType(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "BlobTooLarge")]
-    BlobTooLarge(std::option::Option<jacquard_common::CowStr<'a>>),
+    BlobTooLarge(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "UploadFailed")]
-    UploadFailed(std::option::Option<jacquard_common::CowStr<'a>>),
+    UploadFailed(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "NoActiveSession")]
-    NoActiveSession(std::option::Option<jacquard_common::CowStr<'a>>),
+    NoActiveSession(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for UploadBlobError<'_> {

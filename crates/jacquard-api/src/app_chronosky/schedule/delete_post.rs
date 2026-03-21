@@ -55,9 +55,9 @@ pub struct DeletePostOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeletePostError<'a> {
     #[serde(rename = "PostNotFound")]
-    PostNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    PostNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "PostNotPending")]
-    PostNotPending(std::option::Option<jacquard_common::CowStr<'a>>),
+    PostNotPending(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeletePostError<'_> {

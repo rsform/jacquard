@@ -33,9 +33,9 @@ pub struct GetFeedGenerator<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedGeneratorOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub view: std::option::Option<crate::app_rocksky::feed::FeedGeneratorView<'a>>,
+    pub view: core::option::Option<crate::app_rocksky::feed::FeedGeneratorView<'a>>,
 }
 
 /// Response type for

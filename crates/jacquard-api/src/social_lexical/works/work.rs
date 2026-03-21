@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct Work<'a> {
     ///
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -29,8 +29,8 @@ pub struct Work<'a> {
     #[serde(borrow)]
     pub work_type: WorkWorkType<'a>,
     ///
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub year: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub year: core::option::Option<i64>,
 }
 
 ///
@@ -129,9 +129,9 @@ impl jacquard_common::IntoStatic for WorkWorkType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WorkGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -178,19 +178,19 @@ impl jacquard_common::types::collection::Collection for WorkRecord {
     type Record = WorkRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Work<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Work<'a> {
     fn nsid() -> &'static str {
         "social.lexical.works.work"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_lexical_works_work()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.id {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
@@ -321,37 +321,37 @@ pub mod work_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type WorkType;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type WorkType = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type WorkType = S::WorkType;
+        type Title = Unset;
     }
     ///State transition - sets the `work_type` field to Set
     pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkType<S> {}
     impl<S: State> State for SetWorkType<S> {
-        type Title = S::Title;
         type WorkType = Set<members::work_type>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type WorkType = S::WorkType;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `work_type` field
         pub struct work_type(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -452,8 +452,8 @@ impl<'a, S: work_state::State> WorkBuilder<'a, S> {
 impl<'a, S> WorkBuilder<'a, S>
 where
     S: work_state::State,
-    S::Title: work_state::IsSet,
     S::WorkType: work_state::IsSet,
+    S::Title: work_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Work<'a> {
@@ -468,7 +468,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -483,7 +483,7 @@ where
     }
 }
 
-fn lexicon_doc_social_lexical_works_work() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_lexical_works_work() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

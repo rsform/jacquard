@@ -19,27 +19,27 @@
 #[serde(rename_all = "camelCase")]
 pub struct Publication<'a> {
     ///Publication description
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When enabled, also publishes to site.standard.publication and site.standard.document collections for cross-platform compatibility Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_publication_enable_site_standard")]
-    pub enable_site_standard: std::option::Option<bool>,
+    pub enable_site_standard: core::option::Option<bool>,
     ///Publication/blog title
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Default theme for posts in this publication
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: std::option::Option<crate::app_greengale::blog::Theme<'a>>,
+    pub theme: core::option::Option<crate::app_greengale::blog::Theme<'a>>,
     ///Publication base URL (e.g., https://greengale.app)
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
     ///Default voice settings for TTS playback on posts
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub voice_theme: std::option::Option<crate::app_greengale::blog::VoiceTheme<'a>>,
+    pub voice_theme: core::option::Option<crate::app_greengale::blog::VoiceTheme<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -54,9 +54,9 @@ pub struct Publication<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PublicationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -103,19 +103,19 @@ impl jacquard_common::types::collection::Collection for PublicationRecord {
     type Record = PublicationRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
     fn nsid() -> &'static str {
         "app.greengale.publication"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_publication()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -158,7 +158,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Publication<'a> {
     }
 }
 
-fn _default_publication_enable_site_standard() -> std::option::Option<bool> {
+fn _default_publication_enable_site_standard() -> core::option::Option<bool> {
     Some(false)
 }
 
@@ -367,7 +367,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -384,7 +384,7 @@ where
     }
 }
 
-fn lexicon_doc_app_greengale_publication() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_greengale_publication() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

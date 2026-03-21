@@ -19,20 +19,20 @@
 #[serde(rename_all = "camelCase")]
 pub struct Service<'a> {
     ///Description of what this service provides.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Methods available on this service.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub methods: std::option::Option<Vec<crate::garden_lexicon::service::Method<'a>>>,
+    pub methods: core::option::Option<Vec<crate::garden_lexicon::service::Method<'a>>>,
     ///The type of service being declared.
     #[serde(borrow)]
     pub service_type: jacquard_common::CowStr<'a>,
     ///URL templates for constructing web URLs from AT-URIs or record data. Useful for linking to web views of records.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url_templates: std::option::Option<
+    pub url_templates: core::option::Option<
         Vec<crate::garden_lexicon::service::UrlTemplate<'a>>,
     >,
 }
@@ -49,9 +49,9 @@ pub struct Service<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ServiceGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -71,12 +71,12 @@ pub struct ServiceGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Method<'a> {
     ///Authentication methods supported by this method.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub auth_methods: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub auth_methods: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Whether this method is deprecated and should no longer be used.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deprecated: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub deprecated: core::option::Option<bool>,
     ///AT-URI pointing to a lexicon schema that defines this method.
     #[serde(borrow)]
     pub lexicon: jacquard_common::types::string::AtUri<'a>,
@@ -96,13 +96,13 @@ pub struct Method<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct UrlTemplate<'a> {
     ///NSIDs of collections this URL template applies to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collections: std::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
+    pub collections: core::option::Option<Vec<jacquard_common::types::string::Nsid<'a>>>,
     ///Description of what this URL template is for.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URI template with placeholders for record data
     #[serde(borrow)]
     pub url: jacquard_common::CowStr<'a>,
@@ -148,19 +148,19 @@ impl jacquard_common::types::collection::Collection for ServiceRecord {
     type Record = ServiceRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Service<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.service"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_service()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -190,36 +190,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Service<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Method<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Method<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.service"
     }
     fn def_name() -> &'static str {
         "method"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_service()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for UrlTemplate<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for UrlTemplate<'a> {
     fn nsid() -> &'static str {
         "garden.lexicon.service"
     }
     fn def_name() -> &'static str {
         "urlTemplate"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_lexicon_service()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -405,7 +405,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -420,7 +420,7 @@ where
     }
 }
 
-fn lexicon_doc_garden_lexicon_service() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_garden_lexicon_service() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -830,7 +830,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

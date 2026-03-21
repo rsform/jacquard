@@ -23,40 +23,40 @@ pub struct Address<'a> {
     #[serde(borrow)]
     pub country: jacquard_common::CowStr<'a>,
     ///The locality of the region. For example, a city in the USA.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locality: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub locality: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The postal code of the location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub postal_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub postal_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The administrative region of the country. For example, a state in the USA.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub region: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub region: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The street address.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub street: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub street: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Address<'a> {
     fn nsid() -> &'static str {
         "community.lexicon.location.address"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_community_lexicon_location_address()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.country;
             #[allow(unused_comparisons)]
@@ -87,7 +87,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Address<'a> {
     }
 }
 
-fn lexicon_doc_community_lexicon_location_address() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_community_lexicon_location_address() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

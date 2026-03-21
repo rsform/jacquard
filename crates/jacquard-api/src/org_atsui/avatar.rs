@@ -18,16 +18,16 @@
 #[serde(rename_all = "camelCase")]
 pub struct Avatar<'a> {
     ///DID of the blob owner. Used to resolve blob URLs.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
     ///Pull the avatar up by half its own height, overlapping the element above.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lift: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub lift: core::option::Option<bool>,
     ///Size token.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub size: std::option::Option<AvatarSize<'a>>,
+    pub size: core::option::Option<AvatarSize<'a>>,
     ///Blob ref for the image.
     #[serde(borrow)]
     pub src: jacquard_common::types::value::Data<'a>,
@@ -323,7 +323,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

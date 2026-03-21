@@ -21,13 +21,13 @@ pub struct Reminder<'a> {
     ///Timestamp when the reminder was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Whether the reminder has been triggered Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_reminder_occurred")]
-    pub occurred: std::option::Option<bool>,
+    pub occurred: core::option::Option<bool>,
     ///AT-URI of the original post/message that triggered this reminder
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub origin_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub origin_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///DID of the user who created the reminder
     #[serde(borrow)]
     pub requester: jacquard_common::types::string::Did<'a>,
@@ -50,9 +50,9 @@ pub struct Reminder<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReminderGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -99,19 +99,19 @@ impl jacquard_common::types::collection::Collection for ReminderRecord {
     type Record = ReminderRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reminder<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Reminder<'a> {
     fn nsid() -> &'static str {
         "net.jbsm.jb.reminder"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_jbsm_jb_reminder()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.subject;
             #[allow(unused_comparisons)]
@@ -129,7 +129,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Reminder<'a> {
     }
 }
 
-fn _default_reminder_occurred() -> std::option::Option<bool> {
+fn _default_reminder_occurred() -> core::option::Option<bool> {
     Some(false)
 }
 
@@ -143,8 +143,8 @@ pub mod reminder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type TriggerAt;
+        type Subject;
         type CreatedAt;
         type Requester;
     }
@@ -152,26 +152,26 @@ pub mod reminder_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type TriggerAt = Unset;
+        type Subject = Unset;
         type CreatedAt = Unset;
         type Requester = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type TriggerAt = S::TriggerAt;
-        type CreatedAt = S::CreatedAt;
-        type Requester = S::Requester;
     }
     ///State transition - sets the `trigger_at` field to Set
     pub struct SetTriggerAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTriggerAt<S> {}
     impl<S: State> State for SetTriggerAt<S> {
-        type Subject = S::Subject;
         type TriggerAt = Set<members::trigger_at>;
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+        type Requester = S::Requester;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type TriggerAt = S::TriggerAt;
+        type Subject = Set<members::subject>;
         type CreatedAt = S::CreatedAt;
         type Requester = S::Requester;
     }
@@ -179,8 +179,8 @@ pub mod reminder_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
         type TriggerAt = S::TriggerAt;
+        type Subject = S::Subject;
         type CreatedAt = Set<members::created_at>;
         type Requester = S::Requester;
     }
@@ -188,18 +188,18 @@ pub mod reminder_state {
     pub struct SetRequester<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRequester<S> {}
     impl<S: State> State for SetRequester<S> {
-        type Subject = S::Subject;
         type TriggerAt = S::TriggerAt;
+        type Subject = S::Subject;
         type CreatedAt = S::CreatedAt;
         type Requester = Set<members::requester>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `trigger_at` field
         pub struct trigger_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `requester` field
@@ -350,8 +350,8 @@ where
 impl<'a, S> ReminderBuilder<'a, S>
 where
     S: reminder_state::State,
-    S::Subject: reminder_state::IsSet,
     S::TriggerAt: reminder_state::IsSet,
+    S::Subject: reminder_state::IsSet,
     S::CreatedAt: reminder_state::IsSet,
     S::Requester: reminder_state::IsSet,
 {
@@ -370,7 +370,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -387,9 +387,7 @@ where
     }
 }
 
-fn lexicon_doc_net_jbsm_jb_reminder() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_net_jbsm_jb_reminder() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.jbsm.jb.reminder"),

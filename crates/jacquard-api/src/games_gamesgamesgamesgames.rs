@@ -6,20 +6,30 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod actor;
+pub mod claim;
+pub mod claim_review;
 pub mod collection;
+pub mod create_claim;
 pub mod create_game;
 pub mod engine;
 pub mod feed;
 pub mod game;
+pub mod get_claim;
 pub mod get_game;
 pub mod get_profile;
 pub mod get_reviews;
 pub mod graph;
+pub mod list_claims;
 pub mod list_games;
+pub mod list_org_games;
+pub mod migrate_claim;
 pub mod org;
 pub mod platform;
 pub mod platform_family;
 pub mod put_game;
+pub mod redirect;
+pub mod review_claim;
+pub mod richtext;
 pub mod search;
 pub mod search_profiles_typeahead;
 pub mod search_slugs;
@@ -36,33 +46,57 @@ pub mod slug;
     jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
+pub struct ActorCreditView<'a> {
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub actor_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(borrow)]
+    pub credits: Vec<crate::games_gamesgamesgamesgames::CreditEntry<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
 pub struct ActorProfileDetailView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
+    pub description_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub pronouns: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub websites: std::option::Option<
+    pub websites: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
     >,
 }
@@ -79,14 +113,14 @@ pub struct ActorProfileDetailView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ActorProfileSummaryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -104,9 +138,9 @@ pub struct ActorProfileSummaryView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgeRating<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_descriptors: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub content_descriptors: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     #[serde(borrow)]
     pub organization: AgeRatingOrganization<'a>,
     #[serde(borrow)]
@@ -241,12 +275,12 @@ impl jacquard_common::IntoStatic for AgeRatingOrganization<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AlternativeName<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locale: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub locale: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
@@ -266,12 +300,12 @@ pub type ApplicationType<'a> = jacquard_common::CowStr<'a>;
 pub struct CollectionSummaryView<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub slug: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: std::option::Option<CollectionSummaryViewType<'a>>,
+    pub r#type: core::option::Option<CollectionSummaryViewType<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -475,9 +509,9 @@ impl jacquard_common::IntoStatic for CompanyRole<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreditEntry<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub department: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub department: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub role: crate::games_gamesgamesgamesgames::IndividualRole<'a>,
 }
@@ -496,9 +530,9 @@ pub struct CreditEntry<'a> {
 pub struct EngineSummaryView<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub slug: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -516,39 +550,42 @@ pub struct EngineSummaryView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExternalIds<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub apple_app_store: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub apple_app_store: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub epic_games: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub epic_games: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub gog: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub gog: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub google_play: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub google_play: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub humble_bundle: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub humble_bundle: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub igdb: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub igdb: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub itch_io: std::option::Option<crate::games_gamesgamesgamesgames::ItchIoId<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub itch_io: core::option::Option<crate::games_gamesgamesgamesgames::ItchIoId<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub nintendo_eshop: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub nintendo_eshop: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub play_station: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub play_station: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub steam: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub steam: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub xbox: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub twitch: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub xbox: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -566,9 +603,9 @@ pub struct ExternalIds<'a> {
 pub struct ExternalVideo<'a> {
     #[serde(borrow)]
     pub platform: ExternalVideoPlatform<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub video_id: jacquard_common::CowStr<'a>,
 }
@@ -680,101 +717,113 @@ impl jacquard_common::IntoStatic for ExternalVideoPlatform<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GameDetailView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub age_ratings: std::option::Option<
+    pub actor_credits: core::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::ActorCreditView<'a>>,
+    >,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub age_ratings: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alternative_names: std::option::Option<
+    pub alternative_names: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub application_type: std::option::Option<
+    pub application_type: core::option::Option<
         crate::games_gamesgamesgamesgames::ApplicationType<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collections: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub collections: core::option::Option<
+        Vec<jacquard_common::types::string::AtUri<'a>>,
+    >,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub engines: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub engines: core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_ids: std::option::Option<
+    pub external_ids: core::option::Option<
         crate::games_gamesgamesgamesgames::ExternalIds<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genres: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub genres: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub keywords: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub keywords: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub language_supports: std::option::Option<
+    pub language_supports: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub media: std::option::Option<
+    pub media: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub modes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub modes: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub multiplayer_modes: std::option::Option<
+    pub multiplayer_modes: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>,
     >,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub org_credits: core::option::Option<
+        Vec<crate::games_gamesgamesgamesgames::OrgCreditView<'a>>,
+    >,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub player_perspectives: std::option::Option<
+    pub parent: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub player_perspectives: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub published_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub published_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub releases: std::option::Option<
+    pub releases: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::Release<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub slug: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub storyline: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub storyline: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub summary: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub themes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub themes: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub time_to_beat: std::option::Option<
+    pub time_to_beat: core::option::Option<
         crate::games_gamesgamesgamesgames::TimeToBeat<'a>,
     >,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub videos: std::option::Option<
+    pub videos: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub websites: std::option::Option<
+    pub websites: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
     >,
 }
@@ -791,9 +840,9 @@ pub struct GameDetailView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GameFeedViewItem<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub feed_context: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub game: crate::games_gamesgamesgamesgames::GameView<'a>,
 }
@@ -810,27 +859,27 @@ pub struct GameFeedViewItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GameSummaryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub application_type: std::option::Option<
+    pub application_type: core::option::Option<
         crate::games_gamesgamesgamesgames::ApplicationType<'a>,
     >,
     ///Earliest release date as YYYYMMDD integer.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub first_release_date: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub first_release_date: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub media: std::option::Option<
+    pub media: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
     >,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub slug: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub summary: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -849,37 +898,37 @@ pub struct GameSummaryView<'a> {
 pub struct GameView<'a> {
     #[serde(borrow)]
     pub application_type: crate::games_gamesgamesgamesgames::ApplicationType<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genres: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub like_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub genres: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub like_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub media: std::option::Option<
+    pub media: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
     >,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub releases: std::option::Option<
+    pub releases: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::Release<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub slug: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub summary: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub themes: std::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
+    pub themes: core::option::Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::games_gamesgamesgamesgames::ViewerState<'a>>,
+    pub viewer: core::option::Option<crate::games_gamesgamesgamesgames::ViewerState<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1178,14 +1227,14 @@ pub struct ItchIoId<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LanguageSupport<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub audio: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub interface: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub audio: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub interface: core::option::Option<bool>,
     #[serde(borrow)]
     pub language: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub subtitles: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subtitles: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1201,25 +1250,25 @@ pub struct LanguageSupport<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MediaItem<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub height: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locale: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub locale: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub media_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub width: core::option::Option<i64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1337,27 +1386,51 @@ impl jacquard_common::IntoStatic for Mode<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MultiplayerMode<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_campaign_coop: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_drop_in: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_lan_coop: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_splitscreen: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_splitscreen_online: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offline_coop_max: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub offline_max: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub online_coop_max: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub online_max: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_campaign_coop: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_drop_in: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_lan_coop: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_splitscreen: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_splitscreen_online: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offline_coop_max: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub offline_max: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub online_coop_max: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub online_max: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub platform: core::option::Option<jacquard_common::CowStr<'a>>,
+}
+
+#[jacquard_derive::lexicon]
+#[derive(
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
+)]
+#[serde(rename_all = "camelCase")]
+pub struct OrgCreditView<'a> {
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub org_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(borrow)]
+    pub roles: Vec<crate::games_gamesgamesgamesgames::CompanyRole<'a>>,
+    #[serde(borrow)]
+    pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1372,45 +1445,45 @@ pub struct MultiplayerMode<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OrgProfileDetailView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub country: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub country: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
+    pub description_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub founded_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub founded_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub media: std::option::Option<
+    pub media: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub parent: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<OrgProfileDetailViewStatus<'a>>,
+    pub status: core::option::Option<OrgProfileDetailViewStatus<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub websites: std::option::Option<
+    pub websites: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::Website<'a>>,
     >,
 }
@@ -1532,14 +1605,14 @@ impl jacquard_common::IntoStatic for OrgProfileDetailViewStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct OrgProfileSummaryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -1786,19 +1859,19 @@ impl jacquard_common::IntoStatic for PlatformFeaturesPlatform<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlatformSummaryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub abbreviation: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub abbreviation: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: std::option::Option<
+    pub category: core::option::Option<
         crate::games_gamesgamesgamesgames::PlatformCategory<'a>,
     >,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub slug: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -1816,40 +1889,40 @@ pub struct PlatformSummaryView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlatformVersion<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub connectivity: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub connectivity: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cpu: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cpu: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub gpu: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub gpu: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub max_resolution: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub max_resolution: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub media: std::option::Option<
+    pub media: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub memory: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub memory: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub os: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub output: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub output: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub storage: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub storage: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub summary: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub summary: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1976,14 +2049,14 @@ impl jacquard_common::IntoStatic for PlayerPerspective<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileSummaryView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub profile_type: ProfileSummaryViewProfileType<'a>,
     #[serde(borrow)]
@@ -2094,16 +2167,16 @@ impl jacquard_common::IntoStatic for ProfileSummaryViewProfileType<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct Release<'a> {
     ///Free-text platform name, used when no platform record exists.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub platform: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub platform: core::option::Option<jacquard_common::CowStr<'a>>,
     ///AT URI of a platform record.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub platform_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub platform_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_dates: std::option::Option<
+    pub release_dates: core::option::Option<
         Vec<crate::games_gamesgamesgamesgames::ReleaseDate<'a>>,
     >,
 }
@@ -2121,18 +2194,18 @@ pub struct Release<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReleaseDate<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub region: std::option::Option<ReleaseDateRegion<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub region: core::option::Option<ReleaseDateRegion<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub released_at: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub released_at: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub released_at_format: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub released_at_format: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<ReleaseDateStatus<'a>>,
+    pub status: core::option::Option<ReleaseDateStatus<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2402,9 +2475,9 @@ impl jacquard_common::IntoStatic for ReleaseDateStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkeletonGameFeedItem<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub feed_context: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub feed_context: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub game: jacquard_common::types::string::AtUri<'a>,
 }
@@ -2423,14 +2496,14 @@ pub struct SkeletonGameFeedItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SystemRequirements<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub minimum: std::option::Option<crate::games_gamesgamesgamesgames::SystemSpec<'a>>,
+    pub minimum: core::option::Option<crate::games_gamesgamesgamesgames::SystemSpec<'a>>,
     #[serde(borrow)]
     pub platform: SystemRequirementsPlatform<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub recommended: std::option::Option<
+    pub recommended: core::option::Option<
         crate::games_gamesgamesgamesgames::SystemSpec<'a>,
     >,
 }
@@ -2544,30 +2617,30 @@ impl jacquard_common::IntoStatic for SystemRequirementsPlatform<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SystemSpec<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub additional_notes: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub additional_notes: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub directx: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub directx: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub graphics: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub graphics: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub memory: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub memory: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub os: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub os: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub processor: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub processor: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sound_card: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub sound_card: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub storage: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub storage: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2765,12 +2838,12 @@ impl jacquard_common::IntoStatic for Theme<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TimeToBeat<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub completely: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hastily: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub normally: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub completely: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hastily: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub normally: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -2786,9 +2859,9 @@ pub struct TimeToBeat<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ViewerState<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub like: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub like: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -2803,9 +2876,9 @@ pub struct ViewerState<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Website<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: std::option::Option<WebsiteType<'a>>,
+    pub r#type: core::option::Option<WebsiteType<'a>>,
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
 }
@@ -2988,19 +3061,48 @@ impl jacquard_common::IntoStatic for WebsiteType<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActorProfileDetailView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ActorCreditView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "actorCreditView"
+    }
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ActorProfileDetailView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "actorProfileDetailView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -3085,19 +3187,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActorProfileDetailView<'a
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActorProfileSummaryView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ActorProfileSummaryView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "actorProfileSummaryView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -3158,70 +3260,70 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ActorProfileSummaryView<'
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeRating<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AgeRating<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "ageRating"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AlternativeName<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AlternativeName<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "alternativeName"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionSummaryView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionSummaryView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "collectionSummaryView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CreditEntry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CreditEntry<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "creditEntry"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.department {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
@@ -3238,87 +3340,87 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CreditEntry<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for EngineSummaryView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for EngineSummaryView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "engineSummaryView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalIds<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ExternalIds<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "externalIds"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExternalVideo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ExternalVideo<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "externalVideo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameDetailView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GameDetailView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "gameDetailView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameFeedViewItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GameFeedViewItem<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "gameFeedViewItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -3335,36 +3437,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameFeedViewItem<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameSummaryView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GameSummaryView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "gameSummaryView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GameView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "gameView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.like_count {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -3380,53 +3482,53 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GameView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ItchIoId<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ItchIoId<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "itchIoId"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LanguageSupport<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LanguageSupport<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "languageSupport"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MediaItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MediaItem<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "mediaItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.blob {
             {
                 let size = value.blob().size;
@@ -3473,36 +3575,65 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MediaItem<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MultiplayerMode<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MultiplayerMode<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "multiplayerMode"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrgProfileDetailView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for OrgCreditView<'a> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.defs"
+    }
+    fn def_name() -> &'static str {
+        "orgCreditView"
+    }
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_defs()
+    }
+    fn validate(
+        &self,
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
+        if let Some(ref value) = self.display_name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(::jacquard_lexicon::validation::ConstraintError::MaxLength {
+                    path: ::jacquard_lexicon::validation::ValidationPath::from_field(
+                        "display_name",
+                    ),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<'a> jacquard_lexicon::schema::LexiconSchema for OrgProfileDetailView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "orgProfileDetailView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -3575,19 +3706,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrgProfileDetailView<'a> 
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrgProfileSummaryView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for OrgProfileSummaryView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "orgProfileSummaryView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -3648,70 +3779,70 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrgProfileSummaryView<'a>
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformFeatures<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PlatformFeatures<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "platformFeatures"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformSummaryView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PlatformSummaryView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "platformSummaryView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlatformVersion<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PlatformVersion<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "platformVersion"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileSummaryView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ProfileSummaryView<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "profileSummaryView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -3772,53 +3903,53 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileSummaryView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Release<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "release"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReleaseDate<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReleaseDate<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "releaseDate"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonGameFeedItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SkeletonGameFeedItem<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "skeletonGameFeedItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.feed_context {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2000usize {
@@ -3835,92 +3966,92 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SkeletonGameFeedItem<'a> 
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SystemRequirements<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SystemRequirements<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "systemRequirements"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SystemSpec<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SystemSpec<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "systemSpec"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TimeToBeat<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TimeToBeat<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "timeToBeat"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "viewerState"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Website<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Website<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
     fn def_name() -> &'static str {
         "website"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-pub mod actor_profile_detail_view_state {
+pub mod actor_credit_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
@@ -3931,145 +4062,118 @@ pub mod actor_profile_detail_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Uri;
-        type Did;
+        type Credits;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Uri = Unset;
-        type Did = Unset;
+        type Credits = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
-        type Did = S::Did;
+        type Credits = S::Credits;
     }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    ///State transition - sets the `credits` field to Set
+    pub struct SetCredits<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCredits<S> {}
+    impl<S: State> State for SetCredits<S> {
         type Uri = S::Uri;
-        type Did = Set<members::did>;
+        type Credits = Set<members::credits>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `did` field
-        pub struct did(());
+        ///Marker type for the `credits` field
+        pub struct credits(());
     }
 }
 
 /// Builder for constructing an instance of this type
-pub struct ActorProfileDetailViewBuilder<'a, S: actor_profile_detail_view_state::State> {
+pub struct ActorCreditViewBuilder<'a, S: actor_credit_view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
-        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-        ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
-        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::CreditEntry<'a>>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
-        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
 
-impl<'a> ActorProfileDetailView<'a> {
+impl<'a> ActorCreditView<'a> {
     /// Create a new builder for this type
-    pub fn new() -> ActorProfileDetailViewBuilder<
-        'a,
-        actor_profile_detail_view_state::Empty,
-    > {
-        ActorProfileDetailViewBuilder::new()
+    pub fn new() -> ActorCreditViewBuilder<'a, actor_credit_view_state::Empty> {
+        ActorCreditViewBuilder::new()
     }
 }
 
-impl<'a> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::Empty> {
+impl<'a> ActorCreditViewBuilder<'a, actor_credit_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
-        ActorProfileDetailViewBuilder {
+        ActorCreditViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
+            __unsafe_private_named: (None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
 }
 
-impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
-    /// Set the `avatar` field (optional)
-    pub fn avatar(
+impl<'a, S: actor_credit_view_state::State> ActorCreditViewBuilder<'a, S> {
+    /// Set the `actorUri` field (optional)
+    pub fn actor_uri(
         mut self,
-        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value.into();
         self
     }
-    /// Set the `avatar` field to an Option value (optional)
-    pub fn maybe_avatar(
+    /// Set the `actorUri` field to an Option value (optional)
+    pub fn maybe_actor_uri(
         mut self,
-        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+        value: Option<jacquard_common::types::string::AtUri<'a>>,
     ) -> Self {
         self.__unsafe_private_named.0 = value;
         self
     }
 }
 
-impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
-    /// Set the `createdAt` field (optional)
-    pub fn created_at(
+impl<'a, S> ActorCreditViewBuilder<'a, S>
+where
+    S: actor_credit_view_state::State,
+    S::Credits: actor_credit_view_state::IsUnset,
+{
+    /// Set the `credits` field (required)
+    pub fn credits(
         mut self,
-        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
-        self
-    }
-    /// Set the `createdAt` field to an Option value (optional)
-    pub fn maybe_created_at(
-        mut self,
-        value: Option<jacquard_common::types::string::Datetime>,
-    ) -> Self {
-        self.__unsafe_private_named.1 = value;
-        self
+        value: impl Into<Vec<crate::games_gamesgamesgamesgames::CreditEntry<'a>>>,
+    ) -> ActorCreditViewBuilder<'a, actor_credit_view_state::SetCredits<S>> {
+        self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
+        ActorCreditViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
     }
 }
 
-impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
-    /// Set the `description` field (optional)
-    pub fn description(
+impl<'a, S: actor_credit_view_state::State> ActorCreditViewBuilder<'a, S> {
+    /// Set the `displayName` field (optional)
+    pub fn display_name(
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
         self.__unsafe_private_named.2 = value.into();
         self
     }
-    /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
+    /// Set the `displayName` field to an Option value (optional)
+    pub fn maybe_display_name(
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
@@ -4078,100 +4182,18 @@ impl<
     }
 }
 
-impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
-    /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(
-        mut self,
-        value: impl Into<Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>>,
-    ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
-        self
-    }
-    /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(
-        mut self,
-        value: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.3 = value;
-        self
-    }
-}
-
-impl<'a, S> ActorProfileDetailViewBuilder<'a, S>
+impl<'a, S> ActorCreditViewBuilder<'a, S>
 where
-    S: actor_profile_detail_view_state::State,
-    S::Did: actor_profile_detail_view_state::IsUnset,
-{
-    /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<jacquard_common::types::string::Did<'a>>,
-    ) -> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::SetDid<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
-        ActorProfileDetailViewBuilder {
-            _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: ::core::marker::PhantomData,
-        }
-    }
-}
-
-impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
-    /// Set the `displayName` field (optional)
-    pub fn display_name(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
-        self
-    }
-    /// Set the `displayName` field to an Option value (optional)
-    pub fn maybe_display_name(
-        mut self,
-        value: Option<jacquard_common::CowStr<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.5 = value;
-        self
-    }
-}
-
-impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
-    /// Set the `pronouns` field (optional)
-    pub fn pronouns(
-        mut self,
-        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
-        self
-    }
-    /// Set the `pronouns` field to an Option value (optional)
-    pub fn maybe_pronouns(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
-        self
-    }
-}
-
-impl<'a, S> ActorProfileDetailViewBuilder<'a, S>
-where
-    S: actor_profile_detail_view_state::State,
-    S::Uri: actor_profile_detail_view_state::IsUnset,
+    S: actor_credit_view_state::State,
+    S::Uri: actor_credit_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<jacquard_common::types::string::AtUri<'a>>,
-    ) -> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::SetUri<S>> {
-        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
-        ActorProfileDetailViewBuilder {
+    ) -> ActorCreditViewBuilder<'a, actor_credit_view_state::SetUri<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        ActorCreditViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
             _phantom: ::core::marker::PhantomData,
@@ -4179,73 +4201,41 @@ where
     }
 }
 
-impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
-    /// Set the `websites` field (optional)
-    pub fn websites(
-        mut self,
-        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>>,
-    ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
-        self
-    }
-    /// Set the `websites` field to an Option value (optional)
-    pub fn maybe_websites(
-        mut self,
-        value: Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.8 = value;
-        self
-    }
-}
-
-impl<'a, S> ActorProfileDetailViewBuilder<'a, S>
+impl<'a, S> ActorCreditViewBuilder<'a, S>
 where
-    S: actor_profile_detail_view_state::State,
-    S::Uri: actor_profile_detail_view_state::IsSet,
-    S::Did: actor_profile_detail_view_state::IsSet,
+    S: actor_credit_view_state::State,
+    S::Uri: actor_credit_view_state::IsSet,
+    S::Credits: actor_credit_view_state::IsSet,
 {
     /// Build the final struct
-    pub fn build(self) -> ActorProfileDetailView<'a> {
-        ActorProfileDetailView {
-            avatar: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2,
-            description_facets: self.__unsafe_private_named.3,
-            did: self.__unsafe_private_named.4.unwrap(),
-            display_name: self.__unsafe_private_named.5,
-            pronouns: self.__unsafe_private_named.6,
-            uri: self.__unsafe_private_named.7.unwrap(),
-            websites: self.__unsafe_private_named.8,
+    pub fn build(self) -> ActorCreditView<'a> {
+        ActorCreditView {
+            actor_uri: self.__unsafe_private_named.0,
+            credits: self.__unsafe_private_named.1.unwrap(),
+            display_name: self.__unsafe_private_named.2,
+            uri: self.__unsafe_private_named.3.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
-    ) -> ActorProfileDetailView<'a> {
-        ActorProfileDetailView {
-            avatar: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2,
-            description_facets: self.__unsafe_private_named.3,
-            did: self.__unsafe_private_named.4.unwrap(),
-            display_name: self.__unsafe_private_named.5,
-            pronouns: self.__unsafe_private_named.6,
-            uri: self.__unsafe_private_named.7.unwrap(),
-            websites: self.__unsafe_private_named.8,
+    ) -> ActorCreditView<'a> {
+        ActorCreditView {
+            actor_uri: self.__unsafe_private_named.0,
+            credits: self.__unsafe_private_named.1.unwrap(),
+            display_name: self.__unsafe_private_named.2,
+            uri: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_games_gamesgamesgamesgames_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -4255,6 +4245,97 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> ::jacquard_lexicon::lexicon:
         description: None,
         defs: {
             let mut map = ::alloc::collections::BTreeMap::new();
+            map.insert(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                    "actorCreditView",
+                ),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("credits")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "actorUri",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "credits",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "games.gamesgamesgamesgames.defs#creditEntry",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "displayName",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(640usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
             map.insert(
                 ::jacquard_common::deps::smol_str::SmolStr::new_static(
                     "actorProfileDetailView",
@@ -5069,6 +5150,23 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> ::jacquard_lexicon::lexicon:
                         );
                         map.insert(
                             ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "twitch",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "xbox",
                             ),
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
@@ -5172,6 +5270,22 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> ::jacquard_lexicon::lexicon:
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "actorCredits",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "games.gamesgamesgamesgames.defs#actorCreditView",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
                         map.insert(
                             ::jacquard_common::deps::smol_str::SmolStr::new_static(
                                 "ageRatings",
@@ -5410,6 +5524,22 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> ::jacquard_lexicon::lexicon:
                                 r#enum: None,
                                 r#const: None,
                                 known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "orgCredits",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "games.gamesgamesgamesgames.defs#orgCreditView",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
                             }),
                         );
                         map.insert(
@@ -6380,6 +6510,95 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> ::jacquard_lexicon::lexicon:
                             ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                 description: None,
                                 format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map
+                    },
+                }),
+            );
+            map.insert(
+                ::jacquard_common::deps::smol_str::SmolStr::new_static("orgCreditView"),
+                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
+                    description: None,
+                    required: Some(
+                        vec![
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("uri"),
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static("roles")
+                        ],
+                    ),
+                    nullable: None,
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = ::alloc::collections::BTreeMap::new();
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "displayName",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: None,
+                                default: None,
+                                min_length: None,
+                                max_length: Some(640usize),
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "orgUri",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
+                                default: None,
+                                min_length: None,
+                                max_length: None,
+                                min_graphemes: None,
+                                max_graphemes: None,
+                                r#enum: None,
+                                r#const: None,
+                                known_values: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "roles",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::Array(::jacquard_lexicon::lexicon::LexArray {
+                                description: None,
+                                items: ::jacquard_lexicon::lexicon::LexArrayItem::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                    description: None,
+                                    r#ref: ::jacquard_common::CowStr::new_static(
+                                        "games.gamesgamesgamesgames.defs#companyRole",
+                                    ),
+                                }),
+                                min_length: None,
+                                max_length: None,
+                            }),
+                        );
+                        map.insert(
+                            ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                "uri",
+                            ),
+                            ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                description: None,
+                                format: Some(
+                                    ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
+                                ),
                                 default: None,
                                 min_length: None,
                                 max_length: None,
@@ -7799,7 +8018,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_defs() -> ::jacquard_lexicon::lexicon:
     }
 }
 
-pub mod actor_profile_summary_view_state {
+pub mod actor_profile_detail_view_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
@@ -7840,6 +8059,331 @@ pub mod actor_profile_summary_view_state {
         pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct ActorProfileDetailViewBuilder<'a, S: actor_profile_detail_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+        ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::Did<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> ActorProfileDetailView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> ActorProfileDetailViewBuilder<
+        'a,
+        actor_profile_detail_view_state::Empty,
+    > {
+        ActorProfileDetailViewBuilder::new()
+    }
+}
+
+impl<'a> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        ActorProfileDetailViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<
+    'a,
+    S: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<'a, S> {
+    /// Set the `avatar` field (optional)
+    pub fn avatar(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::blob::BlobRef<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `avatar` field to an Option value (optional)
+    pub fn maybe_avatar(
+        mut self,
+        value: Option<jacquard_common::types::blob::BlobRef<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<
+    'a,
+    S: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<'a, S> {
+    /// Set the `createdAt` field (optional)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::Datetime>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `createdAt` field to an Option value (optional)
+    pub fn maybe_created_at(
+        mut self,
+        value: Option<jacquard_common::types::string::Datetime>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<
+    'a,
+    S: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<'a, S> {
+    /// Set the `description` field (optional)
+    pub fn description(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `description` field to an Option value (optional)
+    pub fn maybe_description(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<
+    'a,
+    S: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<'a, S> {
+    /// Set the `descriptionFacets` field (optional)
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `descriptionFacets` field to an Option value (optional)
+    pub fn maybe_description_facets(
+        mut self,
+        value: Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S> ActorProfileDetailViewBuilder<'a, S>
+where
+    S: actor_profile_detail_view_state::State,
+    S::Did: actor_profile_detail_view_state::IsUnset,
+{
+    /// Set the `did` field (required)
+    pub fn did(
+        mut self,
+        value: impl Into<jacquard_common::types::string::Did<'a>>,
+    ) -> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::SetDid<S>> {
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        ActorProfileDetailViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<
+    'a,
+    S: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<'a, S> {
+    /// Set the `displayName` field (optional)
+    pub fn display_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `displayName` field to an Option value (optional)
+    pub fn maybe_display_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<
+    'a,
+    S: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<'a, S> {
+    /// Set the `pronouns` field (optional)
+    pub fn pronouns(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `pronouns` field to an Option value (optional)
+    pub fn maybe_pronouns(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S> ActorProfileDetailViewBuilder<'a, S>
+where
+    S: actor_profile_detail_view_state::State,
+    S::Uri: actor_profile_detail_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::SetUri<S>> {
+        self.__unsafe_private_named.7 = ::core::option::Option::Some(value.into());
+        ActorProfileDetailViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<
+    'a,
+    S: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<'a, S> {
+    /// Set the `websites` field (optional)
+    pub fn websites(
+        mut self,
+        value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `websites` field to an Option value (optional)
+    pub fn maybe_websites(
+        mut self,
+        value: Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S> ActorProfileDetailViewBuilder<'a, S>
+where
+    S: actor_profile_detail_view_state::State,
+    S::Uri: actor_profile_detail_view_state::IsSet,
+    S::Did: actor_profile_detail_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> ActorProfileDetailView<'a> {
+        ActorProfileDetailView {
+            avatar: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1,
+            description: self.__unsafe_private_named.2,
+            description_facets: self.__unsafe_private_named.3,
+            did: self.__unsafe_private_named.4.unwrap(),
+            display_name: self.__unsafe_private_named.5,
+            pronouns: self.__unsafe_private_named.6,
+            uri: self.__unsafe_private_named.7.unwrap(),
+            websites: self.__unsafe_private_named.8,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> ActorProfileDetailView<'a> {
+        ActorProfileDetailView {
+            avatar: self.__unsafe_private_named.0,
+            created_at: self.__unsafe_private_named.1,
+            description: self.__unsafe_private_named.2,
+            description_facets: self.__unsafe_private_named.3,
+            did: self.__unsafe_private_named.4.unwrap(),
+            display_name: self.__unsafe_private_named.5,
+            pronouns: self.__unsafe_private_named.6,
+            uri: self.__unsafe_private_named.7.unwrap(),
+            websites: self.__unsafe_private_named.8,
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod actor_profile_summary_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Did;
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Did = Unset;
+        type Uri = Unset;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Did = S::Did;
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -7970,8 +8514,8 @@ where
 impl<'a, S> ActorProfileSummaryViewBuilder<'a, S>
 where
     S: actor_profile_summary_view_state::State,
-    S::Uri: actor_profile_summary_view_state::IsSet,
     S::Did: actor_profile_summary_view_state::IsSet,
+    S::Uri: actor_profile_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ActorProfileSummaryView<'a> {
@@ -7986,7 +8530,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -8011,37 +8555,37 @@ pub mod collection_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Uri;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
+        type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
         type Uri = Set<members::uri>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Uri = S::Uri;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -8151,8 +8695,8 @@ where
 impl<'a, S> CollectionSummaryViewBuilder<'a, S>
 where
     S: collection_summary_view_state::State,
-    S::Name: collection_summary_view_state::IsSet,
     S::Uri: collection_summary_view_state::IsSet,
+    S::Name: collection_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionSummaryView<'a> {
@@ -8167,7 +8711,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -8296,7 +8840,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -8319,37 +8863,37 @@ pub mod engine_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Name;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Name = S::Name;
+        type Uri = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
         type Name = Set<members::name>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -8439,8 +8983,8 @@ where
 impl<'a, S> EngineSummaryViewBuilder<'a, S>
 where
     S: engine_summary_view_state::State,
-    S::Uri: engine_summary_view_state::IsSet,
     S::Name: engine_summary_view_state::IsSet,
+    S::Uri: engine_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EngineSummaryView<'a> {
@@ -8454,7 +8998,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -8478,51 +9022,51 @@ pub mod game_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
         type CreatedAt;
         type Name;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-        type Uri = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
         type CreatedAt = S::CreatedAt;
         type Name = S::Name;
-        type Uri = Set<members::uri>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
@@ -8530,6 +9074,9 @@ pub mod game_detail_view_state {
 pub struct GameDetailViewBuilder<'a, S: game_detail_view_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
+        ::core::option::Option<
+            Vec<crate::games_gamesgamesgamesgames::ActorCreditView<'a>>,
+        >,
         ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>>,
         ::core::option::Option<
             Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>,
@@ -8550,6 +9097,9 @@ pub struct GameDetailViewBuilder<'a, S: game_detail_view_state::State> {
             Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>,
         >,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<
+            Vec<crate::games_gamesgamesgamesgames::OrgCreditView<'a>>,
+        >,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<
             Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>,
@@ -8609,9 +9159,32 @@ impl<'a> GameDetailViewBuilder<'a, game_detail_view_state::Empty> {
                 None,
                 None,
                 None,
+                None,
+                None,
             ),
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+    /// Set the `actorCredits` field (optional)
+    pub fn actor_credits(
+        mut self,
+        value: impl Into<
+            Option<Vec<crate::games_gamesgamesgamesgames::ActorCreditView<'a>>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `actorCredits` field to an Option value (optional)
+    pub fn maybe_actor_credits(
+        mut self,
+        value: Option<Vec<crate::games_gamesgamesgamesgames::ActorCreditView<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
     }
 }
 
@@ -8621,7 +9194,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self.__unsafe_private_named.1 = value.into();
         self
     }
     /// Set the `ageRatings` field to an Option value (optional)
@@ -8629,7 +9202,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::AgeRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self.__unsafe_private_named.1 = value;
         self
     }
 }
@@ -8642,7 +9215,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
             Option<Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>>,
         >,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self.__unsafe_private_named.2 = value.into();
         self
     }
     /// Set the `alternativeNames` field to an Option value (optional)
@@ -8650,7 +9223,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::AlternativeName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self.__unsafe_private_named.2 = value;
         self
     }
 }
@@ -8661,7 +9234,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::games_gamesgamesgamesgames::ApplicationType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `applicationType` field to an Option value (optional)
@@ -8669,7 +9242,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<crate::games_gamesgamesgamesgames::ApplicationType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self.__unsafe_private_named.3 = value;
         self
     }
 }
@@ -8680,7 +9253,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `collections` field to an Option value (optional)
@@ -8688,7 +9261,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self.__unsafe_private_named.4 = value;
         self
     }
 }
@@ -8703,7 +9276,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Datetime>,
     ) -> GameDetailViewBuilder<'a, game_detail_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.5 = ::core::option::Option::Some(value.into());
         GameDetailViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -8718,7 +9291,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::types::string::AtUri<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self.__unsafe_private_named.6 = value.into();
         self
     }
     /// Set the `engines` field to an Option value (optional)
@@ -8726,7 +9299,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self.__unsafe_private_named.6 = value;
         self
     }
 }
@@ -8737,7 +9310,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::games_gamesgamesgamesgames::ExternalIds<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self.__unsafe_private_named.7 = value.into();
         self
     }
     /// Set the `externalIds` field to an Option value (optional)
@@ -8745,7 +9318,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<crate::games_gamesgamesgamesgames::ExternalIds<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self.__unsafe_private_named.7 = value;
         self
     }
 }
@@ -8756,7 +9329,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self.__unsafe_private_named.8 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
@@ -8764,7 +9337,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::Genre<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self.__unsafe_private_named.8 = value;
         self
     }
 }
@@ -8775,7 +9348,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<jacquard_common::CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self.__unsafe_private_named.9 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
@@ -8783,7 +9356,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self.__unsafe_private_named.9 = value;
         self
     }
 }
@@ -8796,7 +9369,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
             Option<Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>>,
         >,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `languageSupports` field to an Option value (optional)
@@ -8804,7 +9377,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::LanguageSupport<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self.__unsafe_private_named.10 = value;
         self
     }
 }
@@ -8815,7 +9388,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self.__unsafe_private_named.11 = value.into();
         self
     }
     /// Set the `media` field to an Option value (optional)
@@ -8823,7 +9396,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::MediaItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self.__unsafe_private_named.11 = value;
         self
     }
 }
@@ -8834,7 +9407,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
@@ -8842,7 +9415,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::Mode<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self.__unsafe_private_named.12 = value;
         self
     }
 }
@@ -8855,7 +9428,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
             Option<Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
         >,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self.__unsafe_private_named.13 = value.into();
         self
     }
     /// Set the `multiplayerModes` field to an Option value (optional)
@@ -8863,7 +9436,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::MultiplayerMode<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self.__unsafe_private_named.13 = value;
         self
     }
 }
@@ -8878,7 +9451,7 @@ where
         mut self,
         value: impl Into<jacquard_common::CowStr<'a>>,
     ) -> GameDetailViewBuilder<'a, game_detail_view_state::SetName<S>> {
-        self.__unsafe_private_named.13 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.14 = ::core::option::Option::Some(value.into());
         GameDetailViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -8888,12 +9461,33 @@ where
 }
 
 impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+    /// Set the `orgCredits` field (optional)
+    pub fn org_credits(
+        mut self,
+        value: impl Into<
+            Option<Vec<crate::games_gamesgamesgamesgames::OrgCreditView<'a>>>,
+        >,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value.into();
+        self
+    }
+    /// Set the `orgCredits` field to an Option value (optional)
+    pub fn maybe_org_credits(
+        mut self,
+        value: Option<Vec<crate::games_gamesgamesgamesgames::OrgCreditView<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.15 = value;
+        self
+    }
+}
+
+impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     /// Set the `parent` field (optional)
     pub fn parent(
         mut self,
         value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self.__unsafe_private_named.16 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
@@ -8901,7 +9495,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::AtUri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self.__unsafe_private_named.16 = value;
         self
     }
 }
@@ -8914,7 +9508,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
             Option<Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>>,
         >,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self.__unsafe_private_named.17 = value.into();
         self
     }
     /// Set the `playerPerspectives` field to an Option value (optional)
@@ -8922,7 +9516,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::PlayerPerspective<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self.__unsafe_private_named.17 = value;
         self
     }
 }
@@ -8933,7 +9527,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self.__unsafe_private_named.18 = value.into();
         self
     }
     /// Set the `publishedAt` field to an Option value (optional)
@@ -8941,7 +9535,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::Datetime>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self.__unsafe_private_named.18 = value;
         self
     }
 }
@@ -8952,7 +9546,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Release<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self.__unsafe_private_named.19 = value.into();
         self
     }
     /// Set the `releases` field to an Option value (optional)
@@ -8960,7 +9554,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::Release<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self.__unsafe_private_named.19 = value;
         self
     }
 }
@@ -8971,12 +9565,12 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self.__unsafe_private_named.20 = value.into();
         self
     }
     /// Set the `slug` field to an Option value (optional)
     pub fn maybe_slug(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self.__unsafe_private_named.20 = value;
         self
     }
 }
@@ -8987,7 +9581,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self.__unsafe_private_named.21 = value.into();
         self
     }
     /// Set the `storyline` field to an Option value (optional)
@@ -8995,7 +9589,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self.__unsafe_private_named.21 = value;
         self
     }
 }
@@ -9006,12 +9600,12 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self.__unsafe_private_named.22 = value.into();
         self
     }
     /// Set the `summary` field to an Option value (optional)
     pub fn maybe_summary(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self.__unsafe_private_named.22 = value;
         self
     }
 }
@@ -9022,7 +9616,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self.__unsafe_private_named.23 = value.into();
         self
     }
     /// Set the `themes` field to an Option value (optional)
@@ -9030,7 +9624,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::Theme<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self.__unsafe_private_named.23 = value;
         self
     }
 }
@@ -9041,7 +9635,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<crate::games_gamesgamesgamesgames::TimeToBeat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self.__unsafe_private_named.24 = value.into();
         self
     }
     /// Set the `timeToBeat` field to an Option value (optional)
@@ -9049,7 +9643,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<crate::games_gamesgamesgamesgames::TimeToBeat<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self.__unsafe_private_named.24 = value;
         self
     }
 }
@@ -9064,7 +9658,7 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::AtUri<'a>>,
     ) -> GameDetailViewBuilder<'a, game_detail_view_state::SetUri<S>> {
-        self.__unsafe_private_named.23 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.25 = ::core::option::Option::Some(value.into());
         GameDetailViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -9081,7 +9675,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
             Option<Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>>,
         >,
     ) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self.__unsafe_private_named.26 = value.into();
         self
     }
     /// Set the `videos` field to an Option value (optional)
@@ -9089,7 +9683,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::ExternalVideo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self.__unsafe_private_named.26 = value;
         self
     }
 }
@@ -9100,7 +9694,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self.__unsafe_private_named.27 = value.into();
         self
     }
     /// Set the `websites` field to an Option value (optional)
@@ -9108,7 +9702,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<crate::games_gamesgamesgamesgames::Website<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self.__unsafe_private_named.27 = value;
         self
     }
 }
@@ -9116,77 +9710,81 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
 impl<'a, S> GameDetailViewBuilder<'a, S>
 where
     S: game_detail_view_state::State,
+    S::Uri: game_detail_view_state::IsSet,
     S::CreatedAt: game_detail_view_state::IsSet,
     S::Name: game_detail_view_state::IsSet,
-    S::Uri: game_detail_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GameDetailView<'a> {
         GameDetailView {
-            age_ratings: self.__unsafe_private_named.0,
-            alternative_names: self.__unsafe_private_named.1,
-            application_type: self.__unsafe_private_named.2,
-            collections: self.__unsafe_private_named.3,
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            engines: self.__unsafe_private_named.5,
-            external_ids: self.__unsafe_private_named.6,
-            genres: self.__unsafe_private_named.7,
-            keywords: self.__unsafe_private_named.8,
-            language_supports: self.__unsafe_private_named.9,
-            media: self.__unsafe_private_named.10,
-            modes: self.__unsafe_private_named.11,
-            multiplayer_modes: self.__unsafe_private_named.12,
-            name: self.__unsafe_private_named.13.unwrap(),
-            parent: self.__unsafe_private_named.14,
-            player_perspectives: self.__unsafe_private_named.15,
-            published_at: self.__unsafe_private_named.16,
-            releases: self.__unsafe_private_named.17,
-            slug: self.__unsafe_private_named.18,
-            storyline: self.__unsafe_private_named.19,
-            summary: self.__unsafe_private_named.20,
-            themes: self.__unsafe_private_named.21,
-            time_to_beat: self.__unsafe_private_named.22,
-            uri: self.__unsafe_private_named.23.unwrap(),
-            videos: self.__unsafe_private_named.24,
-            websites: self.__unsafe_private_named.25,
+            actor_credits: self.__unsafe_private_named.0,
+            age_ratings: self.__unsafe_private_named.1,
+            alternative_names: self.__unsafe_private_named.2,
+            application_type: self.__unsafe_private_named.3,
+            collections: self.__unsafe_private_named.4,
+            created_at: self.__unsafe_private_named.5.unwrap(),
+            engines: self.__unsafe_private_named.6,
+            external_ids: self.__unsafe_private_named.7,
+            genres: self.__unsafe_private_named.8,
+            keywords: self.__unsafe_private_named.9,
+            language_supports: self.__unsafe_private_named.10,
+            media: self.__unsafe_private_named.11,
+            modes: self.__unsafe_private_named.12,
+            multiplayer_modes: self.__unsafe_private_named.13,
+            name: self.__unsafe_private_named.14.unwrap(),
+            org_credits: self.__unsafe_private_named.15,
+            parent: self.__unsafe_private_named.16,
+            player_perspectives: self.__unsafe_private_named.17,
+            published_at: self.__unsafe_private_named.18,
+            releases: self.__unsafe_private_named.19,
+            slug: self.__unsafe_private_named.20,
+            storyline: self.__unsafe_private_named.21,
+            summary: self.__unsafe_private_named.22,
+            themes: self.__unsafe_private_named.23,
+            time_to_beat: self.__unsafe_private_named.24,
+            uri: self.__unsafe_private_named.25.unwrap(),
+            videos: self.__unsafe_private_named.26,
+            websites: self.__unsafe_private_named.27,
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
     ) -> GameDetailView<'a> {
         GameDetailView {
-            age_ratings: self.__unsafe_private_named.0,
-            alternative_names: self.__unsafe_private_named.1,
-            application_type: self.__unsafe_private_named.2,
-            collections: self.__unsafe_private_named.3,
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            engines: self.__unsafe_private_named.5,
-            external_ids: self.__unsafe_private_named.6,
-            genres: self.__unsafe_private_named.7,
-            keywords: self.__unsafe_private_named.8,
-            language_supports: self.__unsafe_private_named.9,
-            media: self.__unsafe_private_named.10,
-            modes: self.__unsafe_private_named.11,
-            multiplayer_modes: self.__unsafe_private_named.12,
-            name: self.__unsafe_private_named.13.unwrap(),
-            parent: self.__unsafe_private_named.14,
-            player_perspectives: self.__unsafe_private_named.15,
-            published_at: self.__unsafe_private_named.16,
-            releases: self.__unsafe_private_named.17,
-            slug: self.__unsafe_private_named.18,
-            storyline: self.__unsafe_private_named.19,
-            summary: self.__unsafe_private_named.20,
-            themes: self.__unsafe_private_named.21,
-            time_to_beat: self.__unsafe_private_named.22,
-            uri: self.__unsafe_private_named.23.unwrap(),
-            videos: self.__unsafe_private_named.24,
-            websites: self.__unsafe_private_named.25,
+            actor_credits: self.__unsafe_private_named.0,
+            age_ratings: self.__unsafe_private_named.1,
+            alternative_names: self.__unsafe_private_named.2,
+            application_type: self.__unsafe_private_named.3,
+            collections: self.__unsafe_private_named.4,
+            created_at: self.__unsafe_private_named.5.unwrap(),
+            engines: self.__unsafe_private_named.6,
+            external_ids: self.__unsafe_private_named.7,
+            genres: self.__unsafe_private_named.8,
+            keywords: self.__unsafe_private_named.9,
+            language_supports: self.__unsafe_private_named.10,
+            media: self.__unsafe_private_named.11,
+            modes: self.__unsafe_private_named.12,
+            multiplayer_modes: self.__unsafe_private_named.13,
+            name: self.__unsafe_private_named.14.unwrap(),
+            org_credits: self.__unsafe_private_named.15,
+            parent: self.__unsafe_private_named.16,
+            player_perspectives: self.__unsafe_private_named.17,
+            published_at: self.__unsafe_private_named.18,
+            releases: self.__unsafe_private_named.19,
+            slug: self.__unsafe_private_named.20,
+            storyline: self.__unsafe_private_named.21,
+            summary: self.__unsafe_private_named.22,
+            themes: self.__unsafe_private_named.23,
+            time_to_beat: self.__unsafe_private_named.24,
+            uri: self.__unsafe_private_named.25.unwrap(),
+            videos: self.__unsafe_private_named.26,
+            websites: self.__unsafe_private_named.27,
             extra_data: Some(extra_data),
         }
     }
@@ -9306,7 +9904,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -9539,7 +10137,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -9567,49 +10165,49 @@ pub mod game_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Uri;
+        type Name;
         type ApplicationType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Uri = Unset;
+        type Name = Unset;
         type ApplicationType = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
-        type ApplicationType = S::ApplicationType;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
         type Uri = Set<members::uri>;
+        type Name = S::Name;
+        type ApplicationType = S::ApplicationType;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Uri = S::Uri;
+        type Name = Set<members::name>;
         type ApplicationType = S::ApplicationType;
     }
     ///State transition - sets the `application_type` field to Set
     pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetApplicationType<S> {}
     impl<S: State> State for SetApplicationType<S> {
-        type Name = S::Name;
         type Uri = S::Uri;
+        type Name = S::Name;
         type ApplicationType = Set<members::application_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `application_type` field
         pub struct application_type(());
     }
@@ -9864,8 +10462,8 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
 impl<'a, S> GameViewBuilder<'a, S>
 where
     S: game_view_state::State,
-    S::Name: game_view_state::IsSet,
     S::Uri: game_view_state::IsSet,
+    S::Name: game_view_state::IsSet,
     S::ApplicationType: game_view_state::IsSet,
 {
     /// Build the final struct
@@ -9888,7 +10486,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -9905,6 +10503,190 @@ where
             themes: self.__unsafe_private_named.8,
             uri: self.__unsafe_private_named.9.unwrap(),
             viewer: self.__unsafe_private_named.10,
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod org_credit_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Roles;
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Roles = Unset;
+        type Uri = Unset;
+    }
+    ///State transition - sets the `roles` field to Set
+    pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoles<S> {}
+    impl<S: State> State for SetRoles<S> {
+        type Roles = Set<members::roles>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Roles = S::Roles;
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `roles` field
+        pub struct roles(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type
+pub struct OrgCreditViewBuilder<'a, S: org_credit_view_state::State> {
+    _phantom_state: ::core::marker::PhantomData<fn() -> S>,
+    __unsafe_private_named: (
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<Vec<crate::games_gamesgamesgamesgames::CompanyRole<'a>>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    ),
+    _phantom: ::core::marker::PhantomData<&'a ()>,
+}
+
+impl<'a> OrgCreditView<'a> {
+    /// Create a new builder for this type
+    pub fn new() -> OrgCreditViewBuilder<'a, org_credit_view_state::Empty> {
+        OrgCreditViewBuilder::new()
+    }
+}
+
+impl<'a> OrgCreditViewBuilder<'a, org_credit_view_state::Empty> {
+    /// Create a new builder with all fields unset
+    pub fn new() -> Self {
+        OrgCreditViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: (None, None, None, None),
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S: org_credit_view_state::State> OrgCreditViewBuilder<'a, S> {
+    /// Set the `displayName` field (optional)
+    pub fn display_name(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `displayName` field to an Option value (optional)
+    pub fn maybe_display_name(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: org_credit_view_state::State> OrgCreditViewBuilder<'a, S> {
+    /// Set the `orgUri` field (optional)
+    pub fn org_uri(
+        mut self,
+        value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `orgUri` field to an Option value (optional)
+    pub fn maybe_org_uri(
+        mut self,
+        value: Option<jacquard_common::types::string::AtUri<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S> OrgCreditViewBuilder<'a, S>
+where
+    S: org_credit_view_state::State,
+    S::Roles: org_credit_view_state::IsUnset,
+{
+    /// Set the `roles` field (required)
+    pub fn roles(
+        mut self,
+        value: impl Into<Vec<crate::games_gamesgamesgamesgames::CompanyRole<'a>>>,
+    ) -> OrgCreditViewBuilder<'a, org_credit_view_state::SetRoles<S>> {
+        self.__unsafe_private_named.2 = ::core::option::Option::Some(value.into());
+        OrgCreditViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OrgCreditViewBuilder<'a, S>
+where
+    S: org_credit_view_state::State,
+    S::Uri: org_credit_view_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
+    ) -> OrgCreditViewBuilder<'a, org_credit_view_state::SetUri<S>> {
+        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        OrgCreditViewBuilder {
+            _phantom_state: ::core::marker::PhantomData,
+            __unsafe_private_named: self.__unsafe_private_named,
+            _phantom: ::core::marker::PhantomData,
+        }
+    }
+}
+
+impl<'a, S> OrgCreditViewBuilder<'a, S>
+where
+    S: org_credit_view_state::State,
+    S::Roles: org_credit_view_state::IsSet,
+    S::Uri: org_credit_view_state::IsSet,
+{
+    /// Build the final struct
+    pub fn build(self) -> OrgCreditView<'a> {
+        OrgCreditView {
+            display_name: self.__unsafe_private_named.0,
+            org_uri: self.__unsafe_private_named.1,
+            roles: self.__unsafe_private_named.2.unwrap(),
+            uri: self.__unsafe_private_named.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data
+    pub fn build_with_data(
+        self,
+        extra_data: alloc::collections::BTreeMap<
+            jacquard_common::deps::smol_str::SmolStr,
+            jacquard_common::types::value::Data<'a>,
+        >,
+    ) -> OrgCreditView<'a> {
+        OrgCreditView {
+            display_name: self.__unsafe_private_named.0,
+            org_uri: self.__unsafe_private_named.1,
+            roles: self.__unsafe_private_named.2.unwrap(),
+            uri: self.__unsafe_private_named.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -10282,7 +11064,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10478,7 +11260,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10620,7 +11402,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10643,37 +11425,37 @@ pub mod platform_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Name;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Name = S::Name;
+        type Uri = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
         type Name = Set<members::name>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -10803,8 +11585,8 @@ where
 impl<'a, S> PlatformSummaryViewBuilder<'a, S>
 where
     S: platform_summary_view_state::State,
-    S::Uri: platform_summary_view_state::IsSet,
     S::Name: platform_summary_view_state::IsSet,
+    S::Uri: platform_summary_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlatformSummaryView<'a> {
@@ -10820,7 +11602,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10846,49 +11628,49 @@ pub mod profile_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ProfileType;
         type Did;
+        type ProfileType;
         type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ProfileType = Unset;
         type Did = Unset;
+        type ProfileType = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `profile_type` field to Set
-    pub struct SetProfileType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProfileType<S> {}
-    impl<S: State> State for SetProfileType<S> {
-        type ProfileType = Set<members::profile_type>;
-        type Did = S::Did;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type ProfileType = S::ProfileType;
         type Did = Set<members::did>;
+        type ProfileType = S::ProfileType;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `profile_type` field to Set
+    pub struct SetProfileType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProfileType<S> {}
+    impl<S: State> State for SetProfileType<S> {
+        type Did = S::Did;
+        type ProfileType = Set<members::profile_type>;
         type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type ProfileType = S::ProfileType;
         type Did = S::Did;
+        type ProfileType = S::ProfileType;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `profile_type` field
-        pub struct profile_type(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `profile_type` field
+        pub struct profile_type(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
@@ -11023,8 +11805,8 @@ where
 impl<'a, S> ProfileSummaryViewBuilder<'a, S>
 where
     S: profile_summary_view_state::State,
-    S::ProfileType: profile_summary_view_state::IsSet,
     S::Did: profile_summary_view_state::IsSet,
+    S::ProfileType: profile_summary_view_state::IsSet,
     S::Uri: profile_summary_view_state::IsSet,
 {
     /// Build the final struct
@@ -11041,7 +11823,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -11174,7 +11956,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -11295,7 +12077,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -89,9 +89,9 @@ pub struct Cursor<'a> {
     pub container: crate::sh_weaver::edit::cursor::ContainerId<'a>,
     #[serde(borrow)]
     pub id: crate::sh_weaver::edit::cursor::Id<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub side: std::option::Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
+    pub side: core::option::Option<crate::sh_weaver::edit::cursor::CursorSide<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -106,9 +106,9 @@ pub struct Cursor<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CursorGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -165,53 +165,53 @@ impl<'a> Cursor<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContainerId<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ContainerId<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "containerId"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CursorSide<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CursorSide<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "cursorSide"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Id<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Id<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "id"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -243,53 +243,53 @@ impl jacquard_common::types::collection::Collection for CursorRecord {
     type Record = CursorRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Cursor<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Cursor<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NormalContainerId<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for NormalContainerId<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "normalContainerId"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RootContainerId<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RootContainerId<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
     fn def_name() -> &'static str {
         "rootContainerId"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_edit_cursor()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -385,7 +385,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -397,7 +397,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_edit_cursor() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_edit_cursor() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -778,7 +778,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -911,7 +911,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -934,37 +934,37 @@ pub mod cursor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Container;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Container = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Container = S::Container;
+        type Id = Unset;
     }
     ///State transition - sets the `container` field to Set
     pub struct SetContainer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContainer<S> {}
     impl<S: State> State for SetContainer<S> {
-        type Id = S::Id;
         type Container = Set<members::container>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Container = S::Container;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `container` field
         pub struct container(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -1057,8 +1057,8 @@ impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
 impl<'a, S> CursorBuilder<'a, S>
 where
     S: cursor_state::State,
-    S::Id: cursor_state::IsSet,
     S::Container: cursor_state::IsSet,
+    S::Id: cursor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cursor<'a> {
@@ -1072,7 +1072,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1096,51 +1096,51 @@ pub mod normal_container_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ContainerType;
-        type Counter;
         type Peer;
+        type Counter;
+        type ContainerType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ContainerType = Unset;
-        type Counter = Unset;
         type Peer = Unset;
-    }
-    ///State transition - sets the `container_type` field to Set
-    pub struct SetContainerType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContainerType<S> {}
-    impl<S: State> State for SetContainerType<S> {
-        type ContainerType = Set<members::container_type>;
-        type Counter = S::Counter;
-        type Peer = S::Peer;
-    }
-    ///State transition - sets the `counter` field to Set
-    pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCounter<S> {}
-    impl<S: State> State for SetCounter<S> {
-        type ContainerType = S::ContainerType;
-        type Counter = Set<members::counter>;
-        type Peer = S::Peer;
+        type Counter = Unset;
+        type ContainerType = Unset;
     }
     ///State transition - sets the `peer` field to Set
     pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPeer<S> {}
     impl<S: State> State for SetPeer<S> {
-        type ContainerType = S::ContainerType;
-        type Counter = S::Counter;
         type Peer = Set<members::peer>;
+        type Counter = S::Counter;
+        type ContainerType = S::ContainerType;
+    }
+    ///State transition - sets the `counter` field to Set
+    pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCounter<S> {}
+    impl<S: State> State for SetCounter<S> {
+        type Peer = S::Peer;
+        type Counter = Set<members::counter>;
+        type ContainerType = S::ContainerType;
+    }
+    ///State transition - sets the `container_type` field to Set
+    pub struct SetContainerType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContainerType<S> {}
+    impl<S: State> State for SetContainerType<S> {
+        type Peer = S::Peer;
+        type Counter = S::Counter;
+        type ContainerType = Set<members::container_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `container_type` field
-        pub struct container_type(());
-        ///Marker type for the `counter` field
-        pub struct counter(());
         ///Marker type for the `peer` field
         pub struct peer(());
+        ///Marker type for the `counter` field
+        pub struct counter(());
+        ///Marker type for the `container_type` field
+        pub struct container_type(());
     }
 }
 
@@ -1233,9 +1233,9 @@ where
 impl<'a, S> NormalContainerIdBuilder<'a, S>
 where
     S: normal_container_id_state::State,
-    S::ContainerType: normal_container_id_state::IsSet,
-    S::Counter: normal_container_id_state::IsSet,
     S::Peer: normal_container_id_state::IsSet,
+    S::Counter: normal_container_id_state::IsSet,
+    S::ContainerType: normal_container_id_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NormalContainerId<'a> {
@@ -1249,7 +1249,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

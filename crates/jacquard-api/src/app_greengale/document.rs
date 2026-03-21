@@ -36,34 +36,34 @@ pub struct ContentRef<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Document<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub blobs: std::option::Option<Vec<crate::app_greengale::blog::BlobMetadata<'a>>>,
+    pub blobs: core::option::Option<Vec<crate::app_greengale::blog::BlobMetadata<'a>>>,
     ///Markdown content of the document
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
     ///Legacy field for LaTeX math rendering. LaTeX is now always enabled for GreenGale posts; this field is kept for backward compatibility. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_document_latex")]
-    pub latex: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub latex: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp: std::option::Option<crate::app_greengale::blog::Ogp<'a>>,
+    pub ogp: core::option::Option<crate::app_greengale::blog::Ogp<'a>>,
     ///Document path relative to the publication URL (e.g., /handle/rkey)
     #[serde(borrow)]
     pub path: jacquard_common::CowStr<'a>,
     ///Publication timestamp
     pub published_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subtitle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subtitle: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional array of strings to tag/categorize the document. Avoid prepending with hashtags.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub theme: std::option::Option<crate::app_greengale::blog::Theme<'a>>,
+    pub theme: core::option::Option<crate::app_greengale::blog::Theme<'a>>,
     ///Document title
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
@@ -71,10 +71,10 @@ pub struct Document<'a> {
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
     ///Controls who can view this document Defaults to `"public"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_document_visibility")]
     #[serde(borrow)]
-    pub visibility: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub visibility: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -89,9 +89,9 @@ pub struct Document<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DocumentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -111,19 +111,19 @@ impl<'a> Document<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ContentRef<'a> {
     fn nsid() -> &'static str {
         "app.greengale.document"
     }
     fn def_name() -> &'static str {
         "contentRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_document()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -155,19 +155,19 @@ impl jacquard_common::types::collection::Collection for DocumentRecord {
     type Record = DocumentRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Document<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Document<'a> {
     fn nsid() -> &'static str {
         "app.greengale.document"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_greengale_document()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.content;
             #[allow(unused_comparisons)]
@@ -353,7 +353,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -365,7 +365,7 @@ where
     }
 }
 
-fn lexicon_doc_app_greengale_document() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_greengale_document() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -672,11 +672,11 @@ fn lexicon_doc_app_greengale_document() -> ::jacquard_lexicon::lexicon::LexiconD
     }
 }
 
-fn _default_document_latex() -> std::option::Option<bool> {
+fn _default_document_latex() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_document_visibility() -> std::option::Option<
+fn _default_document_visibility() -> core::option::Option<
     jacquard_common::CowStr<'static>,
 > {
     Some(jacquard_common::CowStr::from("public"))
@@ -692,85 +692,85 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Content;
-        type Path;
-        type Url;
         type PublishedAt;
+        type Path;
+        type Content;
+        type Url;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Content = Unset;
-        type Path = Unset;
-        type Url = Unset;
         type PublishedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Content = S::Content;
-        type Path = S::Path;
-        type Url = S::Url;
-        type PublishedAt = S::PublishedAt;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Title = S::Title;
-        type Content = Set<members::content>;
-        type Path = S::Path;
-        type Url = S::Url;
-        type PublishedAt = S::PublishedAt;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type Title = S::Title;
-        type Content = S::Content;
-        type Path = Set<members::path>;
-        type Url = S::Url;
-        type PublishedAt = S::PublishedAt;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Title = S::Title;
-        type Content = S::Content;
-        type Path = S::Path;
-        type Url = Set<members::url>;
-        type PublishedAt = S::PublishedAt;
+        type Path = Unset;
+        type Content = Unset;
+        type Url = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
     impl<S: State> State for SetPublishedAt<S> {
-        type Title = S::Title;
-        type Content = S::Content;
-        type Path = S::Path;
-        type Url = S::Url;
         type PublishedAt = Set<members::published_at>;
+        type Path = S::Path;
+        type Content = S::Content;
+        type Url = S::Url;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type PublishedAt = S::PublishedAt;
+        type Path = Set<members::path>;
+        type Content = S::Content;
+        type Url = S::Url;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type PublishedAt = S::PublishedAt;
+        type Path = S::Path;
+        type Content = Set<members::content>;
+        type Url = S::Url;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type PublishedAt = S::PublishedAt;
+        type Path = S::Path;
+        type Content = S::Content;
+        type Url = Set<members::url>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type PublishedAt = S::PublishedAt;
+        type Path = S::Path;
+        type Content = S::Content;
+        type Url = S::Url;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `path` field
-        pub struct path(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
+        ///Marker type for the `path` field
+        pub struct path(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -1047,11 +1047,11 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Title: document_state::IsSet,
-    S::Content: document_state::IsSet,
-    S::Path: document_state::IsSet,
-    S::Url: document_state::IsSet,
     S::PublishedAt: document_state::IsSet,
+    S::Path: document_state::IsSet,
+    S::Content: document_state::IsSet,
+    S::Url: document_state::IsSet,
+    S::Title: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
@@ -1077,7 +1077,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -17,12 +17,12 @@
 #[serde(rename_all = "camelCase")]
 pub struct ListNotes<'a> {
     ///(max length: 100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///(min: 1, max: 100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     #[serde(borrow)]
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
 }
@@ -39,9 +39,9 @@ pub struct ListNotes<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListNotesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub notes: Vec<crate::systems_timker::hawlt::list_notes::NoteView<'a>>,
 }
@@ -94,19 +94,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListNotesRequest {
     type Response = ListNotesResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NoteView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for NoteView<'a> {
     fn nsid() -> &'static str {
         "systems.timker.hawlt.listNotes"
     }
     fn def_name() -> &'static str {
         "noteView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_systems_timker_hawlt_listNotes()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -245,65 +245,65 @@ pub mod note_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Cid;
         type Value;
         type IndexedAt;
-        type Cid;
         type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Cid = Unset;
         type Value = Unset;
         type IndexedAt = Unset;
-        type Cid = Unset;
         type Uri = Unset;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
+        type Cid = S::Cid;
         type Value = Set<members::value>;
         type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Uri = S::Uri;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
+        type Cid = S::Cid;
         type Value = S::Value;
         type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
         type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
         type Value = S::Value;
         type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `value` field
         pub struct value(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
     }
@@ -418,9 +418,9 @@ where
 impl<'a, S> NoteViewBuilder<'a, S>
 where
     S: note_view_state::State,
+    S::Cid: note_view_state::IsSet,
     S::Value: note_view_state::IsSet,
     S::IndexedAt: note_view_state::IsSet,
-    S::Cid: note_view_state::IsSet,
     S::Uri: note_view_state::IsSet,
 {
     /// Build the final struct
@@ -436,7 +436,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -451,7 +451,7 @@ where
     }
 }
 
-fn lexicon_doc_systems_timker_hawlt_listNotes() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_systems_timker_hawlt_listNotes() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -18,13 +18,13 @@
 pub struct GetActorLikes<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::ident::AtIdentifier<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -39,9 +39,9 @@ pub struct GetActorLikes<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorLikesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: Vec<crate::app_bsky::feed::FeedViewPost<'a>>,
 }
@@ -62,9 +62,9 @@ pub struct GetActorLikesOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetActorLikesError<'a> {
     #[serde(rename = "BlockedActor")]
-    BlockedActor(std::option::Option<jacquard_common::CowStr<'a>>),
+    BlockedActor(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "BlockedByActor")]
-    BlockedByActor(std::option::Option<jacquard_common::CowStr<'a>>),
+    BlockedByActor(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetActorLikesError<'_> {
@@ -115,7 +115,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorLikesRequest {
     type Response = GetActorLikesResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 

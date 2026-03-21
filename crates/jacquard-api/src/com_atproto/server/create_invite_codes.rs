@@ -38,9 +38,9 @@ pub struct CreateInviteCodes<'a> {
     ///Defaults to `1`.
     #[serde(default = "_default_create_invite_codes_code_count")]
     pub code_count: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub for_accounts: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub for_accounts: core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     pub use_count: i64,
 }
 
@@ -60,19 +60,19 @@ pub struct CreateInviteCodesOutput<'a> {
     pub codes: Vec<crate::com_atproto::server::create_invite_codes::AccountCodes<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountCodes<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AccountCodes<'a> {
     fn nsid() -> &'static str {
         "com.atproto.server.createInviteCodes"
     }
     fn def_name() -> &'static str {
         "accountCodes"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_server_createInviteCodes()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -117,37 +117,37 @@ pub mod account_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Account;
         type Codes;
+        type Account;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Account = Unset;
         type Codes = Unset;
-    }
-    ///State transition - sets the `account` field to Set
-    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccount<S> {}
-    impl<S: State> State for SetAccount<S> {
-        type Account = Set<members::account>;
-        type Codes = S::Codes;
+        type Account = Unset;
     }
     ///State transition - sets the `codes` field to Set
     pub struct SetCodes<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodes<S> {}
     impl<S: State> State for SetCodes<S> {
-        type Account = S::Account;
         type Codes = Set<members::codes>;
+        type Account = S::Account;
+    }
+    ///State transition - sets the `account` field to Set
+    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccount<S> {}
+    impl<S: State> State for SetAccount<S> {
+        type Codes = S::Codes;
+        type Account = Set<members::account>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `account` field
-        pub struct account(());
         ///Marker type for the `codes` field
         pub struct codes(());
+        ///Marker type for the `account` field
+        pub struct account(());
     }
 }
 
@@ -220,8 +220,8 @@ where
 impl<'a, S> AccountCodesBuilder<'a, S>
 where
     S: account_codes_state::State,
-    S::Account: account_codes_state::IsSet,
     S::Codes: account_codes_state::IsSet,
+    S::Account: account_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AccountCodes<'a> {
@@ -234,7 +234,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -247,7 +247,7 @@ where
     }
 }
 
-fn lexicon_doc_com_atproto_server_createInviteCodes() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atproto_server_createInviteCodes() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -555,7 +555,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

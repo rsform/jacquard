@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct DeleteBlob<'a> {
     ///DID of the broadcaster. If not provided, uses the server's default broadcaster.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub broadcaster: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub broadcaster: core::option::Option<jacquard_common::types::string::Did<'a>>,
     ///Branding asset key (mainLogo, favicon, siteTitle, etc.)
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
@@ -59,10 +59,10 @@ pub struct DeleteBlobOutput<'a> {
 pub enum DeleteBlobError<'a> {
     /// The authenticated DID is not authorized to modify branding
     #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The requested branding asset does not exist
     #[serde(rename = "BrandingNotFound")]
-    BrandingNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    BrandingNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteBlobError<'_> {

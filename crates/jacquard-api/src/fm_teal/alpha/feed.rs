@@ -23,9 +23,9 @@ pub mod play;
 #[serde(rename_all = "camelCase")]
 pub struct Artist<'a> {
     ///The Musicbrainz ID of the artist
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist_mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub artist_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the artist
     #[serde(borrow)]
     pub artist_name: jacquard_common::CowStr<'a>,
@@ -47,61 +47,61 @@ pub struct PlayView<'a> {
     #[serde(borrow)]
     pub artists: Vec<crate::fm_teal::alpha::feed::Artist<'a>>,
     ///The length of the track in seconds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration: core::option::Option<i64>,
     ///The ISRC code associated with the recording
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub isrc: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub isrc: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The base domain of the music service. e.g. music.apple.com, tidal.com, spotify.com. Defaults to 'local' if not provided.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub music_service_base_domain: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub music_service_base_domain: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URL associated with this track
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub origin_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub origin_url: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The unix timestamp of when the track was played
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub played_time: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub played_time: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The Musicbrainz recording ID of the track
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub recording_mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub recording_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The Musicbrainz release ID
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the release/album
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///A user-agent style string specifying the user agent. e.g. tealtracker/0.0.1b (Linux; Android 13; SM-A715F). Defaults to 'manual/unknown' if not provided.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub submission_client_agent: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub submission_client_agent: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The Musicbrainz ID of the track
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub track_mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub track_mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the track
     #[serde(borrow)]
     pub track_name: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.feed.defs"
     }
     fn def_name() -> &'static str {
         "artist"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.artist_name;
             #[allow(unused_comparisons)]
@@ -151,19 +151,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.feed.defs"
     }
     fn def_name() -> &'static str {
         "playView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_fm_teal_alpha_feed_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.release_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
@@ -273,7 +273,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlayView<'a> {
     }
 }
 
-fn lexicon_doc_fm_teal_alpha_feed_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_fm_teal_alpha_feed_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -618,37 +618,37 @@ pub mod play_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TrackName;
         type Artists;
+        type TrackName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TrackName = Unset;
         type Artists = Unset;
-    }
-    ///State transition - sets the `track_name` field to Set
-    pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTrackName<S> {}
-    impl<S: State> State for SetTrackName<S> {
-        type TrackName = Set<members::track_name>;
-        type Artists = S::Artists;
+        type TrackName = Unset;
     }
     ///State transition - sets the `artists` field to Set
     pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtists<S> {}
     impl<S: State> State for SetArtists<S> {
-        type TrackName = S::TrackName;
         type Artists = Set<members::artists>;
+        type TrackName = S::TrackName;
+    }
+    ///State transition - sets the `track_name` field to Set
+    pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTrackName<S> {}
+    impl<S: State> State for SetTrackName<S> {
+        type Artists = S::Artists;
+        type TrackName = Set<members::track_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `track_name` field
-        pub struct track_name(());
         ///Marker type for the `artists` field
         pub struct artists(());
+        ///Marker type for the `track_name` field
+        pub struct track_name(());
     }
 }
 
@@ -925,8 +925,8 @@ where
 impl<'a, S> PlayViewBuilder<'a, S>
 where
     S: play_view_state::State,
-    S::TrackName: play_view_state::IsSet,
     S::Artists: play_view_state::IsSet,
+    S::TrackName: play_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlayView<'a> {
@@ -949,7 +949,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

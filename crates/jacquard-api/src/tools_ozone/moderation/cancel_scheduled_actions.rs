@@ -43,9 +43,9 @@ pub struct FailedCancellation<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
     pub error: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub error_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub error_code: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -61,9 +61,9 @@ pub struct FailedCancellation<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CancelScheduledActions<'a> {
     ///Optional comment describing the reason for cancellation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Array of DID subjects to cancel scheduled actions for
     #[serde(borrow)]
     pub subjects: Vec<jacquard_common::types::string::Did<'a>>,
@@ -86,36 +86,36 @@ pub struct CancelScheduledActionsOutput<'a> {
     pub value: jacquard_common::types::value::Data<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CancellationResults<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CancellationResults<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.cancelScheduledActions"
     }
     fn def_name() -> &'static str {
         "cancellationResults"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_cancelScheduledActions()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FailedCancellation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FailedCancellation<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.cancelScheduledActions"
     }
     fn def_name() -> &'static str {
         "failedCancellation"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_cancelScheduledActions()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -289,7 +289,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -302,7 +302,7 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -688,7 +688,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -819,7 +819,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

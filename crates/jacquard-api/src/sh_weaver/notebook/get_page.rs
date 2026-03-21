@@ -54,7 +54,7 @@ pub struct GetPageOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetPageError<'a> {
     #[serde(rename = "PageNotFound")]
-    PageNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    PageNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetPageError<'_> {

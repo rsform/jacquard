@@ -30,8 +30,8 @@ pub struct TemplateView<'a> {
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///Message language.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lang: std::option::Option<jacquard_common::types::string::Language>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub lang: core::option::Option<jacquard_common::types::string::Language>,
     ///DID of the user who last updated the template.
     #[serde(borrow)]
     pub last_updated_by: jacquard_common::types::string::Did<'a>,
@@ -39,25 +39,25 @@ pub struct TemplateView<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Content of the template, can contain markdown and variable placeholders.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subject: core::option::Option<jacquard_common::CowStr<'a>>,
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TemplateView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TemplateView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.communication.defs"
     }
     fn def_name() -> &'static str {
         "templateView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_communication_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -72,127 +72,127 @@ pub mod template_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type ContentMarkdown;
+        type Name;
+        type LastUpdatedBy;
+        type Id;
         type UpdatedAt;
         type Disabled;
-        type ContentMarkdown;
-        type CreatedAt;
-        type Id;
-        type LastUpdatedBy;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
+        type ContentMarkdown = Unset;
+        type Name = Unset;
+        type LastUpdatedBy = Unset;
+        type Id = Unset;
         type UpdatedAt = Unset;
         type Disabled = Unset;
-        type ContentMarkdown = Unset;
-        type CreatedAt = Unset;
-        type Id = Unset;
-        type LastUpdatedBy = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Disabled = S::Disabled;
-        type ContentMarkdown = S::ContentMarkdown;
-        type CreatedAt = S::CreatedAt;
-        type Id = S::Id;
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `disabled` field to Set
-    pub struct SetDisabled<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisabled<S> {}
-    impl<S: State> State for SetDisabled<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Disabled = Set<members::disabled>;
-        type ContentMarkdown = S::ContentMarkdown;
-        type CreatedAt = S::CreatedAt;
-        type Id = S::Id;
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `content_markdown` field to Set
-    pub struct SetContentMarkdown<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContentMarkdown<S> {}
-    impl<S: State> State for SetContentMarkdown<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Disabled = S::Disabled;
-        type ContentMarkdown = Set<members::content_markdown>;
-        type CreatedAt = S::CreatedAt;
-        type Id = S::Id;
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Disabled = S::Disabled;
-        type ContentMarkdown = S::ContentMarkdown;
         type CreatedAt = Set<members::created_at>;
-        type Id = S::Id;
-        type LastUpdatedBy = S::LastUpdatedBy;
+        type ContentMarkdown = S::ContentMarkdown;
         type Name = S::Name;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Id = S::Id;
         type UpdatedAt = S::UpdatedAt;
         type Disabled = S::Disabled;
-        type ContentMarkdown = S::ContentMarkdown;
-        type CreatedAt = S::CreatedAt;
-        type Id = Set<members::id>;
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Name = S::Name;
     }
-    ///State transition - sets the `last_updated_by` field to Set
-    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
-    impl<S: State> State for SetLastUpdatedBy<S> {
+    ///State transition - sets the `content_markdown` field to Set
+    pub struct SetContentMarkdown<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContentMarkdown<S> {}
+    impl<S: State> State for SetContentMarkdown<S> {
+        type CreatedAt = S::CreatedAt;
+        type ContentMarkdown = Set<members::content_markdown>;
+        type Name = S::Name;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Id = S::Id;
         type UpdatedAt = S::UpdatedAt;
         type Disabled = S::Disabled;
-        type ContentMarkdown = S::ContentMarkdown;
-        type CreatedAt = S::CreatedAt;
-        type Id = S::Id;
-        type LastUpdatedBy = Set<members::last_updated_by>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Name = Set<members::name>;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Id = S::Id;
         type UpdatedAt = S::UpdatedAt;
         type Disabled = S::Disabled;
-        type ContentMarkdown = S::ContentMarkdown;
+    }
+    ///State transition - sets the `last_updated_by` field to Set
+    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
+    impl<S: State> State for SetLastUpdatedBy<S> {
         type CreatedAt = S::CreatedAt;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Name = S::Name;
+        type LastUpdatedBy = Set<members::last_updated_by>;
         type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+        type Disabled = S::Disabled;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type CreatedAt = S::CreatedAt;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Name = S::Name;
         type LastUpdatedBy = S::LastUpdatedBy;
-        type Name = Set<members::name>;
+        type Id = Set<members::id>;
+        type UpdatedAt = S::UpdatedAt;
+        type Disabled = S::Disabled;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type CreatedAt = S::CreatedAt;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Name = S::Name;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Id = S::Id;
+        type UpdatedAt = Set<members::updated_at>;
+        type Disabled = S::Disabled;
+    }
+    ///State transition - sets the `disabled` field to Set
+    pub struct SetDisabled<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisabled<S> {}
+    impl<S: State> State for SetDisabled<S> {
+        type CreatedAt = S::CreatedAt;
+        type ContentMarkdown = S::ContentMarkdown;
+        type Name = S::Name;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+        type Disabled = Set<members::disabled>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `content_markdown` field
+        pub struct content_markdown(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `last_updated_by` field
+        pub struct last_updated_by(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `disabled` field
         pub struct disabled(());
-        ///Marker type for the `content_markdown` field
-        pub struct content_markdown(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `last_updated_by` field
-        pub struct last_updated_by(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -412,13 +412,13 @@ where
 impl<'a, S> TemplateViewBuilder<'a, S>
 where
     S: template_view_state::State,
+    S::CreatedAt: template_view_state::IsSet,
+    S::ContentMarkdown: template_view_state::IsSet,
+    S::Name: template_view_state::IsSet,
+    S::LastUpdatedBy: template_view_state::IsSet,
+    S::Id: template_view_state::IsSet,
     S::UpdatedAt: template_view_state::IsSet,
     S::Disabled: template_view_state::IsSet,
-    S::ContentMarkdown: template_view_state::IsSet,
-    S::CreatedAt: template_view_state::IsSet,
-    S::Id: template_view_state::IsSet,
-    S::LastUpdatedBy: template_view_state::IsSet,
-    S::Name: template_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TemplateView<'a> {
@@ -438,7 +438,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -458,7 +458,7 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_communication_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tools_ozone_communication_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

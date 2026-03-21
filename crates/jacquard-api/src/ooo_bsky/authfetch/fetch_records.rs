@@ -87,19 +87,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for FetchRecordsRequest {
     type Response = FetchRecordsResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FetchRecordsResult<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FetchRecordsResult<'a> {
     fn nsid() -> &'static str {
         "ooo.bsky.authfetch.fetchRecords"
     }
     fn def_name() -> &'static str {
         "result"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ooo_bsky_authfetch_fetchRecords()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -205,51 +205,51 @@ pub mod fetch_records_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Record;
         type Strategy;
         type Uri;
-        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Record = Unset;
         type Strategy = Unset;
         type Uri = Unset;
-        type Record = Unset;
-    }
-    ///State transition - sets the `strategy` field to Set
-    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStrategy<S> {}
-    impl<S: State> State for SetStrategy<S> {
-        type Strategy = Set<members::strategy>;
-        type Uri = S::Uri;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Strategy = S::Strategy;
-        type Uri = Set<members::uri>;
-        type Record = S::Record;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
+        type Record = Set<members::record>;
         type Strategy = S::Strategy;
         type Uri = S::Uri;
-        type Record = Set<members::record>;
+    }
+    ///State transition - sets the `strategy` field to Set
+    pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStrategy<S> {}
+    impl<S: State> State for SetStrategy<S> {
+        type Record = S::Record;
+        type Strategy = Set<members::strategy>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Record = S::Record;
+        type Strategy = S::Strategy;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `strategy` field
         pub struct strategy(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `record` field
-        pub struct record(());
     }
 }
 
@@ -342,9 +342,9 @@ where
 impl<'a, S> FetchRecordsResultBuilder<'a, S>
 where
     S: fetch_records_result_state::State,
+    S::Record: fetch_records_result_state::IsSet,
     S::Strategy: fetch_records_result_state::IsSet,
     S::Uri: fetch_records_result_state::IsSet,
-    S::Record: fetch_records_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FetchRecordsResult<'a> {
@@ -358,7 +358,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -372,7 +372,7 @@ where
     }
 }
 
-fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_ooo_bsky_authfetch_fetchRecords() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

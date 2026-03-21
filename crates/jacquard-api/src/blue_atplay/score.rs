@@ -19,8 +19,8 @@
 #[serde(rename_all = "camelCase")]
 pub struct Attestation<'a> {
     ///Timestamp when the attestation was created (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub attested_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub attested_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///DID key reference for verifying the signature
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
@@ -29,19 +29,19 @@ pub struct Attestation<'a> {
     pub signature: jacquard_common::deps::bytes::Bytes,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Attestation<'a> {
     fn nsid() -> &'static str {
         "blue.atplay.score.defs"
     }
     fn def_name() -> &'static str {
         "attestation"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_atplay_score_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.key;
             #[allow(unused_comparisons)]
@@ -69,37 +69,37 @@ pub mod attestation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Signature;
         type Key;
+        type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Signature = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type Signature = Set<members::signature>;
-        type Key = S::Key;
+        type Signature = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Signature = S::Signature;
         type Key = Set<members::key>;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type Key = S::Key;
+        type Signature = Set<members::signature>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signature` field
-        pub struct signature(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
     }
 }
 
@@ -192,8 +192,8 @@ where
 impl<'a, S> AttestationBuilder<'a, S>
 where
     S: attestation_state::State,
-    S::Signature: attestation_state::IsSet,
     S::Key: attestation_state::IsSet,
+    S::Signature: attestation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Attestation<'a> {
@@ -207,7 +207,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -221,7 +221,7 @@ where
     }
 }
 
-fn lexicon_doc_blue_atplay_score_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blue_atplay_score_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -16,9 +16,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetFiles<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub at: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub at: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]

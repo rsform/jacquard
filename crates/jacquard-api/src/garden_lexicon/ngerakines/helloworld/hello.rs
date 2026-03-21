@@ -17,9 +17,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct Hello<'a> {
     ///(max length: 55)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subject: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]

@@ -27,20 +27,20 @@ pub struct CreateRecord<'a> {
     #[serde(borrow)]
     pub repo: jacquard_common::types::ident::AtIdentifier<'a>,
     ///The Record Key.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rkey: std::option::Option<
+    pub rkey: core::option::Option<
         jacquard_common::types::string::RecordKey<
             jacquard_common::types::string::Rkey<'a>,
         >,
     >,
     ///Compare and swap with the previous commit by CID.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub swap_commit: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub swap_commit: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///Can be set to 'false' to skip Lexicon schema validation of record data, 'true' to require it, or leave unset to validate only for known Lexicons.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub validate: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub validate: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -57,14 +57,14 @@ pub struct CreateRecord<'a> {
 pub struct CreateRecordOutput<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub commit: std::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
+    pub commit: core::option::Option<crate::com_atproto::repo::CommitMeta<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub validation_status: std::option::Option<CreateRecordOutputValidationStatus<'a>>,
+    pub validation_status: core::option::Option<CreateRecordOutputValidationStatus<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -178,7 +178,7 @@ impl jacquard_common::IntoStatic for CreateRecordOutputValidationStatus<'_> {
 pub enum CreateRecordError<'a> {
     /// Indicates that 'swapCommit' didn't match current repo commit.
     #[serde(rename = "InvalidSwap")]
-    InvalidSwap(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidSwap(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for CreateRecordError<'_> {
@@ -236,51 +236,51 @@ pub mod create_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
-        type Collection;
         type Record;
+        type Collection;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
-        type Collection = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Collection = S::Collection;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Repo = S::Repo;
-        type Collection = Set<members::collection>;
-        type Record = S::Record;
+        type Collection = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Repo = S::Repo;
-        type Collection = S::Collection;
         type Record = Set<members::record>;
+        type Collection = S::Collection;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Record = S::Record;
+        type Collection = Set<members::collection>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Record = S::Record;
+        type Collection = S::Collection;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -441,9 +441,9 @@ impl<'a, S: create_record_state::State> CreateRecordBuilder<'a, S> {
 impl<'a, S> CreateRecordBuilder<'a, S>
 where
     S: create_record_state::State,
-    S::Repo: create_record_state::IsSet,
-    S::Collection: create_record_state::IsSet,
     S::Record: create_record_state::IsSet,
+    S::Collection: create_record_state::IsSet,
+    S::Repo: create_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateRecord<'a> {
@@ -460,7 +460,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

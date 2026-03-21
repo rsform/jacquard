@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct Locale<'a> {
     ///URI's comment. It can use GitHub Flavored Markdown.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Comments Language
     #[serde(borrow)]
     pub lang: jacquard_common::CowStr<'a>,
@@ -48,23 +48,23 @@ pub struct Bookmark<'a> {
     pub comments: Vec<crate::blue_rito::feed::bookmark::Locale<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///OGP Description
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp_description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub ogp_description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///OGP Image Uri
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp_image: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub ogp_image: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///OGP Title
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ogp_title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub ogp_title: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub subject: jacquard_common::types::string::UriValue<'a>,
     ///Tags describing the uri's description (max 10 tags, 25 charactors)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -79,9 +79,9 @@ pub struct Bookmark<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BookmarkGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -101,19 +101,19 @@ impl<'a> Bookmark<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Locale<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Locale<'a> {
     fn nsid() -> &'static str {
         "blue.rito.feed.bookmark"
     }
     fn def_name() -> &'static str {
         "locale"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_rito_feed_bookmark()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.comment {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100000usize {
@@ -220,19 +220,19 @@ impl jacquard_common::types::collection::Collection for BookmarkRecord {
     type Record = BookmarkRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
     fn nsid() -> &'static str {
         "blue.rito.feed.bookmark"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blue_rito_feed_bookmark()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.comments;
             #[allow(unused_comparisons)]
@@ -262,7 +262,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Bookmark<'a> {
     }
 }
 
-fn lexicon_doc_blue_rito_feed_bookmark() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blue_rito_feed_bookmark() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -532,51 +532,51 @@ pub mod bookmark_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Comments;
-        type Subject;
         type CreatedAt;
+        type Subject;
+        type Comments;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Comments = Unset;
-        type Subject = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `comments` field to Set
-    pub struct SetComments<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComments<S> {}
-    impl<S: State> State for SetComments<S> {
-        type Comments = Set<members::comments>;
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Comments = S::Comments;
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type Subject = Unset;
+        type Comments = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Comments = S::Comments;
-        type Subject = S::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+        type Comments = S::Comments;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subject = Set<members::subject>;
+        type Comments = S::Comments;
+    }
+    ///State transition - sets the `comments` field to Set
+    pub struct SetComments<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComments<S> {}
+    impl<S: State> State for SetComments<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+        type Comments = Set<members::comments>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `comments` field
-        pub struct comments(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `comments` field
+        pub struct comments(());
     }
 }
 
@@ -749,9 +749,9 @@ impl<'a, S: bookmark_state::State> BookmarkBuilder<'a, S> {
 impl<'a, S> BookmarkBuilder<'a, S>
 where
     S: bookmark_state::State,
-    S::Comments: bookmark_state::IsSet,
-    S::Subject: bookmark_state::IsSet,
     S::CreatedAt: bookmark_state::IsSet,
+    S::Subject: bookmark_state::IsSet,
+    S::Comments: bookmark_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Bookmark<'a> {
@@ -769,7 +769,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

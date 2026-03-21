@@ -1,0 +1,19 @@
+{
+  "lexicon": 1,
+  "id": "coop.hypha.pollen.embed.text",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "Free-form text content for a claim.",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "Context or description of the provenance claim."
+        }
+      }
+    }
+  }
+}

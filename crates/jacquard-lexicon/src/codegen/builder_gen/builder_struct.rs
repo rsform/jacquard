@@ -79,6 +79,7 @@ fn generate_field_declarations(
     type_name: &str,
     schema: &BuilderSchema,
 ) -> TokenStream {
+    let resolved = codegen.default_resolved_imports();
     let property_names = schema.property_names();
     let field_types: Vec<_> = property_names
         .iter()
@@ -88,12 +89,12 @@ fn generate_field_declarations(
                 BuilderSchema::Object(obj) => {
                     let field_type = &obj.properties[field_name_str];
                     codegen
-                        .property_to_rust_type(nsid, type_name, field_name_str, field_type)
+                        .property_to_rust_type(nsid, type_name, field_name_str, field_type, &resolved)
                         .unwrap_or_else(|_| quote! { () })
                 }
                 BuilderSchema::Parameters(params) => {
                     let field_type = &params.properties[field_name_str];
-                    get_params_rust_type(codegen, field_type)
+                    get_params_rust_type(codegen, field_type, &resolved)
                 }
             };
 
@@ -116,23 +117,25 @@ fn generate_field_declarations(
 pub(super) fn get_params_rust_type(
     codegen: &crate::codegen::CodeGenerator,
     field_type: &crate::lexicon::LexXrpcParametersProperty<'static>,
+    resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     use crate::lexicon::LexXrpcParametersProperty;
+    use crate::codegen::prettify::CommonType;
 
     match field_type {
         LexXrpcParametersProperty::Boolean(_) => quote! { bool },
         LexXrpcParametersProperty::Integer(_) => quote! { i64 },
-        LexXrpcParametersProperty::String(s) => codegen.string_to_rust_type(s),
+        LexXrpcParametersProperty::String(s) => codegen.string_to_rust_type(s, resolved),
         LexXrpcParametersProperty::Unknown(_) => {
-            quote! { jacquard_common::types::value::Data<'a> }
+            resolved.type_tokens(&CommonType::Data)
         }
         LexXrpcParametersProperty::Array(arr) => {
             let item_type = match &arr.items {
                 crate::lexicon::LexPrimitiveArrayItem::Boolean(_) => quote! { bool },
                 crate::lexicon::LexPrimitiveArrayItem::Integer(_) => quote! { i64 },
-                crate::lexicon::LexPrimitiveArrayItem::String(s) => codegen.string_to_rust_type(s),
+                crate::lexicon::LexPrimitiveArrayItem::String(s) => codegen.string_to_rust_type(s, resolved),
                 crate::lexicon::LexPrimitiveArrayItem::Unknown(_) => {
-                    quote! { jacquard_common::types::value::Data<'a> }
+                    resolved.type_tokens(&CommonType::Data)
                 }
             };
             quote! { Vec<#item_type> }

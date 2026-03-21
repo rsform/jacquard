@@ -20,14 +20,14 @@ pub struct Comment<'a> {
     #[serde(borrow)]
     pub body: jacquard_common::CowStr<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mentions: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub mentions: core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     #[serde(borrow)]
     pub pull: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub references: std::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
+    pub references: core::option::Option<Vec<jacquard_common::types::string::AtUri<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -42,9 +42,9 @@ pub struct Comment<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CommentGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -91,19 +91,19 @@ impl jacquard_common::types::collection::Collection for CommentRecord {
     type Record = CommentRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Comment<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.pull.comment"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_pull_comment()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -118,49 +118,49 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Body;
         type CreatedAt;
+        type Body;
         type Pull;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Body = Unset;
         type CreatedAt = Unset;
+        type Body = Unset;
         type Pull = Unset;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Body = Set<members::body>;
-        type CreatedAt = S::CreatedAt;
-        type Pull = S::Pull;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Body = S::Body;
         type CreatedAt = Set<members::created_at>;
+        type Body = S::Body;
+        type Pull = S::Pull;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type CreatedAt = S::CreatedAt;
+        type Body = Set<members::body>;
         type Pull = S::Pull;
     }
     ///State transition - sets the `pull` field to Set
     pub struct SetPull<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPull<S> {}
     impl<S: State> State for SetPull<S> {
-        type Body = S::Body;
         type CreatedAt = S::CreatedAt;
+        type Body = S::Body;
         type Pull = Set<members::pull>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `body` field
-        pub struct body(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `body` field
+        pub struct body(());
         ///Marker type for the `pull` field
         pub struct pull(());
     }
@@ -295,8 +295,8 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Body: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
+    S::Body: comment_state::IsSet,
     S::Pull: comment_state::IsSet,
 {
     /// Build the final struct
@@ -313,7 +313,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -329,7 +329,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_repo_pull_comment() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_tangled_repo_pull_comment() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

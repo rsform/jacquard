@@ -18,31 +18,31 @@
 #[serde(rename_all = "camelCase")]
 pub struct Stack<'a> {
     ///Cross-axis alignment of children.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub align: std::option::Option<StackAlign<'a>>,
+    pub align: core::option::Option<StackAlign<'a>>,
     #[serde(borrow)]
     pub children: jacquard_common::types::value::Data<'a>,
     ///Space between children.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub gap: std::option::Option<StackGap<'a>>,
+    pub gap: core::option::Option<StackGap<'a>>,
     ///Whether this container has inset padding. The theme controls the amount.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub inset: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub inset: core::option::Option<bool>,
     ///Main-axis distribution of children.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub justify: std::option::Option<StackJustify<'a>>,
+    pub justify: core::option::Option<StackJustify<'a>>,
     ///Whether the container has an opaque background.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub opaque: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub opaque: core::option::Option<bool>,
     ///Whether to show a visual separator between children.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub separator: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub separator: core::option::Option<bool>,
     ///Whether the container sticks to the top of the scroll area.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sticky: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sticky: core::option::Option<bool>,
 }
 
 /// Cross-axis alignment of children.
@@ -587,7 +587,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

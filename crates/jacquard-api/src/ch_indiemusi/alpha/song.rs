@@ -19,33 +19,33 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InterestedParty<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collecting_society: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub collecting_society: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ipi: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub ipi: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Percentage of mechanical royalties allocated to this interested party, 10000 = 100%
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mechanical_royalties_percentage: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mechanical_royalties_percentage: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Percentage of performance royalties allocated to this interested party, 10000 = 100%
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub performance_royalties_percentage: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub performance_royalties_percentage: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub publishing_owner: std::option::Option<
+    pub publishing_owner: core::option::Option<
         crate::ch_indiemusi::alpha::actor::publishing_owner::PublishingOwner<'a>,
     >,
     ///Role of the interested party (e.g., 'author', 'composer', 'publisher')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub role: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub role: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// A song or musical work: the melody, lyrics, and arrangement created by composers and authors
@@ -65,9 +65,9 @@ pub struct Song<'a> {
     #[serde(borrow)]
     pub interested_parties: Vec<crate::ch_indiemusi::alpha::song::InterestedParty<'a>>,
     ///ISWC (International Standard Musical Work Code) with which the song is registered at a collecting society
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub iswc: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub iswc: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
@@ -84,9 +84,9 @@ pub struct Song<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SongGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -106,19 +106,19 @@ impl<'a> Song<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for InterestedParty<'a> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.song"
     }
     fn def_name() -> &'static str {
         "interestedParty"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ch_indiemusi_alpha_song()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.collecting_society {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
@@ -198,19 +198,19 @@ impl jacquard_common::types::collection::Collection for SongRecord {
     type Record = SongRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Song<'a> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.song"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ch_indiemusi_alpha_song()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.interested_parties;
             #[allow(unused_comparisons)]
@@ -253,7 +253,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
     }
 }
 
-fn lexicon_doc_ch_indiemusi_alpha_song() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_ch_indiemusi_alpha_song() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -509,37 +509,37 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type InterestedParties;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type InterestedParties = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type InterestedParties = S::InterestedParties;
+        type Title = Unset;
     }
     ///State transition - sets the `interested_parties` field to Set
     pub struct SetInterestedParties<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInterestedParties<S> {}
     impl<S: State> State for SetInterestedParties<S> {
-        type Title = S::Title;
         type InterestedParties = Set<members::interested_parties>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type InterestedParties = S::InterestedParties;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `interested_parties` field
         pub struct interested_parties(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -631,8 +631,8 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::Title: song_state::IsSet,
     S::InterestedParties: song_state::IsSet,
+    S::Title: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {
@@ -646,7 +646,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

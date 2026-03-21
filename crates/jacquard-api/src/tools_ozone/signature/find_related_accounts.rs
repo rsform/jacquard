@@ -16,15 +16,15 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FindRelatedAccounts<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -43,9 +43,9 @@ pub struct FindRelatedAccountsOutput<'a> {
     pub accounts: Vec<
         crate::tools_ozone::signature::find_related_accounts::RelatedAccount<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -62,9 +62,9 @@ pub struct FindRelatedAccountsOutput<'a> {
 pub struct RelatedAccount<'a> {
     #[serde(borrow)]
     pub account: crate::com_atproto::admin::AccountView<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub similarities: std::option::Option<
+    pub similarities: core::option::Option<
         Vec<crate::tools_ozone::signature::SigDetail<'a>>,
     >,
 }
@@ -95,24 +95,24 @@ impl jacquard_common::xrpc::XrpcEndpoint for FindRelatedAccountsRequest {
     type Response = FindRelatedAccountsResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RelatedAccount<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RelatedAccount<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.signature.findRelatedAccounts"
     }
     fn def_name() -> &'static str {
         "relatedAccount"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_signature_findRelatedAccounts()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
@@ -354,7 +354,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -367,7 +367,7 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

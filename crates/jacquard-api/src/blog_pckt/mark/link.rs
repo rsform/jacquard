@@ -22,17 +22,17 @@ pub struct LinkAttrs<'a> {
     #[serde(borrow)]
     pub href: jacquard_common::types::string::UriValue<'a>,
     ///Defines the relationship between the current document and the linked resource (e.g., nofollow, noopener)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rel: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rel: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Specifies where to open the linked document (e.g., _blank, _self)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub target: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub target: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Additional information about the link, typically shown as a tooltip on hover
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -52,19 +52,19 @@ pub struct Link<'a> {
     pub attrs: crate::blog_pckt::mark::link::LinkAttrs<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkAttrs<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LinkAttrs<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.mark.link"
     }
     fn def_name() -> &'static str {
         "linkAttrs"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_mark_link()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.href;
             #[allow(unused_comparisons)]
@@ -118,19 +118,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkAttrs<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Link<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.mark.link"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_mark_link()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -279,7 +279,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -294,9 +294,7 @@ where
     }
 }
 
-fn lexicon_doc_blog_pckt_mark_link() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_blog_pckt_mark_link() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blog.pckt.mark.link"),
@@ -533,7 +531,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

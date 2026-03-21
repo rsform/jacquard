@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "net.alternativeproto.vote",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A user vote on a submission to AlternativeProto. Each user may cast one vote per submission.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "direction",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the vote was cast",
+            "format": "datetime"
+          },
+          "direction": {
+            "type": "string",
+            "description": "Vote direction: 'up' for positive/quality, 'down' for negative/irrelevant",
+            "knownValues": [
+              "up",
+              "down"
+            ]
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Strong reference (AT URI + CID) to the submission record being voted on",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

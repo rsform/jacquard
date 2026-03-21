@@ -16,9 +16,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetProfile<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub handle: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -35,15 +35,15 @@ pub struct GetProfile<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetProfileOutput<'a> {
     ///The resolved ATProto handle for display.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub handle: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<GetProfileOutputProfile<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub profile: core::option::Option<GetProfileOutputProfile<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile_type: std::option::Option<GetProfileOutputProfileType<'a>>,
+    pub profile_type: core::option::Option<GetProfileOutputProfileType<'a>>,
 }
 
 #[jacquard_derive::open_union]

@@ -23,8 +23,8 @@ pub struct CollectionItem<'a> {
     pub collection: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///Order within the collection
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub order: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub order: core::option::Option<i64>,
     ///Reference to the post
     #[serde(borrow)]
     pub post: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -42,9 +42,9 @@ pub struct CollectionItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionItemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -91,19 +91,19 @@ impl jacquard_common::types::collection::Collection for CollectionItemRecord {
     type Record = CollectionItemRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CollectionItem<'a> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.collectionItem"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tech_tokimeki_kaku_collectionItem()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.order {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -297,7 +297,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -312,7 +312,7 @@ where
     }
 }
 
-fn lexicon_doc_tech_tokimeki_kaku_collectionItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tech_tokimeki_kaku_collectionItem() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

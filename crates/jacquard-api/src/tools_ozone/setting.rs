@@ -21,26 +21,26 @@ pub mod upsert_option;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DefsOption<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
     pub key: jacquard_common::types::string::Nsid<'a>,
     #[serde(borrow)]
     pub last_updated_by: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub manager_role: std::option::Option<DefsOptionManagerRole<'a>>,
+    pub manager_role: core::option::Option<DefsOptionManagerRole<'a>>,
     #[serde(borrow)]
     pub scope: DefsOptionScope<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub value: jacquard_common::types::value::Data<'a>,
 }
@@ -233,19 +233,19 @@ impl jacquard_common::IntoStatic for DefsOptionScope<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DefsOption<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DefsOption<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.setting.defs"
     }
     fn def_name() -> &'static str {
         "option"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_setting_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10240usize {
@@ -291,104 +291,104 @@ pub mod defs_option_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Key;
-        type Scope;
         type Did;
-        type LastUpdatedBy;
         type Value;
+        type Scope;
         type CreatedBy;
+        type LastUpdatedBy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Key = Unset;
-        type Scope = Unset;
         type Did = Unset;
-        type LastUpdatedBy = Unset;
         type Value = Unset;
+        type Scope = Unset;
         type CreatedBy = Unset;
+        type LastUpdatedBy = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
         type Key = Set<members::key>;
+        type Did = S::Did;
+        type Value = S::Value;
         type Scope = S::Scope;
-        type Did = S::Did;
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Value = S::Value;
         type CreatedBy = S::CreatedBy;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScope<S> {}
-    impl<S: State> State for SetScope<S> {
-        type Key = S::Key;
-        type Scope = Set<members::scope>;
-        type Did = S::Did;
         type LastUpdatedBy = S::LastUpdatedBy;
-        type Value = S::Value;
-        type CreatedBy = S::CreatedBy;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Key = S::Key;
-        type Scope = S::Scope;
         type Did = Set<members::did>;
-        type LastUpdatedBy = S::LastUpdatedBy;
         type Value = S::Value;
-        type CreatedBy = S::CreatedBy;
-    }
-    ///State transition - sets the `last_updated_by` field to Set
-    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
-    impl<S: State> State for SetLastUpdatedBy<S> {
-        type Key = S::Key;
         type Scope = S::Scope;
-        type Did = S::Did;
-        type LastUpdatedBy = Set<members::last_updated_by>;
-        type Value = S::Value;
         type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
         type Key = S::Key;
-        type Scope = S::Scope;
         type Did = S::Did;
-        type LastUpdatedBy = S::LastUpdatedBy;
         type Value = Set<members::value>;
+        type Scope = S::Scope;
         type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Key = S::Key;
+        type Did = S::Did;
+        type Value = S::Value;
+        type Scope = Set<members::scope>;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = S::LastUpdatedBy;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
         type Key = S::Key;
-        type Scope = S::Scope;
         type Did = S::Did;
-        type LastUpdatedBy = S::LastUpdatedBy;
         type Value = S::Value;
+        type Scope = S::Scope;
         type CreatedBy = Set<members::created_by>;
+        type LastUpdatedBy = S::LastUpdatedBy;
+    }
+    ///State transition - sets the `last_updated_by` field to Set
+    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
+    impl<S: State> State for SetLastUpdatedBy<S> {
+        type Key = S::Key;
+        type Did = S::Did;
+        type Value = S::Value;
+        type Scope = S::Scope;
+        type CreatedBy = S::CreatedBy;
+        type LastUpdatedBy = Set<members::last_updated_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `key` field
         pub struct key(());
-        ///Marker type for the `scope` field
-        pub struct scope(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `last_updated_by` field
-        pub struct last_updated_by(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
+        ///Marker type for the `last_updated_by` field
+        pub struct last_updated_by(());
     }
 }
 
@@ -633,11 +633,11 @@ impl<'a, S> DefsOptionBuilder<'a, S>
 where
     S: defs_option_state::State,
     S::Key: defs_option_state::IsSet,
-    S::Scope: defs_option_state::IsSet,
     S::Did: defs_option_state::IsSet,
-    S::LastUpdatedBy: defs_option_state::IsSet,
     S::Value: defs_option_state::IsSet,
+    S::Scope: defs_option_state::IsSet,
     S::CreatedBy: defs_option_state::IsSet,
+    S::LastUpdatedBy: defs_option_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DefsOption<'a> {
@@ -658,7 +658,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -679,7 +679,7 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_setting_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tools_ozone_setting_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

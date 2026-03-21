@@ -41,9 +41,9 @@ pub struct DeleteAccount<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DeleteAccountError<'a> {
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    ExpiredToken(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteAccountError<'_> {
@@ -109,50 +109,50 @@ pub mod delete_account_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Token;
-        type Did;
         type Password;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Token = Unset;
-        type Did = Unset;
         type Password = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `token` field to Set
     pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetToken<S> {}
     impl<S: State> State for SetToken<S> {
         type Token = Set<members::token>;
+        type Password = S::Password;
         type Did = S::Did;
-        type Password = S::Password;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Token = S::Token;
-        type Did = Set<members::did>;
-        type Password = S::Password;
     }
     ///State transition - sets the `password` field to Set
     pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPassword<S> {}
     impl<S: State> State for SetPassword<S> {
         type Token = S::Token;
-        type Did = S::Did;
         type Password = Set<members::password>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Token = S::Token;
+        type Password = S::Password;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `token` field
         pub struct token(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `password` field
         pub struct password(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -246,8 +246,8 @@ impl<'a, S> DeleteAccountBuilder<'a, S>
 where
     S: delete_account_state::State,
     S::Token: delete_account_state::IsSet,
-    S::Did: delete_account_state::IsSet,
     S::Password: delete_account_state::IsSet,
+    S::Did: delete_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteAccount<'a> {
@@ -261,7 +261,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

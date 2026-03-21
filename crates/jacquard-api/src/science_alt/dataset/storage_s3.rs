@@ -22,13 +22,13 @@ pub struct StorageS3<'a> {
     #[serde(borrow)]
     pub bucket: jacquard_common::CowStr<'a>,
     ///Custom S3-compatible endpoint URL (e.g., for MinIO, Cloudflare R2). Omit for standard AWS S3.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub endpoint: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub endpoint: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///AWS region (e.g., 'us-east-1'). Optional for S3-compatible services.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub region: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub region: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Array of shard entries with object key and integrity checksum
     #[serde(borrow)]
     pub shards: Vec<crate::science_alt::dataset::storage_s3::ShardEntry<'a>>,
@@ -55,19 +55,19 @@ pub struct ShardEntry<'a> {
     pub key: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageS3<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for StorageS3<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageS3"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_storageS3()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.bucket;
             #[allow(unused_comparisons)]
@@ -122,19 +122,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StorageS3<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ShardEntry<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ShardEntry<'a> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageS3"
     }
     fn def_name() -> &'static str {
         "shardEntry"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_science_alt_dataset_storageS3()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.key;
             #[allow(unused_comparisons)]
@@ -162,37 +162,37 @@ pub mod storage_s3_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Shards;
         type Bucket;
+        type Shards;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Shards = Unset;
         type Bucket = Unset;
-    }
-    ///State transition - sets the `shards` field to Set
-    pub struct SetShards<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShards<S> {}
-    impl<S: State> State for SetShards<S> {
-        type Shards = Set<members::shards>;
-        type Bucket = S::Bucket;
+        type Shards = Unset;
     }
     ///State transition - sets the `bucket` field to Set
     pub struct SetBucket<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBucket<S> {}
     impl<S: State> State for SetBucket<S> {
-        type Shards = S::Shards;
         type Bucket = Set<members::bucket>;
+        type Shards = S::Shards;
+    }
+    ///State transition - sets the `shards` field to Set
+    pub struct SetShards<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShards<S> {}
+    impl<S: State> State for SetShards<S> {
+        type Bucket = S::Bucket;
+        type Shards = Set<members::shards>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `shards` field
-        pub struct shards(());
         ///Marker type for the `bucket` field
         pub struct bucket(());
+        ///Marker type for the `shards` field
+        pub struct shards(());
     }
 }
 
@@ -304,8 +304,8 @@ where
 impl<'a, S> StorageS3Builder<'a, S>
 where
     S: storage_s3_state::State,
-    S::Shards: storage_s3_state::IsSet,
     S::Bucket: storage_s3_state::IsSet,
+    S::Shards: storage_s3_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StorageS3<'a> {
@@ -320,7 +320,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -335,7 +335,7 @@ where
     }
 }
 
-fn lexicon_doc_science_alt_dataset_storageS3() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_science_alt_dataset_storageS3() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -517,37 +517,37 @@ pub mod shard_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Checksum;
         type Key;
+        type Checksum;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Checksum = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `checksum` field to Set
-    pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChecksum<S> {}
-    impl<S: State> State for SetChecksum<S> {
-        type Checksum = Set<members::checksum>;
-        type Key = S::Key;
+        type Checksum = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Checksum = S::Checksum;
         type Key = Set<members::key>;
+        type Checksum = S::Checksum;
+    }
+    ///State transition - sets the `checksum` field to Set
+    pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChecksum<S> {}
+    impl<S: State> State for SetChecksum<S> {
+        type Key = S::Key;
+        type Checksum = Set<members::checksum>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `checksum` field
-        pub struct checksum(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `checksum` field
+        pub struct checksum(());
     }
 }
 
@@ -620,8 +620,8 @@ where
 impl<'a, S> ShardEntryBuilder<'a, S>
 where
     S: shard_entry_state::State,
-    S::Checksum: shard_entry_state::IsSet,
     S::Key: shard_entry_state::IsSet,
+    S::Checksum: shard_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ShardEntry<'a> {
@@ -634,7 +634,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

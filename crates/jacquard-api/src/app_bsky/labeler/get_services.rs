@@ -18,8 +18,8 @@
 pub struct GetServices<'a> {
     /// Defaults to `false`.
     #[serde(default = "_default_detailed")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub detailed: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub detailed: core::option::Option<bool>,
     #[serde(borrow)]
     pub dids: Vec<jacquard_common::types::string::Did<'a>>,
 }
@@ -85,7 +85,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetServicesRequest {
     type Response = GetServicesResponse;
 }
 
-fn _default_detailed() -> std::option::Option<bool> {
+fn _default_detailed() -> core::option::Option<bool> {
     Some(false)
 }
 

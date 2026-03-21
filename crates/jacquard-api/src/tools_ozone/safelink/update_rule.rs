@@ -20,13 +20,13 @@ pub struct UpdateRule<'a> {
     #[serde(borrow)]
     pub action: crate::tools_ozone::safelink::ActionType<'a>,
     ///Optional comment about the update
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional DID to credit as the creator. Only respected for admin_token authentication.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub created_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub created_by: core::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
     pub pattern: crate::tools_ozone::safelink::PatternType<'a>,
     #[serde(borrow)]
@@ -70,7 +70,7 @@ pub struct UpdateRuleOutput<'a> {
 pub enum UpdateRuleError<'a> {
     /// No active rule found for this URL/domain
     #[serde(rename = "RuleNotFound")]
-    RuleNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RuleNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateRuleError<'_> {
@@ -358,7 +358,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -14,6 +14,10 @@
           "createdAt"
         ],
         "properties": {
+          "artistMbId": {
+            "type": "string",
+            "description": "MusicBrainz ID for the artist."
+          },
           "artistNames": {
             "type": "array",
             "description": "Artist name(s).",
@@ -40,9 +44,17 @@
             "description": "When the track was played on Last.fm.",
             "format": "datetime"
           },
+          "releaseMbId": {
+            "type": "string",
+            "description": "MusicBrainz ID for the release/album."
+          },
           "releaseName": {
             "type": "string",
             "description": "Album/release name."
+          },
+          "trackMbId": {
+            "type": "string",
+            "description": "MusicBrainz ID for the track."
           },
           "trackName": {
             "type": "string",

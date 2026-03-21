@@ -33,9 +33,9 @@ pub struct GetConvoAvailability<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetConvoAvailabilityOutput<'a> {
     pub can_chat: bool,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub convo: std::option::Option<crate::chat_bsky::convo::ConvoView<'a>>,
+    pub convo: core::option::Option<crate::chat_bsky::convo::ConvoView<'a>>,
 }
 
 /// Response type for

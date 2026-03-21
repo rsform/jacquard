@@ -1,0 +1,151 @@
+{
+  "lexicon": 1,
+  "id": "blue.backyard.feed.post",
+  "description": "An original post in a user's Backyard feed. Content is structured as an ordered array of blocks (text, images, embeds) to support inline media.",
+  "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "description": "Width and height of the media, used for layout before the blob is loaded.",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "embedBlock": {
+      "type": "object",
+      "description": "An inline URL embed (link preview).",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "The URL to embed as a link preview.",
+          "format": "uri"
+        }
+      }
+    },
+    "imageBlock": {
+      "type": "object",
+      "description": "An inline image or video.",
+      "required": [
+        "blob",
+        "mimeType"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text description for accessibility.",
+          "maxLength": 10000,
+          "maxGraphemes": 1000
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "#aspectRatio"
+        },
+        "blob": {
+          "type": "blob",
+          "accept": [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
+            "image/avif",
+            "video/mp4",
+            "video/webm"
+          ],
+          "maxSize": 50000000
+        },
+        "mimeType": {
+          "type": "string",
+          "description": "MIME type of the media (e.g. image/jpeg, video/mp4). Duplicated from the blob ref for convenience.",
+          "maxLength": 255
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "An original post in a user's Backyard feed.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "content",
+          "createdAt"
+        ],
+        "properties": {
+          "content": {
+            "type": "array",
+            "description": "Ordered array of content blocks. Each block is a text block, image block, or embed block.",
+            "items": {
+              "type": "union",
+              "refs": [
+                "#textBlock",
+                "#imageBlock",
+                "#embedBlock"
+              ]
+            },
+            "minLength": 1,
+            "maxLength": 20
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "langs": {
+            "type": "array",
+            "description": "BCP-47 language tags of the post text.",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3
+          },
+          "tags": {
+            "type": "array",
+            "description": "Additional non-inline tags for categorization.",
+            "items": {
+              "type": "string",
+              "maxLength": 640,
+              "maxGraphemes": 64
+            },
+            "maxLength": 8
+          }
+        }
+      }
+    },
+    "textBlock": {
+      "type": "object",
+      "description": "A block of rich text content.",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "facets": {
+          "type": "array",
+          "description": "Annotations of text (mentions, URLs, hashtags, formatting).",
+          "items": {
+            "type": "ref",
+            "ref": "blue.backyard.richtext.facet"
+          }
+        },
+        "text": {
+          "type": "string",
+          "description": "The text content of this block.",
+          "maxLength": 30000,
+          "maxGraphemes": 3000
+        }
+      }
+    }
+  }
+}

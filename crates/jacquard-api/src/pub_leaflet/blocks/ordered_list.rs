@@ -18,17 +18,17 @@
 #[serde(rename_all = "camelCase")]
 pub struct ListItem<'a> {
     ///Nested ordered list items. Mutually exclusive with unorderedListChildren; if both are present, children takes precedence.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub children: std::option::Option<
+    pub children: core::option::Option<
         Vec<crate::pub_leaflet::blocks::ordered_list::ListItem<'a>>,
     >,
     #[serde(borrow)]
     pub content: ListItemContent<'a>,
     ///A nested unordered list. Mutually exclusive with children; if both are present, children takes precedence.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub unordered_list_children: std::option::Option<
+    pub unordered_list_children: core::option::Option<
         crate::pub_leaflet::blocks::unordered_list::UnorderedList<'a>,
     >,
 }
@@ -69,40 +69,40 @@ pub struct OrderedList<'a> {
     #[serde(borrow)]
     pub children: Vec<crate::pub_leaflet::blocks::ordered_list::ListItem<'a>>,
     ///The starting number for this ordered list. Defaults to 1 if not specified.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub start_index: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub start_index: core::option::Option<i64>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ListItem<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.orderedList"
     }
     fn def_name() -> &'static str {
         "listItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_blocks_orderedList()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OrderedList<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for OrderedList<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.orderedList"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_blocks_orderedList()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -250,7 +250,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -264,7 +264,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_leaflet_blocks_orderedList() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_pub_leaflet_blocks_orderedList() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -493,7 +493,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

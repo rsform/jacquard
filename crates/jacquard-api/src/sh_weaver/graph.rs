@@ -57,12 +57,12 @@ pub struct CommunityTagCount<'a> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Curatelist;
-impl std::fmt::Display for Curatelist {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Curatelist {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "curatelist")
     }
 }
@@ -80,8 +80,8 @@ impl std::fmt::Display for Curatelist {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListItemView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub added_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub added_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub subject: ListItemViewSubject<'a>,
     #[serde(borrow)]
@@ -213,16 +213,16 @@ impl jacquard_common::IntoStatic for ListPurpose<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     #[serde(borrow)]
     pub creator: crate::sh_weaver::actor::ProfileViewBasic<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     pub indexed_at: jacquard_common::types::string::Datetime,
     pub item_count: i64,
     #[serde(borrow)]
@@ -231,9 +231,9 @@ pub struct ListView<'a> {
     pub purpose: crate::sh_weaver::graph::ListPurpose<'a>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer_subscribed: std::option::Option<
+    pub viewer_subscribed: core::option::Option<
         jacquard_common::types::string::AtUri<'a>,
     >,
 }
@@ -246,12 +246,12 @@ pub struct ListView<'a> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Readinglist;
-impl std::fmt::Display for Readinglist {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Readinglist {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "readinglist")
     }
 }
@@ -278,9 +278,9 @@ pub struct ResourceTagsView<'a> {
     #[serde(borrow)]
     pub resource: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     ///Tags the current viewer has applied.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer_applied_tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub viewer_applied_tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// An ordered series of related works (sequels, spin-offs).
@@ -291,12 +291,12 @@ pub struct ResourceTagsView<'a> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct Serieslist;
-impl std::fmt::Display for Serieslist {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Serieslist {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "serieslist")
     }
 }
@@ -336,120 +336,120 @@ pub struct TagApplicationView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TagView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub entry_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub notebook_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub entry_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub notebook_count: core::option::Option<i64>,
     ///Uses in the last 30 days.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub recent_use_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub recent_use_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub tag: jacquard_common::CowStr<'a>,
     ///Appview-computed trending score.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub trending_score: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub trending_score: core::option::Option<i64>,
     ///Total number of resources tagged with this tag.
     pub use_count: i64,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CommunityTagCount<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CommunityTagCount<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
     fn def_name() -> &'static str {
         "communityTagCount"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_graph_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListItemView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ListItemView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
     fn def_name() -> &'static str {
         "listItemView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_graph_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ListView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
     fn def_name() -> &'static str {
         "listView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_graph_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ResourceTagsView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ResourceTagsView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
     fn def_name() -> &'static str {
         "resourceTagsView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_graph_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagApplicationView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TagApplicationView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
     fn def_name() -> &'static str {
         "tagApplicationView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_graph_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TagView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TagView<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
     fn def_name() -> &'static str {
         "tagView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_graph_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -464,37 +464,37 @@ pub mod community_tag_count_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
         type Count;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
         type Count = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Tag = Set<members::tag>;
-        type Count = S::Count;
+        type Tag = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type Tag = S::Tag;
         type Count = Set<members::count>;
+        type Tag = S::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Count = S::Count;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `count` field
         pub struct count(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
@@ -567,8 +567,8 @@ where
 impl<'a, S> CommunityTagCountBuilder<'a, S>
 where
     S: community_tag_count_state::State,
-    S::Tag: community_tag_count_state::IsSet,
     S::Count: community_tag_count_state::IsSet,
+    S::Tag: community_tag_count_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CommunityTagCount<'a> {
@@ -581,7 +581,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -594,9 +594,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_graph_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_sh_weaver_graph_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("sh.weaver.graph.defs"),
@@ -1408,7 +1406,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1432,127 +1430,127 @@ pub mod list_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Creator;
         type Uri;
+        type IndexedAt;
+        type Creator;
+        type ItemCount;
+        type Purpose;
         type Name;
         type Cid;
-        type Purpose;
-        type ItemCount;
-        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Creator = Unset;
         type Uri = Unset;
+        type IndexedAt = Unset;
+        type Creator = Unset;
+        type ItemCount = Unset;
+        type Purpose = Unset;
         type Name = Unset;
         type Cid = Unset;
-        type Purpose = Unset;
-        type ItemCount = Unset;
-        type IndexedAt = Unset;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Creator = Set<members::creator>;
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Cid = S::Cid;
-        type Purpose = S::Purpose;
-        type ItemCount = S::ItemCount;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Creator = S::Creator;
         type Uri = Set<members::uri>;
+        type IndexedAt = S::IndexedAt;
+        type Creator = S::Creator;
+        type ItemCount = S::ItemCount;
+        type Purpose = S::Purpose;
         type Name = S::Name;
         type Cid = S::Cid;
-        type Purpose = S::Purpose;
-        type ItemCount = S::ItemCount;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Creator = S::Creator;
-        type Uri = S::Uri;
-        type Name = Set<members::name>;
-        type Cid = S::Cid;
-        type Purpose = S::Purpose;
-        type ItemCount = S::ItemCount;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Creator = S::Creator;
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Cid = Set<members::cid>;
-        type Purpose = S::Purpose;
-        type ItemCount = S::ItemCount;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `purpose` field to Set
-    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPurpose<S> {}
-    impl<S: State> State for SetPurpose<S> {
-        type Creator = S::Creator;
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Cid = S::Cid;
-        type Purpose = Set<members::purpose>;
-        type ItemCount = S::ItemCount;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `item_count` field to Set
-    pub struct SetItemCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItemCount<S> {}
-    impl<S: State> State for SetItemCount<S> {
-        type Creator = S::Creator;
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Cid = S::Cid;
-        type Purpose = S::Purpose;
-        type ItemCount = Set<members::item_count>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Creator = S::Creator;
         type Uri = S::Uri;
+        type IndexedAt = Set<members::indexed_at>;
+        type Creator = S::Creator;
+        type ItemCount = S::ItemCount;
+        type Purpose = S::Purpose;
         type Name = S::Name;
         type Cid = S::Cid;
-        type Purpose = S::Purpose;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Creator = Set<members::creator>;
         type ItemCount = S::ItemCount;
-        type IndexedAt = Set<members::indexed_at>;
+        type Purpose = S::Purpose;
+        type Name = S::Name;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `item_count` field to Set
+    pub struct SetItemCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItemCount<S> {}
+    impl<S: State> State for SetItemCount<S> {
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Creator = S::Creator;
+        type ItemCount = Set<members::item_count>;
+        type Purpose = S::Purpose;
+        type Name = S::Name;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `purpose` field to Set
+    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPurpose<S> {}
+    impl<S: State> State for SetPurpose<S> {
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Creator = S::Creator;
+        type ItemCount = S::ItemCount;
+        type Purpose = Set<members::purpose>;
+        type Name = S::Name;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Creator = S::Creator;
+        type ItemCount = S::ItemCount;
+        type Purpose = S::Purpose;
+        type Name = Set<members::name>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Creator = S::Creator;
+        type ItemCount = S::ItemCount;
+        type Purpose = S::Purpose;
+        type Name = S::Name;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
+        ///Marker type for the `item_count` field
+        pub struct item_count(());
+        ///Marker type for the `purpose` field
+        pub struct purpose(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `purpose` field
-        pub struct purpose(());
-        ///Marker type for the `item_count` field
-        pub struct item_count(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
     }
 }
 
@@ -1796,13 +1794,13 @@ impl<'a, S: list_view_state::State> ListViewBuilder<'a, S> {
 impl<'a, S> ListViewBuilder<'a, S>
 where
     S: list_view_state::State,
-    S::Creator: list_view_state::IsSet,
     S::Uri: list_view_state::IsSet,
+    S::IndexedAt: list_view_state::IsSet,
+    S::Creator: list_view_state::IsSet,
+    S::ItemCount: list_view_state::IsSet,
+    S::Purpose: list_view_state::IsSet,
     S::Name: list_view_state::IsSet,
     S::Cid: list_view_state::IsSet,
-    S::Purpose: list_view_state::IsSet,
-    S::ItemCount: list_view_state::IsSet,
-    S::IndexedAt: list_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListView<'a> {
@@ -1823,7 +1821,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1855,50 +1853,50 @@ pub mod resource_tags_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CommunityTags;
-        type AuthorTags;
         type Resource;
+        type AuthorTags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CommunityTags = Unset;
-        type AuthorTags = Unset;
         type Resource = Unset;
+        type AuthorTags = Unset;
     }
     ///State transition - sets the `community_tags` field to Set
     pub struct SetCommunityTags<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommunityTags<S> {}
     impl<S: State> State for SetCommunityTags<S> {
         type CommunityTags = Set<members::community_tags>;
+        type Resource = S::Resource;
         type AuthorTags = S::AuthorTags;
-        type Resource = S::Resource;
-    }
-    ///State transition - sets the `author_tags` field to Set
-    pub struct SetAuthorTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthorTags<S> {}
-    impl<S: State> State for SetAuthorTags<S> {
-        type CommunityTags = S::CommunityTags;
-        type AuthorTags = Set<members::author_tags>;
-        type Resource = S::Resource;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
         type CommunityTags = S::CommunityTags;
-        type AuthorTags = S::AuthorTags;
         type Resource = Set<members::resource>;
+        type AuthorTags = S::AuthorTags;
+    }
+    ///State transition - sets the `author_tags` field to Set
+    pub struct SetAuthorTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthorTags<S> {}
+    impl<S: State> State for SetAuthorTags<S> {
+        type CommunityTags = S::CommunityTags;
+        type Resource = S::Resource;
+        type AuthorTags = Set<members::author_tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `community_tags` field
         pub struct community_tags(());
-        ///Marker type for the `author_tags` field
-        pub struct author_tags(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `author_tags` field
+        pub struct author_tags(());
     }
 }
 
@@ -2012,8 +2010,8 @@ impl<'a, S> ResourceTagsViewBuilder<'a, S>
 where
     S: resource_tags_view_state::State,
     S::CommunityTags: resource_tags_view_state::IsSet,
-    S::AuthorTags: resource_tags_view_state::IsSet,
     S::Resource: resource_tags_view_state::IsSet,
+    S::AuthorTags: resource_tags_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ResourceTagsView<'a> {
@@ -2028,7 +2026,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2053,67 +2051,67 @@ pub mod tag_application_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AppliedBy;
-        type Tag;
-        type CreatedAt;
         type Uri;
+        type Tag;
+        type AppliedBy;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AppliedBy = Unset;
-        type Tag = Unset;
-        type CreatedAt = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `applied_by` field to Set
-    pub struct SetAppliedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAppliedBy<S> {}
-    impl<S: State> State for SetAppliedBy<S> {
-        type AppliedBy = Set<members::applied_by>;
-        type Tag = S::Tag;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type AppliedBy = S::AppliedBy;
-        type Tag = Set<members::tag>;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type AppliedBy = S::AppliedBy;
-        type Tag = S::Tag;
-        type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
+        type Tag = Unset;
+        type AppliedBy = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type AppliedBy = S::AppliedBy;
-        type Tag = S::Tag;
-        type CreatedAt = S::CreatedAt;
         type Uri = Set<members::uri>;
+        type Tag = S::Tag;
+        type AppliedBy = S::AppliedBy;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type Uri = S::Uri;
+        type Tag = Set<members::tag>;
+        type AppliedBy = S::AppliedBy;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `applied_by` field to Set
+    pub struct SetAppliedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAppliedBy<S> {}
+    impl<S: State> State for SetAppliedBy<S> {
+        type Uri = S::Uri;
+        type Tag = S::Tag;
+        type AppliedBy = Set<members::applied_by>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Uri = S::Uri;
+        type Tag = S::Tag;
+        type AppliedBy = S::AppliedBy;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `applied_by` field
-        pub struct applied_by(());
-        ///Marker type for the `tag` field
-        pub struct tag(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
+        ///Marker type for the `applied_by` field
+        pub struct applied_by(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -2226,10 +2224,10 @@ where
 impl<'a, S> TagApplicationViewBuilder<'a, S>
 where
     S: tag_application_view_state::State,
-    S::AppliedBy: tag_application_view_state::IsSet,
-    S::Tag: tag_application_view_state::IsSet,
-    S::CreatedAt: tag_application_view_state::IsSet,
     S::Uri: tag_application_view_state::IsSet,
+    S::Tag: tag_application_view_state::IsSet,
+    S::AppliedBy: tag_application_view_state::IsSet,
+    S::CreatedAt: tag_application_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TagApplicationView<'a> {
@@ -2244,7 +2242,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2269,37 +2267,37 @@ pub mod tag_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UseCount;
         type Tag;
+        type UseCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UseCount = Unset;
         type Tag = Unset;
-    }
-    ///State transition - sets the `use_count` field to Set
-    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUseCount<S> {}
-    impl<S: State> State for SetUseCount<S> {
-        type UseCount = Set<members::use_count>;
-        type Tag = S::Tag;
+        type UseCount = Unset;
     }
     ///State transition - sets the `tag` field to Set
     pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTag<S> {}
     impl<S: State> State for SetTag<S> {
-        type UseCount = S::UseCount;
         type Tag = Set<members::tag>;
+        type UseCount = S::UseCount;
+    }
+    ///State transition - sets the `use_count` field to Set
+    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUseCount<S> {}
+    impl<S: State> State for SetUseCount<S> {
+        type Tag = S::Tag;
+        type UseCount = Set<members::use_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `use_count` field
-        pub struct use_count(());
         ///Marker type for the `tag` field
         pub struct tag(());
+        ///Marker type for the `use_count` field
+        pub struct use_count(());
     }
 }
 
@@ -2428,8 +2426,8 @@ where
 impl<'a, S> TagViewBuilder<'a, S>
 where
     S: tag_view_state::State,
-    S::UseCount: tag_view_state::IsSet,
     S::Tag: tag_view_state::IsSet,
+    S::UseCount: tag_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TagView<'a> {
@@ -2446,7 +2444,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

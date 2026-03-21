@@ -52,9 +52,9 @@ pub struct GetRecipeOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRecipeError<'a> {
     #[serde(rename = "NotFound")]
-    NotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidUri")]
-    InvalidUri(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidUri(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetRecipeError<'_> {

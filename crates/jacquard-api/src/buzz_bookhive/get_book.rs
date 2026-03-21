@@ -16,18 +16,18 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBook<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub goodreads_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub goodreads_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub isbn: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub isbn: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub isbn13: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub isbn13: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -43,44 +43,44 @@ pub struct GetBook<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetBookOutput<'a> {
     ///Other users' activity on the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub activity: std::option::Option<Vec<crate::buzz_bookhive::Activity<'a>>>,
+    pub activity: core::option::Option<Vec<crate::buzz_bookhive::Activity<'a>>>,
     ///The hive book's info
     #[serde(borrow)]
     pub book: crate::buzz_bookhive::hive_book::HiveBook<'a>,
     ///Reading progress for the user
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub book_progress: std::option::Option<crate::buzz_bookhive::BookProgress<'a>>,
+    pub book_progress: core::option::Option<crate::buzz_bookhive::BookProgress<'a>>,
     ///Comments on the book
     #[serde(borrow)]
     pub comments: Vec<crate::buzz_bookhive::Comment<'a>>,
     ///Cover image of the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub cover: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The date the user finished reading the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub finished_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub finished_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The book's review
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub review: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub review: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Reviews of the book
     #[serde(borrow)]
     pub reviews: Vec<crate::buzz_bookhive::Review<'a>>,
     ///Number of stars given to the book (1-10) which will be mapped to 1-5 stars
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stars: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub stars: core::option::Option<i64>,
     ///The date the user started reading the book
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub started_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub started_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<GetBookOutputStatus<'a>>,
+    pub status: core::option::Option<GetBookOutputStatus<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

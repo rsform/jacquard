@@ -51,9 +51,9 @@ pub struct DismissMatchOutput<'a> {}
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum DismissMatchError<'a> {
     #[serde(rename = "InvalidDid")]
-    InvalidDid(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDid(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InternalError")]
-    InternalError(std::option::Option<jacquard_common::CowStr<'a>>),
+    InternalError(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DismissMatchError<'_> {
@@ -201,7 +201,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

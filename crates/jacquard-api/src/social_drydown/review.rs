@@ -19,67 +19,67 @@
 #[serde(rename_all = "camelCase")]
 pub struct Review<'a> {
     ///Final: Depth and evolution (1-5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub complexity: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub complexity: core::option::Option<i64>,
     ///Timestamp when the review was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Mid-Wear: How it smells after settling (1-5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub drydown_rating: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub drydown_rating: core::option::Option<i64>,
     ///Elevation in meters above sea level
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub elevation: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub elevation: core::option::Option<i64>,
     ///Final: How it smells at the end (1-5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub end_rating: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub end_rating: core::option::Option<i64>,
     ///Reference to the social.drydown.fragrance record
     #[serde(borrow)]
     pub fragrance: jacquard_common::types::string::AtUri<'a>,
     ///Final: Total duration (1-5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub longevity: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub longevity: core::option::Option<i64>,
     ///Mid-Wear: Scent bubble radius during mid-wear (1-5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mid_projection: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mid_projection: core::option::Option<i64>,
     ///First Impression: Immediate scent bubble radius (1-5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub opening_projection: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub opening_projection: core::option::Option<i64>,
     ///First Impression: How it smells immediately (1-5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub opening_rating: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub opening_rating: core::option::Option<i64>,
     ///Final: Holistic 'Gut Score' (1-5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub overall_rating: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub overall_rating: core::option::Option<i64>,
     ///Mid-Wear: Trail left behind (1-5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sillage: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sillage: core::option::Option<i64>,
     ///Temperature in Celsius at Stage 1 * 10 (e.g. 225 = 22.5°C)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stage1_temp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub stage1_temp: core::option::Option<i64>,
     ///Timestamp when Stage 2 was completed (for accurate temperature)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stage2_completed_at: std::option::Option<
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub stage2_completed_at: core::option::Option<
         jacquard_common::types::string::Datetime,
     >,
     ///Temperature in Celsius at Stage 2 * 10 (e.g. 225 = 22.5°C)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stage2_temp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub stage2_temp: core::option::Option<i64>,
     ///Temperature in Celsius at Stage 3 * 10 (e.g. 225 = 22.5°C)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stage3_temp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub stage3_temp: core::option::Option<i64>,
     ///Written review (max 255 graphemes)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Daily maximum UV index (0-11+)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub uv_index: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub uv_index: core::option::Option<i64>,
     ///User opted in to weather data collection
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub weather_opt_in: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub weather_opt_in: core::option::Option<bool>,
     ///Calculated final score * 1000 (e.g. 4250 = 4.25)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub weighted_score: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub weighted_score: core::option::Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -94,9 +94,9 @@ pub struct Review<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReviewGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -143,19 +143,19 @@ impl jacquard_common::types::collection::Collection for ReviewRecord {
     type Record = ReviewRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
     fn nsid() -> &'static str {
         "social.drydown.review"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_drydown_review()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.complexity {
             if *value > 5i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -837,7 +837,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -868,7 +868,7 @@ where
     }
 }
 
-fn lexicon_doc_social_drydown_review() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_drydown_review() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

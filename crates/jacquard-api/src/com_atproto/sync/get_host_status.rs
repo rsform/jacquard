@@ -34,16 +34,16 @@ pub struct GetHostStatus<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetHostStatusOutput<'a> {
     ///Number of accounts on the server which are associated with the upstream host. Note that the upstream may actually have more accounts.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub account_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub account_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub hostname: jacquard_common::CowStr<'a>,
     ///Recent repo stream event sequence number. May be delayed from actual stream processing (eg, persisted cursor not in-memory cursor).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub seq: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub seq: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<crate::com_atproto::sync::HostStatus<'a>>,
+    pub status: core::option::Option<crate::com_atproto::sync::HostStatus<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -62,7 +62,7 @@ pub struct GetHostStatusOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetHostStatusError<'a> {
     #[serde(rename = "HostNotFound")]
-    HostNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    HostNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetHostStatusError<'_> {

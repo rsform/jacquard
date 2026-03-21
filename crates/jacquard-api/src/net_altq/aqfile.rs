@@ -135,12 +135,12 @@ impl jacquard_common::IntoStatic for ChecksumAlgo<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct File<'a> {
     ///MIME type, e.g. 'video/mp4'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mime_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub mime_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Client-side last-modified timestamp.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub modified_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub modified_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///User-visible filename.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -162,18 +162,18 @@ pub struct File<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Aqfile<'a> {
     ///Handle or DID of the account to attribute this upload to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub attribution: std::option::Option<
+    pub attribution: core::option::Option<
         jacquard_common::types::ident::AtIdentifier<'a>,
     >,
     ///The uploaded blob reference. Note: Individual PDS instances may enforce lower size limits.
     #[serde(borrow)]
     pub blob: jacquard_common::types::blob::BlobRef<'a>,
     ///Optional cryptographic checksum for integrity verification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub checksum: std::option::Option<crate::net_altq::aqfile::Checksum<'a>>,
+    pub checksum: core::option::Option<crate::net_altq::aqfile::Checksum<'a>>,
     ///Timestamp when this record was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Metadata about the file.
@@ -193,9 +193,9 @@ pub struct Aqfile<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AqfileGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -215,19 +215,19 @@ impl<'a> Aqfile<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
     fn def_name() -> &'static str {
         "checksum"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_altq_aqfile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.algo;
             #[allow(unused_comparisons)]
@@ -258,19 +258,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Checksum<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for File<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for File<'a> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
     fn def_name() -> &'static str {
         "file"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_altq_aqfile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.mime_type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
@@ -351,19 +351,19 @@ impl jacquard_common::types::collection::Collection for AqfileRecord {
     type Record = AqfileRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Aqfile<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Aqfile<'a> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_altq_aqfile()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.blob;
             {
@@ -412,7 +412,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Aqfile<'a> {
     }
 }
 
-fn lexicon_doc_net_altq_aqfile() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_net_altq_aqfile() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("net.altq.aqfile"),
@@ -859,7 +859,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -884,51 +884,51 @@ pub mod aqfile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type File;
         type CreatedAt;
         type Blob;
+        type File;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type File = Unset;
         type CreatedAt = Unset;
         type Blob = Unset;
-    }
-    ///State transition - sets the `file` field to Set
-    pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFile<S> {}
-    impl<S: State> State for SetFile<S> {
-        type File = Set<members::file>;
-        type CreatedAt = S::CreatedAt;
-        type Blob = S::Blob;
+        type File = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type File = S::File;
         type CreatedAt = Set<members::created_at>;
         type Blob = S::Blob;
+        type File = S::File;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlob<S> {}
     impl<S: State> State for SetBlob<S> {
-        type File = S::File;
         type CreatedAt = S::CreatedAt;
         type Blob = Set<members::blob>;
+        type File = S::File;
+    }
+    ///State transition - sets the `file` field to Set
+    pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFile<S> {}
+    impl<S: State> State for SetFile<S> {
+        type CreatedAt = S::CreatedAt;
+        type Blob = S::Blob;
+        type File = Set<members::file>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `file` field
-        pub struct file(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `file` field
+        pub struct file(());
     }
 }
 
@@ -1061,9 +1061,9 @@ where
 impl<'a, S> AqfileBuilder<'a, S>
 where
     S: aqfile_state::State,
-    S::File: aqfile_state::IsSet,
     S::CreatedAt: aqfile_state::IsSet,
     S::Blob: aqfile_state::IsSet,
+    S::File: aqfile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Aqfile<'a> {
@@ -1079,7 +1079,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

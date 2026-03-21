@@ -18,15 +18,15 @@
 pub struct GetMessageContext<'a> {
     ///Defaults to `5`.
     #[serde(default = "_default_after")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub after: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub after: core::option::Option<i64>,
     ///Defaults to `5`.
     #[serde(default = "_default_before")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub before: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub before: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub convo_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub convo_id: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub message_id: jacquard_common::CowStr<'a>,
 }
@@ -92,11 +92,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetMessageContextRequest {
     type Response = GetMessageContextResponse;
 }
 
-fn _default_after() -> std::option::Option<i64> {
+fn _default_after() -> core::option::Option<i64> {
     Some(5i64)
 }
 
-fn _default_before() -> std::option::Option<i64> {
+fn _default_before() -> core::option::Option<i64> {
     Some(5i64)
 }
 

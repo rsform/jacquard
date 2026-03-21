@@ -19,26 +19,26 @@
 #[serde(rename_all = "camelCase")]
 pub struct Folder<'a> {
     ///Hex color code for the folder (e.g., #ff0000)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp when the folder was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Description of the folder
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Lucide icon name
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub icon: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Display name of the folder
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Visibility setting for the folder
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub visibility: std::option::Option<FolderVisibility<'a>>,
+    pub visibility: core::option::Option<FolderVisibility<'a>>,
 }
 
 /// Visibility setting for the folder
@@ -147,9 +147,9 @@ impl jacquard_common::IntoStatic for FolderVisibility<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FolderGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -196,19 +196,19 @@ impl jacquard_common::types::collection::Collection for FolderRecord {
     type Record = FolderRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Folder<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Folder<'a> {
     fn nsid() -> &'static str {
         "app.beaconbits.bookmark.folder"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_beaconbits_bookmark_folder()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.color {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -503,7 +503,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -520,7 +520,7 @@ where
     }
 }
 
-fn lexicon_doc_app_beaconbits_bookmark_folder() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_beaconbits_bookmark_folder() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

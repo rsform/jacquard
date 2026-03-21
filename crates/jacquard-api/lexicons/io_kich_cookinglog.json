@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "io.kich.cookinglog",
+  "description": "Record declaring that the user cooked a public recipe.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When this cooking log was created.",
+            "format": "datetime"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Optional user notes captured at completion.",
+            "maxLength": 500
+          },
+          "scaledServings": {
+            "type": "unknown",
+            "description": "Optional servings value used while cooking."
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Reference to the cooked recipe record (io.kich.recipe.recipe).",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

@@ -18,17 +18,17 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CrewExport<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub added_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub added_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub permissions: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub permissions: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub role: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub role: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tier: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub tier: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -44,19 +44,19 @@ pub struct CrewExport<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LayerExport<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub digest: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub digest: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub manifest: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub manifest: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub media_type: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub size: std::option::Option<i64>,
+    pub media_type: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub size: core::option::Option<i64>,
 }
 
 #[derive(
@@ -86,9 +86,9 @@ pub struct ExportUserDataOutput<'a> {
     #[serde(borrow)]
     pub bluesky_posts: Vec<crate::io_atcr::hold::export_user_data::PostExport<'a>>,
     ///User's crew record (if they are a crew member)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub crew_record: std::option::Option<
+    pub crew_record: core::option::Option<
         crate::io_atcr::hold::export_user_data::CrewExport<'a>,
     >,
     ///RFC3339 timestamp of when the export was generated
@@ -125,7 +125,7 @@ pub struct ExportUserDataOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum ExportUserDataError<'a> {
     #[serde(rename = "AuthRequired")]
-    AuthRequired(std::option::Option<jacquard_common::CowStr<'a>>),
+    AuthRequired(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ExportUserDataError<'_> {
@@ -156,14 +156,14 @@ impl core::fmt::Display for ExportUserDataError<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostExport<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub text: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -179,34 +179,34 @@ pub struct PostExport<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatsExport<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_pull: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_push: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pull_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub push_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_pull: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_push: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pull_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub push_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub repository: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub repository: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CrewExport<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CrewExport<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }
     fn def_name() -> &'static str {
         "crewExport"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_exportUserData()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.role {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {
@@ -235,19 +235,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CrewExport<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LayerExport<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LayerExport<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }
     fn def_name() -> &'static str {
         "layerExport"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_exportUserData()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.digest {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {
@@ -302,19 +302,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for ExportUserDataRequest {
     type Response = ExportUserDataResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostExport<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PostExport<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }
     fn def_name() -> &'static str {
         "postExport"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_exportUserData()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.text {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30000usize {
@@ -349,19 +349,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostExport<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatsExport<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for StatsExport<'a> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }
     fn def_name() -> &'static str {
         "statsExport"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_hold_exportUserData()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.repository {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 256usize {
@@ -378,7 +378,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatsExport<'a> {
     }
 }
 
-fn lexicon_doc_io_atcr_hold_exportUserData() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_io_atcr_hold_exportUserData() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

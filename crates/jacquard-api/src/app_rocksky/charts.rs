@@ -22,9 +22,9 @@ pub mod get_top_tracks;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChartsView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub scrobbles: std::option::Option<
+    pub scrobbles: core::option::Option<
         Vec<crate::app_rocksky::charts::ScrobbleViewBasic<'a>>,
     >,
 }
@@ -43,48 +43,48 @@ pub struct ChartsView<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ScrobbleViewBasic<'a> {
     ///The number of scrobbles on this date.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub count: core::option::Option<i64>,
     ///The date of the scrobble.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub date: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ChartsView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ChartsView<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.charts.defs"
     }
     fn def_name() -> &'static str {
         "chartsView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_charts_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ScrobbleViewBasic<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.charts.defs"
     }
     fn def_name() -> &'static str {
         "scrobbleViewBasic"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_charts_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_app_rocksky_charts_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_rocksky_charts_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

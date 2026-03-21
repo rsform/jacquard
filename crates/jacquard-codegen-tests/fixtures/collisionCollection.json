@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "test.collision.collection",
+  "description": "Test fixture that defines a local type named Collection, which collides with jacquard_common::types::collection::Collection trait.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A record that itself references the Collection trait via its NSID.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["name", "items"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "ref",
+              "ref": "#collection"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "collection": {
+      "type": "object",
+      "description": "A locally-defined type named Collection that collides with the trait import.",
+      "required": ["label"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

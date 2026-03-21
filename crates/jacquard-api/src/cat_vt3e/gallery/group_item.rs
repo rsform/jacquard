@@ -25,9 +25,9 @@ pub struct GroupItem<'a> {
     ///uri of the image that this item represents
     #[serde(borrow)]
     pub image: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub note: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub note: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -42,9 +42,9 @@ pub struct GroupItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GroupItemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -91,19 +91,19 @@ impl jacquard_common::types::collection::Collection for GroupItemRecord {
     type Record = GroupItemRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for GroupItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for GroupItem<'a> {
     fn nsid() -> &'static str {
         "cat.vt3e.gallery.groupItem"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_cat_vt3e_gallery_groupItem()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -118,51 +118,51 @@ pub mod group_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
-        type Group;
         type AddedAt;
+        type Group;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
-        type Group = Unset;
         type AddedAt = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Image = Set<members::image>;
-        type Group = S::Group;
-        type AddedAt = S::AddedAt;
-    }
-    ///State transition - sets the `group` field to Set
-    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGroup<S> {}
-    impl<S: State> State for SetGroup<S> {
-        type Image = S::Image;
-        type Group = Set<members::group>;
-        type AddedAt = S::AddedAt;
+        type Group = Unset;
+        type Image = Unset;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Image = S::Image;
-        type Group = S::Group;
         type AddedAt = Set<members::added_at>;
+        type Group = S::Group;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `group` field to Set
+    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGroup<S> {}
+    impl<S: State> State for SetGroup<S> {
+        type AddedAt = S::AddedAt;
+        type Group = Set<members::group>;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type AddedAt = S::AddedAt;
+        type Group = S::Group;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
-        ///Marker type for the `group` field
-        pub struct group(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `group` field
+        pub struct group(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
@@ -272,9 +272,9 @@ impl<'a, S: group_item_state::State> GroupItemBuilder<'a, S> {
 impl<'a, S> GroupItemBuilder<'a, S>
 where
     S: group_item_state::State,
-    S::Image: group_item_state::IsSet,
-    S::Group: group_item_state::IsSet,
     S::AddedAt: group_item_state::IsSet,
+    S::Group: group_item_state::IsSet,
+    S::Image: group_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GroupItem<'a> {
@@ -289,7 +289,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -304,7 +304,7 @@ where
     }
 }
 
-fn lexicon_doc_cat_vt3e_gallery_groupItem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_cat_vt3e_gallery_groupItem() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

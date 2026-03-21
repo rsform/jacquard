@@ -18,22 +18,22 @@
 #[serde(rename_all = "camelCase")]
 pub struct CheckSignupQueueOutput<'a> {
     pub activated: bool,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub estimated_time_ms: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub place_in_queue: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub estimated_time_ms: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub place_in_queue: core::option::Option<i64>,
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct CheckSignupQueue;
 /// Response type for

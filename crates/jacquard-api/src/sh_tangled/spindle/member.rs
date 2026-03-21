@@ -37,9 +37,9 @@ pub struct Member<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MemberGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -86,19 +86,19 @@ impl jacquard_common::types::collection::Collection for MemberRecord {
     type Record = MemberRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Member<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Member<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.spindle.member"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_spindle_member()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -113,51 +113,51 @@ pub mod member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type Instance;
         type CreatedAt;
+        type Instance;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type Instance = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Instance = S::Instance;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `instance` field to Set
-    pub struct SetInstance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInstance<S> {}
-    impl<S: State> State for SetInstance<S> {
-        type Subject = S::Subject;
-        type Instance = Set<members::instance>;
-        type CreatedAt = S::CreatedAt;
+        type Instance = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type Instance = S::Instance;
         type CreatedAt = Set<members::created_at>;
+        type Instance = S::Instance;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `instance` field to Set
+    pub struct SetInstance<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInstance<S> {}
+    impl<S: State> State for SetInstance<S> {
+        type CreatedAt = S::CreatedAt;
+        type Instance = Set<members::instance>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Instance = S::Instance;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `instance` field
-        pub struct instance(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `instance` field
+        pub struct instance(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -250,9 +250,9 @@ where
 impl<'a, S> MemberBuilder<'a, S>
 where
     S: member_state::State,
-    S::Subject: member_state::IsSet,
-    S::Instance: member_state::IsSet,
     S::CreatedAt: member_state::IsSet,
+    S::Instance: member_state::IsSet,
+    S::Subject: member_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Member<'a> {
@@ -266,7 +266,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -280,7 +280,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_spindle_member() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_tangled_spindle_member() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

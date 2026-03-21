@@ -21,22 +21,22 @@ pub mod upload_video;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct JobStatus<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub error: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub error: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub job_id: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Progress within the current processing state.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub progress: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub progress: core::option::Option<i64>,
     ///The state of the video processing job. All values not listed as a known value indicate that the job is in process.
     #[serde(borrow)]
     pub state: JobStatusState<'a>,
@@ -131,19 +131,19 @@ impl jacquard_common::IntoStatic for JobStatusState<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for JobStatus<'a> {
     fn nsid() -> &'static str {
         "app.bsky.video.defs"
     }
     fn def_name() -> &'static str {
         "jobStatus"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_video_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.progress {
             if *value > 100i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -180,51 +180,51 @@ pub mod job_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type JobId;
-        type Did;
         type State;
+        type Did;
+        type JobId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type JobId = Unset;
-        type Did = Unset;
         type State = Unset;
-    }
-    ///State transition - sets the `job_id` field to Set
-    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetJobId<S> {}
-    impl<S: State> State for SetJobId<S> {
-        type JobId = Set<members::job_id>;
-        type Did = S::Did;
-        type State = S::State;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type JobId = S::JobId;
-        type Did = Set<members::did>;
-        type State = S::State;
+        type Did = Unset;
+        type JobId = Unset;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetState<S> {}
     impl<S: State> State for SetState<S> {
-        type JobId = S::JobId;
-        type Did = S::Did;
         type State = Set<members::state>;
+        type Did = S::Did;
+        type JobId = S::JobId;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type State = S::State;
+        type Did = Set<members::did>;
+        type JobId = S::JobId;
+    }
+    ///State transition - sets the `job_id` field to Set
+    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetJobId<S> {}
+    impl<S: State> State for SetJobId<S> {
+        type State = S::State;
+        type Did = S::Did;
+        type JobId = Set<members::job_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `job_id` field
-        pub struct job_id(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `state` field
         pub struct state(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `job_id` field
+        pub struct job_id(());
     }
 }
 
@@ -385,9 +385,9 @@ where
 impl<'a, S> JobStatusBuilder<'a, S>
 where
     S: job_status_state::State,
-    S::JobId: job_status_state::IsSet,
-    S::Did: job_status_state::IsSet,
     S::State: job_status_state::IsSet,
+    S::Did: job_status_state::IsSet,
+    S::JobId: job_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> JobStatus<'a> {
@@ -405,7 +405,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -423,9 +423,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_video_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_bsky_video_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.video.defs"),

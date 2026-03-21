@@ -55,19 +55,19 @@ pub struct SendMessageBatchOutput<'a> {
     pub items: Vec<crate::chat_bsky::convo::MessageView<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BatchItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BatchItem<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.sendMessageBatch"
     }
     fn def_name() -> &'static str {
         "batchItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_sendMessageBatch()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -229,7 +229,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -242,7 +242,7 @@ where
     }
 }
 
-fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_chat_bsky_convo_sendMessageBatch() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -443,7 +443,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -18,24 +18,24 @@
 #[serde(rename_all = "camelCase")]
 pub struct Merge<'a> {
     ///Author email for the merge commit
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub author_email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub author_email: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Author name for the merge commit
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub author_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub author_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Target branch to merge into
     #[serde(borrow)]
     pub branch: jacquard_common::CowStr<'a>,
     ///Additional commit message body
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub commit_body: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub commit_body: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Merge commit message
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub commit_message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub commit_message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///DID of the repository owner
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
@@ -88,66 +88,66 @@ pub mod merge_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Branch;
         type Did;
         type Patch;
+        type Branch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Branch = Unset;
         type Did = Unset;
         type Patch = Unset;
+        type Branch = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Did = S::Did;
+        type Patch = S::Patch;
         type Branch = S::Branch;
-        type Did = S::Did;
-        type Patch = S::Patch;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Name = S::Name;
-        type Branch = Set<members::branch>;
-        type Did = S::Did;
-        type Patch = S::Patch;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Name = S::Name;
-        type Branch = S::Branch;
         type Did = Set<members::did>;
         type Patch = S::Patch;
+        type Branch = S::Branch;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPatch<S> {}
     impl<S: State> State for SetPatch<S> {
         type Name = S::Name;
-        type Branch = S::Branch;
         type Did = S::Did;
         type Patch = Set<members::patch>;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Name = S::Name;
+        type Did = S::Did;
+        type Patch = S::Patch;
+        type Branch = Set<members::branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `branch` field
-        pub struct branch(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `patch` field
         pub struct patch(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
     }
 }
 
@@ -341,9 +341,9 @@ impl<'a, S> MergeBuilder<'a, S>
 where
     S: merge_state::State,
     S::Name: merge_state::IsSet,
-    S::Branch: merge_state::IsSet,
     S::Did: merge_state::IsSet,
     S::Patch: merge_state::IsSet,
+    S::Branch: merge_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Merge<'a> {
@@ -362,7 +362,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

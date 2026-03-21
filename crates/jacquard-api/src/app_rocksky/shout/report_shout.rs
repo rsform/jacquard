@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct ReportShout<'a> {
     ///The reason for reporting the shout
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub reason: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The unique identifier of the shout to report
     #[serde(borrow)]
     pub shout_id: jacquard_common::CowStr<'a>,

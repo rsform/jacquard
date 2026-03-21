@@ -2,6 +2,34 @@
   "lexicon": 1,
   "id": "games.gamesgamesgamesgames.defs",
   "defs": {
+    "actorCreditView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "credits"
+      ],
+      "properties": {
+        "actorUri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "credits": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#creditEntry"
+          }
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
     "actorProfileDetailView": {
       "type": "object",
       "required": [
@@ -258,6 +286,9 @@
         "steam": {
           "type": "string"
         },
+        "twitch": {
+          "type": "string"
+        },
         "xbox": {
           "type": "string"
         }
@@ -294,6 +325,13 @@
         "createdAt"
       ],
       "properties": {
+        "actorCredits": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#actorCreditView"
+          }
+        },
         "ageRatings": {
           "type": "array",
           "items": {
@@ -377,6 +415,13 @@
         },
         "name": {
           "type": "string"
+        },
+        "orgCredits": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#orgCreditView"
+          }
         },
         "parent": {
           "type": "string",
@@ -727,6 +772,34 @@
         },
         "platform": {
           "type": "string"
+        }
+      }
+    },
+    "orgCreditView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "roles"
+      ],
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
+        "orgUri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "games.gamesgamesgamesgames.defs#companyRole"
+          }
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
         }
       }
     },

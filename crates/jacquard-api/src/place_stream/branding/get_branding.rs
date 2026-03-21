@@ -19,12 +19,12 @@
 #[serde(rename_all = "camelCase")]
 pub struct BrandingAsset<'a> {
     ///Inline data for text assets
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub data: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub data: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Image height in pixels (optional, for images only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub height: core::option::Option<i64>,
     ///Asset key identifier
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
@@ -32,12 +32,12 @@ pub struct BrandingAsset<'a> {
     #[serde(borrow)]
     pub mime_type: jacquard_common::CowStr<'a>,
     ///URL to fetch the asset blob (for images)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub url: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Image width in pixels (optional, for images only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub width: core::option::Option<i64>,
 }
 
 #[derive(
@@ -51,9 +51,9 @@ pub struct BrandingAsset<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBranding<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub broadcaster: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub broadcaster: core::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -96,19 +96,19 @@ impl core::fmt::Display for GetBrandingError<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BrandingAsset<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BrandingAsset<'a> {
     fn nsid() -> &'static str {
         "place.stream.branding.getBranding"
     }
     fn def_name() -> &'static str {
         "brandingAsset"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_branding_getBranding()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -139,7 +139,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBrandingRequest {
     type Response = GetBrandingResponse;
 }
 
-fn lexicon_doc_place_stream_branding_getBranding() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_branding_getBranding() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

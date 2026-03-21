@@ -19,42 +19,42 @@
 #[serde(rename_all = "camelCase")]
 pub struct Evaluation<'a> {
     ///Overall confidence in this evaluation (0-1000, where 1000 = 100.0%).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub confidence: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub confidence: core::option::Option<i64>,
     ///Timestamp of when this evaluation was produced.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Additional structured data as a JSON string. Escape hatch for experimental result types before they are formalized into the union.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub dynamic_properties: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub dynamic_properties: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Identifier for the type of evaluation (must match one declared in the evaluator's service record).
     #[serde(borrow)]
     pub evaluation_type: jacquard_common::CowStr<'a>,
     ///Method/model provenance for this specific evaluation (overrides service-level method if set).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub method: std::option::Option<crate::app_gainforest::evaluator::MethodInfo<'a>>,
+    pub method: core::option::Option<crate::app_gainforest::evaluator::MethodInfo<'a>>,
     ///If true, this is a negation/withdrawal of a previous evaluation (like label negation).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub neg: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub neg: core::option::Option<bool>,
     ///The typed evaluation result. The $type field determines which result schema is used.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub result: std::option::Option<EvaluationResult<'a>>,
+    pub result: core::option::Option<EvaluationResult<'a>>,
     ///Single target record being evaluated. Use this OR subjects, not both.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: std::option::Option<crate::app_gainforest::evaluator::SubjectRef<'a>>,
+    pub subject: core::option::Option<crate::app_gainforest::evaluator::SubjectRef<'a>>,
     ///Batch evaluation: multiple target records sharing the same result. Use this OR subject, not both.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subjects: std::option::Option<
+    pub subjects: core::option::Option<
         Vec<crate::app_gainforest::evaluator::SubjectRef<'a>>,
     >,
     ///AT-URI of a previous evaluation record that this one supersedes (e.g., model re-run with improved version).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub supersedes: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub supersedes: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -96,9 +96,9 @@ pub enum EvaluationResult<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -145,19 +145,19 @@ impl jacquard_common::types::collection::Collection for EvaluationRecord {
     type Record = EvaluationRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.evaluation"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_evaluator_evaluation()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.confidence {
             if *value > 1000i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -521,7 +521,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -542,7 +542,7 @@ where
     }
 }
 
-fn lexicon_doc_app_gainforest_evaluator_evaluation() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_gainforest_evaluator_evaluation() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

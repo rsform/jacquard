@@ -18,24 +18,24 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Underline<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Underline<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Underline<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.mark.underline"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_mark_underline()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_blog_pckt_mark_underline() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blog_pckt_mark_underline() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

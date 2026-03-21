@@ -18,20 +18,20 @@
 #[serde(rename_all = "camelCase")]
 pub struct SetStats<'a> {
     ///RFC3339 timestamp of last pull
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_pull: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_pull: core::option::Option<jacquard_common::types::string::Datetime>,
     ///RFC3339 timestamp of last push
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_push: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_push: core::option::Option<jacquard_common::types::string::Datetime>,
     ///DID of the repository owner
     #[serde(borrow)]
     pub owner_did: jacquard_common::types::string::Did<'a>,
     ///Absolute pull count to set
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pull_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pull_count: core::option::Option<i64>,
     ///Absolute push count to set
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub push_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub push_count: core::option::Option<i64>,
     ///Repository name
     #[serde(borrow)]
     pub repository: jacquard_common::CowStr<'a>,
@@ -69,9 +69,9 @@ pub struct SetStatsOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum SetStatsError<'a> {
     #[serde(rename = "InvalidOwner")]
-    InvalidOwner(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidOwner(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidRepository")]
-    InvalidRepository(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRepository(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for SetStatsError<'_> {
@@ -325,7 +325,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

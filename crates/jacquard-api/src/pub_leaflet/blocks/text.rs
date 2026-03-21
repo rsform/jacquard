@@ -18,34 +18,36 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Text<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<
+        Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>,
+    >,
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text_size: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text_size: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Text<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.text"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_blocks_text()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_pub_leaflet_blocks_text() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_pub_leaflet_blocks_text() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -64,19 +64,19 @@ pub struct BskyAppProgressGuide<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BskyAppStatePref<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub active_progress_guide: std::option::Option<
+    pub active_progress_guide: core::option::Option<
         crate::app_bsky::actor::BskyAppProgressGuide<'a>,
     >,
     ///Storage for NUXs the user has encountered.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub nuxs: std::option::Option<Vec<crate::app_bsky::actor::Nux<'a>>>,
+    pub nuxs: core::option::Option<Vec<crate::app_bsky::actor::Nux<'a>>>,
     ///An array of tokens which identify nudges (modals, popups, tours, highlight dots) that should be shown to the user.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub queued_nudges: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub queued_nudges: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -95,9 +95,9 @@ pub struct ContentLabelPref<'a> {
     #[serde(borrow)]
     pub label: jacquard_common::CowStr<'a>,
     ///Which labeler does this preference apply to? If undefined, applies globally.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labeler_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub labeler_did: core::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
     pub visibility: ContentLabelPrefVisibility<'a>,
 }
@@ -217,14 +217,14 @@ impl jacquard_common::IntoStatic for ContentLabelPrefVisibility<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct DeclaredAgePref<'a> {
     ///Indicates if the user has declared that they are over 13 years of age.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_over_age13: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_over_age13: core::option::Option<bool>,
     ///Indicates if the user has declared that they are over 16 years of age.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_over_age16: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_over_age16: core::option::Option<bool>,
     ///Indicates if the user has declared that they are over 18 years of age.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_over_age18: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_over_age18: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -244,21 +244,21 @@ pub struct FeedViewPref<'a> {
     #[serde(borrow)]
     pub feed: jacquard_common::CowStr<'a>,
     ///Hide quote posts in the feed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_quote_posts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hide_quote_posts: core::option::Option<bool>,
     ///Hide replies in the feed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_replies: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hide_replies: core::option::Option<bool>,
     ///Hide replies in the feed if they do not have this number of likes.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_replies_by_like_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hide_replies_by_like_count: core::option::Option<i64>,
     ///Hide replies in the feed if they are not by followed users. Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_feed_view_pref_hide_replies_by_unfollowed")]
-    pub hide_replies_by_unfollowed: std::option::Option<bool>,
+    pub hide_replies_by_unfollowed: core::option::Option<bool>,
     ///Hide reposts in the feed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_reposts: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hide_reposts: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -359,13 +359,13 @@ pub struct LabelersPref<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct LiveEventPreferences<'a> {
     ///A list of feed IDs that the user has hidden from live events.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hidden_feed_ids: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub hidden_feed_ids: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Whether to hide all feeds from live events. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_live_event_preferences_hide_all_feeds")]
-    pub hide_all_feeds: std::option::Option<bool>,
+    pub hide_all_feeds: core::option::Option<bool>,
 }
 
 /// A word that the account owner has muted.
@@ -382,15 +382,15 @@ pub struct LiveEventPreferences<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct MutedWord<'a> {
     ///Groups of users to apply the muted word to. If undefined, applies to all users.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub actor_target: std::option::Option<MutedWordActorTarget<'a>>,
+    pub actor_target: core::option::Option<MutedWordActorTarget<'a>>,
     ///The date and time at which the muted word will expire and no longer be applied.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The intended targets of the muted word.
     #[serde(borrow)]
     pub targets: Vec<crate::app_bsky::actor::MutedWordTarget<'a>>,
@@ -608,12 +608,12 @@ pub struct Nux<'a> {
     #[serde(default = "_default_nux_completed")]
     pub completed: bool,
     ///Arbitrary data for the NUX. The structure is defined by the NUX itself. Limited to 300 characters.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub data: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub data: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The date and time at which the NUX will expire and should be considered completed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
 }
@@ -632,8 +632,8 @@ pub struct Nux<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct PersonalDetailsPref<'a> {
     ///The birth date of account owner.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub birth_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub birth_date: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Default post interaction settings for the account. These values should be applied as default values when creating new posts. These refs should mirror the threadgate and postgate records exactly.
@@ -651,15 +651,15 @@ pub struct PersonalDetailsPref<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct PostInteractionSettingsPref<'a> {
     ///Matches postgate record. List of rules defining who can embed this users posts. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub postgate_embedding_rules: std::option::Option<
+    pub postgate_embedding_rules: core::option::Option<
         Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
     >,
     ///Matches threadgate record. List of rules defining who can reply to this users posts. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub threadgate_allow_rules: std::option::Option<
+    pub threadgate_allow_rules: core::option::Option<
         Vec<PostInteractionSettingsPrefThreadgateAllowRulesItem<'a>>,
     >,
 }
@@ -750,25 +750,25 @@ pub type Preferences<'a> = Vec<PreferencesItem<'a>>;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileAssociated<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub activity_subscription: std::option::Option<
+    pub activity_subscription: core::option::Option<
         crate::app_bsky::actor::ProfileAssociatedActivitySubscription<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub chat: std::option::Option<crate::app_bsky::actor::ProfileAssociatedChat<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub feedgens: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub chat: core::option::Option<crate::app_bsky::actor::ProfileAssociatedChat<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub feedgens: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub germ: std::option::Option<crate::app_bsky::actor::ProfileAssociatedGerm<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub labeler: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lists: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starter_packs: std::option::Option<i64>,
+    pub germ: core::option::Option<crate::app_bsky::actor::ProfileAssociatedGerm<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub labeler: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub lists: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub starter_packs: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1137,45 +1137,47 @@ impl jacquard_common::IntoStatic for ProfileAssociatedGermShowButtonTo<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub associated: core::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub avatar: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Debug information for internal development
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub debug: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub indexed_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub labels: core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pronouns: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub status: core::option::Option<crate::app_bsky::actor::StatusView<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub verification: core::option::Option<
+        crate::app_bsky::actor::VerificationState<'a>,
+    >,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: core::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1190,40 +1192,42 @@ pub struct ProfileView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileViewBasic<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub associated: core::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub avatar: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Debug information for internal development
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub debug: core::option::Option<jacquard_common::types::value::Data<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub labels: core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pronouns: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub status: core::option::Option<crate::app_bsky::actor::StatusView<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub verification: core::option::Option<
+        crate::app_bsky::actor::VerificationState<'a>,
+    >,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    pub viewer: core::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1238,67 +1242,69 @@ pub struct ProfileViewBasic<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ProfileViewDetailed<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub associated: std::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub associated: core::option::Option<crate::app_bsky::actor::ProfileAssociated<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub avatar: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub banner: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Debug information for internal development
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub debug: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub debug: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub followers_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub follows_count: std::option::Option<i64>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub followers_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub follows_count: core::option::Option<i64>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub indexed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub indexed_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub joined_via_starter_pack: std::option::Option<
+    pub joined_via_starter_pack: core::option::Option<
         crate::app_bsky::graph::StarterPackViewBasic<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub labels: core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pinned_post: std::option::Option<
+    pub pinned_post: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub posts_count: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub posts_count: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub pronouns: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<crate::app_bsky::actor::StatusView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub status: core::option::Option<crate::app_bsky::actor::StatusView<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub verification: std::option::Option<crate::app_bsky::actor::VerificationState<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub verification: core::option::Option<
+        crate::app_bsky::actor::VerificationState<'a>,
+    >,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer: std::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub viewer: core::option::Option<crate::app_bsky::actor::ViewerState<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub website: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub website: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1431,8 +1437,8 @@ pub struct SavedFeedsPref<'a> {
     pub pinned: Vec<jacquard_common::types::string::AtUri<'a>>,
     #[serde(borrow)]
     pub saved: Vec<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub timeline_index: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub timeline_index: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1463,30 +1469,30 @@ pub struct SavedFeedsPrefV2<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatusView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     ///An optional embed associated with the status.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<crate::app_bsky::embed::external::View<'a>>,
+    pub embed: core::option::Option<crate::app_bsky::embed::external::View<'a>>,
     ///The date when this status will expire. The application might choose to no longer return the status after expiration.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expires_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///True if the status is not expired, false if it is expired. Only present if expiration was set.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_active: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_active: core::option::Option<bool>,
     ///True if the user's go-live access has been disabled by a moderator, false otherwise.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_disabled: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_disabled: core::option::Option<bool>,
     #[serde(borrow)]
     pub record: jacquard_common::types::value::Data<'a>,
     ///The status for the account.
     #[serde(borrow)]
     pub status: StatusViewStatus<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 /// The status for the account.
@@ -1587,9 +1593,9 @@ impl jacquard_common::IntoStatic for StatusViewStatus<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct ThreadViewPref<'a> {
     ///Sorting mode for threads.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort: std::option::Option<ThreadViewPrefSort<'a>>,
+    pub sort: core::option::Option<ThreadViewPrefSort<'a>>,
 }
 
 /// Sorting mode for threads.
@@ -1710,9 +1716,9 @@ impl jacquard_common::IntoStatic for ThreadViewPrefSort<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct VerificationPrefs<'a> {
     ///Hide the blue check badges for verified accounts and trusted verifiers. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_verification_prefs_hide_badges")]
-    pub hide_badges: std::option::Option<bool>,
+    pub hide_badges: core::option::Option<bool>,
 }
 
 /// Represents the verification information about the user this object is attached to.
@@ -1983,66 +1989,70 @@ pub struct VerificationView<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ViewerState<'a> {
     ///This property is present only in selected cases, as an optimization.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub activity_subscription: std::option::Option<
+    pub activity_subscription: core::option::Option<
         crate::app_bsky::notification::ActivitySubscription<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub blocked_by: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub blocked_by: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub blocking: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub blocking: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub blocking_by_list: std::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub blocking_by_list: core::option::Option<
+        crate::app_bsky::graph::ListViewBasic<'a>,
+    >,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub followed_by: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub followed_by: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub following: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub following: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///This property is present only in selected cases, as an optimization.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub known_followers: std::option::Option<crate::app_bsky::actor::KnownFollowers<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub muted: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub known_followers: core::option::Option<
+        crate::app_bsky::actor::KnownFollowers<'a>,
+    >,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub muted: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub muted_by_list: std::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
+    pub muted_by_list: core::option::Option<crate::app_bsky::graph::ListViewBasic<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AdultContentPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AdultContentPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "adultContentPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BskyAppProgressGuide<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BskyAppProgressGuide<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "bskyAppProgressGuide"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.guide;
             #[allow(unused_comparisons)]
@@ -2060,19 +2070,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BskyAppProgressGuide<'a> 
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BskyAppStatePref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BskyAppStatePref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "bskyAppStatePref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.nuxs {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
@@ -2101,87 +2111,87 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BskyAppStatePref<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ContentLabelPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ContentLabelPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "contentLabelPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeclaredAgePref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DeclaredAgePref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "declaredAgePref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeedViewPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FeedViewPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "feedViewPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for HiddenPostsPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for HiddenPostsPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "hiddenPostsPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestsPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for InterestsPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "interestsPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.tags;
             #[allow(unused_comparisons)]
@@ -2199,19 +2209,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for InterestsPref<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KnownFollowers<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for KnownFollowers<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "knownFollowers"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.followers;
             #[allow(unused_comparisons)]
@@ -2242,70 +2252,70 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for KnownFollowers<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelerPrefItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LabelerPrefItem<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "labelerPrefItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LabelersPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LabelersPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "labelersPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LiveEventPreferences<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LiveEventPreferences<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "liveEventPreferences"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MutedWord<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MutedWord<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "mutedWord"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.value;
             #[allow(unused_comparisons)]
@@ -2342,36 +2352,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MutedWord<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MutedWordsPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MutedWordsPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "mutedWordsPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Nux<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Nux<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "nux"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.data {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -2419,36 +2429,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Nux<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PersonalDetailsPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PersonalDetailsPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "personalDetailsPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostInteractionSettingsPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PostInteractionSettingsPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "postInteractionSettingsPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.postgate_embedding_rules {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
@@ -2477,24 +2487,24 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PostInteractionSettingsPr
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociated<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ProfileAssociated<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "profileAssociated"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
+impl<'a> jacquard_lexicon::schema::LexiconSchema
 for ProfileAssociatedActivitySubscription<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
@@ -2502,63 +2512,63 @@ for ProfileAssociatedActivitySubscription<'a> {
     fn def_name() -> &'static str {
         "profileAssociatedActivitySubscription"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociatedChat<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ProfileAssociatedChat<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "profileAssociatedChat"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileAssociatedGerm<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ProfileAssociatedGerm<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "profileAssociatedGerm"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "profileView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
@@ -2623,19 +2633,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewBasic<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ProfileViewBasic<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "profileViewBasic"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.display_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
@@ -2670,19 +2680,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewBasic<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewDetailed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ProfileViewDetailed<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "profileViewDetailed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2560usize {
@@ -2747,155 +2757,155 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewDetailed<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SavedFeed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SavedFeed<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "savedFeed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SavedFeedsPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SavedFeedsPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "savedFeedsPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SavedFeedsPrefV2<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SavedFeedsPrefV2<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "savedFeedsPrefV2"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StatusView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for StatusView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "statusView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ThreadViewPref<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ThreadViewPref<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "threadViewPref"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationPrefs<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for VerificationPrefs<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "verificationPrefs"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationState<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for VerificationState<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "verificationState"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VerificationView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for VerificationView<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "verificationView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
     fn nsid() -> &'static str {
         "app.bsky.actor.defs"
     }
     fn def_name() -> &'static str {
         "viewerState"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_actor_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -3004,7 +3014,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3016,9 +3026,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_bsky_actor_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.bsky.actor.defs"),
@@ -5765,7 +5773,7 @@ fn lexicon_doc_app_bsky_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
     }
 }
 
-fn _default_feed_view_pref_hide_replies_by_unfollowed() -> std::option::Option<bool> {
+fn _default_feed_view_pref_hide_replies_by_unfollowed() -> core::option::Option<bool> {
     Some(true)
 }
 
@@ -5862,7 +5870,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -5965,7 +5973,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -6104,7 +6112,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -6210,7 +6218,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -6315,7 +6323,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -6327,7 +6335,7 @@ where
     }
 }
 
-fn _default_live_event_preferences_hide_all_feeds() -> std::option::Option<bool> {
+fn _default_live_event_preferences_hide_all_feeds() -> core::option::Option<bool> {
     Some(false)
 }
 
@@ -6351,37 +6359,37 @@ pub mod muted_word_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Targets;
         type Value;
+        type Targets;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Targets = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `targets` field to Set
-    pub struct SetTargets<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargets<S> {}
-    impl<S: State> State for SetTargets<S> {
-        type Targets = Set<members::targets>;
-        type Value = S::Value;
+        type Targets = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Targets = S::Targets;
         type Value = Set<members::value>;
+        type Targets = S::Targets;
+    }
+    ///State transition - sets the `targets` field to Set
+    pub struct SetTargets<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargets<S> {}
+    impl<S: State> State for SetTargets<S> {
+        type Value = S::Value;
+        type Targets = Set<members::targets>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `targets` field
-        pub struct targets(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `targets` field
+        pub struct targets(());
     }
 }
 
@@ -6508,8 +6516,8 @@ where
 impl<'a, S> MutedWordBuilder<'a, S>
 where
     S: muted_word_state::State,
-    S::Targets: muted_word_state::IsSet,
     S::Value: muted_word_state::IsSet,
+    S::Targets: muted_word_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MutedWord<'a> {
@@ -6525,7 +6533,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -6634,7 +6642,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -6660,37 +6668,37 @@ pub mod nux_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Completed;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Completed = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Completed = S::Completed;
+        type Id = Unset;
     }
     ///State transition - sets the `completed` field to Set
     pub struct SetCompleted<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCompleted<S> {}
     impl<S: State> State for SetCompleted<S> {
-        type Id = S::Id;
         type Completed = Set<members::completed>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Completed = S::Completed;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `completed` field
         pub struct completed(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -6800,8 +6808,8 @@ where
 impl<'a, S> NuxBuilder<'a, S>
 where
     S: nux_state::State,
-    S::Id: nux_state::IsSet,
     S::Completed: nux_state::IsSet,
+    S::Id: nux_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Nux<'a> {
@@ -6816,7 +6824,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -6841,37 +6849,37 @@ pub mod profile_associated_germ_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShowButtonTo;
         type MessageMeUrl;
+        type ShowButtonTo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShowButtonTo = Unset;
         type MessageMeUrl = Unset;
-    }
-    ///State transition - sets the `show_button_to` field to Set
-    pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
-    impl<S: State> State for SetShowButtonTo<S> {
-        type ShowButtonTo = Set<members::show_button_to>;
-        type MessageMeUrl = S::MessageMeUrl;
+        type ShowButtonTo = Unset;
     }
     ///State transition - sets the `message_me_url` field to Set
     pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
     impl<S: State> State for SetMessageMeUrl<S> {
-        type ShowButtonTo = S::ShowButtonTo;
         type MessageMeUrl = Set<members::message_me_url>;
+        type ShowButtonTo = S::ShowButtonTo;
+    }
+    ///State transition - sets the `show_button_to` field to Set
+    pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
+    impl<S: State> State for SetShowButtonTo<S> {
+        type MessageMeUrl = S::MessageMeUrl;
+        type ShowButtonTo = Set<members::show_button_to>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show_button_to` field
-        pub struct show_button_to(());
         ///Marker type for the `message_me_url` field
         pub struct message_me_url(());
+        ///Marker type for the `show_button_to` field
+        pub struct show_button_to(());
     }
 }
 
@@ -6953,8 +6961,8 @@ where
 impl<'a, S> ProfileAssociatedGermBuilder<'a, S>
 where
     S: profile_associated_germ_state::State,
-    S::ShowButtonTo: profile_associated_germ_state::IsSet,
     S::MessageMeUrl: profile_associated_germ_state::IsSet,
+    S::ShowButtonTo: profile_associated_germ_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileAssociatedGerm<'a> {
@@ -6967,7 +6975,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -7371,7 +7379,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -7743,7 +7751,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -8293,7 +8301,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -8335,67 +8343,67 @@ pub mod saved_feed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Pinned;
-        type Value;
+        type Id;
         type Type;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Pinned = Unset;
-        type Value = Unset;
+        type Id = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Pinned = S::Pinned;
-        type Value = S::Value;
-        type Type = S::Type;
+        type Value = Unset;
     }
     ///State transition - sets the `pinned` field to Set
     pub struct SetPinned<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPinned<S> {}
     impl<S: State> State for SetPinned<S> {
-        type Id = S::Id;
         type Pinned = Set<members::pinned>;
-        type Value = S::Value;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
         type Id = S::Id;
-        type Pinned = S::Pinned;
-        type Value = Set<members::value>;
         type Type = S::Type;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Pinned = S::Pinned;
+        type Id = Set<members::id>;
+        type Type = S::Type;
+        type Value = S::Value;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Id = S::Id;
         type Pinned = S::Pinned;
-        type Value = S::Value;
+        type Id = S::Id;
         type Type = Set<members::r#type>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Pinned = S::Pinned;
+        type Id = S::Id;
+        type Type = S::Type;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `pinned` field
         pub struct pinned(());
-        ///Marker type for the `value` field
-        pub struct value(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -8508,10 +8516,10 @@ where
 impl<'a, S> SavedFeedBuilder<'a, S>
 where
     S: saved_feed_state::State,
-    S::Id: saved_feed_state::IsSet,
     S::Pinned: saved_feed_state::IsSet,
-    S::Value: saved_feed_state::IsSet,
+    S::Id: saved_feed_state::IsSet,
     S::Type: saved_feed_state::IsSet,
+    S::Value: saved_feed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SavedFeed<'a> {
@@ -8526,7 +8534,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -8683,7 +8691,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -8790,7 +8798,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -9043,7 +9051,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -9062,7 +9070,7 @@ where
     }
 }
 
-fn _default_verification_prefs_hide_badges() -> std::option::Option<bool> {
+fn _default_verification_prefs_hide_badges() -> core::option::Option<bool> {
     Some(false)
 }
 
@@ -9085,51 +9093,51 @@ pub mod verification_state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TrustedVerifierStatus;
-        type VerifiedStatus;
         type Verifications;
+        type VerifiedStatus;
+        type TrustedVerifierStatus;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TrustedVerifierStatus = Unset;
-        type VerifiedStatus = Unset;
         type Verifications = Unset;
-    }
-    ///State transition - sets the `trusted_verifier_status` field to Set
-    pub struct SetTrustedVerifierStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTrustedVerifierStatus<S> {}
-    impl<S: State> State for SetTrustedVerifierStatus<S> {
-        type TrustedVerifierStatus = Set<members::trusted_verifier_status>;
-        type VerifiedStatus = S::VerifiedStatus;
-        type Verifications = S::Verifications;
-    }
-    ///State transition - sets the `verified_status` field to Set
-    pub struct SetVerifiedStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVerifiedStatus<S> {}
-    impl<S: State> State for SetVerifiedStatus<S> {
-        type TrustedVerifierStatus = S::TrustedVerifierStatus;
-        type VerifiedStatus = Set<members::verified_status>;
-        type Verifications = S::Verifications;
+        type VerifiedStatus = Unset;
+        type TrustedVerifierStatus = Unset;
     }
     ///State transition - sets the `verifications` field to Set
     pub struct SetVerifications<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVerifications<S> {}
     impl<S: State> State for SetVerifications<S> {
-        type TrustedVerifierStatus = S::TrustedVerifierStatus;
-        type VerifiedStatus = S::VerifiedStatus;
         type Verifications = Set<members::verifications>;
+        type VerifiedStatus = S::VerifiedStatus;
+        type TrustedVerifierStatus = S::TrustedVerifierStatus;
+    }
+    ///State transition - sets the `verified_status` field to Set
+    pub struct SetVerifiedStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVerifiedStatus<S> {}
+    impl<S: State> State for SetVerifiedStatus<S> {
+        type Verifications = S::Verifications;
+        type VerifiedStatus = Set<members::verified_status>;
+        type TrustedVerifierStatus = S::TrustedVerifierStatus;
+    }
+    ///State transition - sets the `trusted_verifier_status` field to Set
+    pub struct SetTrustedVerifierStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTrustedVerifierStatus<S> {}
+    impl<S: State> State for SetTrustedVerifierStatus<S> {
+        type Verifications = S::Verifications;
+        type VerifiedStatus = S::VerifiedStatus;
+        type TrustedVerifierStatus = Set<members::trusted_verifier_status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `trusted_verifier_status` field
-        pub struct trusted_verifier_status(());
-        ///Marker type for the `verified_status` field
-        pub struct verified_status(());
         ///Marker type for the `verifications` field
         pub struct verifications(());
+        ///Marker type for the `verified_status` field
+        pub struct verified_status(());
+        ///Marker type for the `trusted_verifier_status` field
+        pub struct trusted_verifier_status(());
     }
 }
 
@@ -9225,9 +9233,9 @@ where
 impl<'a, S> VerificationStateBuilder<'a, S>
 where
     S: verification_state_state::State,
-    S::TrustedVerifierStatus: verification_state_state::IsSet,
-    S::VerifiedStatus: verification_state_state::IsSet,
     S::Verifications: verification_state_state::IsSet,
+    S::VerifiedStatus: verification_state_state::IsSet,
+    S::TrustedVerifierStatus: verification_state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationState<'a> {
@@ -9241,7 +9249,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -9265,67 +9273,67 @@ pub mod verification_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Issuer;
         type IsValid;
-        type Uri;
         type CreatedAt;
+        type Issuer;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Issuer = Unset;
         type IsValid = Unset;
-        type Uri = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssuer<S> {}
-    impl<S: State> State for SetIssuer<S> {
-        type Issuer = Set<members::issuer>;
-        type IsValid = S::IsValid;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
+        type Issuer = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `is_valid` field to Set
     pub struct SetIsValid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsValid<S> {}
     impl<S: State> State for SetIsValid<S> {
-        type Issuer = S::Issuer;
         type IsValid = Set<members::is_valid>;
-        type Uri = S::Uri;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
         type Issuer = S::Issuer;
-        type IsValid = S::IsValid;
-        type Uri = Set<members::uri>;
-        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Issuer = S::Issuer;
         type IsValid = S::IsValid;
-        type Uri = S::Uri;
         type CreatedAt = Set<members::created_at>;
+        type Issuer = S::Issuer;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssuer<S> {}
+    impl<S: State> State for SetIssuer<S> {
+        type IsValid = S::IsValid;
+        type CreatedAt = S::CreatedAt;
+        type Issuer = Set<members::issuer>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type IsValid = S::IsValid;
+        type CreatedAt = S::CreatedAt;
+        type Issuer = S::Issuer;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `issuer` field
-        pub struct issuer(());
         ///Marker type for the `is_valid` field
         pub struct is_valid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -9438,10 +9446,10 @@ where
 impl<'a, S> VerificationViewBuilder<'a, S>
 where
     S: verification_view_state::State,
-    S::Issuer: verification_view_state::IsSet,
     S::IsValid: verification_view_state::IsSet,
-    S::Uri: verification_view_state::IsSet,
     S::CreatedAt: verification_view_state::IsSet,
+    S::Issuer: verification_view_state::IsSet,
+    S::Uri: verification_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationView<'a> {
@@ -9456,7 +9464,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

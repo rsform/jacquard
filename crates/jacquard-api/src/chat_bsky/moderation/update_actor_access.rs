@@ -20,9 +20,9 @@ pub struct UpdateActorAccess<'a> {
     #[serde(borrow)]
     pub actor: jacquard_common::types::string::Did<'a>,
     pub allow_access: bool,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#ref: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Response type for
@@ -65,37 +65,37 @@ pub mod update_actor_access_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Actor;
         type AllowAccess;
+        type Actor;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Actor = Unset;
         type AllowAccess = Unset;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Actor = Set<members::actor>;
-        type AllowAccess = S::AllowAccess;
+        type Actor = Unset;
     }
     ///State transition - sets the `allow_access` field to Set
     pub struct SetAllowAccess<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAllowAccess<S> {}
     impl<S: State> State for SetAllowAccess<S> {
-        type Actor = S::Actor;
         type AllowAccess = Set<members::allow_access>;
+        type Actor = S::Actor;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActor<S> {}
+    impl<S: State> State for SetActor<S> {
+        type AllowAccess = S::AllowAccess;
+        type Actor = Set<members::actor>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `actor` field
-        pub struct actor(());
         ///Marker type for the `allow_access` field
         pub struct allow_access(());
+        ///Marker type for the `actor` field
+        pub struct actor(());
     }
 }
 
@@ -185,8 +185,8 @@ impl<'a, S: update_actor_access_state::State> UpdateActorAccessBuilder<'a, S> {
 impl<'a, S> UpdateActorAccessBuilder<'a, S>
 where
     S: update_actor_access_state::State,
-    S::Actor: update_actor_access_state::IsSet,
     S::AllowAccess: update_actor_access_state::IsSet,
+    S::Actor: update_actor_access_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateActorAccess<'a> {
@@ -200,7 +200,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

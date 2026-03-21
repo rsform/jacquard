@@ -18,18 +18,18 @@
 #[serde(rename_all = "camelCase")]
 pub struct SendEmail<'a> {
     ///Additional comment by the sender that won't be used in the email itself but helpful to provide more context for moderators/reviewers
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub content: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
     pub recipient_did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
     pub sender_did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subject: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -87,51 +87,51 @@ pub mod send_email_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RecipientDid;
-        type SenderDid;
         type Content;
+        type SenderDid;
+        type RecipientDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RecipientDid = Unset;
-        type SenderDid = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `recipient_did` field to Set
-    pub struct SetRecipientDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecipientDid<S> {}
-    impl<S: State> State for SetRecipientDid<S> {
-        type RecipientDid = Set<members::recipient_did>;
-        type SenderDid = S::SenderDid;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `sender_did` field to Set
-    pub struct SetSenderDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSenderDid<S> {}
-    impl<S: State> State for SetSenderDid<S> {
-        type RecipientDid = S::RecipientDid;
-        type SenderDid = Set<members::sender_did>;
-        type Content = S::Content;
+        type SenderDid = Unset;
+        type RecipientDid = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type RecipientDid = S::RecipientDid;
-        type SenderDid = S::SenderDid;
         type Content = Set<members::content>;
+        type SenderDid = S::SenderDid;
+        type RecipientDid = S::RecipientDid;
+    }
+    ///State transition - sets the `sender_did` field to Set
+    pub struct SetSenderDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSenderDid<S> {}
+    impl<S: State> State for SetSenderDid<S> {
+        type Content = S::Content;
+        type SenderDid = Set<members::sender_did>;
+        type RecipientDid = S::RecipientDid;
+    }
+    ///State transition - sets the `recipient_did` field to Set
+    pub struct SetRecipientDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecipientDid<S> {}
+    impl<S: State> State for SetRecipientDid<S> {
+        type Content = S::Content;
+        type SenderDid = S::SenderDid;
+        type RecipientDid = Set<members::recipient_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `recipient_did` field
-        pub struct recipient_did(());
-        ///Marker type for the `sender_did` field
-        pub struct sender_did(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `sender_did` field
+        pub struct sender_did(());
+        ///Marker type for the `recipient_did` field
+        pub struct recipient_did(());
     }
 }
 
@@ -258,9 +258,9 @@ impl<'a, S: send_email_state::State> SendEmailBuilder<'a, S> {
 impl<'a, S> SendEmailBuilder<'a, S>
 where
     S: send_email_state::State,
-    S::RecipientDid: send_email_state::IsSet,
-    S::SenderDid: send_email_state::IsSet,
     S::Content: send_email_state::IsSet,
+    S::SenderDid: send_email_state::IsSet,
+    S::RecipientDid: send_email_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SendEmail<'a> {
@@ -276,7 +276,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

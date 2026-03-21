@@ -18,33 +18,33 @@
 #[serde(rename_all = "camelCase")]
 pub struct Tape<'a> {
     ///Permanent link to view on aesthetic.computer (e.g., https://aesthetic.computer/!a3x)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ac_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub ac_url: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Short alphanumeric code for easy lookup (e.g., 'a3x')
     #[serde(borrow)]
     pub code: jacquard_common::CowStr<'a>,
     ///MongoDB ObjectId reference for bi-directional sync
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#ref: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The unique slug identifier for this tape (e.g., wand-1729177200000)
     #[serde(borrow)]
     pub slug: jacquard_common::CowStr<'a>,
     ///Thumbnail image from midpoint frame, 3x scaled with nearest neighbor (max 1MB)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumbnail: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub thumbnail: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///MP4 video with 3x pixel scaling and audio soundtrack (max 50MB)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub video: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub video: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///ISO 8601 timestamp when the tape was created
     pub when: jacquard_common::types::string::Datetime,
     ///Direct URL to download the original ZIP file with frames and audio
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub zip_url: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub zip_url: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -59,9 +59,9 @@ pub struct Tape<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TapeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -108,19 +108,19 @@ impl jacquard_common::types::collection::Collection for TapeRecord {
     type Record = TapeRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tape<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Tape<'a> {
     fn nsid() -> &'static str {
         "computer.aesthetic.tape"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_computer_aesthetic_tape()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.thumbnail {
             {
                 let size = value.blob().size;
@@ -221,51 +221,51 @@ pub mod tape_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
-        type Code;
         type When;
+        type Code;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
-        type Code = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type Code = S::Code;
-        type When = S::When;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Slug = S::Slug;
-        type Code = Set<members::code>;
-        type When = S::When;
+        type Code = Unset;
+        type Slug = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Slug = S::Slug;
-        type Code = S::Code;
         type When = Set<members::when>;
+        type Code = S::Code;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type When = S::When;
+        type Code = Set<members::code>;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type When = S::When;
+        type Code = S::Code;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `code` field
+        pub struct code(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
@@ -449,9 +449,9 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
 impl<'a, S> TapeBuilder<'a, S>
 where
     S: tape_state::State,
-    S::Slug: tape_state::IsSet,
-    S::Code: tape_state::IsSet,
     S::When: tape_state::IsSet,
+    S::Code: tape_state::IsSet,
+    S::Slug: tape_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tape<'a> {
@@ -470,7 +470,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -489,7 +489,7 @@ where
     }
 }
 
-fn lexicon_doc_computer_aesthetic_tape() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_computer_aesthetic_tape() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

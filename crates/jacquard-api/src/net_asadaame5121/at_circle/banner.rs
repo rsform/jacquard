@@ -37,9 +37,9 @@ pub struct Banner<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BannerGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -86,19 +86,19 @@ impl jacquard_common::types::collection::Collection for BannerRecord {
     type Record = BannerRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Banner<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Banner<'a> {
     fn nsid() -> &'static str {
         "net.asadaame5121.at-circle.banner"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_asadaame5121_at_circle_banner()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.banner;
             {
@@ -157,49 +157,49 @@ pub mod banner_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Banner;
         type Ring;
+        type Banner;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Banner = Unset;
         type Ring = Unset;
+        type Banner = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `banner` field to Set
-    pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBanner<S> {}
-    impl<S: State> State for SetBanner<S> {
-        type Banner = Set<members::banner>;
-        type Ring = S::Ring;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRing<S> {}
     impl<S: State> State for SetRing<S> {
-        type Banner = S::Banner;
         type Ring = Set<members::ring>;
+        type Banner = S::Banner;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `banner` field to Set
+    pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBanner<S> {}
+    impl<S: State> State for SetBanner<S> {
+        type Ring = S::Ring;
+        type Banner = Set<members::banner>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Banner = S::Banner;
         type Ring = S::Ring;
+        type Banner = S::Banner;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `banner` field
-        pub struct banner(());
         ///Marker type for the `ring` field
         pub struct ring(());
+        ///Marker type for the `banner` field
+        pub struct banner(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -294,8 +294,8 @@ where
 impl<'a, S> BannerBuilder<'a, S>
 where
     S: banner_state::State,
-    S::Banner: banner_state::IsSet,
     S::Ring: banner_state::IsSet,
+    S::Banner: banner_state::IsSet,
     S::CreatedAt: banner_state::IsSet,
 {
     /// Build the final struct
@@ -310,7 +310,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -324,7 +324,7 @@ where
     }
 }
 
-fn lexicon_doc_net_asadaame5121_at_circle_banner() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_net_asadaame5121_at_circle_banner() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

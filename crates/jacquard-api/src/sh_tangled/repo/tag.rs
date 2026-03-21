@@ -53,13 +53,13 @@ pub struct TagOutput {
 pub enum TagError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Tag not found
     #[serde(rename = "TagNotFound")]
-    TagNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    TagNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for TagError<'_> {

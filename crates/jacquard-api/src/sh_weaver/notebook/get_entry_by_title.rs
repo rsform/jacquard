@@ -57,9 +57,9 @@ pub struct GetEntryByTitleOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetEntryByTitleError<'a> {
     #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotebookNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    EntryNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetEntryByTitleError<'_> {

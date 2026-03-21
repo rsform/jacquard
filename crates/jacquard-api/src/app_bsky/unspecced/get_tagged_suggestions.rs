@@ -170,19 +170,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedSuggestionsRequest {
     type Response = GetTaggedSuggestionsResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Suggestion<'a> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getTaggedSuggestions"
     }
     fn def_name() -> &'static str {
         "suggestion"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_unspecced_getTaggedSuggestions()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -197,51 +197,51 @@ pub mod suggestion_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type SubjectType;
         type Subject;
         type Tag;
-        type SubjectType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type SubjectType = Unset;
         type Subject = Unset;
         type Tag = Unset;
-        type SubjectType = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Tag = S::Tag;
-        type SubjectType = S::SubjectType;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Subject = S::Subject;
-        type Tag = Set<members::tag>;
-        type SubjectType = S::SubjectType;
     }
     ///State transition - sets the `subject_type` field to Set
     pub struct SetSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjectType<S> {}
     impl<S: State> State for SetSubjectType<S> {
+        type SubjectType = Set<members::subject_type>;
         type Subject = S::Subject;
         type Tag = S::Tag;
-        type SubjectType = Set<members::subject_type>;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type SubjectType = S::SubjectType;
+        type Subject = Set<members::subject>;
+        type Tag = S::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTag<S> {}
+    impl<S: State> State for SetTag<S> {
+        type SubjectType = S::SubjectType;
+        type Subject = S::Subject;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `subject_type` field
+        pub struct subject_type(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `tag` field
         pub struct tag(());
-        ///Marker type for the `subject_type` field
-        pub struct subject_type(());
     }
 }
 
@@ -334,9 +334,9 @@ where
 impl<'a, S> SuggestionBuilder<'a, S>
 where
     S: suggestion_state::State,
+    S::SubjectType: suggestion_state::IsSet,
     S::Subject: suggestion_state::IsSet,
     S::Tag: suggestion_state::IsSet,
-    S::SubjectType: suggestion_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Suggestion<'a> {
@@ -350,7 +350,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -364,7 +364,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_unspecced_getTaggedSuggestions() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

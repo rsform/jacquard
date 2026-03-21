@@ -16,15 +16,15 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedSkeleton<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: jacquard_common::types::string::AtUri<'a>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -39,15 +39,15 @@ pub struct GetFeedSkeleton<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetFeedSkeletonOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub feed: Vec<crate::app_bsky::feed::SkeletonFeedPost<'a>>,
     ///Unique identifier per request that may be passed back alongside interactions.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub req_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub req_id: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -66,7 +66,7 @@ pub struct GetFeedSkeletonOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetFeedSkeletonError<'a> {
     #[serde(rename = "UnknownFeed")]
-    UnknownFeed(std::option::Option<jacquard_common::CowStr<'a>>),
+    UnknownFeed(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetFeedSkeletonError<'_> {
@@ -110,7 +110,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetFeedSkeletonRequest {
     type Response = GetFeedSkeletonResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 

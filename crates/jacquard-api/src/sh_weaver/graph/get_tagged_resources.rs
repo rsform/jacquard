@@ -16,31 +16,31 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedResources<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     /// Defaults to `true`.
     #[serde(default = "_default_include_author_tags")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub include_author_tags: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_author_tags: core::option::Option<bool>,
     /// Defaults to `true`.
     #[serde(default = "_default_include_community_tags")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub include_community_tags: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_community_tags: core::option::Option<bool>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///Defaults to `"all"`.
     #[serde(default = "_default_resource_type")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub resource_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub resource_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `"recent"`.
     #[serde(default = "_default_sort")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub sort: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub sort: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub tag: jacquard_common::CowStr<'a>,
 }
@@ -57,14 +57,14 @@ pub struct GetTaggedResources<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetTaggedResourcesOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub resources: Vec<GetTaggedResourcesOutputResourcesItem<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tag: std::option::Option<crate::sh_weaver::graph::TagView<'a>>,
+    pub tag: core::option::Option<crate::sh_weaver::graph::TagView<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -112,23 +112,23 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedResourcesRequest {
     type Response = GetTaggedResourcesResponse;
 }
 
-fn _default_include_author_tags() -> std::option::Option<bool> {
+fn _default_include_author_tags() -> core::option::Option<bool> {
     Some(true)
 }
 
-fn _default_include_community_tags() -> std::option::Option<bool> {
+fn _default_include_community_tags() -> core::option::Option<bool> {
     Some(true)
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
-fn _default_resource_type() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_resource_type() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("all"))
 }
 
-fn _default_sort() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_sort() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("recent"))
 }
 

@@ -18,28 +18,30 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Header<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub level: std::option::Option<i64>,
+    pub facets: core::option::Option<
+        Vec<crate::pub_leaflet::richtext::facet::Facet<'a>>,
+    >,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub level: core::option::Option<i64>,
     #[serde(borrow)]
     pub plaintext: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Header<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Header<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.header"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_blocks_header()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.level {
             if *value > 6i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -66,7 +68,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Header<'a> {
     }
 }
 
-fn lexicon_doc_pub_leaflet_blocks_header() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_pub_leaflet_blocks_header() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

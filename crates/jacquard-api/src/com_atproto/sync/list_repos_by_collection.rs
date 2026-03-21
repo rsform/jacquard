@@ -18,13 +18,13 @@
 pub struct ListReposByCollection<'a> {
     #[serde(borrow)]
     pub collection: jacquard_common::types::string::Nsid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `500`. Min: 1. Max: 2000.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -39,9 +39,9 @@ pub struct ListReposByCollection<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListReposByCollectionOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub repos: Vec<crate::com_atproto::sync::list_repos_by_collection::Repo<'a>>,
 }
@@ -88,24 +88,24 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListReposByCollectionRequest {
     type Response = ListReposByCollectionResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Repo<'a> {
     fn nsid() -> &'static str {
         "com.atproto.sync.listReposByCollection"
     }
     fn def_name() -> &'static str {
         "repo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_sync_listReposByCollection()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(500i64)
 }
 
@@ -332,7 +332,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -344,7 +344,7 @@ where
     }
 }
 
-fn lexicon_doc_com_atproto_sync_listReposByCollection() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atproto_sync_listReposByCollection() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

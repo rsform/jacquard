@@ -17,14 +17,14 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpsertOption<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub key: jacquard_common::types::string::Nsid<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub manager_role: std::option::Option<UpsertOptionManagerRole<'a>>,
+    pub manager_role: core::option::Option<UpsertOptionManagerRole<'a>>,
     #[serde(borrow)]
     pub scope: UpsertOptionScope<'a>,
     #[serde(borrow)]
@@ -474,7 +474,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

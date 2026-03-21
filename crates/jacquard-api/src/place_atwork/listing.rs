@@ -19,24 +19,24 @@
 #[serde(rename_all = "camelCase")]
 pub struct Listing<'a> {
     ///URL where applicants can apply for the job.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub apply_link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub apply_link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Larger horizontal image to display behind job listing view.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub banner: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub banner: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///The description of the job listing.
     #[serde(borrow)]
     pub description: jacquard_common::CowStr<'a>,
     ///Annotations of text (mentions, URLs, hashtags, etc).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     ///Locations that are relevant to the job listing.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub locations: std::option::Option<
+    pub locations: core::option::Option<
         Vec<crate::community_lexicon::location::hthree::Hthree<'a>>,
     >,
     ///Client-declared timestamp when the job listing expires.
@@ -60,9 +60,9 @@ pub struct Listing<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListingGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -109,19 +109,19 @@ impl jacquard_common::types::collection::Collection for ListingRecord {
     type Record = ListingRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Listing<'a> {
     fn nsid() -> &'static str {
         "place.atwork.listing"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_atwork_listing()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.banner {
             {
                 let size = value.blob().size;
@@ -225,67 +225,67 @@ pub mod listing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NotBefore;
-        type NotAfter;
         type Title;
+        type NotBefore;
         type Description;
+        type NotAfter;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NotBefore = Unset;
-        type NotAfter = Unset;
         type Title = Unset;
+        type NotBefore = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `not_before` field to Set
-    pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotBefore<S> {}
-    impl<S: State> State for SetNotBefore<S> {
-        type NotBefore = Set<members::not_before>;
-        type NotAfter = S::NotAfter;
-        type Title = S::Title;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `not_after` field to Set
-    pub struct SetNotAfter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotAfter<S> {}
-    impl<S: State> State for SetNotAfter<S> {
-        type NotBefore = S::NotBefore;
-        type NotAfter = Set<members::not_after>;
-        type Title = S::Title;
-        type Description = S::Description;
+        type NotAfter = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type NotBefore = S::NotBefore;
-        type NotAfter = S::NotAfter;
         type Title = Set<members::title>;
+        type NotBefore = S::NotBefore;
         type Description = S::Description;
+        type NotAfter = S::NotAfter;
+    }
+    ///State transition - sets the `not_before` field to Set
+    pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotBefore<S> {}
+    impl<S: State> State for SetNotBefore<S> {
+        type Title = S::Title;
+        type NotBefore = Set<members::not_before>;
+        type Description = S::Description;
+        type NotAfter = S::NotAfter;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type NotBefore = S::NotBefore;
-        type NotAfter = S::NotAfter;
         type Title = S::Title;
+        type NotBefore = S::NotBefore;
         type Description = Set<members::description>;
+        type NotAfter = S::NotAfter;
+    }
+    ///State transition - sets the `not_after` field to Set
+    pub struct SetNotAfter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotAfter<S> {}
+    impl<S: State> State for SetNotAfter<S> {
+        type Title = S::Title;
+        type NotBefore = S::NotBefore;
+        type Description = S::Description;
+        type NotAfter = Set<members::not_after>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `not_before` field
-        pub struct not_before(());
-        ///Marker type for the `not_after` field
-        pub struct not_after(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `not_before` field
+        pub struct not_before(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `not_after` field
+        pub struct not_after(());
     }
 }
 
@@ -482,10 +482,10 @@ where
 impl<'a, S> ListingBuilder<'a, S>
 where
     S: listing_state::State,
-    S::NotBefore: listing_state::IsSet,
-    S::NotAfter: listing_state::IsSet,
     S::Title: listing_state::IsSet,
+    S::NotBefore: listing_state::IsSet,
     S::Description: listing_state::IsSet,
+    S::NotAfter: listing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Listing<'a> {
@@ -504,7 +504,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -523,9 +523,7 @@ where
     }
 }
 
-fn lexicon_doc_place_atwork_listing() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_place_atwork_listing() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("place.atwork.listing"),

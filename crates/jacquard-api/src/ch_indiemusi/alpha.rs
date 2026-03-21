@@ -4,6 +4,8 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod actor;
+pub mod grant;
 pub mod recording;
 pub mod release;
 pub mod song;
+pub mod track;

@@ -37,9 +37,9 @@ pub struct Song<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SongGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -86,19 +86,19 @@ impl jacquard_common::types::collection::Collection for SongRecord {
     type Record = SongRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Song<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Song<'a> {
     fn nsid() -> &'static str {
         "ch.indiemusi.social.song"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ch_indiemusi_social_song()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.joiners_needed;
             if *value < 1i64 {
@@ -170,37 +170,37 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type JoinersNeeded;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type JoinersNeeded = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type JoinersNeeded = S::JoinersNeeded;
+        type Name = Unset;
     }
     ///State transition - sets the `joiners_needed` field to Set
     pub struct SetJoinersNeeded<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetJoinersNeeded<S> {}
     impl<S: State> State for SetJoinersNeeded<S> {
-        type Name = S::Name;
         type JoinersNeeded = Set<members::joiners_needed>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type JoinersNeeded = S::JoinersNeeded;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `joiners_needed` field
         pub struct joiners_needed(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -273,8 +273,8 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::Name: song_state::IsSet,
     S::JoinersNeeded: song_state::IsSet,
+    S::Name: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {
@@ -287,7 +287,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -300,7 +300,7 @@ where
     }
 }
 
-fn lexicon_doc_ch_indiemusi_social_song() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_ch_indiemusi_social_song() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

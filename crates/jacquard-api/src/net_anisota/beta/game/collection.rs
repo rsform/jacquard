@@ -21,64 +21,64 @@ pub struct Collection<'a> {
     ///When the specimen was first acquired
     pub acquired_at: jacquard_common::types::string::Datetime,
     ///Common name of the specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub common_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub common_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When the record was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Taxonomic family
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub family: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub family: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Taxonomic genus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub genus: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub genus: core::option::Option<jacquard_common::CowStr<'a>>,
     ///When the record was last modified
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_modified: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_modified: core::option::Option<jacquard_common::types::string::Datetime>,
     ///When the specimen was last encountered
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_seen: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_seen: core::option::Option<jacquard_common::types::string::Datetime>,
     ///URI of the game.log record that documents the acquisition of this specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub log_record_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub log_record_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Number of specimens collected
     pub quantity: i64,
     ///Rarity level of the specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rarity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub rarity: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Scientific name of the specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub scientific_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub scientific_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///How the specimen was acquired
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub source: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source_details: std::option::Option<
+    pub source_details: core::option::Option<
         crate::net_anisota::beta::game::collection::SourceDetails<'a>,
     >,
     ///Taxonomic species
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub species: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub species: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub specimen_data: std::option::Option<
+    pub specimen_data: core::option::Option<
         crate::net_anisota::beta::game::collection::SpecimenData<'a>,
     >,
     ///Unique identifier for the specimen
     #[serde(borrow)]
     pub specimen_id: jacquard_common::CowStr<'a>,
     ///Collection status of this specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -93,9 +93,9 @@ pub struct Collection<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -117,20 +117,20 @@ pub struct CollectionGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SourceDetails<'a> {
     ///Number of attempts before successful capture
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub attempts: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub attempts: core::option::Option<i64>,
     ///Probability used when catching this specimen (decimal string, e.g. '0.75')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub catch_probability: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub catch_probability: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URI of the game card that provided this specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub game_card_uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub game_card_uri: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Location where specimen was found or observed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub location: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Complete specimen information
@@ -148,13 +148,13 @@ pub struct SourceDetails<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SpecimenData<'a> {
     ///Scientific authorship of the species
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub authorship: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub authorship: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Detailed description of the specimen
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Collection<'a> {
@@ -197,19 +197,19 @@ impl jacquard_common::types::collection::Collection for CollectionRecord {
     type Record = CollectionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.collection"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_collection()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.common_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
@@ -299,36 +299,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collection<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SourceDetails<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.collection"
     }
     fn def_name() -> &'static str {
         "sourceDetails"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_collection()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpecimenData<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SpecimenData<'a> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.collection"
     }
     fn def_name() -> &'static str {
         "specimenData"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_net_anisota_beta_game_collection()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -815,7 +815,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -843,7 +843,7 @@ where
     }
 }
 
-fn lexicon_doc_net_anisota_beta_game_collection() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_net_anisota_beta_game_collection() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -139,8 +139,8 @@ pub struct Link<'a> {
     #[serde(borrow)]
     pub links: Vec<crate::ai_syui::at::link::LinkItem<'a>>,
     ///Client-declared timestamp when this record was last updated.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -155,9 +155,9 @@ pub struct Link<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LinkGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -177,19 +177,19 @@ impl<'a> Link<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LinkItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LinkItem<'a> {
     fn nsid() -> &'static str {
         "ai.syui.at.link"
     }
     fn def_name() -> &'static str {
         "linkItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ai_syui_at_link()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.username;
             #[allow(unused_comparisons)]
@@ -234,24 +234,24 @@ impl jacquard_common::types::collection::Collection for LinkRecord {
     type Record = LinkRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Link<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Link<'a> {
     fn nsid() -> &'static str {
         "ai.syui.at.link"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ai_syui_at_link()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_ai_syui_at_link() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_ai_syui_at_link() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("ai.syui.at.link"),
@@ -422,37 +422,37 @@ pub mod link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Links;
         type CreatedAt;
+        type Links;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Links = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `links` field to Set
-    pub struct SetLinks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLinks<S> {}
-    impl<S: State> State for SetLinks<S> {
-        type Links = Set<members::links>;
-        type CreatedAt = S::CreatedAt;
+        type Links = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Links = S::Links;
         type CreatedAt = Set<members::created_at>;
+        type Links = S::Links;
+    }
+    ///State transition - sets the `links` field to Set
+    pub struct SetLinks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLinks<S> {}
+    impl<S: State> State for SetLinks<S> {
+        type CreatedAt = S::CreatedAt;
+        type Links = Set<members::links>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `links` field
-        pub struct links(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `links` field
+        pub struct links(());
     }
 }
 
@@ -545,8 +545,8 @@ impl<'a, S: link_state::State> LinkBuilder<'a, S> {
 impl<'a, S> LinkBuilder<'a, S>
 where
     S: link_state::State,
-    S::Links: link_state::IsSet,
     S::CreatedAt: link_state::IsSet,
+    S::Links: link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Link<'a> {
@@ -560,7 +560,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

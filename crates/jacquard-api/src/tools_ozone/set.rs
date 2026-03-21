@@ -25,9 +25,9 @@ pub mod upsert_set;
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Set<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
@@ -45,28 +45,28 @@ pub struct Set<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SetView<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     pub set_size: i64,
     pub updated_at: jacquard_common::types::string::Datetime,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Set<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Set<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.set.defs"
     }
     fn def_name() -> &'static str {
         "set"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_set_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10240usize {
@@ -127,19 +127,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Set<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SetView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SetView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.set.defs"
     }
     fn def_name() -> &'static str {
         "setView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_set_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10240usize {
@@ -200,9 +200,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SetView<'a> {
     }
 }
 
-fn lexicon_doc_tools_ozone_set_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_tools_ozone_set_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("tools.ozone.set.defs"),
@@ -382,66 +380,66 @@ pub mod set_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type CreatedAt;
         type UpdatedAt;
         type SetSize;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type CreatedAt = Unset;
         type UpdatedAt = Unset;
         type SetSize = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type UpdatedAt = S::UpdatedAt;
+        type SetSize = S::SetSize;
         type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type SetSize = S::SetSize;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = S::UpdatedAt;
-        type SetSize = S::SetSize;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type UpdatedAt = Set<members::updated_at>;
         type SetSize = S::SetSize;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `set_size` field to Set
     pub struct SetSetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSetSize<S> {}
     impl<S: State> State for SetSetSize<S> {
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type UpdatedAt = S::UpdatedAt;
         type SetSize = Set<members::set_size>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type UpdatedAt = S::UpdatedAt;
+        type SetSize = S::SetSize;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `set_size` field
         pub struct set_size(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -575,9 +573,9 @@ impl<'a, S> SetViewBuilder<'a, S>
 where
     S: set_view_state::State,
     S::Name: set_view_state::IsSet,
-    S::CreatedAt: set_view_state::IsSet,
     S::UpdatedAt: set_view_state::IsSet,
     S::SetSize: set_view_state::IsSet,
+    S::CreatedAt: set_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SetView<'a> {
@@ -593,7 +591,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -35,19 +35,19 @@ pub struct DataPoint<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Trend<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub caption: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub caption: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub chart_style: std::option::Option<TrendChartStyle<'a>>,
+    pub chart_style: core::option::Option<TrendChartStyle<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub data_points: std::option::Option<Vec<crate::app_fitsky::trend::DataPoint<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub data_points: core::option::Option<Vec<crate::app_fitsky::trend::DataPoint<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub metric: TrendMetric<'a>,
     #[serde(borrow)]
@@ -477,9 +477,9 @@ impl jacquard_common::IntoStatic for TrendWidgetType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TrendGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -500,19 +500,19 @@ pub struct TrendGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct TrendSummary<'a> {
     ///Average value in base units
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub average: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub average: core::option::Option<i64>,
     ///Best value in base units
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub best: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub best: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub count: core::option::Option<i64>,
     ///Total value in base units
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub total: core::option::Option<i64>,
     ///Worst value in base units
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub worst: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub worst: core::option::Option<i64>,
 }
 
 impl<'a> Trend<'a> {
@@ -528,19 +528,19 @@ impl<'a> Trend<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DataPoint<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DataPoint<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.trend"
     }
     fn def_name() -> &'static str {
         "dataPoint"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_fitsky_trend()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -572,19 +572,19 @@ impl jacquard_common::types::collection::Collection for TrendRecord {
     type Record = TrendRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.trend"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_fitsky_trend()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.caption {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
@@ -696,19 +696,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Trend<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TrendSummary<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TrendSummary<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.trend"
     }
     fn def_name() -> &'static str {
         "trendSummary"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_fitsky_trend()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -723,37 +723,37 @@ pub mod data_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Date;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Date = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Date = S::Date;
+        type Value = Unset;
     }
     ///State transition - sets the `date` field to Set
     pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDate<S> {}
     impl<S: State> State for SetDate<S> {
-        type Value = S::Value;
         type Date = Set<members::date>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Date = S::Date;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `date` field
         pub struct date(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -826,8 +826,8 @@ where
 impl<'a, S> DataPointBuilder<'a, S>
 where
     S: data_point_state::State,
-    S::Value: data_point_state::IsSet,
     S::Date: data_point_state::IsSet,
+    S::Value: data_point_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DataPoint<'a> {
@@ -840,7 +840,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -853,7 +853,7 @@ where
     }
 }
 
-fn lexicon_doc_app_fitsky_trend() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_fitsky_trend() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.fitsky.trend"),
@@ -1174,9 +1174,9 @@ pub mod trend_state {
     pub trait State: sealed::Sealed {
         type Metric;
         type Summary;
+        type Period;
         type WidgetType;
         type CreatedAt;
-        type Period;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -1184,9 +1184,9 @@ pub mod trend_state {
     impl State for Empty {
         type Metric = Unset;
         type Summary = Unset;
+        type Period = Unset;
         type WidgetType = Unset;
         type CreatedAt = Unset;
-        type Period = Unset;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
@@ -1194,9 +1194,9 @@ pub mod trend_state {
     impl<S: State> State for SetMetric<S> {
         type Metric = Set<members::metric>;
         type Summary = S::Summary;
+        type Period = S::Period;
         type WidgetType = S::WidgetType;
         type CreatedAt = S::CreatedAt;
-        type Period = S::Period;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
@@ -1204,29 +1204,9 @@ pub mod trend_state {
     impl<S: State> State for SetSummary<S> {
         type Metric = S::Metric;
         type Summary = Set<members::summary>;
+        type Period = S::Period;
         type WidgetType = S::WidgetType;
         type CreatedAt = S::CreatedAt;
-        type Period = S::Period;
-    }
-    ///State transition - sets the `widget_type` field to Set
-    pub struct SetWidgetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidgetType<S> {}
-    impl<S: State> State for SetWidgetType<S> {
-        type Metric = S::Metric;
-        type Summary = S::Summary;
-        type WidgetType = Set<members::widget_type>;
-        type CreatedAt = S::CreatedAt;
-        type Period = S::Period;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Metric = S::Metric;
-        type Summary = S::Summary;
-        type WidgetType = S::WidgetType;
-        type CreatedAt = Set<members::created_at>;
-        type Period = S::Period;
     }
     ///State transition - sets the `period` field to Set
     pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
@@ -1234,9 +1214,29 @@ pub mod trend_state {
     impl<S: State> State for SetPeriod<S> {
         type Metric = S::Metric;
         type Summary = S::Summary;
+        type Period = Set<members::period>;
         type WidgetType = S::WidgetType;
         type CreatedAt = S::CreatedAt;
-        type Period = Set<members::period>;
+    }
+    ///State transition - sets the `widget_type` field to Set
+    pub struct SetWidgetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidgetType<S> {}
+    impl<S: State> State for SetWidgetType<S> {
+        type Metric = S::Metric;
+        type Summary = S::Summary;
+        type Period = S::Period;
+        type WidgetType = Set<members::widget_type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Metric = S::Metric;
+        type Summary = S::Summary;
+        type Period = S::Period;
+        type WidgetType = S::WidgetType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -1245,12 +1245,12 @@ pub mod trend_state {
         pub struct metric(());
         ///Marker type for the `summary` field
         pub struct summary(());
+        ///Marker type for the `period` field
+        pub struct period(());
         ///Marker type for the `widget_type` field
         pub struct widget_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `period` field
-        pub struct period(());
     }
 }
 
@@ -1466,9 +1466,9 @@ where
     S: trend_state::State,
     S::Metric: trend_state::IsSet,
     S::Summary: trend_state::IsSet,
+    S::Period: trend_state::IsSet,
     S::WidgetType: trend_state::IsSet,
     S::CreatedAt: trend_state::IsSet,
-    S::Period: trend_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Trend<'a> {
@@ -1488,7 +1488,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

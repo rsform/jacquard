@@ -27,9 +27,9 @@ pub struct LivestreamView<'a> {
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     ///The number of viewers watching this livestream. Use when you can't reasonably use #viewerCount directly.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub viewer_count: std::option::Option<
+    pub viewer_count: core::option::Option<
         crate::place_stream::livestream::ViewerCount<'a>,
     >,
 }
@@ -48,43 +48,45 @@ pub struct LivestreamView<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Livestream<'a> {
     ///The source of the livestream, if available, in a User Agent format: `<product> / <product-version> <comment>` e.g. Streamplace/0.7.5 iOS
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub agent: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub agent: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The primary URL where this livestream can be viewed, if available.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub canonical_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub canonical_url: core::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
     ///Client-declared timestamp when this livestream started.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Client-declared timestamp when this livestream ended. Ended livestreams are not supposed to start up again.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ended_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ended_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Time in seconds after which this livestream should be automatically ended if idle. Zero means no timeout.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub idle_timeout_seconds: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub idle_timeout_seconds: core::option::Option<i64>,
     ///Client-declared timestamp when this livestream was last seen by the Streamplace station.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_seen_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_seen_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notification_settings: std::option::Option<
+    pub notification_settings: core::option::Option<
         crate::place_stream::livestream::NotificationSettings<'a>,
     >,
     ///The post that announced this livestream.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub post: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub post: core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thumb: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub thumb: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///The title of the livestream, as it will be announced to followers.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///The URL where this stream can be found. This is primarily a hint for other Streamplace nodes to locate and replicate the stream.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -99,9 +101,9 @@ pub struct Livestream<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LivestreamGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -122,8 +124,8 @@ pub struct LivestreamGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct NotificationSettings<'a> {
     ///Whether this livestream should trigger a push notification to followers.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub push_notification: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub push_notification: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -186,9 +188,9 @@ pub enum StreamplaceAnythingLivestream<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct TeleportArrival<'a> {
     ///The chat profile of the source streamer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub chat_profile: std::option::Option<
+    pub chat_profile: core::option::Option<
         crate::place_stream::chat::profile::Profile<'a>,
     >,
     ///The streamer who is teleporting their viewers here
@@ -251,19 +253,19 @@ impl<'a> Livestream<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LivestreamView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LivestreamView<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
     fn def_name() -> &'static str {
         "livestreamView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -295,19 +297,19 @@ impl jacquard_common::types::collection::Collection for LivestreamRecord {
     type Record = LivestreamRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Livestream<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Livestream<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.thumb {
             {
                 let size = value.blob().size;
@@ -386,87 +388,87 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Livestream<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for NotificationSettings<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
     fn def_name() -> &'static str {
         "notificationSettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for StreamplaceAnything<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for StreamplaceAnything<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
     fn def_name() -> &'static str {
         "streamplaceAnything"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeleportArrival<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TeleportArrival<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
     fn def_name() -> &'static str {
         "teleportArrival"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TeleportCanceled<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TeleportCanceled<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
     fn def_name() -> &'static str {
         "teleportCanceled"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerCount<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ViewerCount<'a> {
     fn nsid() -> &'static str {
         "place.stream.livestream"
     }
     fn def_name() -> &'static str {
         "viewerCount"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_livestream()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -481,83 +483,83 @@ pub mod livestream_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
-        type Author;
         type Record;
+        type Author;
+        type Uri;
         type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-        type Author = Unset;
         type Record = Unset;
+        type Author = Unset;
+        type Uri = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Record = S::Record;
         type Author = S::Author;
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
         type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = Set<members::author>;
-        type Record = S::Record;
         type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Uri = S::Uri;
         type Cid = S::Cid;
-        type Author = S::Author;
         type Record = Set<members::record>;
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
+        type Record = S::Record;
+        type Author = Set<members::author>;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Record = S::Record;
+        type Author = S::Author;
+        type Uri = Set<members::uri>;
         type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Uri = S::Uri;
         type Cid = S::Cid;
-        type Author = S::Author;
         type Record = S::Record;
+        type Author = S::Author;
+        type Uri = S::Uri;
         type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
     }
@@ -712,10 +714,10 @@ impl<'a, S: livestream_view_state::State> LivestreamViewBuilder<'a, S> {
 impl<'a, S> LivestreamViewBuilder<'a, S>
 where
     S: livestream_view_state::State,
-    S::Uri: livestream_view_state::IsSet,
     S::Cid: livestream_view_state::IsSet,
-    S::Author: livestream_view_state::IsSet,
     S::Record: livestream_view_state::IsSet,
+    S::Author: livestream_view_state::IsSet,
+    S::Uri: livestream_view_state::IsSet,
     S::IndexedAt: livestream_view_state::IsSet,
 {
     /// Build the final struct
@@ -733,7 +735,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -750,7 +752,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_livestream() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_livestream() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -1682,7 +1684,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1795,7 +1797,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1817,67 +1819,67 @@ pub mod teleport_arrival_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ViewerCount;
         type Source;
         type StartsAt;
         type TeleportUri;
-        type ViewerCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ViewerCount = Unset;
         type Source = Unset;
         type StartsAt = Unset;
         type TeleportUri = Unset;
-        type ViewerCount = Unset;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Source = Set<members::source>;
-        type StartsAt = S::StartsAt;
-        type TeleportUri = S::TeleportUri;
-        type ViewerCount = S::ViewerCount;
-    }
-    ///State transition - sets the `starts_at` field to Set
-    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
-    impl<S: State> State for SetStartsAt<S> {
-        type Source = S::Source;
-        type StartsAt = Set<members::starts_at>;
-        type TeleportUri = S::TeleportUri;
-        type ViewerCount = S::ViewerCount;
-    }
-    ///State transition - sets the `teleport_uri` field to Set
-    pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
-    impl<S: State> State for SetTeleportUri<S> {
-        type Source = S::Source;
-        type StartsAt = S::StartsAt;
-        type TeleportUri = Set<members::teleport_uri>;
-        type ViewerCount = S::ViewerCount;
     }
     ///State transition - sets the `viewer_count` field to Set
     pub struct SetViewerCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetViewerCount<S> {}
     impl<S: State> State for SetViewerCount<S> {
+        type ViewerCount = Set<members::viewer_count>;
         type Source = S::Source;
         type StartsAt = S::StartsAt;
         type TeleportUri = S::TeleportUri;
-        type ViewerCount = Set<members::viewer_count>;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type ViewerCount = S::ViewerCount;
+        type Source = Set<members::source>;
+        type StartsAt = S::StartsAt;
+        type TeleportUri = S::TeleportUri;
+    }
+    ///State transition - sets the `starts_at` field to Set
+    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
+    impl<S: State> State for SetStartsAt<S> {
+        type ViewerCount = S::ViewerCount;
+        type Source = S::Source;
+        type StartsAt = Set<members::starts_at>;
+        type TeleportUri = S::TeleportUri;
+    }
+    ///State transition - sets the `teleport_uri` field to Set
+    pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
+    impl<S: State> State for SetTeleportUri<S> {
+        type ViewerCount = S::ViewerCount;
+        type Source = S::Source;
+        type StartsAt = S::StartsAt;
+        type TeleportUri = Set<members::teleport_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `viewer_count` field
+        pub struct viewer_count(());
         ///Marker type for the `source` field
         pub struct source(());
         ///Marker type for the `starts_at` field
         pub struct starts_at(());
         ///Marker type for the `teleport_uri` field
         pub struct teleport_uri(());
-        ///Marker type for the `viewer_count` field
-        pub struct viewer_count(());
     }
 }
 
@@ -2010,10 +2012,10 @@ where
 impl<'a, S> TeleportArrivalBuilder<'a, S>
 where
     S: teleport_arrival_state::State,
+    S::ViewerCount: teleport_arrival_state::IsSet,
     S::Source: teleport_arrival_state::IsSet,
     S::StartsAt: teleport_arrival_state::IsSet,
     S::TeleportUri: teleport_arrival_state::IsSet,
-    S::ViewerCount: teleport_arrival_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TeleportArrival<'a> {
@@ -2029,7 +2031,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2172,7 +2174,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2276,7 +2278,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

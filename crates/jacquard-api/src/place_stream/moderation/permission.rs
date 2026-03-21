@@ -21,8 +21,8 @@ pub struct Permission<'a> {
     ///Client-declared timestamp when this moderator was added.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional expiration time for this delegation. If set, the delegation is invalid after this time.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub expiration_time: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub expiration_time: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The DID of the user granted moderator permissions.
     #[serde(borrow)]
     pub moderator: jacquard_common::types::string::Did<'a>,
@@ -43,9 +43,9 @@ pub struct Permission<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PermissionGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -92,19 +92,19 @@ impl jacquard_common::types::collection::Collection for PermissionRecord {
     type Record = PermissionRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Permission<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Permission<'a> {
     fn nsid() -> &'static str {
         "place.stream.moderation.permission"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_place_stream_moderation_permission()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -119,51 +119,51 @@ pub mod permission_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Permissions;
-        type Moderator;
         type CreatedAt;
+        type Moderator;
+        type Permissions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Permissions = Unset;
-        type Moderator = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `permissions` field to Set
-    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPermissions<S> {}
-    impl<S: State> State for SetPermissions<S> {
-        type Permissions = Set<members::permissions>;
-        type Moderator = S::Moderator;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `moderator` field to Set
-    pub struct SetModerator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModerator<S> {}
-    impl<S: State> State for SetModerator<S> {
-        type Permissions = S::Permissions;
-        type Moderator = Set<members::moderator>;
-        type CreatedAt = S::CreatedAt;
+        type Moderator = Unset;
+        type Permissions = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Permissions = S::Permissions;
-        type Moderator = S::Moderator;
         type CreatedAt = Set<members::created_at>;
+        type Moderator = S::Moderator;
+        type Permissions = S::Permissions;
+    }
+    ///State transition - sets the `moderator` field to Set
+    pub struct SetModerator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModerator<S> {}
+    impl<S: State> State for SetModerator<S> {
+        type CreatedAt = S::CreatedAt;
+        type Moderator = Set<members::moderator>;
+        type Permissions = S::Permissions;
+    }
+    ///State transition - sets the `permissions` field to Set
+    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPermissions<S> {}
+    impl<S: State> State for SetPermissions<S> {
+        type CreatedAt = S::CreatedAt;
+        type Moderator = S::Moderator;
+        type Permissions = Set<members::permissions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `permissions` field
-        pub struct permissions(());
-        ///Marker type for the `moderator` field
-        pub struct moderator(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `moderator` field
+        pub struct moderator(());
+        ///Marker type for the `permissions` field
+        pub struct permissions(());
     }
 }
 
@@ -276,9 +276,9 @@ where
 impl<'a, S> PermissionBuilder<'a, S>
 where
     S: permission_state::State,
-    S::Permissions: permission_state::IsSet,
-    S::Moderator: permission_state::IsSet,
     S::CreatedAt: permission_state::IsSet,
+    S::Moderator: permission_state::IsSet,
+    S::Permissions: permission_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Permission<'a> {
@@ -293,7 +293,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -308,7 +308,7 @@ where
     }
 }
 
-fn lexicon_doc_place_stream_moderation_permission() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_place_stream_moderation_permission() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

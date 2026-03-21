@@ -54,10 +54,10 @@ pub struct GetProfileOutput<'a> {
 pub enum GetProfileError<'a> {
     /// Invalid DID format.
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
     /// No profile found for the given DID.
     #[serde(rename = "ProfileNotFound")]
-    ProfileNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    ProfileNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetProfileError<'_> {

@@ -247,8 +247,8 @@ impl jacquard_common::IntoStatic for DublinCoreTypeEnum<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct Geolocation<'a> {
     ///Horizontal distance from the coordinates describing the smallest circle containing the whole location. Zero is not valid.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub coordinate_uncertainty_in_meters: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub coordinate_uncertainty_in_meters: core::option::Option<i64>,
     ///Geographic latitude in decimal degrees (WGS84). Positive values north of the Equator, negative south. Range: -90 to 90.
     #[serde(borrow)]
     pub decimal_latitude: jacquard_common::CowStr<'a>,
@@ -256,9 +256,9 @@ pub struct Geolocation<'a> {
     #[serde(borrow)]
     pub decimal_longitude: jacquard_common::CowStr<'a>,
     ///The ellipsoid, geodetic datum, or spatial reference system. Recommended: 'EPSG:4326' (WGS84)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub geodetic_datum: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub geodetic_datum: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// The nomenclatural code under which the scientific name is constructed.
@@ -549,29 +549,29 @@ impl jacquard_common::IntoStatic for SexEnum<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct TaxonIdentification<'a> {
     ///Date the identification was made (ISO 8601)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub date_identified: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub date_identified: core::option::Option<jacquard_common::CowStr<'a>>,
     ///GBIF backbone taxonomy key for the identified taxon
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub gbif_taxon_key: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub gbif_taxon_key: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Uncertainty qualifier applied to the taxon name (e.g., 'cf. agrestis', 'aff. agrestis')
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identification_qualifier: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub identification_qualifier: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Notes or comments about the identification
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identification_remarks: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub identification_remarks: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Person(s) who made the identification (pipe-delimited for multiple)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identified_by: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub identified_by: core::option::Option<jacquard_common::CowStr<'a>>,
     ///ORCID or other persistent identifier for the person(s) who identified (pipe-delimited)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identified_by_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub identified_by_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The full scientific name including authorship and date
     #[serde(borrow)]
     pub scientific_name: jacquard_common::CowStr<'a>,
@@ -710,19 +710,19 @@ impl jacquard_common::IntoStatic for TaxonRankEnum<'_> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.defs"
     }
     fn def_name() -> &'static str {
         "geolocation"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_dwc_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.coordinate_uncertainty_in_meters {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -794,19 +794,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Geolocation<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.defs"
     }
     fn def_name() -> &'static str {
         "taxonIdentification"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_gainforest_dwc_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.date_identified {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -938,7 +938,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TaxonIdentification<'a> {
     }
 }
 
-fn lexicon_doc_app_gainforest_dwc_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_gainforest_dwc_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

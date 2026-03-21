@@ -18,12 +18,12 @@
 #[serde(rename_all = "camelCase")]
 pub struct ProfileTab<'a> {
     ///Defaults to `10`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_profile_tab_limit")]
-    pub limit: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tab: std::option::Option<ProfileTabTab<'a>>,
+    pub tab: core::option::Option<ProfileTabTab<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -163,7 +163,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
     type Response = ProfileTabResponse;
 }
 
-fn _default_profile_tab_limit() -> std::option::Option<i64> {
+fn _default_profile_tab_limit() -> core::option::Option<i64> {
     Some(10i64)
 }
 
@@ -290,7 +290,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -18,38 +18,38 @@
 #[serde(rename_all = "camelCase")]
 pub struct WebBookmark<'a> {
     ///Page description/excerpt
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The URL of the bookmarked page
     #[serde(borrow)]
     pub href: jacquard_common::types::string::UriValue<'a>,
     ///Open Graph image for the page
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub preview: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub preview: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Name of the website
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub site_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub site_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Page title
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WebBookmark<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for WebBookmark<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.webBookmark"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_webBookmark()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -161,37 +161,37 @@ pub mod web_bookmark_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Href;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Href = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Href = S::Href;
+        type Title = Unset;
     }
     ///State transition - sets the `href` field to Set
     pub struct SetHref<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHref<S> {}
     impl<S: State> State for SetHref<S> {
-        type Title = S::Title;
         type Href = Set<members::href>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Href = S::Href;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `href` field
         pub struct href(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -324,8 +324,8 @@ where
 impl<'a, S> WebBookmarkBuilder<'a, S>
 where
     S: web_bookmark_state::State,
-    S::Title: web_bookmark_state::IsSet,
     S::Href: web_bookmark_state::IsSet,
+    S::Title: web_bookmark_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WebBookmark<'a> {
@@ -341,7 +341,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -357,7 +357,7 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_webBookmark() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_offprint_block_webBookmark() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

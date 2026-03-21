@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "at.dropb.file",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A file",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "blob"
+        ],
+        "properties": {
+          "blob": {
+            "type": "blob",
+            "accept": [
+              "*/*"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "thumbnail": {
+            "type": "blob",
+            "accept": [
+              "image/*"
+            ],
+            "maxSize": 102400
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

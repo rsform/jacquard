@@ -24,9 +24,9 @@ pub struct WorkoutPlan<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Open Graph preview image for social sharing
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub og_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub og_image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     #[serde(borrow)]
     pub r#type: WorkoutPlanType<'a>,
 }
@@ -141,9 +141,9 @@ impl jacquard_common::IntoStatic for WorkoutPlanType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WorkoutPlanGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -164,9 +164,9 @@ pub struct WorkoutPlanGetRecordOutput<'a> {
 pub struct PlanExercise<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
     pub target_reps: i64,
     pub target_sets: i64,
 }
@@ -211,19 +211,19 @@ impl jacquard_common::types::collection::Collection for WorkoutPlanRecord {
     type Record = WorkoutPlanRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkoutPlan<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for WorkoutPlan<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workoutPlan"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workoutPlan()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -299,19 +299,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkoutPlan<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlanExercise<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PlanExercise<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.workoutPlan"
     }
     fn def_name() -> &'static str {
         "planExercise"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_fitsky_workoutPlan()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -375,67 +375,67 @@ pub mod workout_plan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Exercises;
         type Type;
-        type Name;
         type CreatedAt;
+        type Name;
+        type Exercises;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Exercises = Unset;
         type Type = Unset;
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `exercises` field to Set
-    pub struct SetExercises<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExercises<S> {}
-    impl<S: State> State for SetExercises<S> {
-        type Exercises = Set<members::exercises>;
-        type Type = S::Type;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
+        type Exercises = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Exercises = S::Exercises;
         type Type = Set<members::r#type>;
+        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
         type Exercises = S::Exercises;
-        type Type = S::Type;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Exercises = S::Exercises;
         type Type = S::Type;
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+        type Exercises = S::Exercises;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type Exercises = S::Exercises;
+    }
+    ///State transition - sets the `exercises` field to Set
+    pub struct SetExercises<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExercises<S> {}
+    impl<S: State> State for SetExercises<S> {
+        type Type = S::Type;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Exercises = Set<members::exercises>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `exercises` field
-        pub struct exercises(());
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `exercises` field
+        pub struct exercises(());
     }
 }
 
@@ -568,10 +568,10 @@ where
 impl<'a, S> WorkoutPlanBuilder<'a, S>
 where
     S: workout_plan_state::State,
-    S::Exercises: workout_plan_state::IsSet,
     S::Type: workout_plan_state::IsSet,
-    S::Name: workout_plan_state::IsSet,
     S::CreatedAt: workout_plan_state::IsSet,
+    S::Name: workout_plan_state::IsSet,
+    S::Exercises: workout_plan_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WorkoutPlan<'a> {
@@ -587,7 +587,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -603,7 +603,7 @@ where
     }
 }
 
-fn lexicon_doc_app_fitsky_workoutPlan() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_fitsky_workoutPlan() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -814,51 +814,51 @@ pub mod plan_exercise_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TargetReps;
         type Name;
         type TargetSets;
+        type TargetReps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TargetReps = Unset;
         type Name = Unset;
         type TargetSets = Unset;
-    }
-    ///State transition - sets the `target_reps` field to Set
-    pub struct SetTargetReps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetReps<S> {}
-    impl<S: State> State for SetTargetReps<S> {
-        type TargetReps = Set<members::target_reps>;
-        type Name = S::Name;
-        type TargetSets = S::TargetSets;
+        type TargetReps = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type TargetReps = S::TargetReps;
         type Name = Set<members::name>;
         type TargetSets = S::TargetSets;
+        type TargetReps = S::TargetReps;
     }
     ///State transition - sets the `target_sets` field to Set
     pub struct SetTargetSets<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTargetSets<S> {}
     impl<S: State> State for SetTargetSets<S> {
-        type TargetReps = S::TargetReps;
         type Name = S::Name;
         type TargetSets = Set<members::target_sets>;
+        type TargetReps = S::TargetReps;
+    }
+    ///State transition - sets the `target_reps` field to Set
+    pub struct SetTargetReps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetReps<S> {}
+    impl<S: State> State for SetTargetReps<S> {
+        type Name = S::Name;
+        type TargetSets = S::TargetSets;
+        type TargetReps = Set<members::target_reps>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target_reps` field
-        pub struct target_reps(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `target_sets` field
         pub struct target_sets(());
+        ///Marker type for the `target_reps` field
+        pub struct target_reps(());
     }
 }
 
@@ -968,9 +968,9 @@ where
 impl<'a, S> PlanExerciseBuilder<'a, S>
 where
     S: plan_exercise_state::State,
-    S::TargetReps: plan_exercise_state::IsSet,
     S::Name: plan_exercise_state::IsSet,
     S::TargetSets: plan_exercise_state::IsSet,
+    S::TargetReps: plan_exercise_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlanExercise<'a> {
@@ -985,7 +985,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

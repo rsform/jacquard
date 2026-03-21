@@ -52,10 +52,10 @@ pub struct ImportRepoOutput<'a> {
 pub enum ImportRepoError<'a> {
     /// The CAR file is malformed, has missing blocks, or contains records with mismatched CIDs.
     #[serde(rename = "InvalidCar")]
-    InvalidCar(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidCar(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The destination already has records for this DID. Import is only supported for empty repos.
     #[serde(rename = "RepoAlreadyExists")]
-    RepoAlreadyExists(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoAlreadyExists(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ImportRepoError<'_> {

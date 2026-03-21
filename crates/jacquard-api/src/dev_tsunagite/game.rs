@@ -50,20 +50,20 @@ pub struct Game<'a> {
         jacquard_common::types::string::Rkey<'a>,
     >,
     ///An array of usable input methods for the game. Optional if the game only has one input method or doesn't separate leaderboards by method.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub input_methods: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub input_methods: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///The obtainable judgments during gameplay.
     #[serde(borrow)]
     pub judgments: Vec<crate::dev_tsunagite::types::Indexable<'a>>,
     ///The logo of the game, for display in UI.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub logo: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub logo: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///An array of playable game modes with different gameplay configurations. Optional if the game only has one mode.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub modes: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub modes: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///The human-readable name of the game, for display in UI.
     #[serde(borrow)]
     pub name: jacquard_common::types::value::Data<'a>,
@@ -107,9 +107,9 @@ pub enum GameScoreComponentsItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GameGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -164,8 +164,8 @@ pub struct Points<'a> {
         jacquard_common::types::string::Rkey<'a>,
     >,
     ///The maximum allowed value for this score.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub maximum: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub maximum: core::option::Option<i64>,
     ///The human-readable name of this component in UI.
     #[serde(borrow)]
     pub name: jacquard_common::types::value::Data<'a>,
@@ -207,19 +207,19 @@ impl<'a> Game<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Enum<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Enum<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
     fn def_name() -> &'static str {
         "enum"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_game()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
@@ -277,19 +277,19 @@ impl jacquard_common::types::collection::Collection for GameRecord {
     type Record = GameRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Game<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Game<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_game()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.logo {
             {
                 let size = value.blob().size;
@@ -344,19 +344,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Game<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
     fn def_name() -> &'static str {
         "percentage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_game()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
@@ -387,19 +387,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Percentage<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Points<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Points<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
     fn def_name() -> &'static str {
         "points"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_game()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
@@ -430,19 +430,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Points<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Text<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Text<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.game"
     }
     fn def_name() -> &'static str {
         "text"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_game()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
@@ -484,50 +484,50 @@ pub mod enum_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Values;
-        type Id;
         type Name;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Values = Unset;
-        type Id = Unset;
         type Name = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `values` field to Set
     pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValues<S> {}
     impl<S: State> State for SetValues<S> {
         type Values = Set<members::values>;
+        type Name = S::Name;
         type Id = S::Id;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Values = S::Values;
-        type Id = Set<members::id>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Values = S::Values;
-        type Id = S::Id;
         type Name = Set<members::name>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Values = S::Values;
+        type Name = S::Name;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `values` field
         pub struct values(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -629,8 +629,8 @@ impl<'a, S> EnumBuilder<'a, S>
 where
     S: enum_state::State,
     S::Values: enum_state::IsSet,
-    S::Id: enum_state::IsSet,
     S::Name: enum_state::IsSet,
+    S::Id: enum_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Enum<'a> {
@@ -644,7 +644,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -658,7 +658,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_tsunagite_game() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_dev_tsunagite_game() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.tsunagite.game"),
@@ -1135,8 +1135,8 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type DefaultComponent;
+        type Name;
         type Judgments;
         type ScoreComponents;
     }
@@ -1144,26 +1144,26 @@ pub mod game_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type DefaultComponent = Unset;
+        type Name = Unset;
         type Judgments = Unset;
         type ScoreComponents = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type DefaultComponent = S::DefaultComponent;
-        type Judgments = S::Judgments;
-        type ScoreComponents = S::ScoreComponents;
     }
     ///State transition - sets the `default_component` field to Set
     pub struct SetDefaultComponent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefaultComponent<S> {}
     impl<S: State> State for SetDefaultComponent<S> {
-        type Name = S::Name;
         type DefaultComponent = Set<members::default_component>;
+        type Name = S::Name;
+        type Judgments = S::Judgments;
+        type ScoreComponents = S::ScoreComponents;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type DefaultComponent = S::DefaultComponent;
+        type Name = Set<members::name>;
         type Judgments = S::Judgments;
         type ScoreComponents = S::ScoreComponents;
     }
@@ -1171,8 +1171,8 @@ pub mod game_state {
     pub struct SetJudgments<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetJudgments<S> {}
     impl<S: State> State for SetJudgments<S> {
-        type Name = S::Name;
         type DefaultComponent = S::DefaultComponent;
+        type Name = S::Name;
         type Judgments = Set<members::judgments>;
         type ScoreComponents = S::ScoreComponents;
     }
@@ -1180,18 +1180,18 @@ pub mod game_state {
     pub struct SetScoreComponents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetScoreComponents<S> {}
     impl<S: State> State for SetScoreComponents<S> {
-        type Name = S::Name;
         type DefaultComponent = S::DefaultComponent;
+        type Name = S::Name;
         type Judgments = S::Judgments;
         type ScoreComponents = Set<members::score_components>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `default_component` field
         pub struct default_component(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `judgments` field
         pub struct judgments(());
         ///Marker type for the `score_components` field
@@ -1376,8 +1376,8 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::Name: game_state::IsSet,
     S::DefaultComponent: game_state::IsSet,
+    S::Name: game_state::IsSet,
     S::Judgments: game_state::IsSet,
     S::ScoreComponents: game_state::IsSet,
 {
@@ -1397,7 +1397,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1434,66 +1434,66 @@ pub mod percentage_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Id;
-        type Maximum;
-        type Name;
         type Precision;
+        type Name;
+        type Maximum;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Id = Unset;
-        type Maximum = Unset;
-        type Name = Unset;
         type Precision = Unset;
+        type Name = Unset;
+        type Maximum = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
         type Id = Set<members::id>;
-        type Maximum = S::Maximum;
+        type Precision = S::Precision;
         type Name = S::Name;
-        type Precision = S::Precision;
-    }
-    ///State transition - sets the `maximum` field to Set
-    pub struct SetMaximum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMaximum<S> {}
-    impl<S: State> State for SetMaximum<S> {
-        type Id = S::Id;
-        type Maximum = Set<members::maximum>;
-        type Name = S::Name;
-        type Precision = S::Precision;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Id = S::Id;
         type Maximum = S::Maximum;
-        type Name = Set<members::name>;
-        type Precision = S::Precision;
     }
     ///State transition - sets the `precision` field to Set
     pub struct SetPrecision<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPrecision<S> {}
     impl<S: State> State for SetPrecision<S> {
         type Id = S::Id;
-        type Maximum = S::Maximum;
-        type Name = S::Name;
         type Precision = Set<members::precision>;
+        type Name = S::Name;
+        type Maximum = S::Maximum;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Id = S::Id;
+        type Precision = S::Precision;
+        type Name = Set<members::name>;
+        type Maximum = S::Maximum;
+    }
+    ///State transition - sets the `maximum` field to Set
+    pub struct SetMaximum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMaximum<S> {}
+    impl<S: State> State for SetMaximum<S> {
+        type Id = S::Id;
+        type Precision = S::Precision;
+        type Name = S::Name;
+        type Maximum = Set<members::maximum>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `maximum` field
-        pub struct maximum(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `precision` field
         pub struct precision(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `maximum` field
+        pub struct maximum(());
     }
 }
 
@@ -1615,9 +1615,9 @@ impl<'a, S> PercentageBuilder<'a, S>
 where
     S: percentage_state::State,
     S::Id: percentage_state::IsSet,
-    S::Maximum: percentage_state::IsSet,
-    S::Name: percentage_state::IsSet,
     S::Precision: percentage_state::IsSet,
+    S::Name: percentage_state::IsSet,
+    S::Maximum: percentage_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Percentage<'a> {
@@ -1632,7 +1632,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1657,37 +1657,37 @@ pub mod points_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Id;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Id = S::Id;
+        type Name = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Name = S::Name;
         type Id = Set<members::id>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Id = S::Id;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -1782,8 +1782,8 @@ where
 impl<'a, S> PointsBuilder<'a, S>
 where
     S: points_state::State,
-    S::Name: points_state::IsSet,
     S::Id: points_state::IsSet,
+    S::Name: points_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Points<'a> {
@@ -1797,7 +1797,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1946,7 +1946,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

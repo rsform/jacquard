@@ -62,11 +62,11 @@ pub struct InitAgeAssuranceOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum InitAgeAssuranceError<'a> {
     #[serde(rename = "InvalidEmail")]
-    InvalidEmail(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidEmail(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "DidTooLong")]
-    DidTooLong(std::option::Option<jacquard_common::CowStr<'a>>),
+    DidTooLong(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidInitiation")]
-    InvalidInitiation(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidInitiation(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for InitAgeAssuranceError<'_> {

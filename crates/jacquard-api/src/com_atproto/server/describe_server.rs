@@ -18,9 +18,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Contact<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -36,14 +36,14 @@ pub struct Contact<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Links<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub privacy_policy: std::option::Option<
+    pub privacy_policy: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub terms_of_service: std::option::Option<
+    pub terms_of_service: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
 }
@@ -64,71 +64,71 @@ pub struct DescribeServerOutput<'a> {
     #[serde(borrow)]
     pub available_user_domains: Vec<jacquard_common::CowStr<'a>>,
     ///Contact information
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub contact: std::option::Option<
+    pub contact: core::option::Option<
         crate::com_atproto::server::describe_server::Contact<'a>,
     >,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     ///If true, an invite code must be supplied to create an account on this instance.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub invite_code_required: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub invite_code_required: core::option::Option<bool>,
     ///URLs of service policy documents.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub links: std::option::Option<
+    pub links: core::option::Option<
         crate::com_atproto::server::describe_server::Links<'a>,
     >,
     ///If true, a phone verification token must be supplied to create an account on this instance.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub phone_verification_required: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub phone_verification_required: core::option::Option<bool>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Contact<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Contact<'a> {
     fn nsid() -> &'static str {
         "com.atproto.server.describeServer"
     }
     fn def_name() -> &'static str {
         "contact"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_server_describeServer()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Links<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Links<'a> {
     fn nsid() -> &'static str {
         "com.atproto.server.describeServer"
     }
     fn def_name() -> &'static str {
         "links"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_server_describeServer()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct DescribeServer;
 /// Response type for
@@ -157,7 +157,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DescribeServerRequest {
     type Response = DescribeServerResponse;
 }
 
-fn lexicon_doc_com_atproto_server_describeServer() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atproto_server_describeServer() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

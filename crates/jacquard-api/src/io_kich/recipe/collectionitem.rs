@@ -22,9 +22,13 @@ pub struct Collectionitem<'a> {
     pub collection: jacquard_common::types::string::AtUri<'a>,
     ///When this item was added to the collection
     pub created_at: jacquard_common::types::string::Datetime,
+    ///Optional group/section name for organizing recipes within the collection
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub group: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional position for ordering items within the collection
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub position: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub position: core::option::Option<i64>,
     ///Reference to the recipe (io.kich.recipe.recipe) included in the collection
     #[serde(borrow)]
     pub subject: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -42,9 +46,9 @@ pub struct Collectionitem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CollectionitemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -91,19 +95,19 @@ impl jacquard_common::types::collection::Collection for CollectionitemRecord {
     type Record = CollectionitemRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Collectionitem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Collectionitem<'a> {
     fn nsid() -> &'static str {
         "io.kich.recipe.collectionitem"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_kich_recipe_collectionitem()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -119,50 +123,50 @@ pub mod collectionitem_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Subject;
-        type CreatedAt;
         type Collection;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Subject = Unset;
-        type CreatedAt = Unset;
         type Collection = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
         type Subject = Set<members::subject>;
+        type Collection = S::Collection;
         type CreatedAt = S::CreatedAt;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type CreatedAt = Set<members::created_at>;
-        type Collection = S::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
         type Collection = Set<members::collection>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type Collection = S::Collection;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -172,6 +176,7 @@ pub struct CollectionitemBuilder<'a, S: collectionitem_state::State> {
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
         ::core::option::Option<jacquard_common::types::string::Datetime>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ),
@@ -190,7 +195,7 @@ impl<'a> CollectionitemBuilder<'a, collectionitem_state::Empty> {
     pub fn new() -> Self {
         CollectionitemBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -235,14 +240,30 @@ where
 }
 
 impl<'a, S: collectionitem_state::State> CollectionitemBuilder<'a, S> {
+    /// Set the `group` field (optional)
+    pub fn group(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `group` field to an Option value (optional)
+    pub fn maybe_group(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: collectionitem_state::State> CollectionitemBuilder<'a, S> {
     /// Set the `position` field (optional)
     pub fn position(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `position` field to an Option value (optional)
     pub fn maybe_position(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self.__unsafe_private_named.3 = value;
         self
     }
 }
@@ -257,7 +278,7 @@ where
         mut self,
         value: impl Into<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ) -> CollectionitemBuilder<'a, collectionitem_state::SetSubject<S>> {
-        self.__unsafe_private_named.3 = ::core::option::Option::Some(value.into());
+        self.__unsafe_private_named.4 = ::core::option::Option::Some(value.into());
         CollectionitemBuilder {
             _phantom_state: ::core::marker::PhantomData,
             __unsafe_private_named: self.__unsafe_private_named,
@@ -270,23 +291,24 @@ impl<'a, S> CollectionitemBuilder<'a, S>
 where
     S: collectionitem_state::State,
     S::Subject: collectionitem_state::IsSet,
-    S::CreatedAt: collectionitem_state::IsSet,
     S::Collection: collectionitem_state::IsSet,
+    S::CreatedAt: collectionitem_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collectionitem<'a> {
         Collectionitem {
             collection: self.__unsafe_private_named.0.unwrap(),
             created_at: self.__unsafe_private_named.1.unwrap(),
-            position: self.__unsafe_private_named.2,
-            subject: self.__unsafe_private_named.3.unwrap(),
+            group: self.__unsafe_private_named.2,
+            position: self.__unsafe_private_named.3,
+            subject: self.__unsafe_private_named.4.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -294,14 +316,15 @@ where
         Collectionitem {
             collection: self.__unsafe_private_named.0.unwrap(),
             created_at: self.__unsafe_private_named.1.unwrap(),
-            position: self.__unsafe_private_named.2,
-            subject: self.__unsafe_private_named.3.unwrap(),
+            group: self.__unsafe_private_named.2,
+            position: self.__unsafe_private_named.3,
+            subject: self.__unsafe_private_named.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
 }
 
-fn lexicon_doc_io_kich_recipe_collectionitem() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_io_kich_recipe_collectionitem() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -365,6 +388,27 @@ fn lexicon_doc_io_kich_recipe_collectionitem() -> ::jacquard_lexicon::lexicon::L
                                     format: Some(
                                         ::jacquard_lexicon::lexicon::LexStringFormat::Datetime,
                                     ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
+                                }),
+                            );
+                            map.insert(
+                                ::jacquard_common::deps::smol_str::SmolStr::new_static(
+                                    "group",
+                                ),
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
+                                    description: Some(
+                                        ::jacquard_common::CowStr::new_static(
+                                            "Optional group/section name for organizing recipes within the collection",
+                                        ),
+                                    ),
+                                    format: None,
                                     default: None,
                                     min_length: None,
                                     max_length: None,

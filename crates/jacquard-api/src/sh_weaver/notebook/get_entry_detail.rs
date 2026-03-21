@@ -18,9 +18,11 @@
 pub struct GetEntryDetail<'a> {
     #[serde(borrow)]
     pub entry: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notebook_context: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub notebook_context: core::option::Option<
+        jacquard_common::types::string::AtUri<'a>,
+    >,
 }
 
 #[jacquard_derive::lexicon]
@@ -38,9 +40,9 @@ pub struct GetEntryDetailOutput<'a> {
     #[serde(borrow)]
     pub entry: crate::sh_weaver::notebook::EntryView<'a>,
     pub notebook_count: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notebooks: std::option::Option<
+    pub notebooks: core::option::Option<
         Vec<crate::sh_weaver::notebook::NotebookView<'a>>,
     >,
     #[serde(borrow)]
@@ -63,7 +65,7 @@ pub struct GetEntryDetailOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetEntryDetailError<'a> {
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    EntryNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetEntryDetailError<'_> {

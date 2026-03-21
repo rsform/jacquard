@@ -45,32 +45,32 @@ pub struct Indexable<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct TypedRef<'a> {
     ///The AT URI of the record this object references.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#ref: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub r#ref: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///The type of the record this object references.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: std::option::Option<
+    pub r#type: core::option::Option<
         jacquard_common::types::string::RecordKey<
             jacquard_common::types::string::Rkey<'a>,
         >,
     >,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Indexable<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Indexable<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.types"
     }
     fn def_name() -> &'static str {
         "indexable"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_types()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.id;
             #[allow(unused_comparisons)]
@@ -101,19 +101,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Indexable<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TypedRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TypedRef<'a> {
     fn nsid() -> &'static str {
         "dev.tsunagite.types"
     }
     fn def_name() -> &'static str {
         "typedRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_tsunagite_types()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -128,51 +128,51 @@ pub mod indexable_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Name;
         type Index;
+        type Name;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Name = Unset;
         type Index = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Name = S::Name;
-        type Index = S::Index;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Id = S::Id;
-        type Name = Set<members::name>;
-        type Index = S::Index;
+        type Name = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndex<S> {}
     impl<S: State> State for SetIndex<S> {
-        type Id = S::Id;
-        type Name = S::Name;
         type Index = Set<members::index>;
+        type Name = S::Name;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Index = S::Index;
+        type Name = Set<members::name>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Index = S::Index;
+        type Name = S::Name;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `index` field
         pub struct index(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
@@ -273,9 +273,9 @@ where
 impl<'a, S> IndexableBuilder<'a, S>
 where
     S: indexable_state::State,
-    S::Id: indexable_state::IsSet,
-    S::Name: indexable_state::IsSet,
     S::Index: indexable_state::IsSet,
+    S::Name: indexable_state::IsSet,
+    S::Id: indexable_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Indexable<'a> {
@@ -289,7 +289,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -303,9 +303,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_tsunagite_types() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_tsunagite_types() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("dev.tsunagite.types"),

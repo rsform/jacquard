@@ -19,45 +19,45 @@
 #[serde(rename_all = "camelCase")]
 pub struct Sprite<'a> {
     ///Milliseconds per frame for animation playback Defaults to `200`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_sprite_animation_speed")]
-    pub animation_speed: std::option::Option<i64>,
+    pub animation_speed: core::option::Option<i64>,
     ///Number of columns per animation cycle
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub columns: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub columns: core::option::Option<i64>,
     ///When this record was first created
     pub created_at: jacquard_common::types::string::Datetime,
     ///The game engine format this sprite is designed for. Determines animation interpretation.
     #[serde(borrow)]
     pub engine: SpriteEngine<'a>,
     ///Height of a single frame in pixels (if not auto-calculated from height/rows)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub frame_height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub frame_height: core::option::Option<i64>,
     ///Width of a single frame in pixels (if not auto-calculated from width/columns)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub frame_width: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub frame_width: core::option::Option<i64>,
     ///Total number of animation frames
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub frames: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub frames: core::option::Option<i64>,
     ///Total height of the sprite sheet in pixels
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub height: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub height: core::option::Option<i64>,
     ///Display name for the character (optional, can differ from Bluesky display name)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Number of rows in the sprite sheet (typically 4 for directional sprites: down, left, right, up)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rows: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rows: core::option::Option<i64>,
     ///The sprite sheet image (PNG only). Max 10MB.
     #[serde(borrow)]
     pub sprite_sheet: jacquard_common::types::blob::BlobRef<'a>,
     ///When this record was last modified
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Total width of the sprite sheet in pixels
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub width: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub width: core::option::Option<i64>,
 }
 
 /// The game engine format this sprite is designed for. Determines animation interpretation.
@@ -171,9 +171,9 @@ impl jacquard_common::IntoStatic for SpriteEngine<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SpriteGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -220,19 +220,19 @@ impl jacquard_common::types::collection::Collection for SpriteRecord {
     type Record = SpriteRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.sprite"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_sprite()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.animation_speed {
             if *value > 2000i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -487,7 +487,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sprite<'a> {
     }
 }
 
-fn _default_sprite_animation_speed() -> std::option::Option<i64> {
+fn _default_sprite_animation_speed() -> core::option::Option<i64> {
     Some(200i64)
 }
 
@@ -501,51 +501,51 @@ pub mod sprite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Engine;
         type SpriteSheet;
         type CreatedAt;
+        type Engine;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Engine = Unset;
         type SpriteSheet = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `engine` field to Set
-    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEngine<S> {}
-    impl<S: State> State for SetEngine<S> {
-        type Engine = Set<members::engine>;
-        type SpriteSheet = S::SpriteSheet;
-        type CreatedAt = S::CreatedAt;
+        type Engine = Unset;
     }
     ///State transition - sets the `sprite_sheet` field to Set
     pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
     impl<S: State> State for SetSpriteSheet<S> {
-        type Engine = S::Engine;
         type SpriteSheet = Set<members::sprite_sheet>;
         type CreatedAt = S::CreatedAt;
+        type Engine = S::Engine;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Engine = S::Engine;
         type SpriteSheet = S::SpriteSheet;
         type CreatedAt = Set<members::created_at>;
+        type Engine = S::Engine;
+    }
+    ///State transition - sets the `engine` field to Set
+    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEngine<S> {}
+    impl<S: State> State for SetEngine<S> {
+        type SpriteSheet = S::SpriteSheet;
+        type CreatedAt = S::CreatedAt;
+        type Engine = Set<members::engine>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `engine` field
-        pub struct engine(());
         ///Marker type for the `sprite_sheet` field
         pub struct sprite_sheet(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `engine` field
+        pub struct engine(());
     }
 }
 
@@ -801,9 +801,9 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S> SpriteBuilder<'a, S>
 where
     S: sprite_state::State,
-    S::Engine: sprite_state::IsSet,
     S::SpriteSheet: sprite_state::IsSet,
     S::CreatedAt: sprite_state::IsSet,
+    S::Engine: sprite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sprite<'a> {
@@ -827,7 +827,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -851,7 +851,7 @@ where
     }
 }
 
-fn lexicon_doc_actor_rpg_sprite() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_actor_rpg_sprite() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("actor.rpg.sprite"),

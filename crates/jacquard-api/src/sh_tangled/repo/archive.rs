@@ -18,12 +18,12 @@
 pub struct Archive<'a> {
     ///Defaults to `"tar.gz"`.
     #[serde(default = "_default_format")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub format: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub format: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub prefix: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub prefix: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub r#ref: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -62,16 +62,16 @@ pub struct ArchiveOutput {
 pub enum ArchiveError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RefNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Failed to create archive
     #[serde(rename = "ArchiveError")]
-    ArchiveError(std::option::Option<jacquard_common::CowStr<'a>>),
+    ArchiveError(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ArchiveError<'_> {
@@ -151,7 +151,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ArchiveRequest {
     type Response = ArchiveResponse;
 }
 
-fn _default_format() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_format() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("tar.gz"))
 }
 

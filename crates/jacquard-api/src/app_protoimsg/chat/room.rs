@@ -19,24 +19,24 @@
 #[serde(rename_all = "camelCase")]
 pub struct Room<'a> {
     ///Broad category for room discovery (e.g., music, tech, gaming). Lowercased.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp of room creation.
     pub created_at: jacquard_common::types::string::Datetime,
     ///What the room is about.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Display name for the room.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Room purpose categorization.
     #[serde(borrow)]
     pub purpose: RoomPurpose<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub settings: std::option::Option<
+    pub settings: core::option::Option<
         crate::app_protoimsg::chat::room::RoomSettings<'a>,
     >,
     ///Room topic for sorting, filtering, and discovery.
@@ -155,9 +155,9 @@ impl jacquard_common::IntoStatic for RoomPurpose<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RoomGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -178,21 +178,21 @@ pub struct RoomGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct RoomSettings<'a> {
     ///When true, only users on the room allowlist can send messages. Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_room_settings_allowlist_enabled")]
-    pub allowlist_enabled: std::option::Option<bool>,
+    pub allowlist_enabled: core::option::Option<bool>,
     ///Minimum atproto account age in days to participate. Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_room_settings_min_account_age_days")]
-    pub min_account_age_days: std::option::Option<i64>,
+    pub min_account_age_days: core::option::Option<i64>,
     ///Minimum seconds between messages per user. 0 = disabled. Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_room_settings_slow_mode_seconds")]
-    pub slow_mode_seconds: std::option::Option<i64>,
+    pub slow_mode_seconds: core::option::Option<i64>,
     ///Room discoverability. public = listed in directory, unlisted = link only, private = invite only.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub visibility: std::option::Option<RoomSettingsVisibility<'a>>,
+    pub visibility: core::option::Option<RoomSettingsVisibility<'a>>,
 }
 
 /// Room discoverability. public = listed in directory, unlisted = link only, private = invite only.
@@ -331,19 +331,19 @@ impl jacquard_common::types::collection::Collection for RoomRecord {
     type Record = RoomRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Room<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.room"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_room()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.category {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -398,19 +398,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Room<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RoomSettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RoomSettings<'a> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.room"
     }
     fn def_name() -> &'static str {
         "roomSettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_protoimsg_chat_room()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.min_account_age_days {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -447,8 +447,8 @@ pub mod room_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
         type Topic;
         type Purpose;
     }
@@ -456,26 +456,26 @@ pub mod room_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
         type Topic = Unset;
         type Purpose = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Topic = S::Topic;
-        type Purpose = S::Purpose;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+        type Topic = S::Topic;
+        type Purpose = S::Purpose;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
         type Topic = S::Topic;
         type Purpose = S::Purpose;
     }
@@ -483,8 +483,8 @@ pub mod room_state {
     pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTopic<S> {}
     impl<S: State> State for SetTopic<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type Topic = Set<members::topic>;
         type Purpose = S::Purpose;
     }
@@ -492,18 +492,18 @@ pub mod room_state {
     pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPurpose<S> {}
     impl<S: State> State for SetPurpose<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type Topic = S::Topic;
         type Purpose = Set<members::purpose>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `topic` field
         pub struct topic(());
         ///Marker type for the `purpose` field
@@ -677,8 +677,8 @@ where
 impl<'a, S> RoomBuilder<'a, S>
 where
     S: room_state::State,
-    S::CreatedAt: room_state::IsSet,
     S::Name: room_state::IsSet,
+    S::CreatedAt: room_state::IsSet,
     S::Topic: room_state::IsSet,
     S::Purpose: room_state::IsSet,
 {
@@ -698,7 +698,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -716,7 +716,7 @@ where
     }
 }
 
-fn lexicon_doc_app_protoimsg_chat_room() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_protoimsg_chat_room() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -972,15 +972,15 @@ fn lexicon_doc_app_protoimsg_chat_room() -> ::jacquard_lexicon::lexicon::Lexicon
     }
 }
 
-fn _default_room_settings_allowlist_enabled() -> std::option::Option<bool> {
+fn _default_room_settings_allowlist_enabled() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_room_settings_min_account_age_days() -> std::option::Option<i64> {
+fn _default_room_settings_min_account_age_days() -> core::option::Option<i64> {
     Some(0i64)
 }
 
-fn _default_room_settings_slow_mode_seconds() -> std::option::Option<i64> {
+fn _default_room_settings_slow_mode_seconds() -> core::option::Option<i64> {
     Some(0i64)
 }
 

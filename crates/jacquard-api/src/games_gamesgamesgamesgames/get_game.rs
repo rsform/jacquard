@@ -16,12 +16,46 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetGame<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slug: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub apple_app_store_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub epic_games_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub gog_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub google_play_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub humble_bundle_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub igdb_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_actor_credits: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_org_credits: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub nintendo_eshop_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub play_station_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub slug: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub steam_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    #[serde(borrow)]
+    pub xbox_id: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -90,7 +124,19 @@ pub struct GetGameBuilder<'a, S: get_game_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<bool>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -107,9 +153,196 @@ impl<'a> GetGameBuilder<'a, get_game_state::Empty> {
     pub fn new() -> Self {
         GetGameBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None),
+            __unsafe_private_named: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ),
             _phantom: ::core::marker::PhantomData,
         }
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `appleAppStoreId` field (optional)
+    pub fn apple_app_store_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value.into();
+        self
+    }
+    /// Set the `appleAppStoreId` field to an Option value (optional)
+    pub fn maybe_apple_app_store_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.0 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `epicGamesId` field (optional)
+    pub fn epic_games_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value.into();
+        self
+    }
+    /// Set the `epicGamesId` field to an Option value (optional)
+    pub fn maybe_epic_games_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.1 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `gogId` field (optional)
+    pub fn gog_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.2 = value.into();
+        self
+    }
+    /// Set the `gogId` field to an Option value (optional)
+    pub fn maybe_gog_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.2 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `googlePlayId` field (optional)
+    pub fn google_play_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value.into();
+        self
+    }
+    /// Set the `googlePlayId` field to an Option value (optional)
+    pub fn maybe_google_play_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.3 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `humbleBundleId` field (optional)
+    pub fn humble_bundle_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value.into();
+        self
+    }
+    /// Set the `humbleBundleId` field to an Option value (optional)
+    pub fn maybe_humble_bundle_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.4 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `igdbId` field (optional)
+    pub fn igdb_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.5 = value.into();
+        self
+    }
+    /// Set the `igdbId` field to an Option value (optional)
+    pub fn maybe_igdb_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.5 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `includeActorCredits` field (optional)
+    pub fn include_actor_credits(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.6 = value.into();
+        self
+    }
+    /// Set the `includeActorCredits` field to an Option value (optional)
+    pub fn maybe_include_actor_credits(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.6 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `includeOrgCredits` field (optional)
+    pub fn include_org_credits(mut self, value: impl Into<Option<bool>>) -> Self {
+        self.__unsafe_private_named.7 = value.into();
+        self
+    }
+    /// Set the `includeOrgCredits` field to an Option value (optional)
+    pub fn maybe_include_org_credits(mut self, value: Option<bool>) -> Self {
+        self.__unsafe_private_named.7 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `nintendoEshopId` field (optional)
+    pub fn nintendo_eshop_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value.into();
+        self
+    }
+    /// Set the `nintendoEshopId` field to an Option value (optional)
+    pub fn maybe_nintendo_eshop_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.8 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `playStationId` field (optional)
+    pub fn play_station_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value.into();
+        self
+    }
+    /// Set the `playStationId` field to an Option value (optional)
+    pub fn maybe_play_station_id(
+        mut self,
+        value: Option<jacquard_common::CowStr<'a>>,
+    ) -> Self {
+        self.__unsafe_private_named.9 = value;
+        self
     }
 }
 
@@ -119,12 +352,28 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self.__unsafe_private_named.10 = value.into();
         self
     }
     /// Set the `slug` field to an Option value (optional)
     pub fn maybe_slug(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self.__unsafe_private_named.10 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `steamId` field (optional)
+    pub fn steam_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.11 = value.into();
+        self
+    }
+    /// Set the `steamId` field to an Option value (optional)
+    pub fn maybe_steam_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.11 = value;
         self
     }
 }
@@ -135,7 +384,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
         mut self,
         value: impl Into<Option<jacquard_common::types::string::AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self.__unsafe_private_named.12 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
@@ -143,7 +392,23 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
         mut self,
         value: Option<jacquard_common::types::string::AtUri<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self.__unsafe_private_named.12 = value;
+        self
+    }
+}
+
+impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+    /// Set the `xboxId` field (optional)
+    pub fn xbox_id(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
+        self.__unsafe_private_named.13 = value.into();
+        self
+    }
+    /// Set the `xboxId` field to an Option value (optional)
+    pub fn maybe_xbox_id(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
+        self.__unsafe_private_named.13 = value;
         self
     }
 }
@@ -155,8 +420,20 @@ where
     /// Build the final struct
     pub fn build(self) -> GetGame<'a> {
         GetGame {
-            slug: self.__unsafe_private_named.0,
-            uri: self.__unsafe_private_named.1,
+            apple_app_store_id: self.__unsafe_private_named.0,
+            epic_games_id: self.__unsafe_private_named.1,
+            gog_id: self.__unsafe_private_named.2,
+            google_play_id: self.__unsafe_private_named.3,
+            humble_bundle_id: self.__unsafe_private_named.4,
+            igdb_id: self.__unsafe_private_named.5,
+            include_actor_credits: self.__unsafe_private_named.6,
+            include_org_credits: self.__unsafe_private_named.7,
+            nintendo_eshop_id: self.__unsafe_private_named.8,
+            play_station_id: self.__unsafe_private_named.9,
+            slug: self.__unsafe_private_named.10,
+            steam_id: self.__unsafe_private_named.11,
+            uri: self.__unsafe_private_named.12,
+            xbox_id: self.__unsafe_private_named.13,
         }
     }
 }

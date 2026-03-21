@@ -103,9 +103,9 @@ pub struct ColourSchemeColours<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ColourSchemeGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -152,41 +152,41 @@ impl jacquard_common::types::collection::Collection for ColourSchemeRecord {
     type Record = ColourSchemeRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ColourScheme<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ColourScheme<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.colourScheme"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_colourScheme()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ColourSchemeColours<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ColourSchemeColours<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.colourScheme"
     }
     fn def_name() -> &'static str {
         "ColourSchemeColours"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_colourScheme()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_colourScheme() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_notebook_colourScheme() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -646,49 +646,49 @@ pub mod colour_scheme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Variant;
         type Name;
+        type Variant;
         type Colours;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Variant = Unset;
         type Name = Unset;
+        type Variant = Unset;
         type Colours = Unset;
-    }
-    ///State transition - sets the `variant` field to Set
-    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVariant<S> {}
-    impl<S: State> State for SetVariant<S> {
-        type Variant = Set<members::variant>;
-        type Name = S::Name;
-        type Colours = S::Colours;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Variant = S::Variant;
         type Name = Set<members::name>;
+        type Variant = S::Variant;
+        type Colours = S::Colours;
+    }
+    ///State transition - sets the `variant` field to Set
+    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVariant<S> {}
+    impl<S: State> State for SetVariant<S> {
+        type Name = S::Name;
+        type Variant = Set<members::variant>;
         type Colours = S::Colours;
     }
     ///State transition - sets the `colours` field to Set
     pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetColours<S> {}
     impl<S: State> State for SetColours<S> {
-        type Variant = S::Variant;
         type Name = S::Name;
+        type Variant = S::Variant;
         type Colours = Set<members::colours>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `variant` field
-        pub struct variant(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `variant` field
+        pub struct variant(());
         ///Marker type for the `colours` field
         pub struct colours(());
     }
@@ -783,8 +783,8 @@ where
 impl<'a, S> ColourSchemeBuilder<'a, S>
 where
     S: colour_scheme_state::State,
-    S::Variant: colour_scheme_state::IsSet,
     S::Name: colour_scheme_state::IsSet,
+    S::Variant: colour_scheme_state::IsSet,
     S::Colours: colour_scheme_state::IsSet,
 {
     /// Build the final struct
@@ -799,7 +799,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

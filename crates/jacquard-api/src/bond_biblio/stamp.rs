@@ -40,9 +40,9 @@ pub struct Stamp<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StampGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -89,19 +89,19 @@ impl jacquard_common::types::collection::Collection for StampRecord {
     type Record = StampRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stamp<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Stamp<'a> {
     fn nsid() -> &'static str {
         "bond.biblio.stamp"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_bond_biblio_stamp()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -116,49 +116,49 @@ pub mod stamp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Book;
+        type CreatedAt;
         type List;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Book = Unset;
+        type CreatedAt = Unset;
         type List = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Book = S::Book;
-        type List = S::List;
     }
     ///State transition - sets the `book` field to Set
     pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBook<S> {}
     impl<S: State> State for SetBook<S> {
-        type CreatedAt = S::CreatedAt;
         type Book = Set<members::book>;
+        type CreatedAt = S::CreatedAt;
+        type List = S::List;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Book = S::Book;
+        type CreatedAt = Set<members::created_at>;
         type List = S::List;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetList<S> {}
     impl<S: State> State for SetList<S> {
-        type CreatedAt = S::CreatedAt;
         type Book = S::Book;
+        type CreatedAt = S::CreatedAt;
         type List = Set<members::list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `book` field
         pub struct book(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `list` field
         pub struct list(());
     }
@@ -253,8 +253,8 @@ where
 impl<'a, S> StampBuilder<'a, S>
 where
     S: stamp_state::State,
-    S::CreatedAt: stamp_state::IsSet,
     S::Book: stamp_state::IsSet,
+    S::CreatedAt: stamp_state::IsSet,
     S::List: stamp_state::IsSet,
 {
     /// Build the final struct
@@ -269,7 +269,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -283,7 +283,7 @@ where
     }
 }
 
-fn lexicon_doc_bond_biblio_stamp() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_bond_biblio_stamp() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("bond.biblio.stamp"),

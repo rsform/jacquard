@@ -21,9 +21,9 @@ pub struct Journal<'a> {
     ///Timestamp when the journal entry was created.
     pub created_at: jacquard_common::types::string::Datetime,
     ///Journal entry content written by the agent.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub journal: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub journal: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -38,9 +38,9 @@ pub struct Journal<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct JournalGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -87,19 +87,19 @@ impl jacquard_common::types::collection::Collection for JournalRecord {
     type Record = JournalRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Journal<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Journal<'a> {
     fn nsid() -> &'static str {
         "top.launchpadx.agent.journal"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_top_launchpadx_agent_journal()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -215,7 +215,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -228,7 +228,7 @@ where
     }
 }
 
-fn lexicon_doc_top_launchpadx_agent_journal() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_top_launchpadx_agent_journal() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

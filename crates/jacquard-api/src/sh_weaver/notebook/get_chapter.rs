@@ -18,13 +18,13 @@
 pub struct GetChapter<'a> {
     #[serde(borrow)]
     pub chapter: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_entry_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub entry_limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub entry_limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -43,9 +43,9 @@ pub struct GetChapterOutput<'a> {
     pub chapter: crate::sh_weaver::notebook::ChapterView<'a>,
     #[serde(borrow)]
     pub entries: Vec<crate::sh_weaver::notebook::ChapterEntryView<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub entry_cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub entry_cursor: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -64,7 +64,7 @@ pub struct GetChapterOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetChapterError<'a> {
     #[serde(rename = "ChapterNotFound")]
-    ChapterNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    ChapterNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetChapterError<'_> {
@@ -108,7 +108,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetChapterRequest {
     type Response = GetChapterResponse;
 }
 
-fn _default_entry_limit() -> std::option::Option<i64> {
+fn _default_entry_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 

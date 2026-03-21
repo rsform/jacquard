@@ -22,15 +22,15 @@ pub struct Theme<'a> {
     #[serde(borrow)]
     pub dark: crate::blog_pckt::theme::Palette<'a>,
     ///Font family name (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub font: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub font: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Light mode color palette
     #[serde(borrow)]
     pub light: crate::blog_pckt::theme::Palette<'a>,
     ///Content background transparency percentage (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub transparency: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub transparency: core::option::Option<i64>,
 }
 
 /// Color palette with CSS hex values
@@ -64,19 +64,19 @@ pub struct Palette<'a> {
     pub text: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.theme"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_theme()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.font {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -115,19 +115,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Theme<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Palette<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.theme"
     }
     fn def_name() -> &'static str {
         "palette"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_theme()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.accent;
             #[allow(unused_comparisons)]
@@ -357,7 +357,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -372,7 +372,7 @@ where
     }
 }
 
-fn lexicon_doc_blog_pckt_theme() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_blog_pckt_theme() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("blog.pckt.theme"),

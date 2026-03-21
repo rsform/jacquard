@@ -1,0 +1,73 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.git.temp.analyzeMerge",
+  "defs": {
+    "conflictInfo": {
+      "type": "object",
+      "required": [
+        "filename",
+        "reason"
+      ],
+      "properties": {
+        "filename": {
+          "type": "string",
+          "description": "Name of the conflicted file"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Reason for the conflict"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Check if a merge is possible between two branches",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "patch",
+          "branch"
+        ],
+        "properties": {
+          "branch": {
+            "type": "string",
+            "description": "Target branch to merge into"
+          },
+          "patch": {
+            "type": "string",
+            "description": "Patch or pull request to check for merge conflicts"
+          },
+          "repo": {
+            "type": "string",
+            "description": "AT-URI of the repository",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "is_conflicted"
+          ],
+          "properties": {
+            "conflicts": {
+              "type": "array",
+              "description": "List of files with merge conflicts",
+              "items": {
+                "type": "ref",
+                "ref": "#conflictInfo"
+              }
+            },
+            "is_conflicted": {
+              "type": "boolean",
+              "description": "Whether the merge has conflicts"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -42,9 +42,9 @@ pub struct QuizBegin<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct QuizBeginGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -91,19 +91,19 @@ impl jacquard_common::types::collection::Collection for QuizBeginRecord {
     type Record = QuizBeginRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for QuizBegin<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for QuizBegin<'a> {
     fn nsid() -> &'static str {
         "pub.quizzy.quizBegin"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_quizzy_quizBegin()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -118,67 +118,67 @@ pub mod quiz_begin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartedAt;
-        type Quiz;
-        type League;
         type EndsAt;
+        type Quiz;
+        type StartedAt;
+        type League;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartedAt = Unset;
-        type Quiz = Unset;
-        type League = Unset;
         type EndsAt = Unset;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type StartedAt = Set<members::started_at>;
-        type Quiz = S::Quiz;
-        type League = S::League;
-        type EndsAt = S::EndsAt;
-    }
-    ///State transition - sets the `quiz` field to Set
-    pub struct SetQuiz<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuiz<S> {}
-    impl<S: State> State for SetQuiz<S> {
-        type StartedAt = S::StartedAt;
-        type Quiz = Set<members::quiz>;
-        type League = S::League;
-        type EndsAt = S::EndsAt;
-    }
-    ///State transition - sets the `league` field to Set
-    pub struct SetLeague<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLeague<S> {}
-    impl<S: State> State for SetLeague<S> {
-        type StartedAt = S::StartedAt;
-        type Quiz = S::Quiz;
-        type League = Set<members::league>;
-        type EndsAt = S::EndsAt;
+        type Quiz = Unset;
+        type StartedAt = Unset;
+        type League = Unset;
     }
     ///State transition - sets the `ends_at` field to Set
     pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndsAt<S> {}
     impl<S: State> State for SetEndsAt<S> {
-        type StartedAt = S::StartedAt;
-        type Quiz = S::Quiz;
-        type League = S::League;
         type EndsAt = Set<members::ends_at>;
+        type Quiz = S::Quiz;
+        type StartedAt = S::StartedAt;
+        type League = S::League;
+    }
+    ///State transition - sets the `quiz` field to Set
+    pub struct SetQuiz<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuiz<S> {}
+    impl<S: State> State for SetQuiz<S> {
+        type EndsAt = S::EndsAt;
+        type Quiz = Set<members::quiz>;
+        type StartedAt = S::StartedAt;
+        type League = S::League;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type EndsAt = S::EndsAt;
+        type Quiz = S::Quiz;
+        type StartedAt = Set<members::started_at>;
+        type League = S::League;
+    }
+    ///State transition - sets the `league` field to Set
+    pub struct SetLeague<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLeague<S> {}
+    impl<S: State> State for SetLeague<S> {
+        type EndsAt = S::EndsAt;
+        type Quiz = S::Quiz;
+        type StartedAt = S::StartedAt;
+        type League = Set<members::league>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `quiz` field
-        pub struct quiz(());
-        ///Marker type for the `league` field
-        pub struct league(());
         ///Marker type for the `ends_at` field
         pub struct ends_at(());
+        ///Marker type for the `quiz` field
+        pub struct quiz(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `league` field
+        pub struct league(());
     }
 }
 
@@ -291,10 +291,10 @@ where
 impl<'a, S> QuizBeginBuilder<'a, S>
 where
     S: quiz_begin_state::State,
-    S::StartedAt: quiz_begin_state::IsSet,
-    S::Quiz: quiz_begin_state::IsSet,
-    S::League: quiz_begin_state::IsSet,
     S::EndsAt: quiz_begin_state::IsSet,
+    S::Quiz: quiz_begin_state::IsSet,
+    S::StartedAt: quiz_begin_state::IsSet,
+    S::League: quiz_begin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> QuizBegin<'a> {
@@ -309,7 +309,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -324,9 +324,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_quizzy_quizBegin() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_pub_quizzy_quizBegin() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pub.quizzy.quizBegin"),

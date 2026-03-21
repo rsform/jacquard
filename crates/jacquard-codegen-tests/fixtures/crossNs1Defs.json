@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "test.ns1.defs",
+  "description": "Cross-namespace test: defines types referenced by test.ns2.",
+  "defs": {
+    "foo": {
+      "type": "object",
+      "description": "A type defined in ns1, referenced cross-namespace by ns2.",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "value": {
+          "type": "integer"
+        }
+      }
+    },
+    "bar": {
+      "type": "object",
+      "description": "Another type in ns1 for cross-namespace ref testing.",
+      "required": ["tag"],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "maxLength": 50
+        }
+      }
+    }
+  }
+}

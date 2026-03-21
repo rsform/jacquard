@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct FeatureOfInterest<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Encoding of the feature field, e.g. application/vnd.geo+json
     #[serde(borrow)]
     pub encoding_type: jacquard_common::CowStr<'a>,
@@ -44,9 +44,9 @@ pub struct FeatureOfInterest<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct FeatureOfInterestGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -93,19 +93,19 @@ impl jacquard_common::types::collection::Collection for FeatureOfInterestRecord 
     type Record = FeatureOfInterestRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for FeatureOfInterest<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for FeatureOfInterest<'a> {
     fn nsid() -> &'static str {
         "dev.sensorthings.featureOfInterest"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_sensorthings_featureOfInterest()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 2048usize {
@@ -158,67 +158,67 @@ pub mod feature_of_interest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type CreatedAt;
         type EncodingType;
+        type Name;
         type Feature;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type CreatedAt = Unset;
         type EncodingType = Unset;
+        type Name = Unset;
         type Feature = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type EncodingType = S::EncodingType;
-        type Feature = S::Feature;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type EncodingType = S::EncodingType;
-        type Feature = S::Feature;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `encoding_type` field to Set
     pub struct SetEncodingType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEncodingType<S> {}
     impl<S: State> State for SetEncodingType<S> {
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type EncodingType = Set<members::encoding_type>;
+        type Name = S::Name;
         type Feature = S::Feature;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type EncodingType = S::EncodingType;
+        type Name = Set<members::name>;
+        type Feature = S::Feature;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `feature` field to Set
     pub struct SetFeature<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeature<S> {}
     impl<S: State> State for SetFeature<S> {
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type EncodingType = S::EncodingType;
+        type Name = S::Name;
         type Feature = Set<members::feature>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type EncodingType = S::EncodingType;
+        type Name = S::Name;
+        type Feature = S::Feature;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `encoding_type` field
         pub struct encoding_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `feature` field
         pub struct feature(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -351,10 +351,10 @@ where
 impl<'a, S> FeatureOfInterestBuilder<'a, S>
 where
     S: feature_of_interest_state::State,
-    S::Name: feature_of_interest_state::IsSet,
-    S::CreatedAt: feature_of_interest_state::IsSet,
     S::EncodingType: feature_of_interest_state::IsSet,
+    S::Name: feature_of_interest_state::IsSet,
     S::Feature: feature_of_interest_state::IsSet,
+    S::CreatedAt: feature_of_interest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FeatureOfInterest<'a> {
@@ -370,7 +370,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -386,7 +386,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_sensorthings_featureOfInterest() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_sensorthings_featureOfInterest() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

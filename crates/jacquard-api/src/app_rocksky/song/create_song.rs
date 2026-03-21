@@ -22,9 +22,9 @@ pub struct CreateSong<'a> {
     #[serde(borrow)]
     pub album: jacquard_common::CowStr<'a>,
     ///The URL of the album art for the song
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub album_art: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub album_art: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///The album artist of the song, if different from the main artist
     #[serde(borrow)]
     pub album_artist: jacquard_common::CowStr<'a>,
@@ -32,32 +32,32 @@ pub struct CreateSong<'a> {
     #[serde(borrow)]
     pub artist: jacquard_common::CowStr<'a>,
     ///The disc number of the song in the album, if applicable
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disc_number: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disc_number: core::option::Option<i64>,
     ///The duration of the song in seconds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration: core::option::Option<i64>,
     ///The lyrics of the song, if available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lyrics: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub lyrics: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The MusicBrainz ID of the song, if available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mb_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub mb_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The release date of the song, formatted as YYYY-MM-DD
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub release_date: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub release_date: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The title of the song
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///The track number of the song in the album, if applicable
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub track_number: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub track_number: core::option::Option<i64>,
     ///The year the song was released
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub year: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub year: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]

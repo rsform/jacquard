@@ -19,8 +19,8 @@
 #[serde(rename_all = "camelCase")]
 pub struct Goal<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub end_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub end_date: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub metric: GoalMetric<'a>,
     #[serde(borrow)]
@@ -233,9 +233,9 @@ impl jacquard_common::IntoStatic for GoalPeriod<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GoalGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -282,19 +282,19 @@ impl jacquard_common::types::collection::Collection for GoalRecord {
     type Record = GoalRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.goal"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_fitsky_goal()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.metric;
             #[allow(unused_comparisons)]
@@ -348,84 +348,84 @@ pub mod goal_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type StartDate;
-        type CreatedAt;
         type Metric;
-        type TargetValue;
         type Period;
+        type CreatedAt;
+        type TargetValue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type StartDate = Unset;
-        type CreatedAt = Unset;
         type Metric = Unset;
-        type TargetValue = Unset;
         type Period = Unset;
+        type CreatedAt = Unset;
+        type TargetValue = Unset;
     }
     ///State transition - sets the `start_date` field to Set
     pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartDate<S> {}
     impl<S: State> State for SetStartDate<S> {
         type StartDate = Set<members::start_date>;
+        type Metric = S::Metric;
+        type Period = S::Period;
         type CreatedAt = S::CreatedAt;
-        type Metric = S::Metric;
         type TargetValue = S::TargetValue;
-        type Period = S::Period;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type StartDate = S::StartDate;
-        type CreatedAt = Set<members::created_at>;
-        type Metric = S::Metric;
-        type TargetValue = S::TargetValue;
-        type Period = S::Period;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
         type StartDate = S::StartDate;
-        type CreatedAt = S::CreatedAt;
         type Metric = Set<members::metric>;
-        type TargetValue = S::TargetValue;
         type Period = S::Period;
-    }
-    ///State transition - sets the `target_value` field to Set
-    pub struct SetTargetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetValue<S> {}
-    impl<S: State> State for SetTargetValue<S> {
-        type StartDate = S::StartDate;
         type CreatedAt = S::CreatedAt;
-        type Metric = S::Metric;
-        type TargetValue = Set<members::target_value>;
-        type Period = S::Period;
+        type TargetValue = S::TargetValue;
     }
     ///State transition - sets the `period` field to Set
     pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPeriod<S> {}
     impl<S: State> State for SetPeriod<S> {
         type StartDate = S::StartDate;
-        type CreatedAt = S::CreatedAt;
         type Metric = S::Metric;
-        type TargetValue = S::TargetValue;
         type Period = Set<members::period>;
+        type CreatedAt = S::CreatedAt;
+        type TargetValue = S::TargetValue;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type StartDate = S::StartDate;
+        type Metric = S::Metric;
+        type Period = S::Period;
+        type CreatedAt = Set<members::created_at>;
+        type TargetValue = S::TargetValue;
+    }
+    ///State transition - sets the `target_value` field to Set
+    pub struct SetTargetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetValue<S> {}
+    impl<S: State> State for SetTargetValue<S> {
+        type StartDate = S::StartDate;
+        type Metric = S::Metric;
+        type Period = S::Period;
+        type CreatedAt = S::CreatedAt;
+        type TargetValue = Set<members::target_value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `start_date` field
         pub struct start_date(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `metric` field
         pub struct metric(());
-        ///Marker type for the `target_value` field
-        pub struct target_value(());
         ///Marker type for the `period` field
         pub struct period(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `target_value` field
+        pub struct target_value(());
     }
 }
 
@@ -579,10 +579,10 @@ impl<'a, S> GoalBuilder<'a, S>
 where
     S: goal_state::State,
     S::StartDate: goal_state::IsSet,
-    S::CreatedAt: goal_state::IsSet,
     S::Metric: goal_state::IsSet,
-    S::TargetValue: goal_state::IsSet,
     S::Period: goal_state::IsSet,
+    S::CreatedAt: goal_state::IsSet,
+    S::TargetValue: goal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Goal<'a> {
@@ -599,7 +599,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -616,7 +616,7 @@ where
     }
 }
 
-fn lexicon_doc_app_fitsky_goal() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_app_fitsky_goal() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("app.fitsky.goal"),

@@ -43,9 +43,9 @@ pub struct Interview<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct InterviewGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -134,36 +134,36 @@ impl jacquard_common::types::collection::Collection for InterviewRecord {
     type Record = InterviewRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Interview<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Interview<'a> {
     fn nsid() -> &'static str {
         "org.simocracy.interview"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_simocracy_interview()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OpenAnswer<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for OpenAnswer<'a> {
     fn nsid() -> &'static str {
         "org.simocracy.interview"
     }
     fn def_name() -> &'static str {
         "openAnswer"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_simocracy_interview()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.answer;
             #[allow(unused_comparisons)]
@@ -213,19 +213,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for OpenAnswer<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ValueResponse<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ValueResponse<'a> {
     fn nsid() -> &'static str {
         "org.simocracy.interview"
     }
     fn def_name() -> &'static str {
         "valueResponse"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_simocracy_interview()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.statement;
             #[allow(unused_comparisons)]
@@ -253,67 +253,67 @@ pub mod interview_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Sim;
         type OpenAnswers;
+        type Sim;
         type YesNoAnswers;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Sim = Unset;
         type OpenAnswers = Unset;
+        type Sim = Unset;
         type YesNoAnswers = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Sim = S::Sim;
-        type OpenAnswers = S::OpenAnswers;
-        type YesNoAnswers = S::YesNoAnswers;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSim<S> {}
-    impl<S: State> State for SetSim<S> {
-        type CreatedAt = S::CreatedAt;
-        type Sim = Set<members::sim>;
-        type OpenAnswers = S::OpenAnswers;
-        type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `open_answers` field to Set
     pub struct SetOpenAnswers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOpenAnswers<S> {}
     impl<S: State> State for SetOpenAnswers<S> {
-        type CreatedAt = S::CreatedAt;
-        type Sim = S::Sim;
         type OpenAnswers = Set<members::open_answers>;
+        type Sim = S::Sim;
         type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSim<S> {}
+    impl<S: State> State for SetSim<S> {
+        type OpenAnswers = S::OpenAnswers;
+        type Sim = Set<members::sim>;
+        type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `yes_no_answers` field to Set
     pub struct SetYesNoAnswers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetYesNoAnswers<S> {}
     impl<S: State> State for SetYesNoAnswers<S> {
-        type CreatedAt = S::CreatedAt;
-        type Sim = S::Sim;
         type OpenAnswers = S::OpenAnswers;
+        type Sim = S::Sim;
         type YesNoAnswers = Set<members::yes_no_answers>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type OpenAnswers = S::OpenAnswers;
+        type Sim = S::Sim;
+        type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `sim` field
-        pub struct sim(());
         ///Marker type for the `open_answers` field
         pub struct open_answers(());
+        ///Marker type for the `sim` field
+        pub struct sim(());
         ///Marker type for the `yes_no_answers` field
         pub struct yes_no_answers(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -426,10 +426,10 @@ where
 impl<'a, S> InterviewBuilder<'a, S>
 where
     S: interview_state::State,
-    S::CreatedAt: interview_state::IsSet,
-    S::Sim: interview_state::IsSet,
     S::OpenAnswers: interview_state::IsSet,
+    S::Sim: interview_state::IsSet,
     S::YesNoAnswers: interview_state::IsSet,
+    S::CreatedAt: interview_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Interview<'a> {
@@ -444,7 +444,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -459,7 +459,7 @@ where
     }
 }
 
-fn lexicon_doc_org_simocracy_interview() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_simocracy_interview() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -701,37 +701,37 @@ pub mod value_response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Answer;
         type Statement;
+        type Answer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Answer = Unset;
         type Statement = Unset;
-    }
-    ///State transition - sets the `answer` field to Set
-    pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswer<S> {}
-    impl<S: State> State for SetAnswer<S> {
-        type Answer = Set<members::answer>;
-        type Statement = S::Statement;
+        type Answer = Unset;
     }
     ///State transition - sets the `statement` field to Set
     pub struct SetStatement<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatement<S> {}
     impl<S: State> State for SetStatement<S> {
-        type Answer = S::Answer;
         type Statement = Set<members::statement>;
+        type Answer = S::Answer;
+    }
+    ///State transition - sets the `answer` field to Set
+    pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAnswer<S> {}
+    impl<S: State> State for SetAnswer<S> {
+        type Statement = S::Statement;
+        type Answer = Set<members::answer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `answer` field
-        pub struct answer(());
         ///Marker type for the `statement` field
         pub struct statement(());
+        ///Marker type for the `answer` field
+        pub struct answer(());
     }
 }
 
@@ -804,8 +804,8 @@ where
 impl<'a, S> ValueResponseBuilder<'a, S>
 where
     S: value_response_state::State,
-    S::Answer: value_response_state::IsSet,
     S::Statement: value_response_state::IsSet,
+    S::Answer: value_response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ValueResponse<'a> {
@@ -818,7 +818,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

@@ -37,9 +37,9 @@ pub struct BlueskyPost<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BlueskyPostGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -86,19 +86,19 @@ impl jacquard_common::types::collection::Collection for BlueskyPostRecord {
     type Record = BlueskyPostRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlueskyPost<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BlueskyPost<'a> {
     fn nsid() -> &'static str {
         "app.fitsky.blueskyPost"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_fitsky_blueskyPost()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -114,50 +114,50 @@ pub mod bluesky_post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type PostUri;
         type WorkoutUri;
+        type PostUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type PostUri = Unset;
         type WorkoutUri = Unset;
+        type PostUri = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type WorkoutUri = S::WorkoutUri;
         type PostUri = S::PostUri;
-        type WorkoutUri = S::WorkoutUri;
-    }
-    ///State transition - sets the `post_uri` field to Set
-    pub struct SetPostUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostUri<S> {}
-    impl<S: State> State for SetPostUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type PostUri = Set<members::post_uri>;
-        type WorkoutUri = S::WorkoutUri;
     }
     ///State transition - sets the `workout_uri` field to Set
     pub struct SetWorkoutUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkoutUri<S> {}
     impl<S: State> State for SetWorkoutUri<S> {
         type CreatedAt = S::CreatedAt;
-        type PostUri = S::PostUri;
         type WorkoutUri = Set<members::workout_uri>;
+        type PostUri = S::PostUri;
+    }
+    ///State transition - sets the `post_uri` field to Set
+    pub struct SetPostUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostUri<S> {}
+    impl<S: State> State for SetPostUri<S> {
+        type CreatedAt = S::CreatedAt;
+        type WorkoutUri = S::WorkoutUri;
+        type PostUri = Set<members::post_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `post_uri` field
-        pub struct post_uri(());
         ///Marker type for the `workout_uri` field
         pub struct workout_uri(());
+        ///Marker type for the `post_uri` field
+        pub struct post_uri(());
     }
 }
 
@@ -251,8 +251,8 @@ impl<'a, S> BlueskyPostBuilder<'a, S>
 where
     S: bluesky_post_state::State,
     S::CreatedAt: bluesky_post_state::IsSet,
-    S::PostUri: bluesky_post_state::IsSet,
     S::WorkoutUri: bluesky_post_state::IsSet,
+    S::PostUri: bluesky_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlueskyPost<'a> {
@@ -266,7 +266,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -280,7 +280,7 @@ where
     }
 }
 
-fn lexicon_doc_app_fitsky_blueskyPost() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_fitsky_blueskyPost() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

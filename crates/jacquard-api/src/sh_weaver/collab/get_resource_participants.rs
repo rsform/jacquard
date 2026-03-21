@@ -36,8 +36,8 @@ pub struct GetResourceParticipantsOutput<'a> {
     pub owner: crate::sh_weaver::actor::ProfileViewBasic<'a>,
     #[serde(borrow)]
     pub participants: Vec<crate::sh_weaver::actor::ProfileViewBasic<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub viewer_can_edit: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub viewer_can_edit: core::option::Option<bool>,
 }
 
 /// Response type for

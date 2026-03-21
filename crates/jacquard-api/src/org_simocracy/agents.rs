@@ -21,22 +21,22 @@ pub struct Agents<'a> {
     ///Timestamp when the record was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Full constitution text: beliefs, values, governance positions. Rich text annotations may be provided via descriptionFacets.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Rich text annotations for description (mentions, URLs, hashtags, etc).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
+    pub description_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     ///Short summary of this sim's constitution, suitable for previews and list views. Rich text annotations may be provided via shortDescriptionFacets.
     #[serde(borrow)]
     pub short_description: jacquard_common::CowStr<'a>,
     ///Rich text annotations for shortDescription (mentions, URLs, hashtags, etc).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub short_description_facets: std::option::Option<
+    pub short_description_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     ///Reference to the sim record this constitution belongs to
@@ -56,9 +56,9 @@ pub struct Agents<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgentsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -105,19 +105,19 @@ impl jacquard_common::types::collection::Collection for AgentsRecord {
     type Record = AgentsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Agents<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Agents<'a> {
     fn nsid() -> &'static str {
         "org.simocracy.agents"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_simocracy_agents()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30000usize {
@@ -194,51 +194,51 @@ pub mod agents_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShortDescription;
-        type Sim;
         type CreatedAt;
+        type Sim;
+        type ShortDescription;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShortDescription = Unset;
-        type Sim = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `short_description` field to Set
-    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
-    impl<S: State> State for SetShortDescription<S> {
-        type ShortDescription = Set<members::short_description>;
-        type Sim = S::Sim;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSim<S> {}
-    impl<S: State> State for SetSim<S> {
-        type ShortDescription = S::ShortDescription;
-        type Sim = Set<members::sim>;
-        type CreatedAt = S::CreatedAt;
+        type Sim = Unset;
+        type ShortDescription = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ShortDescription = S::ShortDescription;
-        type Sim = S::Sim;
         type CreatedAt = Set<members::created_at>;
+        type Sim = S::Sim;
+        type ShortDescription = S::ShortDescription;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSim<S> {}
+    impl<S: State> State for SetSim<S> {
+        type CreatedAt = S::CreatedAt;
+        type Sim = Set<members::sim>;
+        type ShortDescription = S::ShortDescription;
+    }
+    ///State transition - sets the `short_description` field to Set
+    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
+    impl<S: State> State for SetShortDescription<S> {
+        type CreatedAt = S::CreatedAt;
+        type Sim = S::Sim;
+        type ShortDescription = Set<members::short_description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `short_description` field
-        pub struct short_description(());
-        ///Marker type for the `sim` field
-        pub struct sim(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `sim` field
+        pub struct sim(());
+        ///Marker type for the `short_description` field
+        pub struct short_description(());
     }
 }
 
@@ -391,9 +391,9 @@ where
 impl<'a, S> AgentsBuilder<'a, S>
 where
     S: agents_state::State,
-    S::ShortDescription: agents_state::IsSet,
-    S::Sim: agents_state::IsSet,
     S::CreatedAt: agents_state::IsSet,
+    S::Sim: agents_state::IsSet,
+    S::ShortDescription: agents_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Agents<'a> {
@@ -410,7 +410,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -427,9 +427,7 @@ where
     }
 }
 
-fn lexicon_doc_org_simocracy_agents() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_simocracy_agents() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.simocracy.agents"),

@@ -33,9 +33,9 @@ pub struct GetBook<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetBookOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub book: std::option::Option<crate::org_passingreads::book::StatefulBook<'a>>,
+    pub book: core::option::Option<crate::org_passingreads::book::StatefulBook<'a>>,
 }
 
 /// Response type for

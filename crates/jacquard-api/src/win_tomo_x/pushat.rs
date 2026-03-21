@@ -46,31 +46,31 @@ pub struct NotifyBody<'a> {
     #[serde(borrow)]
     pub body: jacquard_common::CowStr<'a>,
     ///The URI of the icon displayed in the notification.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub icon: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub icon: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Experimental — do not use. The URI to open when the notification is clicked.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub link: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub link: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Title text of the notification.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
     fn nsid() -> &'static str {
         "win.tomo-x.pushat.defs"
     }
     fn def_name() -> &'static str {
         "deviceListItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_win_tomo_x_pushat_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -107,19 +107,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeviceListItem<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for NotifyBody<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for NotifyBody<'a> {
     fn nsid() -> &'static str {
         "win.tomo-x.pushat.defs"
     }
     fn def_name() -> &'static str {
         "notifyBody"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_win_tomo_x_pushat_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -138,51 +138,51 @@ pub mod device_list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Current;
-        type Id;
         type Name;
+        type Id;
+        type Current;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Current = Unset;
-        type Id = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `current` field to Set
-    pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrent<S> {}
-    impl<S: State> State for SetCurrent<S> {
-        type Current = Set<members::current>;
-        type Id = S::Id;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Current = S::Current;
-        type Id = Set<members::id>;
-        type Name = S::Name;
+        type Id = Unset;
+        type Current = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Current = S::Current;
-        type Id = S::Id;
         type Name = Set<members::name>;
+        type Id = S::Id;
+        type Current = S::Current;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Id = Set<members::id>;
+        type Current = S::Current;
+    }
+    ///State transition - sets the `current` field to Set
+    pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrent<S> {}
+    impl<S: State> State for SetCurrent<S> {
+        type Name = S::Name;
+        type Id = S::Id;
+        type Current = Set<members::current>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `current` field
-        pub struct current(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `current` field
+        pub struct current(());
     }
 }
 
@@ -275,9 +275,9 @@ where
 impl<'a, S> DeviceListItemBuilder<'a, S>
 where
     S: device_list_item_state::State,
-    S::Current: device_list_item_state::IsSet,
-    S::Id: device_list_item_state::IsSet,
     S::Name: device_list_item_state::IsSet,
+    S::Id: device_list_item_state::IsSet,
+    S::Current: device_list_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeviceListItem<'a> {
@@ -291,7 +291,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -305,7 +305,7 @@ where
     }
 }
 
-fn lexicon_doc_win_tomo_x_pushat_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_win_tomo_x_pushat_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

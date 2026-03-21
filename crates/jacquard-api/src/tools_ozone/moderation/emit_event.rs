@@ -22,17 +22,17 @@ pub struct EmitEvent<'a> {
     #[serde(borrow)]
     pub event: EmitEventEvent<'a>,
     ///An optional external ID for the event, used to deduplicate events from external systems. Fails when an event of same type with the same external ID exists for the same subject.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_id: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub external_id: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: core::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub subject: EmitEventSubject<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_blob_cids: std::option::Option<
+    pub subject_blob_cids: core::option::Option<
         Vec<jacquard_common::types::string::Cid<'a>>,
     >,
 }
@@ -172,10 +172,10 @@ pub struct EmitEventOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum EmitEventError<'a> {
     #[serde(rename = "SubjectHasAction")]
-    SubjectHasAction(std::option::Option<jacquard_common::CowStr<'a>>),
+    SubjectHasAction(core::option::Option<jacquard_common::CowStr<'a>>),
     /// An event with the same external ID already exists for the subject.
     #[serde(rename = "DuplicateExternalId")]
-    DuplicateExternalId(std::option::Option<jacquard_common::CowStr<'a>>),
+    DuplicateExternalId(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for EmitEventError<'_> {
@@ -456,7 +456,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

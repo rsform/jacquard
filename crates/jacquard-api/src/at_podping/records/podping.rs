@@ -28,13 +28,13 @@ pub struct Podping<'a> {
     #[serde(borrow)]
     pub reason: jacquard_common::CowStr<'a>,
     ///Optional identifier for the writer session, e.g. 9624937909978522000
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub session_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub session_id: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional source reference, minimized to save space, e.g. hive:92042659:cf11299faf19367f3f2d6bef0bf2bc4f59272506:0:podping.ccc (if mirroring the podping in hive block 92042659, transaction id cf11299faf19367f3f2d6bef0bf2bc4f59272506, first operation, hive auth podping.ccc)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Sender timestamp in ISO format, untrustworthy due to client bugs, not so useful for global ordering, in either millisecond (3 decimals) or nanosecond precision (9 decimals), e.g. 2025-12-29T22:25:09.123456789Z
     pub timestamp: jacquard_common::types::string::Datetime,
     ///Podping schema version, e.g. 1.1
@@ -54,9 +54,9 @@ pub struct Podping<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PodpingGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -103,19 +103,19 @@ impl jacquard_common::types::collection::Collection for PodpingRecord {
     type Record = PodpingRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Podping<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Podping<'a> {
     fn nsid() -> &'static str {
         "at.podping.records.podping"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_podping_records_podping()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -131,84 +131,84 @@ pub mod podping_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Medium;
+        type Reason;
         type Iris;
         type Version;
         type Timestamp;
-        type Reason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Medium = Unset;
+        type Reason = Unset;
         type Iris = Unset;
         type Version = Unset;
         type Timestamp = Unset;
-        type Reason = Unset;
     }
     ///State transition - sets the `medium` field to Set
     pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMedium<S> {}
     impl<S: State> State for SetMedium<S> {
         type Medium = Set<members::medium>;
+        type Reason = S::Reason;
         type Iris = S::Iris;
         type Version = S::Version;
         type Timestamp = S::Timestamp;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `iris` field to Set
-    pub struct SetIris<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIris<S> {}
-    impl<S: State> State for SetIris<S> {
-        type Medium = S::Medium;
-        type Iris = Set<members::iris>;
-        type Version = S::Version;
-        type Timestamp = S::Timestamp;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Medium = S::Medium;
-        type Iris = S::Iris;
-        type Version = Set<members::version>;
-        type Timestamp = S::Timestamp;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Medium = S::Medium;
-        type Iris = S::Iris;
-        type Version = S::Version;
-        type Timestamp = Set<members::timestamp>;
-        type Reason = S::Reason;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
         type Medium = S::Medium;
+        type Reason = Set<members::reason>;
         type Iris = S::Iris;
         type Version = S::Version;
         type Timestamp = S::Timestamp;
-        type Reason = Set<members::reason>;
+    }
+    ///State transition - sets the `iris` field to Set
+    pub struct SetIris<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIris<S> {}
+    impl<S: State> State for SetIris<S> {
+        type Medium = S::Medium;
+        type Reason = S::Reason;
+        type Iris = Set<members::iris>;
+        type Version = S::Version;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type Medium = S::Medium;
+        type Reason = S::Reason;
+        type Iris = S::Iris;
+        type Version = Set<members::version>;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Medium = S::Medium;
+        type Reason = S::Reason;
+        type Iris = S::Iris;
+        type Version = S::Version;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `medium` field
         pub struct medium(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
         ///Marker type for the `iris` field
         pub struct iris(());
         ///Marker type for the `version` field
         pub struct version(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
     }
 }
 
@@ -379,10 +379,10 @@ impl<'a, S> PodpingBuilder<'a, S>
 where
     S: podping_state::State,
     S::Medium: podping_state::IsSet,
+    S::Reason: podping_state::IsSet,
     S::Iris: podping_state::IsSet,
     S::Version: podping_state::IsSet,
     S::Timestamp: podping_state::IsSet,
-    S::Reason: podping_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Podping<'a> {
@@ -400,7 +400,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -418,7 +418,7 @@ where
     }
 }
 
-fn lexicon_doc_at_podping_records_podping() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_at_podping_records_podping() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -34,12 +34,12 @@ pub struct Feed<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Links<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub privacy_policy: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub privacy_policy: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub terms_of_service: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub terms_of_service: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -58,57 +58,57 @@ pub struct DescribeFeedGeneratorOutput<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
     #[serde(borrow)]
     pub feeds: Vec<crate::app_bsky::feed::describe_feed_generator::Feed<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub links: std::option::Option<
+    pub links: core::option::Option<
         crate::app_bsky::feed::describe_feed_generator::Links<'a>,
     >,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Feed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Feed<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.describeFeedGenerator"
     }
     fn def_name() -> &'static str {
         "feed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_describeFeedGenerator()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Links<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Links<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.describeFeedGenerator"
     }
     fn def_name() -> &'static str {
         "links"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_describeFeedGenerator()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct DescribeFeedGenerator;
 /// Response type for
@@ -230,7 +230,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -242,7 +242,7 @@ where
     }
 }
 
-fn lexicon_doc_app_bsky_feed_describeFeedGenerator() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_feed_describeFeedGenerator() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

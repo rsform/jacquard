@@ -50,7 +50,7 @@ pub struct PublishVideoOutput {
 pub enum PublishVideoError<'a> {
     /// The uploaded file was not a video file (or couldn't get converted to a valid video
     #[serde(rename = "NotAVideo")]
-    NotAVideo(std::option::Option<jacquard_common::CowStr<'a>>),
+    NotAVideo(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for PublishVideoError<'_> {

@@ -36,8 +36,8 @@ pub struct DeleteStored<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteStoredOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub success: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub success: core::option::Option<bool>,
 }
 
 /// Response type for

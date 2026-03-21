@@ -21,9 +21,9 @@ pub struct List<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     ///Parameters to pass to the query.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub input: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub input: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///XRPC query to call for pages of items.
     #[serde(borrow)]
     pub query: jacquard_common::types::string::Nsid<'a>,
@@ -60,9 +60,9 @@ pub struct ListOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Page<'a> {
     ///Opaque pagination token. Absent means no more items.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Elements to render as list rows.
     #[serde(borrow)]
     pub items: Vec<crate::at_inlay::Element<'a>>,
@@ -98,19 +98,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListRequest {
     type Response = ListResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Page<'a> {
     fn nsid() -> &'static str {
         "org.atsui.List"
     }
     fn def_name() -> &'static str {
         "page"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_atsui_List()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cursor {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 512usize {
@@ -137,37 +137,37 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Query;
         type Did;
+        type Query;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Query = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `query` field to Set
-    pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuery<S> {}
-    impl<S: State> State for SetQuery<S> {
-        type Query = Set<members::query>;
-        type Did = S::Did;
+        type Query = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Query = S::Query;
         type Did = Set<members::did>;
+        type Query = S::Query;
+    }
+    ///State transition - sets the `query` field to Set
+    pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuery<S> {}
+    impl<S: State> State for SetQuery<S> {
+        type Did = S::Did;
+        type Query = Set<members::query>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `query` field
-        pub struct query(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `query` field
+        pub struct query(());
     }
 }
 
@@ -260,8 +260,8 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Query: list_state::IsSet,
     S::Did: list_state::IsSet,
+    S::Query: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
@@ -275,7 +275,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -400,7 +400,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -413,7 +413,7 @@ where
     }
 }
 
-fn lexicon_doc_org_atsui_List() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_atsui_List() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.atsui.List"),

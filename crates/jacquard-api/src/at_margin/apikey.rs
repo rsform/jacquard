@@ -39,9 +39,9 @@ pub struct Apikey<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ApikeyGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -88,19 +88,19 @@ impl jacquard_common::types::collection::Collection for ApikeyRecord {
     type Record = ApikeyRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Apikey<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Apikey<'a> {
     fn nsid() -> &'static str {
         "at.margin.apikey"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_at_margin_apikey()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -128,51 +128,51 @@ pub mod apikey_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Name;
         type KeyHash;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Name = Unset;
         type KeyHash = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type KeyHash = S::KeyHash;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `key_hash` field to Set
-    pub struct SetKeyHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKeyHash<S> {}
-    impl<S: State> State for SetKeyHash<S> {
-        type Name = S::Name;
-        type KeyHash = Set<members::key_hash>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
         type KeyHash = S::KeyHash;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
+        type KeyHash = S::KeyHash;
+    }
+    ///State transition - sets the `key_hash` field to Set
+    pub struct SetKeyHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKeyHash<S> {}
+    impl<S: State> State for SetKeyHash<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type KeyHash = Set<members::key_hash>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `key_hash` field
         pub struct key_hash(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -265,9 +265,9 @@ where
 impl<'a, S> ApikeyBuilder<'a, S>
 where
     S: apikey_state::State,
+    S::CreatedAt: apikey_state::IsSet,
     S::Name: apikey_state::IsSet,
     S::KeyHash: apikey_state::IsSet,
-    S::CreatedAt: apikey_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Apikey<'a> {
@@ -281,7 +281,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -295,7 +295,7 @@ where
     }
 }
 
-fn lexicon_doc_at_margin_apikey() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_at_margin_apikey() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("at.margin.apikey"),

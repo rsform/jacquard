@@ -25,9 +25,9 @@ pub struct Log<'a> {
     #[serde(borrow)]
     pub item: crate::media_ionosphere::Track<'a>,
     ///The programme this log is a part of
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub programme: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub programme: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -42,9 +42,9 @@ pub struct Log<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct LogGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -91,19 +91,19 @@ impl jacquard_common::types::collection::Collection for LogRecord {
     type Record = LogRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Log<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Log<'a> {
     fn nsid() -> &'static str {
         "media.ionosphere.log"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_media_ionosphere_log()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.ionosphere;
             #[allow(unused_comparisons)]
@@ -132,50 +132,50 @@ pub mod log_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Ionosphere;
-        type CreatedAt;
         type Item;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Ionosphere = Unset;
-        type CreatedAt = Unset;
         type Item = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `ionosphere` field to Set
     pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIonosphere<S> {}
     impl<S: State> State for SetIonosphere<S> {
         type Ionosphere = Set<members::ionosphere>;
+        type Item = S::Item;
         type CreatedAt = S::CreatedAt;
-        type Item = S::Item;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Ionosphere = S::Ionosphere;
-        type CreatedAt = Set<members::created_at>;
-        type Item = S::Item;
     }
     ///State transition - sets the `item` field to Set
     pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItem<S> {}
     impl<S: State> State for SetItem<S> {
         type Ionosphere = S::Ionosphere;
-        type CreatedAt = S::CreatedAt;
         type Item = Set<members::item>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Ionosphere = S::Ionosphere;
+        type Item = S::Item;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `item` field
         pub struct item(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -289,8 +289,8 @@ impl<'a, S> LogBuilder<'a, S>
 where
     S: log_state::State,
     S::Ionosphere: log_state::IsSet,
-    S::CreatedAt: log_state::IsSet,
     S::Item: log_state::IsSet,
+    S::CreatedAt: log_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Log<'a> {
@@ -305,7 +305,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -320,9 +320,7 @@ where
     }
 }
 
-fn lexicon_doc_media_ionosphere_log() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_media_ionosphere_log() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("media.ionosphere.log"),

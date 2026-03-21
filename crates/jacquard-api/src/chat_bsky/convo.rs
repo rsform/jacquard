@@ -37,12 +37,12 @@ pub mod update_read;
 pub struct ConvoView<'a> {
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_message: std::option::Option<ConvoViewLastMessage<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub last_message: core::option::Option<ConvoViewLastMessage<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_reaction: std::option::Option<
+    pub last_reaction: core::option::Option<
         crate::chat_bsky::convo::MessageAndReactionView<'a>,
     >,
     #[serde(borrow)]
@@ -50,9 +50,9 @@ pub struct ConvoView<'a> {
     pub muted: bool,
     #[serde(borrow)]
     pub rev: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<ConvoViewStatus<'a>>,
+    pub status: core::option::Option<ConvoViewStatus<'a>>,
     pub unread_count: i64,
 }
 
@@ -509,13 +509,13 @@ pub struct MessageAndReactionView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageInput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<crate::app_bsky::embed::record::Record<'a>>,
+    pub embed: core::option::Option<crate::app_bsky::embed::record::Record<'a>>,
     ///Annotations of text (mentions, URLs, hashtags, etc)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
 }
@@ -552,19 +552,19 @@ pub struct MessageRef<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MessageView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embed: std::option::Option<crate::app_bsky::embed::record::View<'a>>,
+    pub embed: core::option::Option<crate::app_bsky::embed::record::View<'a>>,
     ///Annotations of text (mentions, URLs, hashtags, etc)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<Vec<crate::app_bsky::richtext::facet::Facet<'a>>>,
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///Reactions to this message, in ascending order of creation time.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reactions: std::option::Option<Vec<crate::chat_bsky::convo::ReactionView<'a>>>,
+    pub reactions: core::option::Option<Vec<crate::chat_bsky::convo::ReactionView<'a>>>,
     #[serde(borrow)]
     pub rev: jacquard_common::CowStr<'a>,
     #[serde(borrow)]
@@ -625,240 +625,240 @@ pub struct ReactionViewSender<'a> {
     pub did: jacquard_common::types::string::Did<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ConvoView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ConvoView<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "convoView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeletedMessageView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DeletedMessageView<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "deletedMessageView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogAcceptConvo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogAcceptConvo<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "logAcceptConvo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogAddReaction<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogAddReaction<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "logAddReaction"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogBeginConvo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogBeginConvo<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "logBeginConvo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogCreateMessage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogCreateMessage<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "logCreateMessage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogDeleteMessage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogDeleteMessage<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "logDeleteMessage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogLeaveConvo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogLeaveConvo<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "logLeaveConvo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogMuteConvo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogMuteConvo<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "logMuteConvo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogReadMessage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogReadMessage<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "logReadMessage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogRemoveReaction<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogRemoveReaction<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "logRemoveReaction"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for LogUnmuteConvo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for LogUnmuteConvo<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "logUnmuteConvo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageAndReactionView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageAndReactionView<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "messageAndReactionView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageInput<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageInput<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "messageInput"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -895,36 +895,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageInput<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageRef<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "messageRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageView<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "messageView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -961,53 +961,53 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MessageViewSender<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MessageViewSender<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "messageViewSender"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReactionView<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "reactionView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReactionViewSender<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReactionViewSender<'a> {
     fn nsid() -> &'static str {
         "chat.bsky.convo.defs"
     }
     fn def_name() -> &'static str {
         "reactionViewSender"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -1022,85 +1022,85 @@ pub mod convo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UnreadCount;
-        type Rev;
-        type Id;
         type Members;
         type Muted;
+        type UnreadCount;
+        type Id;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UnreadCount = Unset;
-        type Rev = Unset;
-        type Id = Unset;
         type Members = Unset;
         type Muted = Unset;
-    }
-    ///State transition - sets the `unread_count` field to Set
-    pub struct SetUnreadCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnreadCount<S> {}
-    impl<S: State> State for SetUnreadCount<S> {
-        type UnreadCount = Set<members::unread_count>;
-        type Rev = S::Rev;
-        type Id = S::Id;
-        type Members = S::Members;
-        type Muted = S::Muted;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type UnreadCount = S::UnreadCount;
-        type Rev = Set<members::rev>;
-        type Id = S::Id;
-        type Members = S::Members;
-        type Muted = S::Muted;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type UnreadCount = S::UnreadCount;
-        type Rev = S::Rev;
-        type Id = Set<members::id>;
-        type Members = S::Members;
-        type Muted = S::Muted;
+        type UnreadCount = Unset;
+        type Id = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `members` field to Set
     pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMembers<S> {}
     impl<S: State> State for SetMembers<S> {
-        type UnreadCount = S::UnreadCount;
-        type Rev = S::Rev;
-        type Id = S::Id;
         type Members = Set<members::members>;
         type Muted = S::Muted;
+        type UnreadCount = S::UnreadCount;
+        type Id = S::Id;
+        type Rev = S::Rev;
     }
     ///State transition - sets the `muted` field to Set
     pub struct SetMuted<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMuted<S> {}
     impl<S: State> State for SetMuted<S> {
-        type UnreadCount = S::UnreadCount;
-        type Rev = S::Rev;
-        type Id = S::Id;
         type Members = S::Members;
         type Muted = Set<members::muted>;
+        type UnreadCount = S::UnreadCount;
+        type Id = S::Id;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `unread_count` field to Set
+    pub struct SetUnreadCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnreadCount<S> {}
+    impl<S: State> State for SetUnreadCount<S> {
+        type Members = S::Members;
+        type Muted = S::Muted;
+        type UnreadCount = Set<members::unread_count>;
+        type Id = S::Id;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Members = S::Members;
+        type Muted = S::Muted;
+        type UnreadCount = S::UnreadCount;
+        type Id = Set<members::id>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Members = S::Members;
+        type Muted = S::Muted;
+        type UnreadCount = S::UnreadCount;
+        type Id = S::Id;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `unread_count` field
-        pub struct unread_count(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `members` field
         pub struct members(());
         ///Marker type for the `muted` field
         pub struct muted(());
+        ///Marker type for the `unread_count` field
+        pub struct unread_count(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
@@ -1287,11 +1287,11 @@ where
 impl<'a, S> ConvoViewBuilder<'a, S>
 where
     S: convo_view_state::State,
-    S::UnreadCount: convo_view_state::IsSet,
-    S::Rev: convo_view_state::IsSet,
-    S::Id: convo_view_state::IsSet,
     S::Members: convo_view_state::IsSet,
     S::Muted: convo_view_state::IsSet,
+    S::UnreadCount: convo_view_state::IsSet,
+    S::Id: convo_view_state::IsSet,
+    S::Rev: convo_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConvoView<'a> {
@@ -1310,7 +1310,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1329,9 +1329,7 @@ where
     }
 }
 
-fn lexicon_doc_chat_bsky_convo_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_chat_bsky_convo_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("chat.bsky.convo.defs"),
@@ -2664,65 +2662,65 @@ pub mod deleted_message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Rev;
         type SentAt;
+        type Rev;
+        type Id;
         type Sender;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Rev = Unset;
         type SentAt = Unset;
+        type Rev = Unset;
+        type Id = Unset;
         type Sender = Unset;
     }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
+    ///State transition - sets the `sent_at` field to Set
+    pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSentAt<S> {}
+    impl<S: State> State for SetSentAt<S> {
+        type SentAt = Set<members::sent_at>;
         type Rev = S::Rev;
-        type SentAt = S::SentAt;
+        type Id = S::Id;
         type Sender = S::Sender;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Id = S::Id;
-        type Rev = Set<members::rev>;
         type SentAt = S::SentAt;
+        type Rev = Set<members::rev>;
+        type Id = S::Id;
         type Sender = S::Sender;
     }
-    ///State transition - sets the `sent_at` field to Set
-    pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSentAt<S> {}
-    impl<S: State> State for SetSentAt<S> {
-        type Id = S::Id;
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type SentAt = S::SentAt;
         type Rev = S::Rev;
-        type SentAt = Set<members::sent_at>;
+        type Id = Set<members::id>;
         type Sender = S::Sender;
     }
     ///State transition - sets the `sender` field to Set
     pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSender<S> {}
     impl<S: State> State for SetSender<S> {
-        type Id = S::Id;
-        type Rev = S::Rev;
         type SentAt = S::SentAt;
+        type Rev = S::Rev;
+        type Id = S::Id;
         type Sender = Set<members::sender>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `sent_at` field
         pub struct sent_at(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `sender` field
         pub struct sender(());
     }
@@ -2837,9 +2835,9 @@ where
 impl<'a, S> DeletedMessageViewBuilder<'a, S>
 where
     S: deleted_message_view_state::State,
-    S::Id: deleted_message_view_state::IsSet,
-    S::Rev: deleted_message_view_state::IsSet,
     S::SentAt: deleted_message_view_state::IsSet,
+    S::Rev: deleted_message_view_state::IsSet,
+    S::Id: deleted_message_view_state::IsSet,
     S::Sender: deleted_message_view_state::IsSet,
 {
     /// Build the final struct
@@ -2855,7 +2853,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -2880,65 +2878,65 @@ pub mod log_add_reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Rev;
         type Reaction;
         type Message;
-        type Rev;
         type ConvoId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Rev = Unset;
         type Reaction = Unset;
         type Message = Unset;
-        type Rev = Unset;
         type ConvoId = Unset;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Rev = Set<members::rev>;
+        type Reaction = S::Reaction;
+        type Message = S::Message;
+        type ConvoId = S::ConvoId;
     }
     ///State transition - sets the `reaction` field to Set
     pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReaction<S> {}
     impl<S: State> State for SetReaction<S> {
+        type Rev = S::Rev;
         type Reaction = Set<members::reaction>;
         type Message = S::Message;
-        type Rev = S::Rev;
         type ConvoId = S::ConvoId;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
         type Reaction = S::Reaction;
         type Message = Set<members::message>;
-        type Rev = S::Rev;
-        type ConvoId = S::ConvoId;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Reaction = S::Reaction;
-        type Message = S::Message;
-        type Rev = Set<members::rev>;
         type ConvoId = S::ConvoId;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvoId<S> {}
     impl<S: State> State for SetConvoId<S> {
+        type Rev = S::Rev;
         type Reaction = S::Reaction;
         type Message = S::Message;
-        type Rev = S::Rev;
         type ConvoId = Set<members::convo_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rev` field
+        pub struct rev(());
         ///Marker type for the `reaction` field
         pub struct reaction(());
         ///Marker type for the `message` field
         pub struct message(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
     }
@@ -3053,9 +3051,9 @@ where
 impl<'a, S> LogAddReactionBuilder<'a, S>
 where
     S: log_add_reaction_state::State,
+    S::Rev: log_add_reaction_state::IsSet,
     S::Reaction: log_add_reaction_state::IsSet,
     S::Message: log_add_reaction_state::IsSet,
-    S::Rev: log_add_reaction_state::IsSet,
     S::ConvoId: log_add_reaction_state::IsSet,
 {
     /// Build the final struct
@@ -3071,7 +3069,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3096,51 +3094,51 @@ pub mod log_create_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
-        type ConvoId;
         type Rev;
+        type ConvoId;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
-        type ConvoId = Unset;
         type Rev = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Message = Set<members::message>;
-        type ConvoId = S::ConvoId;
-        type Rev = S::Rev;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvoId<S> {}
-    impl<S: State> State for SetConvoId<S> {
-        type Message = S::Message;
-        type ConvoId = Set<members::convo_id>;
-        type Rev = S::Rev;
+        type ConvoId = Unset;
+        type Message = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Message = S::Message;
-        type ConvoId = S::ConvoId;
         type Rev = Set<members::rev>;
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Rev = S::Rev;
+        type ConvoId = Set<members::convo_id>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
+        type ConvoId = S::ConvoId;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
@@ -3233,9 +3231,9 @@ where
 impl<'a, S> LogCreateMessageBuilder<'a, S>
 where
     S: log_create_message_state::State,
-    S::Message: log_create_message_state::IsSet,
-    S::ConvoId: log_create_message_state::IsSet,
     S::Rev: log_create_message_state::IsSet,
+    S::ConvoId: log_create_message_state::IsSet,
+    S::Message: log_create_message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogCreateMessage<'a> {
@@ -3249,7 +3247,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3273,49 +3271,49 @@ pub mod log_delete_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type Rev;
+        type Message;
         type ConvoId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type Rev = Unset;
+        type Message = Unset;
         type ConvoId = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Message = Set<members::message>;
-        type Rev = S::Rev;
-        type ConvoId = S::ConvoId;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Message = S::Message;
         type Rev = Set<members::rev>;
+        type Message = S::Message;
+        type ConvoId = S::ConvoId;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
+        type Message = Set<members::message>;
         type ConvoId = S::ConvoId;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvoId<S> {}
     impl<S: State> State for SetConvoId<S> {
-        type Message = S::Message;
         type Rev = S::Rev;
+        type Message = S::Message;
         type ConvoId = Set<members::convo_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `message` field
+        pub struct message(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
     }
@@ -3410,8 +3408,8 @@ where
 impl<'a, S> LogDeleteMessageBuilder<'a, S>
 where
     S: log_delete_message_state::State,
-    S::Message: log_delete_message_state::IsSet,
     S::Rev: log_delete_message_state::IsSet,
+    S::Message: log_delete_message_state::IsSet,
     S::ConvoId: log_delete_message_state::IsSet,
 {
     /// Build the final struct
@@ -3426,7 +3424,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3603,7 +3601,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3627,67 +3625,67 @@ pub mod log_remove_reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Reaction;
-        type Message;
         type Rev;
+        type Message;
         type ConvoId;
+        type Reaction;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Reaction = Unset;
-        type Message = Unset;
         type Rev = Unset;
+        type Message = Unset;
         type ConvoId = Unset;
-    }
-    ///State transition - sets the `reaction` field to Set
-    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReaction<S> {}
-    impl<S: State> State for SetReaction<S> {
-        type Reaction = Set<members::reaction>;
-        type Message = S::Message;
-        type Rev = S::Rev;
-        type ConvoId = S::ConvoId;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Reaction = S::Reaction;
-        type Message = Set<members::message>;
-        type Rev = S::Rev;
-        type ConvoId = S::ConvoId;
+        type Reaction = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Reaction = S::Reaction;
-        type Message = S::Message;
         type Rev = Set<members::rev>;
+        type Message = S::Message;
         type ConvoId = S::ConvoId;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
+        type Message = Set<members::message>;
+        type ConvoId = S::ConvoId;
+        type Reaction = S::Reaction;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvoId<S> {}
     impl<S: State> State for SetConvoId<S> {
-        type Reaction = S::Reaction;
-        type Message = S::Message;
         type Rev = S::Rev;
+        type Message = S::Message;
         type ConvoId = Set<members::convo_id>;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `reaction` field to Set
+    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReaction<S> {}
+    impl<S: State> State for SetReaction<S> {
+        type Rev = S::Rev;
+        type Message = S::Message;
+        type ConvoId = S::ConvoId;
+        type Reaction = Set<members::reaction>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reaction` field
-        pub struct reaction(());
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `message` field
+        pub struct message(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
+        ///Marker type for the `reaction` field
+        pub struct reaction(());
     }
 }
 
@@ -3800,10 +3798,10 @@ where
 impl<'a, S> LogRemoveReactionBuilder<'a, S>
 where
     S: log_remove_reaction_state::State,
-    S::Reaction: log_remove_reaction_state::IsSet,
-    S::Message: log_remove_reaction_state::IsSet,
     S::Rev: log_remove_reaction_state::IsSet,
+    S::Message: log_remove_reaction_state::IsSet,
     S::ConvoId: log_remove_reaction_state::IsSet,
+    S::Reaction: log_remove_reaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogRemoveReaction<'a> {
@@ -3818,7 +3816,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3843,37 +3841,37 @@ pub mod message_and_reaction_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Reaction;
         type Message;
+        type Reaction;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Reaction = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `reaction` field to Set
-    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReaction<S> {}
-    impl<S: State> State for SetReaction<S> {
-        type Reaction = Set<members::reaction>;
-        type Message = S::Message;
+        type Reaction = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type Reaction = S::Reaction;
         type Message = Set<members::message>;
+        type Reaction = S::Reaction;
+    }
+    ///State transition - sets the `reaction` field to Set
+    pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReaction<S> {}
+    impl<S: State> State for SetReaction<S> {
+        type Message = S::Message;
+        type Reaction = Set<members::reaction>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reaction` field
-        pub struct reaction(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `reaction` field
+        pub struct reaction(());
     }
 }
 
@@ -3955,8 +3953,8 @@ where
 impl<'a, S> MessageAndReactionViewBuilder<'a, S>
 where
     S: message_and_reaction_view_state::State,
-    S::Reaction: message_and_reaction_view_state::IsSet,
     S::Message: message_and_reaction_view_state::IsSet,
+    S::Reaction: message_and_reaction_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageAndReactionView<'a> {
@@ -3969,7 +3967,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -3993,50 +3991,50 @@ pub mod message_ref_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type MessageId;
-        type ConvoId;
         type Did;
+        type ConvoId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type MessageId = Unset;
-        type ConvoId = Unset;
         type Did = Unset;
+        type ConvoId = Unset;
     }
     ///State transition - sets the `message_id` field to Set
     pub struct SetMessageId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessageId<S> {}
     impl<S: State> State for SetMessageId<S> {
         type MessageId = Set<members::message_id>;
+        type Did = S::Did;
         type ConvoId = S::ConvoId;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvoId<S> {}
-    impl<S: State> State for SetConvoId<S> {
-        type MessageId = S::MessageId;
-        type ConvoId = Set<members::convo_id>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type MessageId = S::MessageId;
-        type ConvoId = S::ConvoId;
         type Did = Set<members::did>;
+        type ConvoId = S::ConvoId;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type MessageId = S::MessageId;
+        type Did = S::Did;
+        type ConvoId = Set<members::convo_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `message_id` field
         pub struct message_id(());
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
     }
 }
 
@@ -4130,8 +4128,8 @@ impl<'a, S> MessageRefBuilder<'a, S>
 where
     S: message_ref_state::State,
     S::MessageId: message_ref_state::IsSet,
-    S::ConvoId: message_ref_state::IsSet,
     S::Did: message_ref_state::IsSet,
+    S::ConvoId: message_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageRef<'a> {
@@ -4145,7 +4143,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4169,85 +4167,85 @@ pub mod message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Sender;
-        type Rev;
         type SentAt;
-        type Text;
         type Id;
+        type Rev;
+        type Text;
+        type Sender;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Sender = Unset;
-        type Rev = Unset;
         type SentAt = Unset;
-        type Text = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `sender` field to Set
-    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSender<S> {}
-    impl<S: State> State for SetSender<S> {
-        type Sender = Set<members::sender>;
-        type Rev = S::Rev;
-        type SentAt = S::SentAt;
-        type Text = S::Text;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Sender = S::Sender;
-        type Rev = Set<members::rev>;
-        type SentAt = S::SentAt;
-        type Text = S::Text;
-        type Id = S::Id;
+        type Rev = Unset;
+        type Text = Unset;
+        type Sender = Unset;
     }
     ///State transition - sets the `sent_at` field to Set
     pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSentAt<S> {}
     impl<S: State> State for SetSentAt<S> {
-        type Sender = S::Sender;
-        type Rev = S::Rev;
         type SentAt = Set<members::sent_at>;
-        type Text = S::Text;
         type Id = S::Id;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Sender = S::Sender;
         type Rev = S::Rev;
-        type SentAt = S::SentAt;
-        type Text = Set<members::text>;
-        type Id = S::Id;
+        type Text = S::Text;
+        type Sender = S::Sender;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Sender = S::Sender;
-        type Rev = S::Rev;
         type SentAt = S::SentAt;
-        type Text = S::Text;
         type Id = Set<members::id>;
+        type Rev = S::Rev;
+        type Text = S::Text;
+        type Sender = S::Sender;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type SentAt = S::SentAt;
+        type Id = S::Id;
+        type Rev = Set<members::rev>;
+        type Text = S::Text;
+        type Sender = S::Sender;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type SentAt = S::SentAt;
+        type Id = S::Id;
+        type Rev = S::Rev;
+        type Text = Set<members::text>;
+        type Sender = S::Sender;
+    }
+    ///State transition - sets the `sender` field to Set
+    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSender<S> {}
+    impl<S: State> State for SetSender<S> {
+        type SentAt = S::SentAt;
+        type Id = S::Id;
+        type Rev = S::Rev;
+        type Text = S::Text;
+        type Sender = Set<members::sender>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sender` field
-        pub struct sender(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `sent_at` field
         pub struct sent_at(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `sender` field
+        pub struct sender(());
     }
 }
 
@@ -4440,11 +4438,11 @@ where
 impl<'a, S> MessageViewBuilder<'a, S>
 where
     S: message_view_state::State,
-    S::Sender: message_view_state::IsSet,
-    S::Rev: message_view_state::IsSet,
     S::SentAt: message_view_state::IsSet,
-    S::Text: message_view_state::IsSet,
     S::Id: message_view_state::IsSet,
+    S::Rev: message_view_state::IsSet,
+    S::Text: message_view_state::IsSet,
+    S::Sender: message_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageView<'a> {
@@ -4463,7 +4461,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4575,7 +4573,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4597,51 +4595,51 @@ pub mod reaction_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
-        type Sender;
         type CreatedAt;
+        type Sender;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
-        type Sender = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Sender = S::Sender;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `sender` field to Set
-    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSender<S> {}
-    impl<S: State> State for SetSender<S> {
-        type Value = S::Value;
-        type Sender = Set<members::sender>;
-        type CreatedAt = S::CreatedAt;
+        type Sender = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Value = S::Value;
-        type Sender = S::Sender;
         type CreatedAt = Set<members::created_at>;
+        type Sender = S::Sender;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `sender` field to Set
+    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSender<S> {}
+    impl<S: State> State for SetSender<S> {
+        type CreatedAt = S::CreatedAt;
+        type Sender = Set<members::sender>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type CreatedAt = S::CreatedAt;
+        type Sender = S::Sender;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
-        ///Marker type for the `sender` field
-        pub struct sender(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `sender` field
+        pub struct sender(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -4734,9 +4732,9 @@ where
 impl<'a, S> ReactionViewBuilder<'a, S>
 where
     S: reaction_view_state::State,
-    S::Value: reaction_view_state::IsSet,
-    S::Sender: reaction_view_state::IsSet,
     S::CreatedAt: reaction_view_state::IsSet,
+    S::Sender: reaction_view_state::IsSet,
+    S::Value: reaction_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReactionView<'a> {
@@ -4750,7 +4748,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4857,7 +4855,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

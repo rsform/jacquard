@@ -16,21 +16,21 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlayParams<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub player_id: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub player_id: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct Play;
 /// Response type for

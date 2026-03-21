@@ -80,37 +80,37 @@ pub mod authorize_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AuthorizeOptions;
         type Input;
+        type AuthorizeOptions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AuthorizeOptions = Unset;
         type Input = Unset;
-    }
-    ///State transition - sets the `authorize_options` field to Set
-    pub struct SetAuthorizeOptions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthorizeOptions<S> {}
-    impl<S: State> State for SetAuthorizeOptions<S> {
-        type AuthorizeOptions = Set<members::authorize_options>;
-        type Input = S::Input;
+        type AuthorizeOptions = Unset;
     }
     ///State transition - sets the `input` field to Set
     pub struct SetInput<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInput<S> {}
     impl<S: State> State for SetInput<S> {
-        type AuthorizeOptions = S::AuthorizeOptions;
         type Input = Set<members::input>;
+        type AuthorizeOptions = S::AuthorizeOptions;
+    }
+    ///State transition - sets the `authorize_options` field to Set
+    pub struct SetAuthorizeOptions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthorizeOptions<S> {}
+    impl<S: State> State for SetAuthorizeOptions<S> {
+        type Input = S::Input;
+        type AuthorizeOptions = Set<members::authorize_options>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `authorize_options` field
-        pub struct authorize_options(());
         ///Marker type for the `input` field
         pub struct input(());
+        ///Marker type for the `authorize_options` field
+        pub struct authorize_options(());
     }
 }
 
@@ -183,8 +183,8 @@ where
 impl<'a, S> AuthorizeBuilder<'a, S>
 where
     S: authorize_state::State,
-    S::AuthorizeOptions: authorize_state::IsSet,
     S::Input: authorize_state::IsSet,
+    S::AuthorizeOptions: authorize_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Authorize<'a> {
@@ -197,7 +197,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

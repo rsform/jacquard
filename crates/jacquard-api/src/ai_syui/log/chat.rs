@@ -19,61 +19,63 @@
 #[serde(rename_all = "camelCase")]
 pub struct Chat<'a> {
     ///Strong reference to a Bluesky post.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub bsky_post_ref: std::option::Option<
+    pub bsky_post_ref: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Open union for content. Supports markdown and other formats via $type.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: std::option::Option<crate::ai_syui::log::chat::Markdown<'a>>,
+    pub content: core::option::Option<crate::ai_syui::log::chat::Markdown<'a>>,
     ///Cover image. Less than 1MB.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub cover_image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///A brief description or excerpt from the message.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Indicates human language of message content.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub langs: std::option::Option<Vec<jacquard_common::types::string::Language>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub langs: core::option::Option<Vec<jacquard_common::types::string::Language>>,
     ///AT-URI of the parent message being replied to.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub parent: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///Combine with site URL to construct a canonical URL to the message.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub path: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub path: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp of the message's publish time.
     pub published_at: jacquard_common::types::string::Datetime,
     ///AT-URI of the root message in a thread.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub root: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub root: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///Points to a publication record (at://) or a publication URL (https://).
     #[serde(borrow)]
     pub site: jacquard_common::types::string::UriValue<'a>,
     ///Tags to categorize the message.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Plaintext representation of the message content. Should not contain markdown or other formatting.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub text_content: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub text_content: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Title of the message or thread topic.
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
     ///Translations of the message in other languages.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub translations: std::option::Option<crate::ai_syui::log::chat::TranslationMap<'a>>,
+    pub translations: core::option::Option<
+        crate::ai_syui::log::chat::TranslationMap<'a>,
+    >,
     ///Timestamp of the message's last edit.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -88,9 +90,9 @@ pub struct Chat<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ChatGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -130,12 +132,12 @@ pub struct Markdown<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Translation<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub content: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Map of language codes to translations.
@@ -152,12 +154,12 @@ pub struct Translation<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct TranslationMap<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub en: std::option::Option<crate::ai_syui::log::chat::Translation<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub en: core::option::Option<crate::ai_syui::log::chat::Translation<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ja: std::option::Option<crate::ai_syui::log::chat::Translation<'a>>,
+    pub ja: core::option::Option<crate::ai_syui::log::chat::Translation<'a>>,
 }
 
 impl<'a> Chat<'a> {
@@ -200,19 +202,19 @@ impl jacquard_common::types::collection::Collection for ChatRecord {
     type Record = ChatRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chat<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Chat<'a> {
     fn nsid() -> &'static str {
         "ai.syui.log.chat"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ai_syui_log_chat()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cover_image {
             {
                 let size = value.blob().size;
@@ -333,19 +335,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Chat<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Markdown<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Markdown<'a> {
     fn nsid() -> &'static str {
         "ai.syui.log.chat"
     }
     fn def_name() -> &'static str {
         "markdown"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ai_syui_log_chat()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.text;
             #[allow(unused_comparisons)]
@@ -382,19 +384,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Markdown<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
     fn nsid() -> &'static str {
         "ai.syui.log.chat"
     }
     fn def_name() -> &'static str {
         "translation"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ai_syui_log_chat()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.content {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000000usize {
@@ -459,19 +461,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Translation<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TranslationMap<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TranslationMap<'a> {
     fn nsid() -> &'static str {
         "ai.syui.log.chat"
     }
     fn def_name() -> &'static str {
         "translationMap"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ai_syui_log_chat()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -904,7 +906,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -930,7 +932,7 @@ where
     }
 }
 
-fn lexicon_doc_ai_syui_log_chat() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_ai_syui_log_chat() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("ai.syui.log.chat"),

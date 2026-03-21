@@ -24,23 +24,23 @@ pub struct CompletionDetails<'a> {
     #[serde(borrow)]
     pub goal_id: jacquard_common::CowStr<'a>,
     ///AT Protocol URI reference to the goal record
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub goal_uri: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub goal_uri: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ///Month of the completion (1-12)
     pub month: i64,
     ///Optional notes for this day
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Alt text for the photo
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub photo_alt: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub photo_alt: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional photo for this day
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub photo_blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub photo_blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Timestamp when this details record was last updated
     pub updated_at: jacquard_common::types::string::Datetime,
     ///Year of the completion
@@ -59,9 +59,9 @@ pub struct CompletionDetails<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CompletionDetailsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -108,19 +108,19 @@ impl jacquard_common::types::collection::Collection for CompletionDetailsRecord 
     type Record = CompletionDetailsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CompletionDetails<'a> {
     fn nsid() -> &'static str {
         "garden.goals.completionDetails"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_goals_completionDetails()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.day;
             if *value > 31i64 {
@@ -274,9 +274,9 @@ pub mod completion_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Day;
         type UpdatedAt;
         type GoalId;
+        type Day;
         type Month;
         type Year;
     }
@@ -284,29 +284,19 @@ pub mod completion_details_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Day = Unset;
         type UpdatedAt = Unset;
         type GoalId = Unset;
+        type Day = Unset;
         type Month = Unset;
         type Year = Unset;
-    }
-    ///State transition - sets the `day` field to Set
-    pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDay<S> {}
-    impl<S: State> State for SetDay<S> {
-        type Day = Set<members::day>;
-        type UpdatedAt = S::UpdatedAt;
-        type GoalId = S::GoalId;
-        type Month = S::Month;
-        type Year = S::Year;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Day = S::Day;
         type UpdatedAt = Set<members::updated_at>;
         type GoalId = S::GoalId;
+        type Day = S::Day;
         type Month = S::Month;
         type Year = S::Year;
     }
@@ -314,9 +304,19 @@ pub mod completion_details_state {
     pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGoalId<S> {}
     impl<S: State> State for SetGoalId<S> {
-        type Day = S::Day;
         type UpdatedAt = S::UpdatedAt;
         type GoalId = Set<members::goal_id>;
+        type Day = S::Day;
+        type Month = S::Month;
+        type Year = S::Year;
+    }
+    ///State transition - sets the `day` field to Set
+    pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDay<S> {}
+    impl<S: State> State for SetDay<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type GoalId = S::GoalId;
+        type Day = Set<members::day>;
         type Month = S::Month;
         type Year = S::Year;
     }
@@ -324,9 +324,9 @@ pub mod completion_details_state {
     pub struct SetMonth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMonth<S> {}
     impl<S: State> State for SetMonth<S> {
-        type Day = S::Day;
         type UpdatedAt = S::UpdatedAt;
         type GoalId = S::GoalId;
+        type Day = S::Day;
         type Month = Set<members::month>;
         type Year = S::Year;
     }
@@ -334,21 +334,21 @@ pub mod completion_details_state {
     pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetYear<S> {}
     impl<S: State> State for SetYear<S> {
-        type Day = S::Day;
         type UpdatedAt = S::UpdatedAt;
         type GoalId = S::GoalId;
+        type Day = S::Day;
         type Month = S::Month;
         type Year = Set<members::year>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `day` field
-        pub struct day(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `goal_id` field
         pub struct goal_id(());
+        ///Marker type for the `day` field
+        pub struct day(());
         ///Marker type for the `month` field
         pub struct month(());
         ///Marker type for the `year` field
@@ -572,9 +572,9 @@ where
 impl<'a, S> CompletionDetailsBuilder<'a, S>
 where
     S: completion_details_state::State,
-    S::Day: completion_details_state::IsSet,
     S::UpdatedAt: completion_details_state::IsSet,
     S::GoalId: completion_details_state::IsSet,
+    S::Day: completion_details_state::IsSet,
     S::Month: completion_details_state::IsSet,
     S::Year: completion_details_state::IsSet,
 {
@@ -596,7 +596,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -616,7 +616,7 @@ where
     }
 }
 
-fn lexicon_doc_garden_goals_completionDetails() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_garden_goals_completionDetails() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

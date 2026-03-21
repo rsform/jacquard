@@ -40,9 +40,9 @@ pub struct Mood<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MoodGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -89,19 +89,19 @@ impl jacquard_common::types::collection::Collection for MoodRecord {
     type Record = MoodRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Mood<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Mood<'a> {
     fn nsid() -> &'static str {
         "computer.aesthetic.mood"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_computer_aesthetic_mood()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.mood;
             #[allow(unused_comparisons)]
@@ -129,51 +129,51 @@ pub mod mood_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
-        type Mood;
         type Ref;
+        type Mood;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
-        type Mood = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Mood = S::Mood;
-        type Ref = S::Ref;
-    }
-    ///State transition - sets the `mood` field to Set
-    pub struct SetMood<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMood<S> {}
-    impl<S: State> State for SetMood<S> {
-        type When = S::When;
-        type Mood = Set<members::mood>;
-        type Ref = S::Ref;
+        type Mood = Unset;
+        type When = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type When = S::When;
-        type Mood = S::Mood;
         type Ref = Set<members::r#ref>;
+        type Mood = S::Mood;
+        type When = S::When;
+    }
+    ///State transition - sets the `mood` field to Set
+    pub struct SetMood<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMood<S> {}
+    impl<S: State> State for SetMood<S> {
+        type Ref = S::Ref;
+        type Mood = Set<members::mood>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Ref = S::Ref;
+        type Mood = S::Mood;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
-        ///Marker type for the `mood` field
-        pub struct mood(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `mood` field
+        pub struct mood(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
@@ -266,9 +266,9 @@ where
 impl<'a, S> MoodBuilder<'a, S>
 where
     S: mood_state::State,
-    S::When: mood_state::IsSet,
-    S::Mood: mood_state::IsSet,
     S::Ref: mood_state::IsSet,
+    S::Mood: mood_state::IsSet,
+    S::When: mood_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Mood<'a> {
@@ -282,7 +282,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -296,7 +296,7 @@ where
     }
 }
 
-fn lexicon_doc_computer_aesthetic_mood() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_computer_aesthetic_mood() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

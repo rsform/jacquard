@@ -146,19 +146,19 @@ pub struct SubjectRef<'a> {
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Source<'a> {
     fn nsid() -> &'static str {
         "zone.stratos.defs"
     }
     fn def_name() -> &'static str {
         "source"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_zone_stratos_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.vary;
             #[allow(unused_comparisons)]
@@ -176,19 +176,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Source<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectRef<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SubjectRef<'a> {
     fn nsid() -> &'static str {
         "zone.stratos.defs"
     }
     fn def_name() -> &'static str {
         "subjectRef"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_zone_stratos_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -203,49 +203,49 @@ pub mod source_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Service;
         type Subject;
+        type Service;
         type Vary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Service = Unset;
         type Subject = Unset;
+        type Service = Unset;
         type Vary = Unset;
-    }
-    ///State transition - sets the `service` field to Set
-    pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetService<S> {}
-    impl<S: State> State for SetService<S> {
-        type Service = Set<members::service>;
-        type Subject = S::Subject;
-        type Vary = S::Vary;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Service = S::Service;
         type Subject = Set<members::subject>;
+        type Service = S::Service;
+        type Vary = S::Vary;
+    }
+    ///State transition - sets the `service` field to Set
+    pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetService<S> {}
+    impl<S: State> State for SetService<S> {
+        type Subject = S::Subject;
+        type Service = Set<members::service>;
         type Vary = S::Vary;
     }
     ///State transition - sets the `vary` field to Set
     pub struct SetVary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVary<S> {}
     impl<S: State> State for SetVary<S> {
-        type Service = S::Service;
         type Subject = S::Subject;
+        type Service = S::Service;
         type Vary = Set<members::vary>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `service` field
-        pub struct service(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `service` field
+        pub struct service(());
         ///Marker type for the `vary` field
         pub struct vary(());
     }
@@ -340,8 +340,8 @@ where
 impl<'a, S> SourceBuilder<'a, S>
 where
     S: source_state::State,
-    S::Service: source_state::IsSet,
     S::Subject: source_state::IsSet,
+    S::Service: source_state::IsSet,
     S::Vary: source_state::IsSet,
 {
     /// Build the final struct
@@ -356,7 +356,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -370,7 +370,7 @@ where
     }
 }
 
-fn lexicon_doc_zone_stratos_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_zone_stratos_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("zone.stratos.defs"),
@@ -654,7 +654,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

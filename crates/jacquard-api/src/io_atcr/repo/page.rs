@@ -19,15 +19,15 @@
 #[serde(rename_all = "camelCase")]
 pub struct Page<'a> {
     ///Repository avatar/icon image.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Record creation timestamp
     pub created_at: jacquard_common::types::string::Datetime,
     ///Markdown README/description content for the repository page.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The name of the repository (e.g., 'myapp'). Must match the rkey.
     #[serde(borrow)]
     pub repository: jacquard_common::CowStr<'a>,
@@ -47,9 +47,9 @@ pub struct Page<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PageGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -96,19 +96,19 @@ impl jacquard_common::types::collection::Collection for PageRecord {
     type Record = PageRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Page<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Page<'a> {
     fn nsid() -> &'static str {
         "io.atcr.repo.page"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_repo_page()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -194,50 +194,50 @@ pub mod page_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Repository;
         type UpdatedAt;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Repository = Unset;
         type UpdatedAt = Unset;
+        type Repository = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = S::UpdatedAt;
         type Repository = S::Repository;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type CreatedAt = S::CreatedAt;
-        type Repository = Set<members::repository>;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
         type CreatedAt = S::CreatedAt;
-        type Repository = S::Repository;
         type UpdatedAt = Set<members::updated_at>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
@@ -371,8 +371,8 @@ impl<'a, S> PageBuilder<'a, S>
 where
     S: page_state::State,
     S::CreatedAt: page_state::IsSet,
-    S::Repository: page_state::IsSet,
     S::UpdatedAt: page_state::IsSet,
+    S::Repository: page_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Page<'a> {
@@ -388,7 +388,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -404,7 +404,7 @@ where
     }
 }
 
-fn lexicon_doc_io_atcr_repo_page() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_atcr_repo_page() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.atcr.repo.page"),

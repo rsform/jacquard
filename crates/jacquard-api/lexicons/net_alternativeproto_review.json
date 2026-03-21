@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "net.alternativeproto.review",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A user review of an AlternativeProto project",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "projectId",
+          "rating",
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the review was created",
+            "format": "datetime"
+          },
+          "projectId": {
+            "type": "string",
+            "description": "The project ID being reviewed (matches id field from project data)"
+          },
+          "rating": {
+            "type": "integer",
+            "description": "Rating value from 1-5 stars",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "text": {
+            "type": "string",
+            "description": "The review text describing thoughts on the project",
+            "maxLength": 3000,
+            "maxGraphemes": 1000
+          }
+        }
+      }
+    }
+  }
+}

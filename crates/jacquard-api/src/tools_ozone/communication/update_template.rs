@@ -19,29 +19,29 @@
 #[serde(rename_all = "camelCase")]
 pub struct UpdateTemplate<'a> {
     ///Content of the template, markdown supported, can contain variable placeholders.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content_markdown: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disabled: std::option::Option<bool>,
+    pub content_markdown: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disabled: core::option::Option<bool>,
     ///ID of the template to be updated.
     #[serde(borrow)]
     pub id: jacquard_common::CowStr<'a>,
     ///Message language.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lang: std::option::Option<jacquard_common::types::string::Language>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub lang: core::option::Option<jacquard_common::types::string::Language>,
     ///Name of the template.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Subject of the message, used in emails.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subject: core::option::Option<jacquard_common::CowStr<'a>>,
     ///DID of the user who is updating the template.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub updated_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub updated_by: core::option::Option<jacquard_common::types::string::Did<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -77,7 +77,7 @@ pub struct UpdateTemplateOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateTemplateError<'a> {
     #[serde(rename = "DuplicateTemplateName")]
-    DuplicateTemplateName(std::option::Option<jacquard_common::CowStr<'a>>),
+    DuplicateTemplateName(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateTemplateError<'_> {

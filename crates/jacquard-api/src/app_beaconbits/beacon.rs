@@ -21,63 +21,63 @@ pub mod like;
 #[serde(rename_all = "camelCase")]
 pub struct Beacon<'a> {
     ///Structured address using community lexicon
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub address_details: std::option::Option<
+    pub address_details: core::option::Option<
         crate::community_lexicon::location::address::Address<'a>,
     >,
     ///Chain emoji (root beacon only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub chain_emoji: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub chain_emoji: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Custom chain name (root beacon only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub chain_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub chain_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp when the beacon was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Structured location using community lexicon
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<crate::community_lexicon::location::geo::Geo<'a>>,
+    pub location: core::option::Option<crate::community_lexicon::location::geo::Geo<'a>>,
     ///DIDs of users mentioned in the beacon
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mentions: std::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
+    pub mentions: core::option::Option<Vec<jacquard_common::types::string::Did<'a>>>,
     ///Reference to parent beacon for chaining
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent_beacon: std::option::Option<
+    pub parent_beacon: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Reference to associated Bluesky post
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub post: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub post: core::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     ///Star rating (1-5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rating: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rating: core::option::Option<i64>,
     ///ISO timestamp when beacon becomes visible (delayed reveal)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reveal_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reveal_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///User comment or caption
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub shout: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub shout: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Reference to root post for threading
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thread_root: std::option::Option<
+    pub thread_root: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Human-readable address
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub venue_address: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub venue_address: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Category classification (bar, cafe, restaurant, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub venue_category: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub venue_category: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Display name of the venue
     #[serde(borrow)]
     pub venue_name: jacquard_common::CowStr<'a>,
@@ -200,9 +200,9 @@ impl jacquard_common::IntoStatic for BeaconVisibility<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BeaconGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -249,19 +249,19 @@ impl jacquard_common::types::collection::Collection for BeaconRecord {
     type Record = BeaconRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Beacon<'a> {
     fn nsid() -> &'static str {
         "app.beaconbits.beacon"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_beaconbits_beacon()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.chain_emoji {
             {
                 let count = jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation::graphemes(
@@ -445,67 +445,67 @@ pub mod beacon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type VenueUri;
-        type VenueName;
+        type CreatedAt;
         type Visibility;
+        type VenueName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type VenueUri = Unset;
-        type VenueName = Unset;
+        type CreatedAt = Unset;
         type Visibility = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type VenueUri = S::VenueUri;
-        type VenueName = S::VenueName;
-        type Visibility = S::Visibility;
+        type VenueName = Unset;
     }
     ///State transition - sets the `venue_uri` field to Set
     pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVenueUri<S> {}
     impl<S: State> State for SetVenueUri<S> {
-        type CreatedAt = S::CreatedAt;
         type VenueUri = Set<members::venue_uri>;
-        type VenueName = S::VenueName;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `venue_name` field to Set
-    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueName<S> {}
-    impl<S: State> State for SetVenueName<S> {
         type CreatedAt = S::CreatedAt;
-        type VenueUri = S::VenueUri;
-        type VenueName = Set<members::venue_name>;
         type Visibility = S::Visibility;
+        type VenueName = S::VenueName;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type VenueUri = S::VenueUri;
+        type CreatedAt = Set<members::created_at>;
+        type Visibility = S::Visibility;
+        type VenueName = S::VenueName;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type CreatedAt = S::CreatedAt;
         type VenueUri = S::VenueUri;
-        type VenueName = S::VenueName;
+        type CreatedAt = S::CreatedAt;
         type Visibility = Set<members::visibility>;
+        type VenueName = S::VenueName;
+    }
+    ///State transition - sets the `venue_name` field to Set
+    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVenueName<S> {}
+    impl<S: State> State for SetVenueName<S> {
+        type VenueUri = S::VenueUri;
+        type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
+        type VenueName = Set<members::venue_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `venue_uri` field
         pub struct venue_uri(());
-        ///Marker type for the `venue_name` field
-        pub struct venue_name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
+        ///Marker type for the `venue_name` field
+        pub struct venue_name(());
     }
 }
 
@@ -889,10 +889,10 @@ where
 impl<'a, S> BeaconBuilder<'a, S>
 where
     S: beacon_state::State,
-    S::CreatedAt: beacon_state::IsSet,
     S::VenueUri: beacon_state::IsSet,
-    S::VenueName: beacon_state::IsSet,
+    S::CreatedAt: beacon_state::IsSet,
     S::Visibility: beacon_state::IsSet,
+    S::VenueName: beacon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Beacon<'a> {
@@ -920,7 +920,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -948,7 +948,7 @@ where
     }
 }
 
-fn lexicon_doc_app_beaconbits_beacon() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_beaconbits_beacon() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

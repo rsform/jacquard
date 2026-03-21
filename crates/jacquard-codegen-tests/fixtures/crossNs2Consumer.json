@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "test.ns2.consumer",
+  "description": "Cross-namespace test: references types from test.ns1.defs.",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "An object that references types across namespaces.",
+      "required": ["item"],
+      "properties": {
+        "item": {
+          "type": "ref",
+          "ref": "test.ns1.defs#foo"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "test.ns1.defs#bar"
+          }
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500
+        }
+      }
+    }
+  }
+}

@@ -19,14 +19,14 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Artist<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist: std::option::Option<
+    pub artist: core::option::Option<
         crate::ch_indiemusi::alpha::actor::artist::Artist<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
@@ -46,18 +46,18 @@ pub struct Artist<'a> {
 pub struct Release<'a> {
     #[serde(borrow)]
     pub artists: Vec<crate::ch_indiemusi::alpha::release::Artist<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artwork_image: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub artwork_image: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///GTIN (Global Trade Item Number) with which the release is registered, e.g. EAN or UPC
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub gtin: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub gtin: core::option::Option<jacquard_common::CowStr<'a>>,
     ///List of recordings (ch.indiemusi.alpha.recording) included in this release
     #[serde(borrow)]
     pub recordings: Vec<crate::ch_indiemusi::alpha::recording::Recording<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub release_date: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub release_date: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
@@ -74,9 +74,9 @@ pub struct Release<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReleaseGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -96,19 +96,19 @@ impl<'a> Release<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.release"
     }
     fn def_name() -> &'static str {
         "artist"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ch_indiemusi_alpha_release()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -153,19 +153,19 @@ impl jacquard_common::types::collection::Collection for ReleaseRecord {
     type Record = ReleaseRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Release<'a> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.release"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ch_indiemusi_alpha_release()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.artists;
             #[allow(unused_comparisons)]
@@ -221,7 +221,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Release<'a> {
     }
 }
 
-fn lexicon_doc_ch_indiemusi_alpha_release() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_ch_indiemusi_alpha_release() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -442,51 +442,51 @@ pub mod release_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artists;
         type Recordings;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artists = Unset;
         type Recordings = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Artists = S::Artists;
-        type Recordings = S::Recordings;
+        type Title = Unset;
     }
     ///State transition - sets the `artists` field to Set
     pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtists<S> {}
     impl<S: State> State for SetArtists<S> {
-        type Title = S::Title;
         type Artists = Set<members::artists>;
         type Recordings = S::Recordings;
+        type Title = S::Title;
     }
     ///State transition - sets the `recordings` field to Set
     pub struct SetRecordings<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordings<S> {}
     impl<S: State> State for SetRecordings<S> {
-        type Title = S::Title;
         type Artists = S::Artists;
         type Recordings = Set<members::recordings>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Artists = S::Artists;
+        type Recordings = S::Recordings;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artists` field
         pub struct artists(());
         ///Marker type for the `recordings` field
         pub struct recordings(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -638,9 +638,9 @@ where
 impl<'a, S> ReleaseBuilder<'a, S>
 where
     S: release_state::State,
-    S::Title: release_state::IsSet,
     S::Artists: release_state::IsSet,
     S::Recordings: release_state::IsSet,
+    S::Title: release_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Release<'a> {
@@ -657,7 +657,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

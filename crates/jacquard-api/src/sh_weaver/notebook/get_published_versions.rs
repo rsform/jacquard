@@ -20,8 +20,8 @@ pub struct GetPublishedVersions<'a> {
     pub entry: jacquard_common::types::string::AtUri<'a>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_content")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub include_content: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub include_content: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -36,17 +36,17 @@ pub struct GetPublishedVersions<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPublishedVersionsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub canonical: std::option::Option<
+    pub canonical: core::option::Option<
         crate::sh_weaver::notebook::PublishedVersionView<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub has_divergence: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub has_divergence: core::option::Option<bool>,
     ///Full entry records if includeContent=true
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub records: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub records: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
     #[serde(borrow)]
     pub versions: Vec<crate::sh_weaver::notebook::PublishedVersionView<'a>>,
 }
@@ -77,7 +77,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPublishedVersionsRequest {
     type Response = GetPublishedVersionsResponse;
 }
 
-fn _default_include_content() -> std::option::Option<bool> {
+fn _default_include_content() -> core::option::Option<bool> {
     Some(false)
 }
 

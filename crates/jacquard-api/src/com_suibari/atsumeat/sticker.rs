@@ -22,31 +22,31 @@ pub struct Sticker<'a> {
     #[serde(borrow)]
     pub image: jacquard_common::types::value::Data<'a>,
     ///Type of the image source.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub image_type: std::option::Option<StickerImageType<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub image_type: core::option::Option<StickerImageType<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Identifier for the sticker model. 'default' for avatar stickers, 'cid:<cid>' for custom stickers.
     #[serde(borrow)]
     pub model: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The timestamp when this sticker was obtained.
     pub obtained_at: jacquard_common::types::string::Datetime,
     ///The DID of the user from whom this sticker was obtained (for provenance).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub obtained_from: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub obtained_from: core::option::Option<jacquard_common::types::string::Did<'a>>,
     ///The DID of the original creator/minter of this sticker.
     #[serde(borrow)]
     pub original_owner: jacquard_common::types::string::Did<'a>,
     ///The shape of the sticker canvas.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub shape: std::option::Option<StickerShape<'a>>,
+    pub shape: core::option::Option<StickerShape<'a>>,
     ///Cryptographic signature from the server verifying the sticker's authenticity/provenance.
     #[serde(borrow)]
     pub signature: jacquard_common::CowStr<'a>,
@@ -54,12 +54,12 @@ pub struct Sticker<'a> {
     #[serde(borrow)]
     pub signed_payload: jacquard_common::CowStr<'a>,
     ///The DID of the user depicted in the sticker, if applicable (e.g. for avatar stickers).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subject_did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Type of the image source.
@@ -282,9 +282,9 @@ impl jacquard_common::IntoStatic for StickerShape<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StickerGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -331,19 +331,19 @@ impl jacquard_common::types::collection::Collection for StickerRecord {
     type Record = StickerRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Sticker<'a> {
     fn nsid() -> &'static str {
         "com.suibari.atsumeat.sticker"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_suibari_atsumeat_sticker()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.image_type {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {
@@ -493,103 +493,103 @@ pub mod sticker_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Model;
-        type ObtainedAt;
         type Image;
         type Signature;
         type OriginalOwner;
+        type Model;
+        type ObtainedAt;
         type SignedPayload;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Model = Unset;
-        type ObtainedAt = Unset;
         type Image = Unset;
         type Signature = Unset;
         type OriginalOwner = Unset;
+        type Model = Unset;
+        type ObtainedAt = Unset;
         type SignedPayload = Unset;
-    }
-    ///State transition - sets the `model` field to Set
-    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModel<S> {}
-    impl<S: State> State for SetModel<S> {
-        type Model = Set<members::model>;
-        type ObtainedAt = S::ObtainedAt;
-        type Image = S::Image;
-        type Signature = S::Signature;
-        type OriginalOwner = S::OriginalOwner;
-        type SignedPayload = S::SignedPayload;
-    }
-    ///State transition - sets the `obtained_at` field to Set
-    pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
-    impl<S: State> State for SetObtainedAt<S> {
-        type Model = S::Model;
-        type ObtainedAt = Set<members::obtained_at>;
-        type Image = S::Image;
-        type Signature = S::Signature;
-        type OriginalOwner = S::OriginalOwner;
-        type SignedPayload = S::SignedPayload;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type Model = S::Model;
-        type ObtainedAt = S::ObtainedAt;
         type Image = Set<members::image>;
         type Signature = S::Signature;
         type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type ObtainedAt = S::ObtainedAt;
         type SignedPayload = S::SignedPayload;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignature<S> {}
     impl<S: State> State for SetSignature<S> {
-        type Model = S::Model;
-        type ObtainedAt = S::ObtainedAt;
         type Image = S::Image;
         type Signature = Set<members::signature>;
         type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type ObtainedAt = S::ObtainedAt;
         type SignedPayload = S::SignedPayload;
     }
     ///State transition - sets the `original_owner` field to Set
     pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
     impl<S: State> State for SetOriginalOwner<S> {
-        type Model = S::Model;
-        type ObtainedAt = S::ObtainedAt;
         type Image = S::Image;
         type Signature = S::Signature;
         type OriginalOwner = Set<members::original_owner>;
+        type Model = S::Model;
+        type ObtainedAt = S::ObtainedAt;
+        type SignedPayload = S::SignedPayload;
+    }
+    ///State transition - sets the `model` field to Set
+    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModel<S> {}
+    impl<S: State> State for SetModel<S> {
+        type Image = S::Image;
+        type Signature = S::Signature;
+        type OriginalOwner = S::OriginalOwner;
+        type Model = Set<members::model>;
+        type ObtainedAt = S::ObtainedAt;
+        type SignedPayload = S::SignedPayload;
+    }
+    ///State transition - sets the `obtained_at` field to Set
+    pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
+    impl<S: State> State for SetObtainedAt<S> {
+        type Image = S::Image;
+        type Signature = S::Signature;
+        type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type ObtainedAt = Set<members::obtained_at>;
         type SignedPayload = S::SignedPayload;
     }
     ///State transition - sets the `signed_payload` field to Set
     pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
     impl<S: State> State for SetSignedPayload<S> {
-        type Model = S::Model;
-        type ObtainedAt = S::ObtainedAt;
         type Image = S::Image;
         type Signature = S::Signature;
         type OriginalOwner = S::OriginalOwner;
+        type Model = S::Model;
+        type ObtainedAt = S::ObtainedAt;
         type SignedPayload = Set<members::signed_payload>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `model` field
-        pub struct model(());
-        ///Marker type for the `obtained_at` field
-        pub struct obtained_at(());
         ///Marker type for the `image` field
         pub struct image(());
         ///Marker type for the `signature` field
         pub struct signature(());
         ///Marker type for the `original_owner` field
         pub struct original_owner(());
+        ///Marker type for the `model` field
+        pub struct model(());
+        ///Marker type for the `obtained_at` field
+        pub struct obtained_at(());
         ///Marker type for the `signed_payload` field
         pub struct signed_payload(());
     }
@@ -880,11 +880,11 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S> StickerBuilder<'a, S>
 where
     S: sticker_state::State,
-    S::Model: sticker_state::IsSet,
-    S::ObtainedAt: sticker_state::IsSet,
     S::Image: sticker_state::IsSet,
     S::Signature: sticker_state::IsSet,
     S::OriginalOwner: sticker_state::IsSet,
+    S::Model: sticker_state::IsSet,
+    S::ObtainedAt: sticker_state::IsSet,
     S::SignedPayload: sticker_state::IsSet,
 {
     /// Build the final struct
@@ -909,7 +909,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -933,7 +933,7 @@ where
     }
 }
 
-fn lexicon_doc_com_suibari_atsumeat_sticker() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_suibari_atsumeat_sticker() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

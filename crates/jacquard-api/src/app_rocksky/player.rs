@@ -26,9 +26,9 @@ pub mod seek;
 #[serde(rename_all = "camelCase")]
 pub struct CurrentlyPlayingViewDetailed<'a> {
     ///The title of the currently playing track
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -44,46 +44,46 @@ pub struct CurrentlyPlayingViewDetailed<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PlaybackQueueViewDetailed<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tracks: std::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
+    pub tracks: core::option::Option<Vec<jacquard_common::types::value::Data<'a>>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CurrentlyPlayingViewDetailed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CurrentlyPlayingViewDetailed<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.player.defs"
     }
     fn def_name() -> &'static str {
         "currentlyPlayingViewDetailed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_player_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for PlaybackQueueViewDetailed<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for PlaybackQueueViewDetailed<'a> {
     fn nsid() -> &'static str {
         "app.rocksky.player.defs"
     }
     fn def_name() -> &'static str {
         "playbackQueueViewDetailed"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_rocksky_player_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_app_rocksky_player_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_rocksky_player_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

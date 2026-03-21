@@ -16,9 +16,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct HydrateRecord<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
 }
@@ -60,10 +60,10 @@ pub struct HydrateRecordOutput<'a> {
 pub enum HydrateRecordError<'a> {
     /// The requested record does not exist
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RecordNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Access to the record is blocked due to boundary restrictions
     #[serde(rename = "RecordBlocked")]
-    RecordBlocked(std::option::Option<jacquard_common::CowStr<'a>>),
+    RecordBlocked(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for HydrateRecordError<'_> {

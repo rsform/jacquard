@@ -17,26 +17,26 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct BskyPost<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub client_host: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub client_host: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub post_ref: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BskyPost<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BskyPost<'a> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.bskyPost"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pub_leaflet_blocks_bskyPost()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -155,7 +155,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -168,7 +168,7 @@ where
     }
 }
 
-fn lexicon_doc_pub_leaflet_blocks_bskyPost() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_pub_leaflet_blocks_bskyPost() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

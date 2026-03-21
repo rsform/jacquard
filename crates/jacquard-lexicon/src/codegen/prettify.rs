@@ -90,7 +90,7 @@ impl CommonType {
             Self::Cid => ("jacquard_common::types::string::Cid", true),
             // RecordKey is a COMPOSITE type: RecordKey<Rkey<'a>>. needs_lifetime
             // is false here because the lifetime is carried by the inner Rkey, not
-            // RecordKey itself. type_tokens() must special-case this — see Phase 3.
+            // RecordKey itself. type_tokens() must special-case this.
             Self::RecordKey => ("jacquard_common::types::string::RecordKey", false),
             Self::Rkey => ("jacquard_common::types::string::Rkey", true),
             Self::UriValue => ("jacquard_common::types::string::UriValue", true),
@@ -104,10 +104,17 @@ impl CommonType {
     /// The `use` path for grouping imports (everything before the type name).
     pub fn use_path(&self) -> &'static str {
         match self {
-            Self::Did | Self::Handle | Self::AtUri | Self::Nsid
-            | Self::Tid | Self::Cid | Self::Datetime | Self::Language
-            | Self::RecordKey | Self::Rkey | Self::UriValue
-                => "jacquard_common::types::string",
+            Self::Did
+            | Self::Handle
+            | Self::AtUri
+            | Self::Nsid
+            | Self::Tid
+            | Self::Cid
+            | Self::Datetime
+            | Self::Language
+            | Self::RecordKey
+            | Self::Rkey
+            | Self::UriValue => "jacquard_common::types::string",
             Self::AtIdentifier => "jacquard_common::types::ident",
             Self::CidLink => "jacquard_common::types::cid",
             Self::BlobRef => "jacquard_common::types::blob",
@@ -127,8 +134,8 @@ pub enum ExternalImport {
     Deserialize,
     // jacquard_derive derives and attribute macros
     IntoStatic,
-    LexiconAttr,   // #[jacquard_derive::lexicon] attribute macro
-    OpenUnion,     // #[jacquard_derive::open_union] attribute macro
+    LexiconAttr, // #[jacquard_derive::lexicon] attribute macro
+    OpenUnion,   // #[jacquard_derive::open_union] attribute macro
     // jacquard_lexicon types (used in LexiconSchema impls)
     LexiconSchema,
     LexiconDoc,
@@ -192,6 +199,9 @@ pub struct ResolvedImports {
     external_short: BTreeMap<ExternalImport, syn::Ident>,
     /// Cross-namespace lexicon refs to include in use block.
     lexicon_uses: BTreeSet<String>,
+    /// Local type names defined in this file, used for collision detection
+    /// with standard library types like `Option`.
+    local_type_names: HashSet<String>,
 }
 
 impl ResolvedImports {
@@ -210,6 +220,7 @@ impl ResolvedImports {
                     qualified: imports.common.iter().cloned().collect(),
                     external_short: BTreeMap::new(),
                     lexicon_uses: BTreeSet::new(),
+                    local_type_names: local_type_names.clone(),
                 }
             }
             CodegenMode::Pretty => {
@@ -242,21 +253,146 @@ impl ResolvedImports {
                     qualified,
                     external_short,
                     lexicon_uses: imports.lexicon_refs.clone(),
+                    local_type_names: local_type_names.clone(),
                 }
             }
         }
     }
 
     /// Returns tokens for a CommonType — short name or fully-qualified.
+    /// Includes `<'a>` for types that need a lifetime parameter.
+    ///
+    /// Callers should NEVER manually append `<'a>` after calling this method.
+    ///
+    /// SPECIAL CASE: `RecordKey` is a composite type `RecordKey<Rkey<'a>>`.
+    /// It cannot use the generic `Type<'a>` pattern. Handle it explicitly.
     pub fn type_tokens(&self, ct: &CommonType) -> TokenStream {
+        // Special case: RecordKey<Rkey<'a>> is a composed generic.
+        if matches!(ct, CommonType::RecordKey) {
+            let rkey_tokens = self.type_tokens(&CommonType::Rkey);
+            if let Some(ident) = self.short.get(ct) {
+                return quote! { #ident<#rkey_tokens> };
+            } else {
+                let (path_str, _) = ct.fully_qualified();
+                let path: syn::Path = syn::parse_str(path_str).expect("valid path");
+                return quote! { #path<#rkey_tokens> };
+            }
+        }
+
+        if let Some(ident) = self.short.get(ct) {
+            let needs_lifetime = ct.fully_qualified().1;
+            if needs_lifetime {
+                quote! { #ident<'a> }
+            } else {
+                quote! { #ident }
+            }
+        } else {
+            let (path_str, needs_lifetime) = ct.fully_qualified();
+            let path: syn::Path = syn::parse_str(path_str).expect("valid path");
+            if needs_lifetime {
+                quote! { #path<'a> }
+            } else {
+                quote! { #path }
+            }
+        }
+    }
+
+    /// Returns tokens for a CommonType path WITHOUT any lifetime parameter.
+    /// Used when the caller needs to supply a different lifetime (e.g., `'static`)
+    /// or when the path is used as a constructor rather than a type annotation.
+    pub fn type_path(&self, ct: &CommonType) -> TokenStream {
         if let Some(ident) = self.short.get(ct) {
             quote! { #ident }
         } else {
-            let (path_str, _needs_lifetime) = ct.fully_qualified();
-            let path: syn::Path = syn::parse_str(path_str)
-                .expect("invalid fully_qualified path");
+            let (path_str, _) = ct.fully_qualified();
+            let path: syn::Path = syn::parse_str(path_str).expect("valid path");
             quote! { #path }
         }
+    }
+
+    /// Returns a string path for use in serde attribute string literals.
+    /// Short form if imported, fully-qualified if collision or Macro mode.
+    pub fn serde_path(&self, ct: &CommonType) -> String {
+        if self.short.contains_key(ct) {
+            ct.short_name().to_string()
+        } else {
+            ct.fully_qualified().0.to_string()
+        }
+    }
+
+    /// Returns the correct path for `Option::is_none` in serde attributes.
+    /// In Pretty mode: `"Option::is_none"` unless a local type named `Option`
+    /// exists, in which case we fall back to the fully-qualified path.
+    /// In Macro mode: always fully-qualified `core::option::Option::is_none`.
+    pub fn option_is_none_path(&self) -> &'static str {
+        match self.mode {
+            CodegenMode::Pretty if !self.local_type_names.contains("Option") => "Option::is_none",
+            _ => "core::option::Option::is_none",
+        }
+    }
+
+    /// Standard derive attribute for most types.
+    pub fn derive_standard(&self) -> TokenStream {
+        let ser = self.external_path(&ExternalImport::Serialize);
+        let de = self.external_path(&ExternalImport::Deserialize);
+        let into_static = self.external_path(&ExternalImport::IntoStatic);
+        quote! {
+            #[derive(#ser, #de, Debug, Clone, PartialEq, Eq, #into_static)]
+        }
+    }
+
+    /// Standard derive attribute with additional derives appended.
+    /// Used for types that need Default, Hash, Copy, etc.
+    pub fn derive_standard_with(&self, extra: TokenStream) -> TokenStream {
+        let ser = self.external_path(&ExternalImport::Serialize);
+        let de = self.external_path(&ExternalImport::Deserialize);
+        let into_static = self.external_path(&ExternalImport::IntoStatic);
+        quote! {
+            #[derive(#ser, #de, Debug, Clone, PartialEq, Eq, #into_static, #extra)]
+        }
+    }
+
+    /// Derive attribute for error enums (adds thiserror::Error, miette::Diagnostic).
+    pub fn derive_error(&self) -> TokenStream {
+        let ser = self.external_path(&ExternalImport::Serialize);
+        let de = self.external_path(&ExternalImport::Deserialize);
+        let into_static = self.external_path(&ExternalImport::IntoStatic);
+        quote! {
+            #[derive(#ser, #de, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic, #into_static)]
+        }
+    }
+
+    /// Returns the attribute tokens for an external import (e.g., `#[jacquard_derive::lexicon]`).
+    /// Uses short form in Pretty mode if available.
+    pub fn attribute_tokens(&self, ei: &ExternalImport) -> TokenStream {
+        let path = self.external_path(ei);
+        quote! { #[#path] }
+    }
+
+    /// Returns the correct path for an external import (either short or fully-qualified).
+    fn external_path(&self, ei: &ExternalImport) -> TokenStream {
+        if let Some(ident) = self.external_short.get(ei) {
+            quote! { #ident }
+        } else {
+            let path_str = match ei {
+                ExternalImport::Serialize => "serde::Serialize",
+                ExternalImport::Deserialize => "serde::Deserialize",
+                ExternalImport::IntoStatic => "jacquard_derive::IntoStatic",
+                ExternalImport::Bytes => "jacquard_common::deps::bytes::Bytes",
+                ExternalImport::LexiconAttr => "jacquard_derive::lexicon",
+                ExternalImport::OpenUnion => "jacquard_derive::open_union",
+                ExternalImport::LexiconSchema => "jacquard_lexicon::schema::LexiconSchema",
+                ExternalImport::LexiconDoc => "jacquard_lexicon::lexicon::LexiconDoc",
+                ExternalImport::ConstraintError => "jacquard_lexicon::validation::ConstraintError",
+            };
+            let path: syn::Path = syn::parse_str(path_str).expect("valid path");
+            quote! { #path }
+        }
+    }
+
+    /// Returns tokens for an external type import (short or fully-qualified).
+    pub fn external_type_tokens(&self, ei: &ExternalImport) -> TokenStream {
+        self.external_path(ei)
     }
 
     /// Produces the grouped `use` block for the top of the file.
@@ -282,8 +418,7 @@ impl ResolvedImports {
         // Generate use statements.
         let mut tokens = TokenStream::new();
         for (path_str, idents) in grouped {
-            let path: syn::Path = syn::parse_str(path_str)
-                .expect("invalid use_path");
+            let path: syn::Path = syn::parse_str(path_str).expect("invalid use_path");
             tokens.extend(quote! {
                 use #path::{#(#idents),*};
             });
@@ -382,7 +517,11 @@ impl FileOutput {
     ///
     /// Ordering: all type_defs, then all inherent_impls, then all trait_impls,
     /// then all internals.
-    pub fn combine(items: Vec<GeneratedCode>, nsid: Option<String>) -> Self {
+    pub fn combine(
+        items: Vec<GeneratedCode>,
+        nsid: Option<String>,
+        resolved: &ResolvedImports,
+    ) -> Self {
         let mut all_type_defs = TokenStream::new();
         let mut all_inherent_impls = TokenStream::new();
         let mut all_trait_impls = TokenStream::new();
@@ -397,7 +536,9 @@ impl FileOutput {
             merged_imports.merge(item.imports);
         }
 
+        let use_block = resolved.to_use_block();
         let tokens = quote! {
+            #use_block
             #all_type_defs
             #all_inherent_impls
             #all_trait_impls
@@ -462,7 +603,12 @@ mod tests {
 
     #[test]
     fn test_file_output_combine_empty() {
-        let result = FileOutput::combine(vec![], None);
+        let resolved = ResolvedImports::resolve(
+            &ImportSet::default(),
+            &std::collections::HashSet::new(),
+            CodegenMode::Macro,
+        );
+        let result = FileOutput::combine(vec![], None, &resolved);
         assert_eq!(result.tokens.to_string(), "");
         assert!(result.imports.common.is_empty());
         assert!(result.imports.lexicon_refs.is_empty());
@@ -488,7 +634,13 @@ mod tests {
             imports: ImportSet::default(),
         };
 
-        let result = FileOutput::combine(vec![gen1, gen2], Some("test.nsid".to_string()));
+        let resolved = ResolvedImports::resolve(
+            &ImportSet::default(),
+            &std::collections::HashSet::new(),
+            CodegenMode::Macro,
+        );
+        let result =
+            FileOutput::combine(vec![gen1, gen2], Some("test.nsid".to_string()), &resolved);
 
         let output = result.tokens.to_string();
         // Find positions to verify ordering
@@ -496,10 +648,18 @@ mod tests {
         let struct_bar_pos = output.find("struct Bar").expect("struct Bar not found");
         let impl_foo_pos = output.find("impl Foo").expect("impl Foo not found");
         let impl_bar_pos = output.find("impl Bar").expect("impl Bar not found");
-        let clone_foo_pos = output.find("impl Clone for Foo").expect("impl Clone for Foo not found");
-        let clone_bar_pos = output.find("impl Clone for Bar").expect("impl Clone for Bar not found");
-        let foo_int_pos = output.find("mod foo_internals").expect("mod foo_internals not found");
-        let bar_int_pos = output.find("mod bar_internals").expect("mod bar_internals not found");
+        let clone_foo_pos = output
+            .find("impl Clone for Foo")
+            .expect("impl Clone for Foo not found");
+        let clone_bar_pos = output
+            .find("impl Clone for Bar")
+            .expect("impl Clone for Bar not found");
+        let foo_int_pos = output
+            .find("mod foo_internals")
+            .expect("mod foo_internals not found");
+        let bar_int_pos = output
+            .find("mod bar_internals")
+            .expect("mod bar_internals not found");
 
         // type_defs should all come before inherent_impls
         assert!(struct_foo_pos < impl_foo_pos);
@@ -608,31 +768,76 @@ mod tests {
     fn test_common_type_use_path_grouping() {
         // All string types should share same use_path
         assert_eq!(CommonType::Did.use_path(), "jacquard_common::types::string");
-        assert_eq!(CommonType::Handle.use_path(), "jacquard_common::types::string");
-        assert_eq!(CommonType::AtUri.use_path(), "jacquard_common::types::string");
-        assert_eq!(CommonType::Nsid.use_path(), "jacquard_common::types::string");
+        assert_eq!(
+            CommonType::Handle.use_path(),
+            "jacquard_common::types::string"
+        );
+        assert_eq!(
+            CommonType::AtUri.use_path(),
+            "jacquard_common::types::string"
+        );
+        assert_eq!(
+            CommonType::Nsid.use_path(),
+            "jacquard_common::types::string"
+        );
         assert_eq!(CommonType::Tid.use_path(), "jacquard_common::types::string");
         assert_eq!(CommonType::Cid.use_path(), "jacquard_common::types::string");
-        assert_eq!(CommonType::Datetime.use_path(), "jacquard_common::types::string");
-        assert_eq!(CommonType::Language.use_path(), "jacquard_common::types::string");
-        assert_eq!(CommonType::RecordKey.use_path(), "jacquard_common::types::string");
-        assert_eq!(CommonType::Rkey.use_path(), "jacquard_common::types::string");
-        assert_eq!(CommonType::UriValue.use_path(), "jacquard_common::types::string");
+        assert_eq!(
+            CommonType::Datetime.use_path(),
+            "jacquard_common::types::string"
+        );
+        assert_eq!(
+            CommonType::Language.use_path(),
+            "jacquard_common::types::string"
+        );
+        assert_eq!(
+            CommonType::RecordKey.use_path(),
+            "jacquard_common::types::string"
+        );
+        assert_eq!(
+            CommonType::Rkey.use_path(),
+            "jacquard_common::types::string"
+        );
+        assert_eq!(
+            CommonType::UriValue.use_path(),
+            "jacquard_common::types::string"
+        );
 
         // Value types
         assert_eq!(CommonType::Data.use_path(), "jacquard_common::types::value");
-        assert_eq!(CommonType::RawData.use_path(), "jacquard_common::types::value");
+        assert_eq!(
+            CommonType::RawData.use_path(),
+            "jacquard_common::types::value"
+        );
 
         // Collection types
-        assert_eq!(CommonType::Collection.use_path(), "jacquard_common::types::collection");
-        assert_eq!(CommonType::RecordError.use_path(), "jacquard_common::types::collection");
+        assert_eq!(
+            CommonType::Collection.use_path(),
+            "jacquard_common::types::collection"
+        );
+        assert_eq!(
+            CommonType::RecordError.use_path(),
+            "jacquard_common::types::collection"
+        );
 
         // Other types
-        assert_eq!(CommonType::AtIdentifier.use_path(), "jacquard_common::types::ident");
-        assert_eq!(CommonType::CidLink.use_path(), "jacquard_common::types::cid");
-        assert_eq!(CommonType::BlobRef.use_path(), "jacquard_common::types::blob");
+        assert_eq!(
+            CommonType::AtIdentifier.use_path(),
+            "jacquard_common::types::ident"
+        );
+        assert_eq!(
+            CommonType::CidLink.use_path(),
+            "jacquard_common::types::cid"
+        );
+        assert_eq!(
+            CommonType::BlobRef.use_path(),
+            "jacquard_common::types::blob"
+        );
         assert_eq!(CommonType::CowStr.use_path(), "jacquard_common");
-        assert_eq!(CommonType::SmolStr.use_path(), "jacquard_common::deps::smol_str");
+        assert_eq!(
+            CommonType::SmolStr.use_path(),
+            "jacquard_common::deps::smol_str"
+        );
     }
 
     #[test]
@@ -645,7 +850,10 @@ mod tests {
         assert_eq!(ExternalImport::Bytes.short_name(), "Bytes");
         assert_eq!(ExternalImport::LexiconSchema.short_name(), "LexiconSchema");
         assert_eq!(ExternalImport::LexiconDoc.short_name(), "LexiconDoc");
-        assert_eq!(ExternalImport::ConstraintError.short_name(), "ConstraintError");
+        assert_eq!(
+            ExternalImport::ConstraintError.short_name(),
+            "ConstraintError"
+        );
     }
 
     #[test]
@@ -655,10 +863,22 @@ mod tests {
         assert_eq!(ExternalImport::IntoStatic.use_path(), "jacquard_derive");
         assert_eq!(ExternalImport::LexiconAttr.use_path(), "jacquard_derive");
         assert_eq!(ExternalImport::OpenUnion.use_path(), "jacquard_derive");
-        assert_eq!(ExternalImport::Bytes.use_path(), "jacquard_common::deps::bytes");
-        assert_eq!(ExternalImport::LexiconSchema.use_path(), "jacquard_lexicon::schema");
-        assert_eq!(ExternalImport::LexiconDoc.use_path(), "jacquard_lexicon::lexicon");
-        assert_eq!(ExternalImport::ConstraintError.use_path(), "jacquard_lexicon::validation");
+        assert_eq!(
+            ExternalImport::Bytes.use_path(),
+            "jacquard_common::deps::bytes"
+        );
+        assert_eq!(
+            ExternalImport::LexiconSchema.use_path(),
+            "jacquard_lexicon::schema"
+        );
+        assert_eq!(
+            ExternalImport::LexiconDoc.use_path(),
+            "jacquard_lexicon::lexicon"
+        );
+        assert_eq!(
+            ExternalImport::ConstraintError.use_path(),
+            "jacquard_lexicon::validation"
+        );
     }
 
     #[test]
@@ -792,10 +1012,17 @@ mod tests {
         let local_names = HashSet::new();
         let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
 
-        // For a short-named type, type_tokens should emit just the ident
+        // For a short-named type with lifetime, type_tokens should emit ident<'a>.
         let tokens = resolved.type_tokens(&CommonType::Did);
         let tokens_str = tokens.to_string();
-        assert_eq!(tokens_str, "Did");
+        assert_eq!(tokens_str, "Did < 'a >");
+
+        // For a type without lifetime, type_tokens should emit just the ident.
+        let mut imports2 = ImportSet::default();
+        imports2.common.insert(CommonType::Datetime);
+        let resolved2 = ResolvedImports::resolve(&imports2, &local_names, CodegenMode::Pretty);
+        let tokens2 = resolved2.type_tokens(&CommonType::Datetime);
+        assert_eq!(tokens2.to_string(), "Datetime");
     }
 
     #[test]
@@ -806,12 +1033,41 @@ mod tests {
         let local_names = HashSet::new();
         let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Macro);
 
-        // In Macro mode, type_tokens should emit the fully-qualified path
+        // In Macro mode, type_tokens should emit the fully-qualified path with lifetime.
         let tokens = resolved.type_tokens(&CommonType::Did);
         let tokens_str = tokens.to_string();
-        // Should contain the full path
         assert!(tokens_str.contains("jacquard_common"));
         assert!(tokens_str.contains("string"));
         assert!(tokens_str.contains("Did"));
+        assert!(
+            tokens_str.contains("'a"),
+            "Did should include lifetime in Macro mode"
+        );
+    }
+
+    #[test]
+    fn test_option_is_none_path_macro_mode() {
+        let imports = ImportSet::default();
+        let local_names = HashSet::new();
+        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Macro);
+        assert_eq!(resolved.option_is_none_path(), "core::option::Option::is_none");
+    }
+
+    #[test]
+    fn test_option_is_none_path_pretty_no_collision() {
+        let imports = ImportSet::default();
+        let local_names = HashSet::new();
+        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+        assert_eq!(resolved.option_is_none_path(), "Option::is_none");
+    }
+
+    #[test]
+    fn test_option_is_none_path_pretty_with_option_collision() {
+        // If a local type named "Option" exists, the path must be fully-qualified.
+        let imports = ImportSet::default();
+        let mut local_names = HashSet::new();
+        local_names.insert("Option".to_string());
+        let resolved = ResolvedImports::resolve(&imports, &local_names, CodegenMode::Pretty);
+        assert_eq!(resolved.option_is_none_path(), "core::option::Option::is_none");
     }
 }

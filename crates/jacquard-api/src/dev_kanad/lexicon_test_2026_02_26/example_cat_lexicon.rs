@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct ExampleCatLexicon<'a> {
     ///picture of the cat
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub avatar: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub avatar: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
     ///cat name
     #[serde(borrow)]
@@ -40,9 +40,9 @@ pub struct ExampleCatLexicon<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ExampleCatLexiconGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -89,19 +89,19 @@ impl jacquard_common::types::collection::Collection for ExampleCatLexiconRecord 
     type Record = ExampleCatLexiconRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ExampleCatLexicon<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ExampleCatLexicon<'a> {
     fn nsid() -> &'static str {
         "dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_dev_kanad_lexicon_test_2026_02_26_exampleCatLexicon()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.avatar {
             {
                 let size = value.blob().size;
@@ -205,37 +205,37 @@ pub mod example_cat_lexicon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -328,8 +328,8 @@ where
 impl<'a, S> ExampleCatLexiconBuilder<'a, S>
 where
     S: example_cat_lexicon_state::State,
-    S::Name: example_cat_lexicon_state::IsSet,
     S::CreatedAt: example_cat_lexicon_state::IsSet,
+    S::Name: example_cat_lexicon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ExampleCatLexicon<'a> {
@@ -343,7 +343,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -357,7 +357,7 @@ where
     }
 }
 
-fn lexicon_doc_dev_kanad_lexicon_test_2026_02_26_exampleCatLexicon() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_dev_kanad_lexicon_test_2026_02_26_exampleCatLexicon() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

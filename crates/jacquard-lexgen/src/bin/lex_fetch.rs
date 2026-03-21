@@ -1,7 +1,7 @@
 use clap::Parser;
 use jacquard_lexgen::cli::LexFetchArgs;
 use jacquard_lexgen::fetch::{Config, Fetcher};
-use jacquard_lexicon::codegen::CodeGenerator;
+use jacquard_lexicon::codegen::{CodeGenerator, CodegenMode};
 use jacquard_lexicon::corpus::LexiconCorpus;
 use miette::{IntoDiagnostic, Result};
 use std::path::PathBuf;
@@ -53,8 +53,13 @@ async fn main() -> Result<()> {
             println!("Generating code...");
         }
 
+        let mode = if args.macro_mode {
+            CodegenMode::Macro
+        } else {
+            CodegenMode::Pretty
+        };
         let corpus = LexiconCorpus::load_from_dir(&config.output.lexicons_dir)?;
-        let codegen = CodeGenerator::new(&corpus, "crate".to_string());
+        let codegen = CodeGenerator::with_mode(&corpus, "crate".to_string(), mode);
         std::fs::create_dir_all(&config.output.codegen_dir).into_diagnostic()?;
         codegen.write_to_disk(&config.output.codegen_dir)?;
 

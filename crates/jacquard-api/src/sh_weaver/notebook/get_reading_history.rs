@@ -16,18 +16,18 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetReadingHistory<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
     ///Defaults to `"all"`.
     #[serde(default = "_default_status")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub status: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -42,9 +42,9 @@ pub struct GetReadingHistory<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetReadingHistoryOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub history: Vec<
         crate::sh_weaver::notebook::get_reading_history::ReadingHistoryItem<'a>,
@@ -64,9 +64,9 @@ pub struct GetReadingHistoryOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ReadingHistoryItem<'a> {
     ///The entry the user was last reading.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub current_entry: std::option::Option<crate::sh_weaver::notebook::EntryView<'a>>,
+    pub current_entry: core::option::Option<crate::sh_weaver::notebook::EntryView<'a>>,
     #[serde(borrow)]
     pub notebook: crate::sh_weaver::notebook::NotebookView<'a>,
     #[serde(borrow)]
@@ -99,28 +99,28 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetReadingHistoryRequest {
     type Response = GetReadingHistoryResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReadingHistoryItem<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReadingHistoryItem<'a> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getReadingHistory"
     }
     fn def_name() -> &'static str {
         "readingHistoryItem"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_weaver_notebook_getReadingHistory()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 
-fn _default_status() -> std::option::Option<jacquard_common::CowStr<'static>> {
+fn _default_status() -> core::option::Option<jacquard_common::CowStr<'static>> {
     Some(jacquard_common::CowStr::from("all"))
 }
 
@@ -379,7 +379,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -393,7 +393,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_weaver_notebook_getReadingHistory() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -16,12 +16,12 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLiveUsers {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub before: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub before: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -37,9 +37,9 @@ pub struct GetLiveUsers {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetLiveUsersOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub streams: std::option::Option<
+    pub streams: core::option::Option<
         Vec<crate::place_stream::livestream::LivestreamView<'a>>,
     >,
 }
@@ -70,7 +70,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetLiveUsersRequest {
     type Response = GetLiveUsersResponse;
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(50i64)
 }
 

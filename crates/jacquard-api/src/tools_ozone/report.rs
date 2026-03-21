@@ -13,12 +13,12 @@
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonAppeal;
-impl std::fmt::Display for ReasonAppeal {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonAppeal {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonAppeal")
     }
 }
@@ -31,12 +31,12 @@ impl std::fmt::Display for ReasonAppeal {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonChildSafetyCsam;
-impl std::fmt::Display for ReasonChildSafetyCsam {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonChildSafetyCsam {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonChildSafetyCSAM")
     }
 }
@@ -49,12 +49,12 @@ impl std::fmt::Display for ReasonChildSafetyCsam {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonChildSafetyGroom;
-impl std::fmt::Display for ReasonChildSafetyGroom {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonChildSafetyGroom {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonChildSafetyGroom")
     }
 }
@@ -67,12 +67,12 @@ impl std::fmt::Display for ReasonChildSafetyGroom {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonChildSafetyHarassment;
-impl std::fmt::Display for ReasonChildSafetyHarassment {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonChildSafetyHarassment {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonChildSafetyHarassment")
     }
 }
@@ -85,12 +85,12 @@ impl std::fmt::Display for ReasonChildSafetyHarassment {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonChildSafetyOther;
-impl std::fmt::Display for ReasonChildSafetyOther {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonChildSafetyOther {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonChildSafetyOther")
     }
 }
@@ -103,12 +103,12 @@ impl std::fmt::Display for ReasonChildSafetyOther {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonChildSafetyPrivacy;
-impl std::fmt::Display for ReasonChildSafetyPrivacy {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonChildSafetyPrivacy {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonChildSafetyPrivacy")
     }
 }
@@ -121,12 +121,12 @@ impl std::fmt::Display for ReasonChildSafetyPrivacy {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonHarassmentDoxxing;
-impl std::fmt::Display for ReasonHarassmentDoxxing {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonHarassmentDoxxing {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonHarassmentDoxxing")
     }
 }
@@ -139,12 +139,12 @@ impl std::fmt::Display for ReasonHarassmentDoxxing {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonHarassmentHateSpeech;
-impl std::fmt::Display for ReasonHarassmentHateSpeech {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonHarassmentHateSpeech {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonHarassmentHateSpeech")
     }
 }
@@ -157,12 +157,12 @@ impl std::fmt::Display for ReasonHarassmentHateSpeech {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonHarassmentOther;
-impl std::fmt::Display for ReasonHarassmentOther {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonHarassmentOther {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonHarassmentOther")
     }
 }
@@ -175,12 +175,12 @@ impl std::fmt::Display for ReasonHarassmentOther {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonHarassmentTargeted;
-impl std::fmt::Display for ReasonHarassmentTargeted {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonHarassmentTargeted {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonHarassmentTargeted")
     }
 }
@@ -193,12 +193,12 @@ impl std::fmt::Display for ReasonHarassmentTargeted {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonHarassmentTroll;
-impl std::fmt::Display for ReasonHarassmentTroll {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonHarassmentTroll {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonHarassmentTroll")
     }
 }
@@ -211,12 +211,12 @@ impl std::fmt::Display for ReasonHarassmentTroll {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonMisleadingBot;
-impl std::fmt::Display for ReasonMisleadingBot {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonMisleadingBot {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonMisleadingBot")
     }
 }
@@ -229,12 +229,12 @@ impl std::fmt::Display for ReasonMisleadingBot {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonMisleadingElections;
-impl std::fmt::Display for ReasonMisleadingElections {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonMisleadingElections {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonMisleadingElections")
     }
 }
@@ -247,12 +247,12 @@ impl std::fmt::Display for ReasonMisleadingElections {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonMisleadingImpersonation;
-impl std::fmt::Display for ReasonMisleadingImpersonation {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonMisleadingImpersonation {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonMisleadingImpersonation")
     }
 }
@@ -265,12 +265,12 @@ impl std::fmt::Display for ReasonMisleadingImpersonation {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonMisleadingOther;
-impl std::fmt::Display for ReasonMisleadingOther {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonMisleadingOther {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonMisleadingOther")
     }
 }
@@ -283,12 +283,12 @@ impl std::fmt::Display for ReasonMisleadingOther {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonMisleadingScam;
-impl std::fmt::Display for ReasonMisleadingScam {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonMisleadingScam {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonMisleadingScam")
     }
 }
@@ -301,12 +301,12 @@ impl std::fmt::Display for ReasonMisleadingScam {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonMisleadingSpam;
-impl std::fmt::Display for ReasonMisleadingSpam {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonMisleadingSpam {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonMisleadingSpam")
     }
 }
@@ -319,12 +319,12 @@ impl std::fmt::Display for ReasonMisleadingSpam {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonOther;
-impl std::fmt::Display for ReasonOther {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonOther {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonOther")
     }
 }
@@ -337,12 +337,12 @@ impl std::fmt::Display for ReasonOther {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonRuleBanEvasion;
-impl std::fmt::Display for ReasonRuleBanEvasion {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonRuleBanEvasion {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonRuleBanEvasion")
     }
 }
@@ -355,12 +355,12 @@ impl std::fmt::Display for ReasonRuleBanEvasion {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonRuleOther;
-impl std::fmt::Display for ReasonRuleOther {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonRuleOther {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonRuleOther")
     }
 }
@@ -373,12 +373,12 @@ impl std::fmt::Display for ReasonRuleOther {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonRuleProhibitedSales;
-impl std::fmt::Display for ReasonRuleProhibitedSales {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonRuleProhibitedSales {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonRuleProhibitedSales")
     }
 }
@@ -391,12 +391,12 @@ impl std::fmt::Display for ReasonRuleProhibitedSales {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonRuleSiteSecurity;
-impl std::fmt::Display for ReasonRuleSiteSecurity {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonRuleSiteSecurity {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonRuleSiteSecurity")
     }
 }
@@ -409,12 +409,12 @@ impl std::fmt::Display for ReasonRuleSiteSecurity {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSelfHarmContent;
-impl std::fmt::Display for ReasonSelfHarmContent {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSelfHarmContent {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSelfHarmContent")
     }
 }
@@ -427,12 +427,12 @@ impl std::fmt::Display for ReasonSelfHarmContent {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSelfHarmEd;
-impl std::fmt::Display for ReasonSelfHarmEd {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSelfHarmEd {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSelfHarmED")
     }
 }
@@ -445,12 +445,12 @@ impl std::fmt::Display for ReasonSelfHarmEd {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSelfHarmOther;
-impl std::fmt::Display for ReasonSelfHarmOther {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSelfHarmOther {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSelfHarmOther")
     }
 }
@@ -463,12 +463,12 @@ impl std::fmt::Display for ReasonSelfHarmOther {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSelfHarmStunts;
-impl std::fmt::Display for ReasonSelfHarmStunts {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSelfHarmStunts {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSelfHarmStunts")
     }
 }
@@ -481,12 +481,12 @@ impl std::fmt::Display for ReasonSelfHarmStunts {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSelfHarmSubstances;
-impl std::fmt::Display for ReasonSelfHarmSubstances {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSelfHarmSubstances {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSelfHarmSubstances")
     }
 }
@@ -499,12 +499,12 @@ impl std::fmt::Display for ReasonSelfHarmSubstances {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSexualAbuseContent;
-impl std::fmt::Display for ReasonSexualAbuseContent {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSexualAbuseContent {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSexualAbuseContent")
     }
 }
@@ -517,12 +517,12 @@ impl std::fmt::Display for ReasonSexualAbuseContent {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSexualAnimal;
-impl std::fmt::Display for ReasonSexualAnimal {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSexualAnimal {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSexualAnimal")
     }
 }
@@ -535,12 +535,12 @@ impl std::fmt::Display for ReasonSexualAnimal {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSexualDeepfake;
-impl std::fmt::Display for ReasonSexualDeepfake {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSexualDeepfake {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSexualDeepfake")
     }
 }
@@ -553,12 +553,12 @@ impl std::fmt::Display for ReasonSexualDeepfake {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSexualNcii;
-impl std::fmt::Display for ReasonSexualNcii {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSexualNcii {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSexualNCII")
     }
 }
@@ -571,12 +571,12 @@ impl std::fmt::Display for ReasonSexualNcii {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSexualOther;
-impl std::fmt::Display for ReasonSexualOther {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSexualOther {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSexualOther")
     }
 }
@@ -589,12 +589,12 @@ impl std::fmt::Display for ReasonSexualOther {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonSexualUnlabeled;
-impl std::fmt::Display for ReasonSexualUnlabeled {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonSexualUnlabeled {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonSexualUnlabeled")
     }
 }
@@ -1199,12 +1199,12 @@ impl jacquard_common::IntoStatic for ReasonType<'_> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonViolenceAnimal;
-impl std::fmt::Display for ReasonViolenceAnimal {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonViolenceAnimal {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonViolenceAnimal")
     }
 }
@@ -1217,12 +1217,12 @@ impl std::fmt::Display for ReasonViolenceAnimal {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonViolenceExtremistContent;
-impl std::fmt::Display for ReasonViolenceExtremistContent {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonViolenceExtremistContent {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonViolenceExtremistContent")
     }
 }
@@ -1235,12 +1235,12 @@ impl std::fmt::Display for ReasonViolenceExtremistContent {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonViolenceGlorification;
-impl std::fmt::Display for ReasonViolenceGlorification {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonViolenceGlorification {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonViolenceGlorification")
     }
 }
@@ -1253,12 +1253,12 @@ impl std::fmt::Display for ReasonViolenceGlorification {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonViolenceGraphicContent;
-impl std::fmt::Display for ReasonViolenceGraphicContent {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonViolenceGraphicContent {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonViolenceGraphicContent")
     }
 }
@@ -1271,12 +1271,12 @@ impl std::fmt::Display for ReasonViolenceGraphicContent {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonViolenceOther;
-impl std::fmt::Display for ReasonViolenceOther {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonViolenceOther {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonViolenceOther")
     }
 }
@@ -1289,12 +1289,12 @@ impl std::fmt::Display for ReasonViolenceOther {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonViolenceThreats;
-impl std::fmt::Display for ReasonViolenceThreats {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonViolenceThreats {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonViolenceThreats")
     }
 }
@@ -1307,12 +1307,12 @@ impl std::fmt::Display for ReasonViolenceThreats {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReasonViolenceTrafficking;
-impl std::fmt::Display for ReasonViolenceTrafficking {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReasonViolenceTrafficking {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reasonViolenceTrafficking")
     }
 }

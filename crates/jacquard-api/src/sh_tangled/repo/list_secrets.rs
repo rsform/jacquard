@@ -83,19 +83,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListSecretsRequest {
     type Response = ListSecretsResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Secret<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Secret<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.listSecrets"
     }
     fn def_name() -> &'static str {
         "secret"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_listSecrets()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.key;
             #[allow(unused_comparisons)]
@@ -227,67 +227,67 @@ pub mod secret_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
+        type Key;
         type CreatedAt;
         type CreatedBy;
-        type Key;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
+        type Key = Unset;
         type CreatedAt = Unset;
         type CreatedBy = Unset;
-        type Key = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = S::CreatedBy;
-        type Key = S::Key;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Repo = S::Repo;
-        type CreatedAt = Set<members::created_at>;
-        type CreatedBy = S::CreatedBy;
-        type Key = S::Key;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type Repo = S::Repo;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = Set<members::created_by>;
-        type Key = S::Key;
+        type Repo = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
-        type Repo = S::Repo;
+        type Key = Set<members::key>;
         type CreatedAt = S::CreatedAt;
         type CreatedBy = S::CreatedBy;
-        type Key = Set<members::key>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Key = S::Key;
+        type CreatedAt = Set<members::created_at>;
+        type CreatedBy = S::CreatedBy;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Key = S::Key;
+        type CreatedAt = S::CreatedAt;
+        type CreatedBy = Set<members::created_by>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Key = S::Key;
+        type CreatedAt = S::CreatedAt;
+        type CreatedBy = S::CreatedBy;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
+        ///Marker type for the `key` field
+        pub struct key(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
-        ///Marker type for the `key` field
-        pub struct key(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -400,10 +400,10 @@ where
 impl<'a, S> SecretBuilder<'a, S>
 where
     S: secret_state::State,
-    S::Repo: secret_state::IsSet,
+    S::Key: secret_state::IsSet,
     S::CreatedAt: secret_state::IsSet,
     S::CreatedBy: secret_state::IsSet,
-    S::Key: secret_state::IsSet,
+    S::Repo: secret_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Secret<'a> {
@@ -418,7 +418,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -433,7 +433,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_repo_listSecrets() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_tangled_repo_listSecrets() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -23,9 +23,9 @@ pub struct Item<'a> {
     #[serde(borrow)]
     pub item: jacquard_common::types::string::AtUri<'a>,
     ///Defaults to `0`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_item_position")]
-    pub position: std::option::Option<i64>,
+    pub position: core::option::Option<i64>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -40,9 +40,9 @@ pub struct Item<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ItemGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -89,24 +89,24 @@ impl jacquard_common::types::collection::Collection for ItemRecord {
     type Record = ItemRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Item<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Item<'a> {
     fn nsid() -> &'static str {
         "social.grain.gallery.item"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_social_grain_gallery_item()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn _default_item_position() -> std::option::Option<i64> {
+fn _default_item_position() -> core::option::Option<i64> {
     Some(0i64)
 }
 
@@ -120,51 +120,51 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Gallery;
         type Item;
         type CreatedAt;
-        type Gallery;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Gallery = Unset;
         type Item = Unset;
         type CreatedAt = Unset;
-        type Gallery = Unset;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type Item = Set<members::item>;
-        type CreatedAt = S::CreatedAt;
-        type Gallery = S::Gallery;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Item = S::Item;
-        type CreatedAt = Set<members::created_at>;
-        type Gallery = S::Gallery;
     }
     ///State transition - sets the `gallery` field to Set
     pub struct SetGallery<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGallery<S> {}
     impl<S: State> State for SetGallery<S> {
+        type Gallery = Set<members::gallery>;
         type Item = S::Item;
         type CreatedAt = S::CreatedAt;
-        type Gallery = Set<members::gallery>;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetItem<S> {}
+    impl<S: State> State for SetItem<S> {
+        type Gallery = S::Gallery;
+        type Item = Set<members::item>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Gallery = S::Gallery;
+        type Item = S::Item;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `gallery` field
+        pub struct gallery(());
         ///Marker type for the `item` field
         pub struct item(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `gallery` field
-        pub struct gallery(());
     }
 }
 
@@ -271,9 +271,9 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 impl<'a, S> ItemBuilder<'a, S>
 where
     S: item_state::State,
+    S::Gallery: item_state::IsSet,
     S::Item: item_state::IsSet,
     S::CreatedAt: item_state::IsSet,
-    S::Gallery: item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Item<'a> {
@@ -288,7 +288,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -303,7 +303,7 @@ where
     }
 }
 
-fn lexicon_doc_social_grain_gallery_item() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_social_grain_gallery_item() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

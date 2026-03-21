@@ -23,6 +23,13 @@
             "description": "Optional description of the collection",
             "maxLength": 3000
           },
+          "image": {
+            "type": "blob",
+            "description": "Cover image for the collection",
+            "accept": [
+              "image/*"
+            ]
+          },
           "name": {
             "type": "string",
             "description": "Display name for the collection",

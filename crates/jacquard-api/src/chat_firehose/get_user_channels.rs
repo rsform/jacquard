@@ -18,12 +18,12 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Channel<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub uri: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub uri: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -39,40 +39,40 @@ pub struct Channel<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetUserChannelsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub channels: std::option::Option<
+    pub channels: core::option::Option<
         Vec<crate::chat_firehose::get_user_channels::Channel<'a>>,
     >,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Channel<'a> {
     fn nsid() -> &'static str {
         "chat.firehose.getUserChannels"
     }
     fn def_name() -> &'static str {
         "channel"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_chat_firehose_getUserChannels()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-/// XRPC request marker type
+/// XRPC request marker type.
 #[derive(
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
     serde::Serialize,
     serde::Deserialize,
-    jacquard_derive::IntoStatic
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic,
+    Copy
 )]
 pub struct GetUserChannels;
 /// Response type for
@@ -101,7 +101,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetUserChannelsRequest {
     type Response = GetUserChannelsResponse;
 }
 
-fn lexicon_doc_chat_firehose_getUserChannels() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_chat_firehose_getUserChannels() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

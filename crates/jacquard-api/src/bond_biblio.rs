@@ -30,19 +30,19 @@ pub struct BookRequirement<'a> {
     pub title: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookRequirement<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BookRequirement<'a> {
     fn nsid() -> &'static str {
         "bond.biblio.defs"
     }
     fn def_name() -> &'static str {
         "bookRequirement"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_bond_biblio_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.authors;
             #[allow(unused_comparisons)]
@@ -111,7 +111,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BookRequirement<'a> {
     }
 }
 
-fn lexicon_doc_bond_biblio_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_bond_biblio_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("bond.biblio.defs"),

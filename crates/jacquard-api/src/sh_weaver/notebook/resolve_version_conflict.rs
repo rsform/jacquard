@@ -34,9 +34,9 @@ pub struct ResolveVersionConflict<'a> {
 pub struct ResolveVersionConflictOutput<'a> {
     #[serde(borrow)]
     pub canonical: crate::sh_weaver::notebook::PublishedVersionView<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub collaboration_state: std::option::Option<
+    pub collaboration_state: core::option::Option<
         crate::sh_weaver::collab::CollaborationStateView<'a>,
     >,
     #[serde(borrow)]
@@ -60,7 +60,7 @@ pub struct ResolveVersionConflictOutput<'a> {
 pub enum ResolveVersionConflictError<'a> {
     /// The URIs don't appear to be related versions
     #[serde(rename = "NoRelatedVersions")]
-    NoRelatedVersions(std::option::Option<jacquard_common::CowStr<'a>>),
+    NoRelatedVersions(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for ResolveVersionConflictError<'_> {

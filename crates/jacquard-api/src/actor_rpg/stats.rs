@@ -20,23 +20,23 @@
 #[serde(rename_all = "camelCase")]
 pub struct Abilities<'a> {
     ///Charisma
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cha: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cha: core::option::Option<i64>,
     ///Constitution
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub con: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub con: core::option::Option<i64>,
     ///Dexterity
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub dex: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub dex: core::option::Option<i64>,
     ///Intelligence
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub int: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub int: core::option::Option<i64>,
     ///Strength
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub str: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub str: core::option::Option<i64>,
     ///Wisdom
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub wis: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub wis: core::option::Option<i64>,
 }
 
 /// An attack action
@@ -54,20 +54,20 @@ pub struct Abilities<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Attack<'a> {
     ///Attack bonus (e.g., +5)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub bonus: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub bonus: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Damage dice (e.g., 1d8)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub damage: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub damage: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Damage bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub damage_bonus: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub damage_bonus: core::option::Option<i64>,
     ///Damage type
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub damage_type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub damage_type: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Attack name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -88,20 +88,20 @@ pub struct Attack<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Coinage<'a> {
     ///Copper pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cp: core::option::Option<i64>,
     ///Electrum pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ep: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ep: core::option::Option<i64>,
     ///Gold pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub gp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub gp: core::option::Option<i64>,
     ///Platinum pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pp: core::option::Option<i64>,
     ///Silver pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sp: core::option::Option<i64>,
 }
 
 /// Combat and defensive stats
@@ -119,21 +119,21 @@ pub struct Coinage<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Combat<'a> {
     ///Armor Class
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ac: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ac: core::option::Option<i64>,
     ///Hit dice (e.g., 5d10)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hit_dice: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub hit_dice: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Hit dice expended
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hit_dice_used: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hit_dice_used: core::option::Option<i64>,
     ///Initiative modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub initiative: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub initiative: core::option::Option<i64>,
     ///Speed in feet
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub speed: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub speed: core::option::Option<i64>,
 }
 
 /// Status conditions and effects
@@ -151,15 +151,15 @@ pub struct Combat<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Conditions<'a> {
     ///Death saving throw progress
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub death_saves: std::option::Option<crate::actor_rpg::stats::DeathSaves<'a>>,
+    pub death_saves: core::option::Option<crate::actor_rpg::stats::DeathSaves<'a>>,
     ///Exhaustion level (0-6)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub exhaustion: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub exhaustion: core::option::Option<i64>,
     ///Has inspiration
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub inspiration: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub inspiration: core::option::Option<bool>,
 }
 
 /// A custom stat
@@ -176,15 +176,15 @@ pub struct Conditions<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CustomStat<'a> {
     ///Category (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub category: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub category: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Maximum (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub max: core::option::Option<i64>,
     ///Minimum (optional)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub min: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub min: core::option::Option<i64>,
     ///Stat name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -207,17 +207,17 @@ pub struct CustomStat<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct CustomStats<'a> {
     ///Custom stat entries
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub stats: std::option::Option<Vec<crate::actor_rpg::stats::CustomStat<'a>>>,
+    pub stats: core::option::Option<Vec<crate::actor_rpg::stats::CustomStat<'a>>>,
     ///System name
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub system_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub system_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Version
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub system_version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub system_version: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// DCC ability scores (3-18 standard, can be modified by corruption/spellburn)
@@ -235,32 +235,32 @@ pub struct CustomStats<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccAbilities<'a> {
     ///Agility
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub agi: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub agi: core::option::Option<i64>,
     ///Agility base (before spellburn)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub agi_base: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub agi_base: core::option::Option<i64>,
     ///Intelligence
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub int: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub int: core::option::Option<i64>,
     ///Luck (can be permanently burned)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub luk: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub luk: core::option::Option<i64>,
     ///Personality
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub per: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub per: core::option::Option<i64>,
     ///Stamina
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sta: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sta: core::option::Option<i64>,
     ///Stamina base (before spellburn)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sta_base: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sta_base: core::option::Option<i64>,
     ///Strength
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub str: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub str: core::option::Option<i64>,
     ///Strength base (before spellburn)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub str_base: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub str_base: core::option::Option<i64>,
 }
 
 /// A weapon attack (includes deed die for warriors)
@@ -278,32 +278,32 @@ pub struct DccAbilities<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccAttack<'a> {
     ///Attack modifier (e.g., +2, d16+2 for deed die)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub attack_mod: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub attack_mod: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Damage dice (e.g., 1d8+2, 1d6+d3)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub damage: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub damage: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Damage bonus (e.g., +2, +d3 for deed die)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub damage_bonus: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub damage_bonus: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Weapon name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Special properties (backstab, trained weapon, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Range (melee or distance)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub range: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub range: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Attack type (melee, ranged, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Cleric spellcasting features
@@ -321,43 +321,43 @@ pub struct DccAttack<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccCleric<'a> {
     ///Deity or supernatural patron
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub deity: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub deity: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Current disapproval range (starts at 1, accumulates)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disapproval_range: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disapproval_range: core::option::Option<i64>,
     ///Deity-specific disapproval table if any
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub disapproval_table: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub disapproval_table: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Holy symbol description
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub holy_symbol: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub holy_symbol: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Known cleric spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub known_spells: std::option::Option<
+    pub known_spells: core::option::Option<
         Vec<crate::actor_rpg::stats::DccClericSpell<'a>>,
     >,
     ///Lay on hands die (e.g., d14, d16)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lay_on_hands_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub lay_on_hands_die: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Highest spell level accessible
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_spell_level: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub max_spell_level: core::option::Option<i64>,
     ///Spell check modifier (PER mod + level)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub spell_check_mod: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub spell_check_mod: core::option::Option<i64>,
     ///Turn unholy die (e.g., d14, d16)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub turn_unholy_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub turn_unholy_die: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Serves a Chaotic deity (unholy instead of holy)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub unholy: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub unholy: core::option::Option<bool>,
 }
 
 /// A cleric spell
@@ -379,12 +379,12 @@ pub struct DccClericSpell<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Additional spell notes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Casting may cause additional disapproval
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sinful: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sinful: core::option::Option<bool>,
 }
 
 /// DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)
@@ -402,14 +402,14 @@ pub struct DccClericSpell<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccCoinage<'a> {
     ///Copper pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cp: core::option::Option<i64>,
     ///Gold pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub gp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub gp: core::option::Option<i64>,
     ///Silver pieces
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sp: core::option::Option<i64>,
 }
 
 /// Combat statistics
@@ -427,33 +427,33 @@ pub struct DccCoinage<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccCombat<'a> {
     ///Armor Class (10 + armor + AGI mod + shield)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub ac: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub ac: core::option::Option<i64>,
     ///Primary action die (e.g., d20, d20+d14)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub action_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub action_die: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Base attack modifier (level-based for non-warriors)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub attack_mod: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub attack_mod: core::option::Option<i64>,
     ///Critical hit die (e.g., d8, d12, d14)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub crit_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub crit_die: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Critical hit table (I, II, III, IV, V)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub crit_table: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub crit_table: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Fumble die (typically d4 for 0-level, varies by armor)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub fumble_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub fumble_die: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Initiative modifier (AGI mod)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub initiative: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub initiative: core::option::Option<i64>,
     ///Speed in feet (typically 30, Dwarves 20)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub speed: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub speed: core::option::Option<i64>,
 }
 
 /// A corruption effect from failed spell checks
@@ -471,20 +471,20 @@ pub struct DccCombat<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccCorruption<'a> {
     ///Description of the corruption
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub effect: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub effect: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether this corruption is permanent
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub permanent: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub permanent: core::option::Option<bool>,
     ///What spell caused this corruption
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub source: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub source: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Corruption severity (minor, major, greater)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub r#type: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub r#type: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Equipment and inventory
@@ -502,32 +502,32 @@ pub struct DccCorruption<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccEquipment<'a> {
     ///Armor worn (affects fumble die)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub armor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub armor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Armor check penalty (affects skills)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub armor_check_penalty: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub armor_check_penalty: core::option::Option<i64>,
     ///Other equipment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub gear: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub gear: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Shield (if any)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub shield: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub shield: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Trade goods from occupation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub trade_goods: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub trade_goods: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Valuables and treasure
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub treasure: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub treasure: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Weapons carried
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub weapons: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub weapons: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Halfling class features
@@ -545,24 +545,24 @@ pub struct DccEquipment<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccHalfling<'a> {
     ///Can spend luck to aid nearby allies
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub good_luck_charm: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub good_luck_charm: core::option::Option<bool>,
     ///Infravision range in feet (30)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub infravision: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub infravision: core::option::Option<i64>,
     ///Total luck points spent helping allies
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub luck_spent_on_allies: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub luck_spent_on_allies: core::option::Option<i64>,
     ///Weapon type luck modifier applies to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub lucky_weapon: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Bonus to sneak/hide when in natural environment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sneak_and_hide: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sneak_and_hide: core::option::Option<i64>,
     ///Can dual-wield without penalty
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub two_weapon_fighting: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub two_weapon_fighting: core::option::Option<bool>,
 }
 
 /// Hit points (0-level characters use 1d4 + STA mod)
@@ -580,11 +580,11 @@ pub struct DccHalfling<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccHp<'a> {
     ///Current HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub current: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub current: core::option::Option<i64>,
     ///Maximum HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub max: core::option::Option<i64>,
 }
 
 /// DCC character identity and progression
@@ -602,27 +602,27 @@ pub struct DccHp<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccIdentity<'a> {
     ///Alignment (Lawful, Neutral, Chaotic)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alignment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Class (Warrior, Wizard, Cleric, Thief, Elf, Dwarf, Halfling)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub class: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub class: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Character level (0 for funnel characters)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub level: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub level: core::option::Option<i64>,
     ///0-level occupation (e.g., Blacksmith, Farmer)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub occupation: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub occupation: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Level title (e.g., Squire, Cutpurse, Acolyte)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Experience points
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub xp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub xp: core::option::Option<i64>,
 }
 
 /// Birth augur and luck mechanics
@@ -640,20 +640,20 @@ pub struct DccIdentity<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccLuck<'a> {
     ///Birth augur name (e.g., Harsh Winter, The Bull, Fortunate Date)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub birth_augur: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub birth_augur: core::option::Option<jacquard_common::CowStr<'a>>,
     ///What the luck modifier applies to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub birth_augur_effect: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub birth_augur_effect: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Weapon type that luck applies to (Dwarves/Halflings)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub lucky_weapon: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Starting luck score (for tracking burned luck)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub starting_luck: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub starting_luck: core::option::Option<i64>,
 }
 
 /// DCC saving throws (3 saves, not 6)
@@ -671,14 +671,14 @@ pub struct DccLuck<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccSaves<'a> {
     ///Fortitude save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub fort: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub fort: core::option::Option<i64>,
     ///Reflex save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub r#ref: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub r#ref: core::option::Option<i64>,
     ///Willpower save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub will: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub will: core::option::Option<i64>,
 }
 
 /// Current spellburn (temporary ability score sacrifice)
@@ -696,17 +696,17 @@ pub struct DccSaves<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccSpellburn<'a> {
     ///Agility points currently burned
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub agi_burned: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub agi_burned: core::option::Option<i64>,
     ///Points recovered per day
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub recovery_rate: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub recovery_rate: core::option::Option<i64>,
     ///Stamina points currently burned
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sta_burned: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sta_burned: core::option::Option<i64>,
     ///Strength points currently burned
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub str_burned: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub str_burned: core::option::Option<i64>,
 }
 
 /// Dungeon Crawl Classics RPG character sheet. Supports 0-level funnel characters through 10th level.
@@ -724,73 +724,73 @@ pub struct DccSpellburn<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccStats<'a> {
     ///The six ability scores (STR, AGI, STA, INT, PER, LUK)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub abilities: std::option::Option<crate::actor_rpg::stats::DccAbilities<'a>>,
+    pub abilities: core::option::Option<crate::actor_rpg::stats::DccAbilities<'a>>,
     ///Notes about special abilities, class features, and racial traits
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub abilities_notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub abilities_notes: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Weapon attacks
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub attacks: std::option::Option<Vec<crate::actor_rpg::stats::DccAttack<'a>>>,
+    pub attacks: core::option::Option<Vec<crate::actor_rpg::stats::DccAttack<'a>>>,
     ///Cleric spellcasting (disapproval, turn unholy, lay on hands)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cleric: std::option::Option<crate::actor_rpg::stats::DccCleric<'a>>,
+    pub cleric: core::option::Option<crate::actor_rpg::stats::DccCleric<'a>>,
     ///Currency (cp, sp, gp)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub coinage: std::option::Option<crate::actor_rpg::stats::DccCoinage<'a>>,
+    pub coinage: core::option::Option<crate::actor_rpg::stats::DccCoinage<'a>>,
     ///Combat stats (AC, speed, action die, initiative, crit die/table)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub combat: std::option::Option<crate::actor_rpg::stats::DccCombat<'a>>,
+    pub combat: core::option::Option<crate::actor_rpg::stats::DccCombat<'a>>,
     ///Gear, treasure, and trade goods
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub equipment: std::option::Option<crate::actor_rpg::stats::DccEquipment<'a>>,
+    pub equipment: core::option::Option<crate::actor_rpg::stats::DccEquipment<'a>>,
     ///Halfling luck-sharing and dual wielding
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub halfling: std::option::Option<crate::actor_rpg::stats::DccHalfling<'a>>,
+    pub halfling: core::option::Option<crate::actor_rpg::stats::DccHalfling<'a>>,
     ///Hit points
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hp: std::option::Option<crate::actor_rpg::stats::DccHp<'a>>,
+    pub hp: core::option::Option<crate::actor_rpg::stats::DccHp<'a>>,
     ///Character identity (occupation, class, level, alignment)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identity: std::option::Option<crate::actor_rpg::stats::DccIdentity<'a>>,
+    pub identity: core::option::Option<crate::actor_rpg::stats::DccIdentity<'a>>,
     ///Languages known
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub languages: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub languages: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Birth augur and luck tracking
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub luck: std::option::Option<crate::actor_rpg::stats::DccLuck<'a>>,
+    pub luck: core::option::Option<crate::actor_rpg::stats::DccLuck<'a>>,
     ///Character notes, backstory, and special abilities
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Saving throws (Reflex, Fortitude, Willpower)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub saves: std::option::Option<crate::actor_rpg::stats::DccSaves<'a>>,
+    pub saves: core::option::Option<crate::actor_rpg::stats::DccSaves<'a>>,
     ///Thief skills and abilities
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub thief: std::option::Option<crate::actor_rpg::stats::DccThief<'a>>,
+    pub thief: core::option::Option<crate::actor_rpg::stats::DccThief<'a>>,
     ///Warrior/Dwarf class features (deed die, mighty deeds)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub warrior: std::option::Option<crate::actor_rpg::stats::DccWarrior<'a>>,
+    pub warrior: core::option::Option<crate::actor_rpg::stats::DccWarrior<'a>>,
     ///Wizard/Elf spellcasting (spellburn, corruption, mercurial magic)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub wizard: std::option::Option<crate::actor_rpg::stats::DccWizard<'a>>,
+    pub wizard: core::option::Option<crate::actor_rpg::stats::DccWizard<'a>>,
 }
 
 /// Thief class features and skills
@@ -808,20 +808,20 @@ pub struct DccStats<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccThief<'a> {
     ///Alignment (affects some skill targets)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alignment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Backstab damage die level (+1, +2, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub backstab: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub backstab: core::option::Option<i64>,
     ///Weapon type that luck applies to (one type only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub lucky_weapon: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Thief skill modifiers
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub skills: std::option::Option<crate::actor_rpg::stats::DccThiefSkills<'a>>,
+    pub skills: core::option::Option<crate::actor_rpg::stats::DccThiefSkills<'a>>,
 }
 
 /// Thief skill bonuses (roll d20 + skill vs target)
@@ -839,44 +839,44 @@ pub struct DccThief<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccThiefSkills<'a> {
     ///Backstab attack bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub backstab: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub backstab: core::option::Option<i64>,
     ///Cast spell from scroll bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cast_spell_from_scroll: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cast_spell_from_scroll: core::option::Option<i64>,
     ///Climb sheer surfaces bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub climb_sheer_surfaces: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub climb_sheer_surfaces: core::option::Option<i64>,
     ///Disable trap bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disable_trap: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disable_trap: core::option::Option<i64>,
     ///Disguise self bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub disguise_self: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub disguise_self: core::option::Option<i64>,
     ///Find trap bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub find_trap: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub find_trap: core::option::Option<i64>,
     ///Forge document bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub forge_document: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub forge_document: core::option::Option<i64>,
     ///Handle poison bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub handle_poison: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub handle_poison: core::option::Option<i64>,
     ///Hide in shadows bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hide_in_shadows: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hide_in_shadows: core::option::Option<i64>,
     ///Pick lock bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pick_lock: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pick_lock: core::option::Option<i64>,
     ///Pick pocket bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pick_pocket: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pick_pocket: core::option::Option<i64>,
     ///Read languages bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub read_languages: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub read_languages: core::option::Option<i64>,
     ///Sneak silently bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sneak_silently: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sneak_silently: core::option::Option<i64>,
 }
 
 /// Warrior and Dwarf class features
@@ -894,29 +894,29 @@ pub struct DccThiefSkills<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccWarrior<'a> {
     ///Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub deed_die: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub deed_die: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Infravision range in feet (Dwarves: 60)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub infravision: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub infravision: core::option::Option<i64>,
     ///Weapon type luck modifier applies to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub lucky_weapon: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub lucky_weapon: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Signature mighty deeds of arms
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mighty_deeds: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub mighty_deeds: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Can use shield bash (Dwarves)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub shield_bash: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub shield_bash: core::option::Option<bool>,
     ///Can smell gold/gems (Dwarves)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub smell_gold: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub smell_gold: core::option::Option<bool>,
     ///Underground detection bonus (Dwarves: equal to level)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub underground_skills: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub underground_skills: core::option::Option<i64>,
 }
 
 /// Wizard and Elf spellcasting features
@@ -934,37 +934,39 @@ pub struct DccWarrior<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DccWizard<'a> {
     ///Corruption effects suffered (structured)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub corruption: std::option::Option<Vec<crate::actor_rpg::stats::DccCorruption<'a>>>,
+    pub corruption: core::option::Option<
+        Vec<crate::actor_rpg::stats::DccCorruption<'a>>,
+    >,
     ///Corruption effects as free-form text
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub corruption_text: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub corruption_text: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Known spells with mercurial magic effects
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub known_spells: std::option::Option<
+    pub known_spells: core::option::Option<
         Vec<crate::actor_rpg::stats::DccWizardSpell<'a>>,
     >,
     ///Highest spell level accessible
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_spell_level: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub max_spell_level: core::option::Option<i64>,
     ///Supernatural patron (if any)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub patron: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub patron: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Patron bond description and effects
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub patron_bond: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub patron_bond: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Spell check modifier (INT mod + level)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub spell_check_mod: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub spell_check_mod: core::option::Option<i64>,
     ///Current spellburn status
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub spellburn: std::option::Option<crate::actor_rpg::stats::DccSpellburn<'a>>,
+    pub spellburn: core::option::Option<crate::actor_rpg::stats::DccSpellburn<'a>>,
 }
 
 /// A wizard spell with mercurial magic effect
@@ -983,22 +985,22 @@ pub struct DccWizardSpell<'a> {
     ///Spell level
     pub level: i64,
     ///Spell is currently lost (must be re-learned)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub lost: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub lost: core::option::Option<bool>,
     ///Unique mercurial magic effect (d100 roll result)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mercurial_magic: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub mercurial_magic: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The d100 roll for mercurial magic
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mercurial_roll: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mercurial_roll: core::option::Option<i64>,
     ///Spell name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Additional spell notes
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub notes: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub notes: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Death saving throw successes and failures
@@ -1016,11 +1018,11 @@ pub struct DccWizardSpell<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DeathSaves<'a> {
     ///Failures (0-3)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub failures: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub failures: core::option::Option<i64>,
     ///Successes (0-3)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub successes: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub successes: core::option::Option<i64>,
 }
 
 /// D&D 5e character sheet. All sub-objects are optional.
@@ -1038,69 +1040,69 @@ pub struct DeathSaves<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct DndStats<'a> {
     ///The six ability scores (STR, DEX, CON, INT, WIS, CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub abilities: std::option::Option<crate::actor_rpg::stats::Abilities<'a>>,
+    pub abilities: core::option::Option<crate::actor_rpg::stats::Abilities<'a>>,
     ///Attack actions
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub attacks: std::option::Option<Vec<crate::actor_rpg::stats::Attack<'a>>>,
+    pub attacks: core::option::Option<Vec<crate::actor_rpg::stats::Attack<'a>>>,
     ///Currency (cp, sp, ep, gp, pp)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub coinage: std::option::Option<crate::actor_rpg::stats::Coinage<'a>>,
+    pub coinage: core::option::Option<crate::actor_rpg::stats::Coinage<'a>>,
     ///Combat stats (AC, speed, initiative, hit dice)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub combat: std::option::Option<crate::actor_rpg::stats::Combat<'a>>,
+    pub combat: core::option::Option<crate::actor_rpg::stats::Combat<'a>>,
     ///Status conditions (inspiration, exhaustion, death saves)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub conditions: std::option::Option<crate::actor_rpg::stats::Conditions<'a>>,
+    pub conditions: core::option::Option<crate::actor_rpg::stats::Conditions<'a>>,
     ///Gear and inventory
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub equipment: std::option::Option<crate::actor_rpg::stats::Equipment<'a>>,
+    pub equipment: core::option::Option<crate::actor_rpg::stats::Equipment<'a>>,
     ///Class features, racial traits, and feats
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub features: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub features: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Hit points (current, max, temp)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hp: std::option::Option<crate::actor_rpg::stats::Hp<'a>>,
+    pub hp: core::option::Option<crate::actor_rpg::stats::Hp<'a>>,
     ///Character identity (race, class, level, background)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub identity: std::option::Option<crate::actor_rpg::stats::Identity<'a>>,
+    pub identity: core::option::Option<crate::actor_rpg::stats::Identity<'a>>,
     ///Languages known
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub languages: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub languages: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Passive scores (Perception, Investigation, Insight)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub passives: std::option::Option<crate::actor_rpg::stats::Passives<'a>>,
+    pub passives: core::option::Option<crate::actor_rpg::stats::Passives<'a>>,
     ///Traits, ideals, bonds, flaws, backstory
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub personality: std::option::Option<crate::actor_rpg::stats::Personality<'a>>,
+    pub personality: core::option::Option<crate::actor_rpg::stats::Personality<'a>>,
     ///Armor, weapon, and tool proficiencies
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub proficiencies: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub proficiencies: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Saving throw modifiers
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub saves: std::option::Option<crate::actor_rpg::stats::Saves<'a>>,
+    pub saves: core::option::Option<crate::actor_rpg::stats::Saves<'a>>,
     ///Skill modifiers
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub skills: std::option::Option<crate::actor_rpg::stats::Skills<'a>>,
+    pub skills: core::option::Option<crate::actor_rpg::stats::Skills<'a>>,
     ///Spellcasting details (for casters)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub spellcasting: std::option::Option<crate::actor_rpg::stats::Spellcasting<'a>>,
+    pub spellcasting: core::option::Option<crate::actor_rpg::stats::Spellcasting<'a>>,
 }
 
 /// Gear and inventory
@@ -1118,21 +1120,21 @@ pub struct DndStats<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Equipment<'a> {
     ///Armor
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub armor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub armor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Other equipment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub gear: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub gear: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Valuables and treasure
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub treasure: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub treasure: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Weapons
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub weapons: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub weapons: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Hit point tracking
@@ -1150,14 +1152,14 @@ pub struct Equipment<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Hp<'a> {
     ///Current HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub current: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub current: core::option::Option<i64>,
     ///Maximum HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub max: core::option::Option<i64>,
     ///Temporary HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub temp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub temp: core::option::Option<i64>,
 }
 
 /// Character identity and progression
@@ -1175,30 +1177,30 @@ pub struct Hp<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Identity<'a> {
     ///Alignment (e.g., Lawful Good)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub alignment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub alignment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Background (e.g., Soldier, Sage)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub background: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub background: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Class and subclass (e.g., Fighter (Champion))
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub class: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub class: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Character level
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub level: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub level: core::option::Option<i64>,
     ///Proficiency bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub proficiency: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub proficiency: core::option::Option<i64>,
     ///Race (e.g., Human, Elf, Dwarf)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub race: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub race: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Experience points
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub xp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub xp: core::option::Option<i64>,
 }
 
 /// A user's RPG character statistics. One record per user (rkey: self).
@@ -1217,28 +1219,28 @@ pub struct Stats<'a> {
     ///Timestamp when this record was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///User-defined custom stat system
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub custom: std::option::Option<crate::actor_rpg::stats::CustomStats<'a>>,
+    pub custom: core::option::Option<crate::actor_rpg::stats::CustomStats<'a>>,
     ///Dungeon Crawl Classics RPG character sheet
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub dcc: std::option::Option<crate::actor_rpg::stats::DccStats<'a>>,
+    pub dcc: core::option::Option<crate::actor_rpg::stats::DccStats<'a>>,
     ///Dungeons & Dragons 5th Edition character sheet
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub dnd: std::option::Option<crate::actor_rpg::stats::DndStats<'a>>,
+    pub dnd: core::option::Option<crate::actor_rpg::stats::DndStats<'a>>,
     ///Reverie House philosophical alignment
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reverie: std::option::Option<crate::actor_rpg::stats::ReverieStats<'a>>,
+    pub reverie: core::option::Option<crate::actor_rpg::stats::ReverieStats<'a>>,
     ///RPG Maker MZ engine character parameters
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub rmmz: std::option::Option<crate::actor_rpg::stats::RmmzStats<'a>>,
+    pub rmmz: core::option::Option<crate::actor_rpg::stats::RmmzStats<'a>>,
     ///Timestamp when this record was last modified
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -1253,9 +1255,9 @@ pub struct Stats<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct StatsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -1277,14 +1279,14 @@ pub struct StatsGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Passives<'a> {
     ///Passive Insight
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub insight: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub insight: core::option::Option<i64>,
     ///Passive Investigation
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub investigation: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub investigation: core::option::Option<i64>,
     ///Passive Perception
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub perception: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub perception: core::option::Option<i64>,
 }
 
 /// Personality and backstory
@@ -1302,25 +1304,25 @@ pub struct Passives<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Personality<'a> {
     ///Backstory
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub backstory: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub backstory: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Bonds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub bonds: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub bonds: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Flaws
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub flaws: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub flaws: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Ideals
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ideals: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub ideals: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Personality traits
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub traits: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub traits: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Reverie House philosophical alignment
@@ -1338,27 +1340,27 @@ pub struct Personality<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ReverieStats<'a> {
     ///Authority (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub authority: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub authority: core::option::Option<i64>,
     ///Entropy (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub entropy: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub entropy: core::option::Option<i64>,
     ///Liberty (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub liberty: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub liberty: core::option::Option<i64>,
     ///Oblivion (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub oblivion: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub oblivion: core::option::Option<i64>,
     ///Philosophical octant
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub octant: std::option::Option<ReverieStatsOctant<'a>>,
+    pub octant: core::option::Option<ReverieStatsOctant<'a>>,
     ///Receptive (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub receptive: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub receptive: core::option::Option<i64>,
     ///Skeptic (0-100)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub skeptic: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub skeptic: core::option::Option<i64>,
 }
 
 /// Philosophical octant
@@ -1510,60 +1512,60 @@ impl jacquard_common::IntoStatic for ReverieStatsOctant<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct RmmzStats<'a> {
     ///Agility
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub agi: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub agi: core::option::Option<i64>,
     ///Attack
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub atk: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub atk: core::option::Option<i64>,
     ///Class
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub class: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub class: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Critical %
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cri: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cri: core::option::Option<i64>,
     ///Defense
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub def: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub def: core::option::Option<i64>,
     ///Evasion %
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub eva: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub eva: core::option::Option<i64>,
     ///Hit Rate %
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hit: core::option::Option<i64>,
     ///Current HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub hp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub hp: core::option::Option<i64>,
     ///Level
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub level: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub level: core::option::Option<i64>,
     ///Luck
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub luk: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub luk: core::option::Option<i64>,
     ///Magic Attack
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mat: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mat: core::option::Option<i64>,
     ///Max HP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_hp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub max_hp: core::option::Option<i64>,
     ///Max MP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_mp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub max_mp: core::option::Option<i64>,
     ///Max TP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub max_tp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub max_tp: core::option::Option<i64>,
     ///Magic Defense
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mdf: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mdf: core::option::Option<i64>,
     ///Current MP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mp: core::option::Option<i64>,
     ///Current TP
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub tp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub tp: core::option::Option<i64>,
     ///Experience
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub xp: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub xp: core::option::Option<i64>,
 }
 
 /// Saving throw modifiers (actual values, not proficiency flags)
@@ -1581,23 +1583,23 @@ pub struct RmmzStats<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Saves<'a> {
     ///Charisma save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub cha: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub cha: core::option::Option<i64>,
     ///Constitution save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub con: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub con: core::option::Option<i64>,
     ///Dexterity save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub dex: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub dex: core::option::Option<i64>,
     ///Intelligence save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub int: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub int: core::option::Option<i64>,
     ///Strength save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub str: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub str: core::option::Option<i64>,
     ///Wisdom save modifier
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub wis: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub wis: core::option::Option<i64>,
 }
 
 /// Skill modifiers (actual values, not proficiency flags)
@@ -1615,59 +1617,59 @@ pub struct Saves<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Skills<'a> {
     ///Acrobatics (DEX)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub acrobatics: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub acrobatics: core::option::Option<i64>,
     ///Animal Handling (WIS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub animal_handling: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub animal_handling: core::option::Option<i64>,
     ///Arcana (INT)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub arcana: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub arcana: core::option::Option<i64>,
     ///Athletics (STR)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub athletics: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub athletics: core::option::Option<i64>,
     ///Deception (CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deception: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub deception: core::option::Option<i64>,
     ///History (INT)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub history: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub history: core::option::Option<i64>,
     ///Insight (WIS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub insight: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub insight: core::option::Option<i64>,
     ///Intimidation (CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub intimidation: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub intimidation: core::option::Option<i64>,
     ///Investigation (INT)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub investigation: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub investigation: core::option::Option<i64>,
     ///Medicine (WIS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub medicine: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub medicine: core::option::Option<i64>,
     ///Nature (INT)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub nature: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub nature: core::option::Option<i64>,
     ///Perception (WIS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub perception: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub perception: core::option::Option<i64>,
     ///Performance (CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub performance: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub performance: core::option::Option<i64>,
     ///Persuasion (CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub persuasion: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub persuasion: core::option::Option<i64>,
     ///Religion (INT)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub religion: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub religion: core::option::Option<i64>,
     ///Sleight of Hand (DEX)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sleight_of_hand: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sleight_of_hand: core::option::Option<i64>,
     ///Stealth (DEX)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub stealth: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub stealth: core::option::Option<i64>,
     ///Survival (WIS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub survival: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub survival: core::option::Option<i64>,
 }
 
 /// Spells organized by level
@@ -1685,45 +1687,45 @@ pub struct Skills<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct SpellList<'a> {
     ///Cantrips (at-will)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cantrips: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub cantrips: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///1st-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub l1: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l1: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///2nd-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub l2: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l2: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///3rd-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub l3: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l3: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///4th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub l4: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l4: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///5th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub l5: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l5: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///6th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub l6: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l6: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///7th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub l7: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l7: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///8th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub l8: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l8: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///9th-level spells
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub l9: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub l9: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Spellcasting details
@@ -1741,23 +1743,23 @@ pub struct SpellList<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Spellcasting<'a> {
     ///Spellcasting ability (INT, WIS, CHA)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub ability: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub ability: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Spell attack bonus
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub attack: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub attack: core::option::Option<i64>,
     ///Spell save DC
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub dc: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub dc: core::option::Option<i64>,
     ///Spell slots by level
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub slots: std::option::Option<Vec<crate::actor_rpg::stats::Spellslot<'a>>>,
+    pub slots: core::option::Option<Vec<crate::actor_rpg::stats::Spellslot<'a>>>,
     ///Known/prepared spells by level
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub spells: std::option::Option<crate::actor_rpg::stats::SpellList<'a>>,
+    pub spells: core::option::Option<crate::actor_rpg::stats::SpellList<'a>>,
 }
 
 /// Spell slot entry
@@ -1778,8 +1780,8 @@ pub struct Spellslot<'a> {
     ///Total slots
     pub total: i64,
     ///Slots used
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub used: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub used: core::option::Option<i64>,
 }
 
 impl<'a> Stats<'a> {
@@ -1795,19 +1797,19 @@ impl<'a> Stats<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "abilities"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cha {
             if *value > 30i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -1944,19 +1946,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Abilities<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attack<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Attack<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "attack"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.bonus {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
@@ -2010,19 +2012,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Attack<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "coinage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cp {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -2082,19 +2084,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Coinage<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Combat<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Combat<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "combat"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.ac {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -2144,19 +2146,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Combat<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Conditions<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Conditions<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "conditions"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.exhaustion {
             if *value > 6i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -2183,19 +2185,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Conditions<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomStat<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CustomStat<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "customStat"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.category {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -2225,19 +2227,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomStat<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomStats<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CustomStats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "customStats"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.system_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -2266,19 +2268,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CustomStats<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccAbilities"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.agi {
             if *value > 24i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -2481,19 +2483,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccAbilities<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccAttack"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.attack_mod {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 30usize {
@@ -2583,19 +2585,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccAttack<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccCleric"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.deity {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -2716,19 +2718,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCleric<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccClericSpell<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccClericSpell<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccClericSpell"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.level;
             if *value > 5i64 {
@@ -2782,19 +2784,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccClericSpell<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCoinage<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCoinage<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccCoinage"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cp {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -2832,19 +2834,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCoinage<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccCombat"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.ac {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -2919,19 +2921,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCombat<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCorruption<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccCorruption<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccCorruption"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.effect {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {
@@ -2972,19 +2974,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccCorruption<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccEquipment"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.armor {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
@@ -3072,19 +3074,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccEquipment<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccHalfling<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccHalfling<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccHalfling"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.infravision {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -3123,19 +3125,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccHalfling<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccHp<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccHp<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccHp"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.current {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -3162,19 +3164,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccHp<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccIdentity"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alignment {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
@@ -3260,19 +3262,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccIdentity<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccLuck"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.birth_augur {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -3335,36 +3337,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccLuck<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccSaves<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccSaves<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccSaves"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccSpellburn<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccSpellburn<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccSpellburn"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.agi_burned {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -3413,19 +3415,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccSpellburn<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccStats<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccStats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccStats"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.abilities_notes {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -3478,19 +3480,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccStats<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccThief<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccThief<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccThief"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alignment {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 20usize {
@@ -3530,36 +3532,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccThief<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccThiefSkills<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccThiefSkills<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccThiefSkills"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccWarrior"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.deed_die {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10usize {
@@ -3622,19 +3624,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWarrior<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccWizard"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.corruption {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
@@ -3721,19 +3723,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWizard<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dccWizardSpell"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.level;
             if *value > 5i64 {
@@ -3821,19 +3823,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DccWizardSpell<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeathSaves<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DeathSaves<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "deathSaves"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.failures {
             if *value > 3i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -3882,19 +3884,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DeathSaves<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DndStats<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DndStats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "dndStats"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.attacks {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
@@ -3947,19 +3949,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DndStats<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Equipment<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Equipment<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "equipment"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.armor {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
@@ -4012,19 +4014,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Equipment<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Hp<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Hp<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "hp"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.current {
             if *value < 0i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -4062,19 +4064,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Hp<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Identity<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "identity"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.alignment {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -4187,53 +4189,53 @@ impl jacquard_common::types::collection::Collection for StatsRecord {
     type Record = StatsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Stats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Passives<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Passives<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "passives"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "personality"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.backstory {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 5000usize {
@@ -4298,19 +4300,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Personality<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "reverieStats"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.authority {
             if *value > 100i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -4447,19 +4449,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReverieStats<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "rmmzStats"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.agi {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -4696,53 +4698,53 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RmmzStats<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Saves<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Saves<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "saves"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Skills<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Skills<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "skills"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "spellList"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.cantrips {
             #[allow(unused_comparisons)]
             if value.len() > 20usize {
@@ -4867,19 +4869,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpellList<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Spellcasting<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellcasting<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "spellcasting"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.ability {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3usize {
@@ -4919,19 +4921,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Spellcasting<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Spellslot<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Spellslot<'a> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
     fn def_name() -> &'static str {
         "spellslot"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_actor_rpg_stats()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.level;
             if *value > 9i64 {
@@ -4983,7 +4985,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Spellslot<'a> {
     }
 }
 
-fn lexicon_doc_actor_rpg_stats() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_actor_rpg_stats() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("actor.rpg.stats"),
@@ -10042,7 +10044,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10218,7 +10220,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10429,7 +10431,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10665,7 +10667,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10825,7 +10827,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

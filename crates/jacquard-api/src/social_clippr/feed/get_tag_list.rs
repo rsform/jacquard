@@ -16,9 +16,9 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetTagList<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub actor: std::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
+    pub actor: core::option::Option<jacquard_common::types::ident::AtIdentifier<'a>>,
 }
 
 #[jacquard_derive::lexicon]

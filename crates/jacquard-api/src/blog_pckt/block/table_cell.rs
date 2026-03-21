@@ -18,29 +18,29 @@
 #[serde(rename_all = "camelCase")]
 pub struct TableCell<'a> {
     ///Number of columns this cell spans
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub colspan: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub colspan: core::option::Option<i64>,
     ///Array of block content (typically text)
     #[serde(borrow)]
     pub content: Vec<crate::blog_pckt::block::text::Text<'a>>,
     ///Number of rows this cell spans
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rowspan: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rowspan: core::option::Option<i64>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for TableCell<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for TableCell<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.block.tableCell"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_block_tableCell()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.colspan {
             if *value < 1i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Minimum {
@@ -190,7 +190,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -204,7 +204,7 @@ where
     }
 }
 
-fn lexicon_doc_blog_pckt_block_tableCell() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blog_pckt_block_tableCell() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -36,12 +36,12 @@ pub struct GetRepoStatusOutput<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     ///Optional field, the current rev of the repo, if active=true
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub rev: std::option::Option<jacquard_common::types::string::Tid>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub rev: core::option::Option<jacquard_common::types::string::Tid>,
     ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<GetRepoStatusOutputStatus<'a>>,
+    pub status: core::option::Option<GetRepoStatusOutputStatus<'a>>,
 }
 
 /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
@@ -175,7 +175,7 @@ impl jacquard_common::IntoStatic for GetRepoStatusOutputStatus<'_> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetRepoStatusError<'a> {
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetRepoStatusError<'_> {

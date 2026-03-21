@@ -27,12 +27,12 @@ pub mod vote;
 #[serde(rename_all = "camelCase")]
 pub struct SpriteSettings<'a> {
     ///0=right, 1=back, 2=left, 3=front
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub current_anim_direction: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub current_anim_direction: core::option::Option<i64>,
     ///Map of part name -> {red, green, blue, alpha}
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub part_color_settings: std::option::Option<
+    pub part_color_settings: core::option::Option<
         jacquard_common::types::value::Data<'a>,
     >,
     ///Map of part name -> sprite path
@@ -40,19 +40,19 @@ pub struct SpriteSettings<'a> {
     pub selected_options: jacquard_common::types::value::Data<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SpriteSettings<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SpriteSettings<'a> {
     fn nsid() -> &'static str {
         "org.simocracy.defs"
     }
     fn def_name() -> &'static str {
         "spriteSettings"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_simocracy_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -186,7 +186,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -200,7 +200,7 @@ where
     }
 }
 
-fn lexicon_doc_org_simocracy_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_org_simocracy_defs() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.simocracy.defs"),

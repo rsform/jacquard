@@ -21,23 +21,23 @@ pub struct Skill<'a> {
     ///Timestamp when the skill was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Short description of what this skill does. Rich text annotations may be provided via descriptionFacets.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Rich text annotations for description.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description_facets: std::option::Option<
+    pub description_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     ///Detailed step-by-step instructions for executing this skill. Rich text annotations may be provided via instructionsFacets.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub instructions: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub instructions: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Rich text annotations for instructions.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub instructions_facets: std::option::Option<
+    pub instructions_facets: core::option::Option<
         Vec<crate::app_bsky::richtext::facet::Facet<'a>>,
     >,
     ///Name of the skill
@@ -47,9 +47,9 @@ pub struct Skill<'a> {
     #[serde(borrow)]
     pub sim: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     ///Conditions or phrases that trigger this skill
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub triggers: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub triggers: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -64,9 +64,9 @@ pub struct Skill<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SkillGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -113,19 +113,19 @@ impl jacquard_common::types::collection::Collection for SkillRecord {
     type Record = SkillRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Skill<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Skill<'a> {
     fn nsid() -> &'static str {
         "org.simocracy.skill"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_simocracy_skill()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 3000usize {
@@ -483,7 +483,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -502,9 +502,7 @@ where
     }
 }
 
-fn lexicon_doc_org_simocracy_skill() -> ::jacquard_lexicon::lexicon::LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_org_simocracy_skill() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("org.simocracy.skill"),

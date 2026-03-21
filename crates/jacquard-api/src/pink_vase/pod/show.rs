@@ -19,29 +19,29 @@
 #[serde(rename_all = "camelCase")]
 pub struct Show<'a> {
     ///Podcast categories e.g. 'Technology', 'Comedy'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub categories: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub categories: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Cover art image. Stored as a blob in the user's PDS.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cover_art: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub cover_art: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether the show contains explicit content.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub explicit: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub explicit: core::option::Option<bool>,
     ///Primary language of the show, BCP-47 format e.g. 'en', 'es'.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub language: std::option::Option<jacquard_common::types::string::Language>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub language: core::option::Option<jacquard_common::types::string::Language>,
     ///The display name of the show.
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub website_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub website_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -56,9 +56,9 @@ pub struct Show<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ShowGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -105,19 +105,19 @@ impl jacquard_common::types::collection::Collection for ShowRecord {
     type Record = ShowRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Show<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Show<'a> {
     fn nsid() -> &'static str {
         "pink.vase.pod.show"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_pink_vase_pod_show()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.categories {
             #[allow(unused_comparisons)]
             if value.len() > 3usize {
@@ -214,37 +214,37 @@ pub mod show_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -431,8 +431,8 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
 impl<'a, S> ShowBuilder<'a, S>
 where
     S: show_state::State,
-    S::CreatedAt: show_state::IsSet,
     S::Name: show_state::IsSet,
+    S::CreatedAt: show_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Show<'a> {
@@ -451,7 +451,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -470,7 +470,7 @@ where
     }
 }
 
-fn lexicon_doc_pink_vase_pod_show() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_pink_vase_pod_show() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("pink.vase.pod.show"),

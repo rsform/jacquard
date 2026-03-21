@@ -19,14 +19,14 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Artist<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub artist: std::option::Option<
+    pub artist: core::option::Option<
         crate::ch_indiemusi::alpha::actor::artist::Artist<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
 }
@@ -46,24 +46,24 @@ pub struct Artist<'a> {
 pub struct Recording<'a> {
     #[serde(borrow)]
     pub artists: Vec<crate::ch_indiemusi::alpha::recording::Artist<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub audio_file: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub audio_file: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Duration of the recording in seconds
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration: core::option::Option<i64>,
     ///ISRC (International Standard Recording Code) with which the recording is registered
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub isrc: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub isrc: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub master_owner: std::option::Option<
+    pub master_owner: core::option::Option<
         crate::ch_indiemusi::alpha::recording::MasterOwnerInfo<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub song: std::option::Option<crate::ch_indiemusi::alpha::song::Song<'a>>,
+    pub song: core::option::Option<crate::ch_indiemusi::alpha::song::Song<'a>>,
     #[serde(borrow)]
     pub title: jacquard_common::CowStr<'a>,
 }
@@ -80,9 +80,9 @@ pub struct Recording<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordingGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -103,17 +103,17 @@ pub struct RecordingGetRecordOutput<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct MasterOwnerInfo<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub did: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub did: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub master_owner: std::option::Option<
+    pub master_owner: core::option::Option<
         crate::ch_indiemusi::alpha::actor::master_owner::MasterOwner<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub name: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Recording<'a> {
@@ -129,19 +129,19 @@ impl<'a> Recording<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Artist<'a> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.recording"
     }
     fn def_name() -> &'static str {
         "artist"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ch_indiemusi_alpha_recording()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
@@ -186,19 +186,19 @@ impl jacquard_common::types::collection::Collection for RecordingRecord {
     type Record = RecordingRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recording<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Recording<'a> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.recording"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ch_indiemusi_alpha_recording()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.artists;
             #[allow(unused_comparisons)]
@@ -241,19 +241,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Recording<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MasterOwnerInfo<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for MasterOwnerInfo<'a> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.recording"
     }
     fn def_name() -> &'static str {
         "masterOwnerInfo"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_ch_indiemusi_alpha_recording()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 255usize {
@@ -270,7 +270,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for MasterOwnerInfo<'a> {
     }
 }
 
-fn lexicon_doc_ch_indiemusi_alpha_recording() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_ch_indiemusi_alpha_recording() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -769,7 +769,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

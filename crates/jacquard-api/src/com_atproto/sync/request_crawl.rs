@@ -39,7 +39,7 @@ pub struct RequestCrawl<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum RequestCrawlError<'a> {
     #[serde(rename = "HostBanned")]
-    HostBanned(std::option::Option<jacquard_common::CowStr<'a>>),
+    HostBanned(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for RequestCrawlError<'_> {

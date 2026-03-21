@@ -19,39 +19,39 @@
 #[serde(rename_all = "camelCase")]
 pub struct Goal<'a> {
     ///Preset name or hex color for incomplete state
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub accent_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub accent_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Array of category UUIDs this goal belongs to
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub categories: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub categories: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Preset name or hex color for complete state
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub completed_accent_color: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub completed_accent_color: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Shape name or emoji for complete state
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub completed_piece: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub completed_piece: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Uploaded image for complete state
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub completed_piece_blob: std::option::Option<
+    pub completed_piece_blob: core::option::Option<
         jacquard_common::types::blob::BlobRef<'a>,
     >,
     ///Favicon URL for complete state
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub completed_piece_url: std::option::Option<
+    pub completed_piece_url: core::option::Option<
         jacquard_common::types::string::UriValue<'a>,
     >,
     ///Timestamp when the goal was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional description of the goal
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Unique identifier for the goal (UUID)
     #[serde(borrow)]
     pub goal_id: jacquard_common::CowStr<'a>,
@@ -59,20 +59,20 @@ pub struct Goal<'a> {
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Shape name or emoji for incomplete state
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub piece: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub piece: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Uploaded image for incomplete state
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub piece_blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub piece_blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Favicon URL for incomplete state
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub piece_url: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub piece_url: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     ///Target count for countable goals
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub target_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub target_count: core::option::Option<i64>,
     ///Year this goal is tracked for
     pub year: i64,
 }
@@ -89,9 +89,9 @@ pub struct Goal<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GoalGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -138,19 +138,19 @@ impl jacquard_common::types::collection::Collection for GoalRecord {
     type Record = GoalRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Goal<'a> {
     fn nsid() -> &'static str {
         "garden.goals.goal"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_garden_goals_goal()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.accent_color {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -359,66 +359,66 @@ pub mod goal_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Year;
         type GoalId;
         type CreatedAt;
+        type Year;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Year = Unset;
         type GoalId = Unset;
         type CreatedAt = Unset;
+        type Year = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type GoalId = S::GoalId;
+        type CreatedAt = S::CreatedAt;
         type Year = S::Year;
-        type GoalId = S::GoalId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `year` field to Set
-    pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetYear<S> {}
-    impl<S: State> State for SetYear<S> {
-        type Name = S::Name;
-        type Year = Set<members::year>;
-        type GoalId = S::GoalId;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `goal_id` field to Set
     pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGoalId<S> {}
     impl<S: State> State for SetGoalId<S> {
         type Name = S::Name;
-        type Year = S::Year;
         type GoalId = Set<members::goal_id>;
         type CreatedAt = S::CreatedAt;
+        type Year = S::Year;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Name = S::Name;
-        type Year = S::Year;
         type GoalId = S::GoalId;
         type CreatedAt = Set<members::created_at>;
+        type Year = S::Year;
+    }
+    ///State transition - sets the `year` field to Set
+    pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetYear<S> {}
+    impl<S: State> State for SetYear<S> {
+        type Name = S::Name;
+        type GoalId = S::GoalId;
+        type CreatedAt = S::CreatedAt;
+        type Year = Set<members::year>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `year` field
-        pub struct year(());
         ///Marker type for the `goal_id` field
         pub struct goal_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `year` field
+        pub struct year(());
     }
 }
 
@@ -759,9 +759,9 @@ impl<'a, S> GoalBuilder<'a, S>
 where
     S: goal_state::State,
     S::Name: goal_state::IsSet,
-    S::Year: goal_state::IsSet,
     S::GoalId: goal_state::IsSet,
     S::CreatedAt: goal_state::IsSet,
+    S::Year: goal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Goal<'a> {
@@ -787,7 +787,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -813,7 +813,7 @@ where
     }
 }
 
-fn lexicon_doc_garden_goals_goal() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_garden_goals_goal() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("garden.goals.goal"),

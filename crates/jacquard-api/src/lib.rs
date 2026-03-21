@@ -22,6 +22,9 @@ pub mod app_bsky;
 #[cfg(feature = "app_certified")]
 pub mod app_certified;
 
+#[cfg(feature = "app_chavatar")]
+pub mod app_chavatar;
+
 #[cfg(feature = "app_chronosky")]
 pub mod app_chronosky;
 
@@ -64,6 +67,9 @@ pub mod app_rocksky;
 #[cfg(feature = "art_cllctv")]
 pub mod art_cllctv;
 
+#[cfg(feature = "at_dropb")]
+pub mod at_dropb;
+
 #[cfg(feature = "at_inlay")]
 pub mod at_inlay;
 
@@ -99,6 +105,9 @@ pub mod blue_atplay;
 
 #[cfg(feature = "blue_atroom")]
 pub mod blue_atroom;
+
+#[cfg(feature = "blue_backyard")]
+pub mod blue_backyard;
 
 #[cfg(feature = "blue_linkat")]
 pub mod blue_linkat;
@@ -157,6 +166,9 @@ pub mod com_atprotofans;
 
 #[cfg(feature = "com_bad_example")]
 pub mod com_bad_example;
+
+#[cfg(feature = "com_chrisvanderloo")]
+pub mod com_chrisvanderloo;
 
 #[cfg(feature = "com_crabdance")]
 pub mod com_crabdance;
@@ -301,6 +313,9 @@ pub mod my_skylights;
 
 #[cfg(feature = "net_aftertheinter")]
 pub mod net_aftertheinter;
+
+#[cfg(feature = "net_alternativeproto")]
+pub mod net_alternativeproto;
 
 #[cfg(feature = "net_altq")]
 pub mod net_altq;
@@ -469,6 +484,9 @@ pub mod store__88x31;
 
 #[cfg(feature = "systems_timker")]
 pub mod systems_timker;
+
+#[cfg(feature = "tech_lenooby09")]
+pub mod tech_lenooby09;
 
 #[cfg(feature = "tech_manos")]
 pub mod tech_manos;

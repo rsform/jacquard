@@ -19,13 +19,13 @@
 #[serde(rename_all = "camelCase")]
 pub struct Paragraph<'a> {
     ///Array of inline content nodes (text, hard breaks, and mentions)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: std::option::Option<Vec<ParagraphContentItem<'a>>>,
+    pub content: core::option::Option<Vec<ParagraphContentItem<'a>>>,
     ///Facets for text formatting and features within this paragraph
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub facets: std::option::Option<Vec<crate::blog_pckt::richtext::facet::Facet<'a>>>,
+    pub facets: core::option::Option<Vec<crate::blog_pckt::richtext::facet::Facet<'a>>>,
 }
 
 #[jacquard_derive::open_union]
@@ -49,24 +49,24 @@ pub enum ParagraphContentItem<'a> {
     Mention(Box<crate::blog_pckt::block::mention::Mention<'a>>),
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Paragraph<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Paragraph<'a> {
     fn nsid() -> &'static str {
         "blog.pckt.block.paragraph"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_blog_pckt_block_paragraph()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-fn lexicon_doc_blog_pckt_block_paragraph() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_blog_pckt_block_paragraph() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

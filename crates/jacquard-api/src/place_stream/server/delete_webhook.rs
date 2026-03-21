@@ -56,10 +56,10 @@ pub struct DeleteWebhookOutput<'a> {
 pub enum DeleteWebhookError<'a> {
     /// The specified webhook was not found.
     #[serde(rename = "WebhookNotFound")]
-    WebhookNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    WebhookNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// The authenticated user does not have access to this webhook.
     #[serde(rename = "Unauthorized")]
-    Unauthorized(std::option::Option<jacquard_common::CowStr<'a>>),
+    Unauthorized(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for DeleteWebhookError<'_> {

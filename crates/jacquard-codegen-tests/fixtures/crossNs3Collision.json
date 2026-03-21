@@ -1,0 +1,39 @@
+{
+  "lexicon": 1,
+  "id": "test.ns3.collision",
+  "description": "Cross-namespace test: defines local Foo AND references test.ns1.defs#foo (collision + cross-ref).",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "An object with both a local Foo ref and a cross-namespace Foo ref.",
+      "required": ["localFoo", "externalFoo"],
+      "properties": {
+        "localFoo": {
+          "type": "ref",
+          "ref": "#foo"
+        },
+        "externalFoo": {
+          "type": "ref",
+          "ref": "test.ns1.defs#foo"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "foo": {
+      "type": "object",
+      "description": "A locally-defined Foo that shares a name with test.ns1.defs#foo.",
+      "required": ["localId"],
+      "properties": {
+        "localId": {
+          "type": "integer"
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 100
+        }
+      }
+    }
+  }
+}

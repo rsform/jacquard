@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.claimReview",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A review of a claim for ownership of game or organization records.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "claim",
+          "status",
+          "reviewedBy",
+          "createdAt"
+        ],
+        "properties": {
+          "approvedGames": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "claim": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "reason": {
+            "type": "string",
+            "maxGraphemes": 3000
+          },
+          "reviewedBy": {
+            "type": "string",
+            "format": "did"
+          },
+          "status": {
+            "type": "string",
+            "knownValues": [
+              "approved",
+              "denied"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

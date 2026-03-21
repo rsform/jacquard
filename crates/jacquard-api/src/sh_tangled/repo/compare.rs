@@ -56,16 +56,16 @@ pub struct CompareOutput {
 pub enum CompareError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// One or both revisions not found
     #[serde(rename = "RevisionNotFound")]
-    RevisionNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RevisionNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Failed to compare revisions
     #[serde(rename = "CompareError")]
-    CompareError(std::option::Option<jacquard_common::CowStr<'a>>),
+    CompareError(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for CompareError<'_> {
@@ -155,51 +155,51 @@ pub mod compare_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev2;
-        type Repo;
         type Rev1;
+        type Repo;
+        type Rev2;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev2 = Unset;
-        type Repo = Unset;
         type Rev1 = Unset;
-    }
-    ///State transition - sets the `rev2` field to Set
-    pub struct SetRev2<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev2<S> {}
-    impl<S: State> State for SetRev2<S> {
-        type Rev2 = Set<members::rev2>;
-        type Repo = S::Repo;
-        type Rev1 = S::Rev1;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Rev2 = S::Rev2;
-        type Repo = Set<members::repo>;
-        type Rev1 = S::Rev1;
+        type Repo = Unset;
+        type Rev2 = Unset;
     }
     ///State transition - sets the `rev1` field to Set
     pub struct SetRev1<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev1<S> {}
     impl<S: State> State for SetRev1<S> {
-        type Rev2 = S::Rev2;
-        type Repo = S::Repo;
         type Rev1 = Set<members::rev1>;
+        type Repo = S::Repo;
+        type Rev2 = S::Rev2;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Rev1 = S::Rev1;
+        type Repo = Set<members::repo>;
+        type Rev2 = S::Rev2;
+    }
+    ///State transition - sets the `rev2` field to Set
+    pub struct SetRev2<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev2<S> {}
+    impl<S: State> State for SetRev2<S> {
+        type Rev1 = S::Rev1;
+        type Repo = S::Repo;
+        type Rev2 = Set<members::rev2>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev2` field
-        pub struct rev2(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `rev1` field
         pub struct rev1(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `rev2` field
+        pub struct rev2(());
     }
 }
 
@@ -292,9 +292,9 @@ where
 impl<'a, S> CompareBuilder<'a, S>
 where
     S: compare_state::State,
-    S::Rev2: compare_state::IsSet,
-    S::Repo: compare_state::IsSet,
     S::Rev1: compare_state::IsSet,
+    S::Repo: compare_state::IsSet,
+    S::Rev2: compare_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Compare<'a> {

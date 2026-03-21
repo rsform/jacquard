@@ -18,12 +18,12 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Credit<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///The name to be used if there is no profile associated with this credit, or the profile is inaccessible.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub display_name: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub display_name: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The game to which this organization is being credited.
     #[serde(borrow)]
     pub game: crate::com_atproto::repo::strong_ref::StrongRef<'a>,
@@ -45,9 +45,9 @@ pub struct Credit<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CreditGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -94,19 +94,19 @@ impl jacquard_common::types::collection::Collection for CreditRecord {
     type Record = CreditRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Credit<'a> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.org.credit"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_games_gamesgamesgamesgames_org_credit()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.display_name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 640usize {
@@ -133,51 +133,51 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Roles;
-        type Game;
         type Org;
+        type Game;
+        type Roles;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Roles = Unset;
-        type Game = Unset;
         type Org = Unset;
-    }
-    ///State transition - sets the `roles` field to Set
-    pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoles<S> {}
-    impl<S: State> State for SetRoles<S> {
-        type Roles = Set<members::roles>;
-        type Game = S::Game;
-        type Org = S::Org;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Roles = S::Roles;
-        type Game = Set<members::game>;
-        type Org = S::Org;
+        type Game = Unset;
+        type Roles = Unset;
     }
     ///State transition - sets the `org` field to Set
     pub struct SetOrg<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOrg<S> {}
     impl<S: State> State for SetOrg<S> {
-        type Roles = S::Roles;
-        type Game = S::Game;
         type Org = Set<members::org>;
+        type Game = S::Game;
+        type Roles = S::Roles;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Org = S::Org;
+        type Game = Set<members::game>;
+        type Roles = S::Roles;
+    }
+    ///State transition - sets the `roles` field to Set
+    pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoles<S> {}
+    impl<S: State> State for SetRoles<S> {
+        type Org = S::Org;
+        type Game = S::Game;
+        type Roles = Set<members::roles>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `roles` field
-        pub struct roles(());
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `org` field
         pub struct org(());
+        ///Marker type for the `game` field
+        pub struct game(());
+        ///Marker type for the `roles` field
+        pub struct roles(());
     }
 }
 
@@ -310,9 +310,9 @@ where
 impl<'a, S> CreditBuilder<'a, S>
 where
     S: credit_state::State,
-    S::Roles: credit_state::IsSet,
-    S::Game: credit_state::IsSet,
     S::Org: credit_state::IsSet,
+    S::Game: credit_state::IsSet,
+    S::Roles: credit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
@@ -328,7 +328,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -344,7 +344,7 @@ where
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_games_gamesgamesgamesgames_org_credit() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

@@ -155,7 +155,7 @@ pub struct AddMemberOutput<'a> {
 pub enum AddMemberError<'a> {
     /// Member already exists in the team.
     #[serde(rename = "MemberAlreadyExists")]
-    MemberAlreadyExists(std::option::Option<jacquard_common::CowStr<'a>>),
+    MemberAlreadyExists(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for AddMemberError<'_> {
@@ -330,7 +330,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

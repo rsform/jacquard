@@ -19,36 +19,36 @@
 #[serde(rename_all = "camelCase")]
 pub struct Evaluation<'a> {
     ///Evaluation data (URIs or blobs) containing detailed reports or methodology
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: std::option::Option<Vec<EvaluationContentItem<'a>>>,
+    pub content: core::option::Option<Vec<EvaluationContentItem<'a>>>,
     ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
     ///DIDs of the evaluators
     #[serde(borrow)]
     pub evaluators: Vec<crate::app_certified::Did<'a>>,
     ///An optional reference for georeferenced evaluations. The record referenced must conform with the lexicon app.certified.location.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub location: std::option::Option<
+    pub location: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Optional references to the measurements that contributed to this evaluation. The record(s) referenced must conform with the lexicon org.hypercerts.context.measurement
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub measurements: std::option::Option<
+    pub measurements: core::option::Option<
         Vec<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
     >,
     ///Optional overall score for this evaluation on a numeric scale.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub score: std::option::Option<
+    pub score: core::option::Option<
         crate::org_hypercerts::context::evaluation::Score<'a>,
     >,
     ///A strong reference to what is being evaluated (e.g. activity, measurement, contribution, etc.)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: std::option::Option<
+    pub subject: core::option::Option<
         crate::com_atproto::repo::strong_ref::StrongRef<'a>,
     >,
     ///Brief evaluation summary
@@ -87,9 +87,9 @@ pub enum EvaluationContentItem<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct EvaluationGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -157,19 +157,19 @@ impl jacquard_common::types::collection::Collection for EvaluationRecord {
     type Record = EvaluationRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.evaluation"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_context_evaluation()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.content {
             #[allow(unused_comparisons)]
             if value.len() > 100usize {
@@ -243,19 +243,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Evaluation<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Score<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Score<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.context.evaluation"
     }
     fn def_name() -> &'static str {
         "score"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_context_evaluation()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -270,51 +270,51 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Evaluators;
         type Summary;
         type CreatedAt;
+        type Evaluators;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Evaluators = Unset;
         type Summary = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `evaluators` field to Set
-    pub struct SetEvaluators<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvaluators<S> {}
-    impl<S: State> State for SetEvaluators<S> {
-        type Evaluators = Set<members::evaluators>;
-        type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
+        type Evaluators = Unset;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
-        type Evaluators = S::Evaluators;
         type Summary = Set<members::summary>;
         type CreatedAt = S::CreatedAt;
+        type Evaluators = S::Evaluators;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Evaluators = S::Evaluators;
         type Summary = S::Summary;
         type CreatedAt = Set<members::created_at>;
+        type Evaluators = S::Evaluators;
+    }
+    ///State transition - sets the `evaluators` field to Set
+    pub struct SetEvaluators<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvaluators<S> {}
+    impl<S: State> State for SetEvaluators<S> {
+        type Summary = S::Summary;
+        type CreatedAt = S::CreatedAt;
+        type Evaluators = Set<members::evaluators>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `evaluators` field
-        pub struct evaluators(());
         ///Marker type for the `summary` field
         pub struct summary(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `evaluators` field
+        pub struct evaluators(());
     }
 }
 
@@ -509,9 +509,9 @@ where
 impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
-    S::Evaluators: evaluation_state::IsSet,
     S::Summary: evaluation_state::IsSet,
     S::CreatedAt: evaluation_state::IsSet,
+    S::Evaluators: evaluation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Evaluation<'a> {
@@ -530,7 +530,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -549,7 +549,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_context_evaluation() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hypercerts_context_evaluation() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -800,49 +800,49 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Max;
         type Min;
+        type Max;
         type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Max = Unset;
         type Min = Unset;
+        type Max = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `max` field to Set
-    pub struct SetMax<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMax<S> {}
-    impl<S: State> State for SetMax<S> {
-        type Max = Set<members::max>;
-        type Min = S::Min;
-        type Value = S::Value;
     }
     ///State transition - sets the `min` field to Set
     pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMin<S> {}
     impl<S: State> State for SetMin<S> {
-        type Max = S::Max;
         type Min = Set<members::min>;
+        type Max = S::Max;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `max` field to Set
+    pub struct SetMax<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMax<S> {}
+    impl<S: State> State for SetMax<S> {
+        type Min = S::Min;
+        type Max = Set<members::max>;
         type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Max = S::Max;
         type Min = S::Min;
+        type Max = S::Max;
         type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `max` field
-        pub struct max(());
         ///Marker type for the `min` field
         pub struct min(());
+        ///Marker type for the `max` field
+        pub struct max(());
         ///Marker type for the `value` field
         pub struct value(());
     }
@@ -937,8 +937,8 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
-    S::Max: score_state::IsSet,
     S::Min: score_state::IsSet,
+    S::Max: score_state::IsSet,
     S::Value: score_state::IsSet,
 {
     /// Build the final struct
@@ -953,7 +953,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

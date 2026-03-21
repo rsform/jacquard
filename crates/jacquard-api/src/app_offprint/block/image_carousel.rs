@@ -18,35 +18,35 @@
 #[serde(rename_all = "camelCase")]
 pub struct ImageCarousel<'a> {
     ///Auto-advance slides Defaults to `false`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_image_carousel_autoplay")]
-    pub autoplay: std::option::Option<bool>,
+    pub autoplay: core::option::Option<bool>,
     ///Carousel caption
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub caption: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub caption: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Array of images in the carousel (2-6)
     #[serde(borrow)]
     pub images: Vec<crate::app_offprint::block::image_grid::GridImage<'a>>,
     ///Milliseconds between slides Defaults to `3000`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_image_carousel_interval")]
-    pub interval: std::option::Option<i64>,
+    pub interval: core::option::Option<i64>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageCarousel<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageCarousel<'a> {
     fn nsid() -> &'static str {
         "app.offprint.block.imageCarousel"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_offprint_block_imageCarousel()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.images;
             #[allow(unused_comparisons)]
@@ -77,11 +77,11 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageCarousel<'a> {
     }
 }
 
-fn _default_image_carousel_autoplay() -> std::option::Option<bool> {
+fn _default_image_carousel_autoplay() -> core::option::Option<bool> {
     Some(false)
 }
 
-fn _default_image_carousel_interval() -> std::option::Option<i64> {
+fn _default_image_carousel_interval() -> core::option::Option<i64> {
     Some(3000i64)
 }
 
@@ -228,7 +228,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -243,7 +243,7 @@ where
     }
 }
 
-fn lexicon_doc_app_offprint_block_imageCarousel() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_offprint_block_imageCarousel() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

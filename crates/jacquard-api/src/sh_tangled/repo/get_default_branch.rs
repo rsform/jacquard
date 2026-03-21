@@ -32,25 +32,25 @@ pub struct GetDefaultBranch<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetDefaultBranchOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub author: std::option::Option<
+    pub author: core::option::Option<
         crate::sh_tangled::repo::get_default_branch::Signature<'a>,
     >,
     ///Latest commit hash on default branch
     #[serde(borrow)]
     pub hash: jacquard_common::CowStr<'a>,
     ///Latest commit message
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub message: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub message: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Default branch name
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
     ///Short commit hash
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub short_hash: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub short_hash: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp of latest commit
     pub when: jacquard_common::types::string::Datetime,
 }
@@ -72,10 +72,10 @@ pub struct GetDefaultBranchOutput<'a> {
 pub enum GetDefaultBranchError<'a> {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(std::option::Option<jacquard_common::CowStr<'a>>),
+    RepoNotFound(core::option::Option<jacquard_common::CowStr<'a>>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidRequest(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetDefaultBranchError<'_> {
@@ -148,19 +148,19 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetDefaultBranchRequest {
     type Response = GetDefaultBranchResponse;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Signature<'a> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.getDefaultBranch"
     }
     fn def_name() -> &'static str {
         "signature"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_sh_tangled_repo_getDefaultBranch()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -264,51 +264,51 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
         type Email;
         type Name;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
         type Email = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Email = S::Email;
-        type Name = S::Name;
+        type When = Unset;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmail<S> {}
     impl<S: State> State for SetEmail<S> {
-        type When = S::When;
         type Email = Set<members::email>;
         type Name = S::Name;
+        type When = S::When;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type When = S::When;
         type Email = S::Email;
         type Name = Set<members::name>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Email = S::Email;
+        type Name = S::Name;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `email` field
         pub struct email(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
@@ -401,9 +401,9 @@ where
 impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
-    S::When: signature_state::IsSet,
     S::Email: signature_state::IsSet,
     S::Name: signature_state::IsSet,
+    S::When: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
@@ -417,7 +417,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -431,7 +431,7 @@ where
     }
 }
 
-fn lexicon_doc_sh_tangled_repo_getDefaultBranch() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_sh_tangled_repo_getDefaultBranch() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

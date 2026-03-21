@@ -20,12 +20,12 @@
 pub struct UpdateEmail<'a> {
     #[serde(borrow)]
     pub email: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub email_auth_factor: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub email_auth_factor: core::option::Option<bool>,
     ///Requires a token from com.atproto.sever.requestEmailUpdate if the account's email has been confirmed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub token: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub token: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -44,11 +44,11 @@ pub struct UpdateEmail<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum UpdateEmailError<'a> {
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    ExpiredToken(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidToken")]
-    InvalidToken(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidToken(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "TokenRequired")]
-    TokenRequired(std::option::Option<jacquard_common::CowStr<'a>>),
+    TokenRequired(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for UpdateEmailError<'_> {

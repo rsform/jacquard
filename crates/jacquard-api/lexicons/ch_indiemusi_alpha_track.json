@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "ch.indiemusi.alpha.track",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An encrypted audio track. The audio blob is encrypted with AES-GCM-256, and the decryption key is wrapped and stored in grant records.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "audioBlob",
+          "encryptedContentIv",
+          "createdAt"
+        ],
+        "properties": {
+          "audioBlob": {
+            "type": "blob",
+            "description": "The encrypted audio file",
+            "accept": [
+              "audio/wav",
+              "audio/mpeg",
+              "audio/flac"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the track was uploaded",
+            "format": "datetime"
+          },
+          "encryptedContentIv": {
+            "type": "string",
+            "description": "Base64-encoded IV (12 bytes) used to encrypt the audio with the content key",
+            "maxLength": 32
+          },
+          "encryptionAlgorithm": {
+            "type": "string",
+            "description": "The symmetric algorithm used to encrypt the audio blob",
+            "default": "AES-GCM-256",
+            "maxLength": 50
+          },
+          "title": {
+            "type": "string",
+            "description": "Track title",
+            "maxLength": 255
+          }
+        }
+      }
+    }
+  }
+}

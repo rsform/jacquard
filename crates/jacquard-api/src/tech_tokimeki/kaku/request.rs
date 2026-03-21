@@ -20,23 +20,23 @@
 pub struct Request<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///Whether still accepting responses Defaults to `true`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_request_is_open")]
-    pub is_open: std::option::Option<bool>,
+    pub is_open: core::option::Option<bool>,
     ///Reference images for the request
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reference_images: std::option::Option<
+    pub reference_images: core::option::Option<
         Vec<jacquard_common::types::blob::BlobRef<'a>>,
     >,
     ///Tags for categorization
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Optional: specific artist to request
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub target_actor: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub target_actor: core::option::Option<jacquard_common::types::string::Did<'a>>,
     ///Description of what to draw
     #[serde(borrow)]
     pub text: jacquard_common::CowStr<'a>,
@@ -54,9 +54,9 @@ pub struct Request<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RequestGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -103,19 +103,19 @@ impl jacquard_common::types::collection::Collection for RequestRecord {
     type Record = RequestRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Request<'a> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.request"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tech_tokimeki_kaku_request()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.reference_images {
             #[allow(unused_comparisons)]
             if value.len() > 4usize {
@@ -176,7 +176,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Request<'a> {
     }
 }
 
-fn _default_request_is_open() -> std::option::Option<bool> {
+fn _default_request_is_open() -> core::option::Option<bool> {
     Some(true)
 }
 
@@ -385,7 +385,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -402,7 +402,7 @@ where
     }
 }
 
-fn lexicon_doc_tech_tokimeki_kaku_request() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tech_tokimeki_kaku_request() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

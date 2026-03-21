@@ -4,3 +4,4 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod ref_update;
+pub mod temp;

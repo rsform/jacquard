@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "com.chrisvanderloo.project",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A project for display on my website.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "repo",
+          "language"
+        ],
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "language": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "link": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "repo": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 120
+          }
+        }
+      }
+    }
+  }
+}

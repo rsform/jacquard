@@ -38,9 +38,9 @@ pub struct Issue<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IssueGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -87,19 +87,19 @@ impl jacquard_common::types::collection::Collection for IssueRecord {
     type Record = IssueRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Issue<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Issue<'a> {
     fn nsid() -> &'static str {
         "network.slices.tools.bug.issue"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_network_slices_tools_bug_issue()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -114,51 +114,51 @@ pub mod issue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Issue;
         type CreatedAt;
         type Bug;
-        type Issue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Issue = Unset;
         type CreatedAt = Unset;
         type Bug = Unset;
-        type Issue = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Bug = S::Bug;
-        type Issue = S::Issue;
-    }
-    ///State transition - sets the `bug` field to Set
-    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBug<S> {}
-    impl<S: State> State for SetBug<S> {
-        type CreatedAt = S::CreatedAt;
-        type Bug = Set<members::bug>;
-        type Issue = S::Issue;
     }
     ///State transition - sets the `issue` field to Set
     pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIssue<S> {}
     impl<S: State> State for SetIssue<S> {
+        type Issue = Set<members::issue>;
         type CreatedAt = S::CreatedAt;
         type Bug = S::Bug;
-        type Issue = Set<members::issue>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Issue = S::Issue;
+        type CreatedAt = Set<members::created_at>;
+        type Bug = S::Bug;
+    }
+    ///State transition - sets the `bug` field to Set
+    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBug<S> {}
+    impl<S: State> State for SetBug<S> {
+        type Issue = S::Issue;
+        type CreatedAt = S::CreatedAt;
+        type Bug = Set<members::bug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `issue` field
+        pub struct issue(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `bug` field
         pub struct bug(());
-        ///Marker type for the `issue` field
-        pub struct issue(());
     }
 }
 
@@ -251,9 +251,9 @@ where
 impl<'a, S> IssueBuilder<'a, S>
 where
     S: issue_state::State,
+    S::Issue: issue_state::IsSet,
     S::CreatedAt: issue_state::IsSet,
     S::Bug: issue_state::IsSet,
-    S::Issue: issue_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Issue<'a> {
@@ -267,7 +267,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -281,7 +281,7 @@ where
     }
 }
 
-fn lexicon_doc_network_slices_tools_bug_issue() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_network_slices_tools_bug_issue() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

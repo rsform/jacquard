@@ -19,33 +19,35 @@
 #[serde(rename_all = "camelCase")]
 pub struct WorkScopeTag<'a> {
     ///Optional array of alternative names or identifiers for this scope.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub aliases: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub aliases: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Optional longer description of this scope.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional external reference for this scope as a URI or blob.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub external_reference: std::option::Option<WorkScopeTagExternalReference<'a>>,
+    pub external_reference: core::option::Option<WorkScopeTagExternalReference<'a>>,
     ///Lowercase, hyphenated machine-readable key for this scope (e.g., 'ipfs', 'go-lang', 'filecoin').
     #[serde(borrow)]
     pub key: jacquard_common::CowStr<'a>,
     ///Category type of this scope. Recommended values: topic, language, domain, method, tag.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub kind: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub kind: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Human-readable label for this scope.
     #[serde(borrow)]
     pub label: jacquard_common::CowStr<'a>,
     ///Optional strong reference to a parent scope record for taxonomy/hierarchy support.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub parent: std::option::Option<crate::com_atproto::repo::strong_ref::StrongRef<'a>>,
+    pub parent: core::option::Option<
+        crate::com_atproto::repo::strong_ref::StrongRef<'a>,
+    >,
 }
 
 #[jacquard_derive::open_union]
@@ -79,9 +81,9 @@ pub enum WorkScopeTagExternalReference<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct WorkScopeTagGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -128,19 +130,19 @@ impl jacquard_common::types::collection::Collection for WorkScopeTagRecord {
     type Record = WorkScopeTagRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for WorkScopeTag<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.helper.workScopeTag"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_helper_workScopeTag()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.aliases {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
@@ -235,51 +237,51 @@ pub mod work_scope_tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Key;
         type Label;
+        type Key;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Key = Unset;
         type Label = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Key = S::Key;
-        type Label = S::Label;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type CreatedAt = S::CreatedAt;
-        type Key = Set<members::key>;
-        type Label = S::Label;
+        type Key = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `label` field to Set
     pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLabel<S> {}
     impl<S: State> State for SetLabel<S> {
-        type CreatedAt = S::CreatedAt;
-        type Key = S::Key;
         type Label = Set<members::label>;
+        type Key = S::Key;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Label = S::Label;
+        type Key = Set<members::key>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Label = S::Label;
+        type Key = S::Key;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `label` field
         pub struct label(());
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -469,9 +471,9 @@ impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
 impl<'a, S> WorkScopeTagBuilder<'a, S>
 where
     S: work_scope_tag_state::State,
-    S::CreatedAt: work_scope_tag_state::IsSet,
-    S::Key: work_scope_tag_state::IsSet,
     S::Label: work_scope_tag_state::IsSet,
+    S::Key: work_scope_tag_state::IsSet,
+    S::CreatedAt: work_scope_tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WorkScopeTag<'a> {
@@ -490,7 +492,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -509,7 +511,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hypercerts_helper_workScopeTag() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

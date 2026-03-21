@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct BlobReference<'a> {
     ///Optional OCI annotation metadata. Map of string keys to string values.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub annotations: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub annotations: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///Content digest (e.g., 'sha256:...')
     #[serde(borrow)]
     pub digest: jacquard_common::CowStr<'a>,
@@ -31,9 +31,9 @@ pub struct BlobReference<'a> {
     ///Size in bytes
     pub size: i64,
     ///Optional direct URLs to blob (for BYOS)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub urls: std::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
+    pub urls: core::option::Option<Vec<jacquard_common::types::string::UriValue<'a>>>,
 }
 
 /// A container image manifest following OCI specification, stored in ATProto
@@ -50,38 +50,40 @@ pub struct BlobReference<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct Manifest<'a> {
     ///Optional OCI annotation metadata. Map of string keys to string values (e.g., org.opencontainers.image.title → 'My App').
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub annotations: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub annotations: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///Reference to image configuration blob
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub config: std::option::Option<crate::io_atcr::manifest::BlobReference<'a>>,
+    pub config: core::option::Option<crate::io_atcr::manifest::BlobReference<'a>>,
     ///Record creation timestamp
     pub created_at: jacquard_common::types::string::Datetime,
     ///Content digest (e.g., 'sha256:abc123...')
     #[serde(borrow)]
     pub digest: jacquard_common::CowStr<'a>,
     ///DID of the hold service where blobs are stored (e.g., 'did:web:hold01.atcr.io'). Primary reference for hold resolution.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hold_did: std::option::Option<jacquard_common::types::string::Did<'a>>,
+    pub hold_did: core::option::Option<jacquard_common::types::string::Did<'a>>,
     ///Hold service endpoint URL where blobs are stored. DEPRECATED: Use holdDid instead. Kept for backward compatibility.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hold_endpoint: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub hold_endpoint: core::option::Option<
+        jacquard_common::types::string::UriValue<'a>,
+    >,
     ///Filesystem layers (for image manifests)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub layers: std::option::Option<Vec<crate::io_atcr::manifest::BlobReference<'a>>>,
+    pub layers: core::option::Option<Vec<crate::io_atcr::manifest::BlobReference<'a>>>,
     ///The full OCI manifest stored as a blob in ATProto.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub manifest_blob: std::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
+    pub manifest_blob: core::option::Option<jacquard_common::types::blob::BlobRef<'a>>,
     ///Referenced manifests (for manifest lists/indexes)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub manifests: std::option::Option<
+    pub manifests: core::option::Option<
         Vec<crate::io_atcr::manifest::ManifestReference<'a>>,
     >,
     ///OCI media type
@@ -93,9 +95,9 @@ pub struct Manifest<'a> {
     ///OCI schema version (typically 2)
     pub schema_version: i64,
     ///Optional reference to another manifest (for attestations, signatures)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject: std::option::Option<crate::io_atcr::manifest::BlobReference<'a>>,
+    pub subject: core::option::Option<crate::io_atcr::manifest::BlobReference<'a>>,
 }
 
 /// OCI media type
@@ -241,9 +243,9 @@ impl jacquard_common::IntoStatic for ManifestMediaType<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ManifestGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -264,9 +266,9 @@ pub struct ManifestGetRecordOutput<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ManifestReference<'a> {
     ///Optional OCI annotation metadata. Map of string keys to string values.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub annotations: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub annotations: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///Content digest (e.g., 'sha256:...')
     #[serde(borrow)]
     pub digest: jacquard_common::CowStr<'a>,
@@ -274,9 +276,9 @@ pub struct ManifestReference<'a> {
     #[serde(borrow)]
     pub media_type: jacquard_common::CowStr<'a>,
     ///Platform information for this manifest
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub platform: std::option::Option<crate::io_atcr::manifest::Platform<'a>>,
+    pub platform: core::option::Option<crate::io_atcr::manifest::Platform<'a>>,
     ///Size in bytes
     pub size: i64,
 }
@@ -302,17 +304,17 @@ pub struct Platform<'a> {
     #[serde(borrow)]
     pub os: jacquard_common::CowStr<'a>,
     ///Optional OS features
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub os_features: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub os_features: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Optional OS version
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub os_version: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub os_version: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Optional CPU variant (e.g., 'v7' for ARM)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub variant: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub variant: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 impl<'a> Manifest<'a> {
@@ -328,19 +330,19 @@ impl<'a> Manifest<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobReference<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobReference<'a> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
     fn def_name() -> &'static str {
         "blobReference"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_manifest()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.digest;
             #[allow(unused_comparisons)]
@@ -398,19 +400,19 @@ impl jacquard_common::types::collection::Collection for ManifestRecord {
     type Record = ManifestRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_manifest()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.digest;
             #[allow(unused_comparisons)]
@@ -454,19 +456,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Manifest<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestReference<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ManifestReference<'a> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
     fn def_name() -> &'static str {
         "manifestReference"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_manifest()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.digest;
             #[allow(unused_comparisons)]
@@ -497,19 +499,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ManifestReference<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Platform<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Platform<'a> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
     fn def_name() -> &'static str {
         "platform"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_io_atcr_manifest()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.architecture;
             #[allow(unused_comparisons)]
@@ -574,51 +576,51 @@ pub mod blob_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Size;
-        type Digest;
         type MediaType;
+        type Digest;
+        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Size = Unset;
-        type Digest = Unset;
         type MediaType = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Size = Set<members::size>;
-        type Digest = S::Digest;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Size = S::Size;
-        type Digest = Set<members::digest>;
-        type MediaType = S::MediaType;
+        type Digest = Unset;
+        type Size = Unset;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
-        type Size = S::Size;
-        type Digest = S::Digest;
         type MediaType = Set<members::media_type>;
+        type Digest = S::Digest;
+        type Size = S::Size;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type MediaType = S::MediaType;
+        type Digest = Set<members::digest>;
+        type Size = S::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type MediaType = S::MediaType;
+        type Digest = S::Digest;
+        type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `size` field
-        pub struct size(());
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
+        ///Marker type for the `size` field
+        pub struct size(());
     }
 }
 
@@ -751,9 +753,9 @@ impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
 impl<'a, S> BlobReferenceBuilder<'a, S>
 where
     S: blob_reference_state::State,
-    S::Size: blob_reference_state::IsSet,
-    S::Digest: blob_reference_state::IsSet,
     S::MediaType: blob_reference_state::IsSet,
+    S::Digest: blob_reference_state::IsSet,
+    S::Size: blob_reference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlobReference<'a> {
@@ -769,7 +771,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -785,7 +787,7 @@ where
     }
 }
 
-fn lexicon_doc_io_atcr_manifest() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+fn lexicon_doc_io_atcr_manifest() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
     ::jacquard_lexicon::lexicon::LexiconDoc {
         lexicon: ::jacquard_lexicon::lexicon::Lexicon::Lexicon1,
         id: ::jacquard_common::CowStr::new_static("io.atcr.manifest"),
@@ -1399,85 +1401,85 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SchemaVersion;
         type Digest;
-        type MediaType;
+        type SchemaVersion;
         type CreatedAt;
         type Repository;
+        type MediaType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SchemaVersion = Unset;
         type Digest = Unset;
-        type MediaType = Unset;
+        type SchemaVersion = Unset;
         type CreatedAt = Unset;
         type Repository = Unset;
-    }
-    ///State transition - sets the `schema_version` field to Set
-    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
-    impl<S: State> State for SetSchemaVersion<S> {
-        type SchemaVersion = Set<members::schema_version>;
-        type Digest = S::Digest;
-        type MediaType = S::MediaType;
-        type CreatedAt = S::CreatedAt;
-        type Repository = S::Repository;
+        type MediaType = Unset;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
-        type SchemaVersion = S::SchemaVersion;
         type Digest = Set<members::digest>;
-        type MediaType = S::MediaType;
-        type CreatedAt = S::CreatedAt;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
         type SchemaVersion = S::SchemaVersion;
-        type Digest = S::Digest;
-        type MediaType = Set<members::media_type>;
         type CreatedAt = S::CreatedAt;
         type Repository = S::Repository;
+        type MediaType = S::MediaType;
+    }
+    ///State transition - sets the `schema_version` field to Set
+    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
+    impl<S: State> State for SetSchemaVersion<S> {
+        type Digest = S::Digest;
+        type SchemaVersion = Set<members::schema_version>;
+        type CreatedAt = S::CreatedAt;
+        type Repository = S::Repository;
+        type MediaType = S::MediaType;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SchemaVersion = S::SchemaVersion;
         type Digest = S::Digest;
-        type MediaType = S::MediaType;
+        type SchemaVersion = S::SchemaVersion;
         type CreatedAt = Set<members::created_at>;
         type Repository = S::Repository;
+        type MediaType = S::MediaType;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
-        type SchemaVersion = S::SchemaVersion;
         type Digest = S::Digest;
-        type MediaType = S::MediaType;
+        type SchemaVersion = S::SchemaVersion;
         type CreatedAt = S::CreatedAt;
         type Repository = Set<members::repository>;
+        type MediaType = S::MediaType;
+    }
+    ///State transition - sets the `media_type` field to Set
+    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMediaType<S> {}
+    impl<S: State> State for SetMediaType<S> {
+        type Digest = S::Digest;
+        type SchemaVersion = S::SchemaVersion;
+        type CreatedAt = S::CreatedAt;
+        type Repository = S::Repository;
+        type MediaType = Set<members::media_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `schema_version` field
-        pub struct schema_version(());
         ///Marker type for the `digest` field
         pub struct digest(());
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
+        ///Marker type for the `schema_version` field
+        pub struct schema_version(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `repository` field
         pub struct repository(());
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
     }
 }
 
@@ -1784,11 +1786,11 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
-    S::SchemaVersion: manifest_state::IsSet,
     S::Digest: manifest_state::IsSet,
-    S::MediaType: manifest_state::IsSet,
+    S::SchemaVersion: manifest_state::IsSet,
     S::CreatedAt: manifest_state::IsSet,
     S::Repository: manifest_state::IsSet,
+    S::MediaType: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {
@@ -1812,7 +1814,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -1846,51 +1848,51 @@ pub mod manifest_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
-        type MediaType;
         type Size;
+        type MediaType;
+        type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
-        type MediaType = Unset;
         type Size = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Digest = Set<members::digest>;
-        type MediaType = S::MediaType;
-        type Size = S::Size;
-    }
-    ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
-        type Digest = S::Digest;
-        type MediaType = Set<members::media_type>;
-        type Size = S::Size;
+        type MediaType = Unset;
+        type Digest = Unset;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type Digest = S::Digest;
-        type MediaType = S::MediaType;
         type Size = Set<members::size>;
+        type MediaType = S::MediaType;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `media_type` field to Set
+    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMediaType<S> {}
+    impl<S: State> State for SetMediaType<S> {
+        type Size = S::Size;
+        type MediaType = Set<members::media_type>;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type Size = S::Size;
+        type MediaType = S::MediaType;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
         ///Marker type for the `size` field
         pub struct size(());
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
     }
 }
 
@@ -2023,9 +2025,9 @@ where
 impl<'a, S> ManifestReferenceBuilder<'a, S>
 where
     S: manifest_reference_state::State,
-    S::Digest: manifest_reference_state::IsSet,
-    S::MediaType: manifest_reference_state::IsSet,
     S::Size: manifest_reference_state::IsSet,
+    S::MediaType: manifest_reference_state::IsSet,
+    S::Digest: manifest_reference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ManifestReference<'a> {
@@ -2041,7 +2043,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

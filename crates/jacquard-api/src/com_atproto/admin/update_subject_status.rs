@@ -17,14 +17,14 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateSubjectStatus<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub deactivated: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub deactivated: core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
     #[serde(borrow)]
     pub subject: UpdateSubjectStatusSubject<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub takedown: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub takedown: core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -62,9 +62,9 @@ pub enum UpdateSubjectStatusSubject<'a> {
 pub struct UpdateSubjectStatusOutput<'a> {
     #[serde(borrow)]
     pub subject: UpdateSubjectStatusOutputSubject<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub takedown: std::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
+    pub takedown: core::option::Option<crate::com_atproto::admin::StatusAttr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -253,7 +253,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

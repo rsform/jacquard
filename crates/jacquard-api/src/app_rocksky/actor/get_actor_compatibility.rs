@@ -33,9 +33,9 @@ pub struct GetActorCompatibility<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetActorCompatibilityOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub compatibility: std::option::Option<
+    pub compatibility: core::option::Option<
         crate::app_rocksky::actor::CompatibilityViewBasic<'a>,
     >,
 }

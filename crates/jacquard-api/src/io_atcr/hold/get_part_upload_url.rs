@@ -37,14 +37,14 @@ pub struct GetPartUploadUrl<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct GetPartUploadUrlOutput<'a> {
     ///Additional headers required for the request (e.g., content-type)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub headers: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub headers: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///HTTP method to use (usually PUT) Defaults to `"PUT"`.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(default = "_default_get_part_upload_url_output_method")]
     #[serde(borrow)]
-    pub method: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub method: core::option::Option<jacquard_common::CowStr<'a>>,
     ///URL to PUT the part data to
     #[serde(borrow)]
     pub url: jacquard_common::types::string::UriValue<'a>,
@@ -66,9 +66,9 @@ pub struct GetPartUploadUrlOutput<'a> {
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum GetPartUploadUrlError<'a> {
     #[serde(rename = "InvalidUploadId")]
-    InvalidUploadId(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidUploadId(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidPartNumber")]
-    InvalidPartNumber(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidPartNumber(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for GetPartUploadUrlError<'_> {
@@ -250,7 +250,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -263,7 +263,7 @@ where
     }
 }
 
-fn _default_get_part_upload_url_output_method() -> std::option::Option<
+fn _default_get_part_upload_url_output_method() -> core::option::Option<
     jacquard_common::CowStr<'static>,
 > {
     Some(jacquard_common::CowStr::from("PUT"))

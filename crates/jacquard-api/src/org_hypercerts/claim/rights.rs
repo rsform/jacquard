@@ -19,9 +19,9 @@
 #[serde(rename_all = "camelCase")]
 pub struct Rights<'a> {
     ///An attachment to define the rights further, e.g. a legal document.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub attachment: std::option::Option<RightsAttachment<'a>>,
+    pub attachment: core::option::Option<RightsAttachment<'a>>,
     ///Client-declared timestamp when this record was originally created
     pub created_at: jacquard_common::types::string::Datetime,
     ///Detailed explanation of the rights holders' permissions, restrictions, and conditions
@@ -66,9 +66,9 @@ pub enum RightsAttachment<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RightsGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -115,19 +115,19 @@ impl jacquard_common::types::collection::Collection for RightsRecord {
     type Record = RightsRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Rights<'a> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.rights"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_hypercerts_claim_rights()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.rights_description;
             #[allow(unused_comparisons)]
@@ -200,67 +200,67 @@ pub mod rights_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type RightsDescription;
         type RightsName;
         type RightsType;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type RightsDescription = Unset;
         type RightsName = Unset;
         type RightsType = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `rights_description` field to Set
-    pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
-    impl<S: State> State for SetRightsDescription<S> {
-        type RightsDescription = Set<members::rights_description>;
-        type RightsName = S::RightsName;
-        type RightsType = S::RightsType;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `rights_name` field to Set
-    pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsName<S> {}
-    impl<S: State> State for SetRightsName<S> {
-        type RightsDescription = S::RightsDescription;
-        type RightsName = Set<members::rights_name>;
-        type RightsType = S::RightsType;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `rights_type` field to Set
-    pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsType<S> {}
-    impl<S: State> State for SetRightsType<S> {
-        type RightsDescription = S::RightsDescription;
-        type RightsName = S::RightsName;
-        type RightsType = Set<members::rights_type>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type RightsDescription = S::RightsDescription;
         type RightsName = S::RightsName;
         type RightsType = S::RightsType;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `rights_description` field to Set
+    pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
+    impl<S: State> State for SetRightsDescription<S> {
+        type CreatedAt = S::CreatedAt;
+        type RightsDescription = Set<members::rights_description>;
+        type RightsName = S::RightsName;
+        type RightsType = S::RightsType;
+    }
+    ///State transition - sets the `rights_name` field to Set
+    pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRightsName<S> {}
+    impl<S: State> State for SetRightsName<S> {
+        type CreatedAt = S::CreatedAt;
+        type RightsDescription = S::RightsDescription;
+        type RightsName = Set<members::rights_name>;
+        type RightsType = S::RightsType;
+    }
+    ///State transition - sets the `rights_type` field to Set
+    pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRightsType<S> {}
+    impl<S: State> State for SetRightsType<S> {
+        type CreatedAt = S::CreatedAt;
+        type RightsDescription = S::RightsDescription;
+        type RightsName = S::RightsName;
+        type RightsType = Set<members::rights_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `rights_description` field
         pub struct rights_description(());
         ///Marker type for the `rights_name` field
         pub struct rights_name(());
         ///Marker type for the `rights_type` field
         pub struct rights_type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -387,10 +387,10 @@ where
 impl<'a, S> RightsBuilder<'a, S>
 where
     S: rights_state::State,
+    S::CreatedAt: rights_state::IsSet,
     S::RightsDescription: rights_state::IsSet,
     S::RightsName: rights_state::IsSet,
     S::RightsType: rights_state::IsSet,
-    S::CreatedAt: rights_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rights<'a> {
@@ -406,7 +406,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -422,7 +422,7 @@ where
     }
 }
 
-fn lexicon_doc_org_hypercerts_claim_rights() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_hypercerts_claim_rights() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

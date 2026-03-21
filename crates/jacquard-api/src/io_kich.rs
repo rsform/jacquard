@@ -4,6 +4,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 pub mod accomplishment;
+pub mod cookinglog;
 pub mod graph;
 pub mod profile;
 pub mod recipe;

@@ -18,16 +18,16 @@
 #[serde(rename_all = "camelCase")]
 pub struct UpdateReadingProgress<'a> {
     ///The entry the user is currently on.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub current_entry: std::option::Option<jacquard_common::types::string::AtUri<'a>>,
+    pub current_entry: core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     #[serde(borrow)]
     pub notebook: jacquard_common::types::string::AtUri<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub percent_complete: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub percent_complete: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<UpdateReadingProgressStatus<'a>>,
+    pub status: core::option::Option<UpdateReadingProgressStatus<'a>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -338,7 +338,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

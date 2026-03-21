@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.git.temp.getBlob",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path within the repository tree"
+          },
+          "ref": {
+            "type": "string",
+            "description": "Git reference (branch, tag, or commit SHA)",
+            "default": "HEAD"
+          },
+          "repo": {
+            "type": "string",
+            "description": "AT-URI of the repository",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "description": "raw blob served in octet-stream",
+        "encoding": "*/*"
+      },
+      "errors": [
+        {
+          "description": "Repository not found or access denied",
+          "name": "RepoNotFound"
+        },
+        {
+          "description": "Blob not found",
+          "name": "BlobNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    }
+  }
+}

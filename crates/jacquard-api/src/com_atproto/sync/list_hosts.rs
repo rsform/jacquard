@@ -18,17 +18,17 @@
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Host<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub account_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub account_count: core::option::Option<i64>,
     ///hostname of server; not a URL (no scheme)
     #[serde(borrow)]
     pub hostname: jacquard_common::CowStr<'a>,
     ///Recent repo stream event sequence number. May be delayed from actual stream processing (eg, persisted cursor not in-memory cursor).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub seq: std::option::Option<i64>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub seq: core::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<crate::com_atproto::sync::HostStatus<'a>>,
+    pub status: core::option::Option<crate::com_atproto::sync::HostStatus<'a>>,
 }
 
 #[derive(
@@ -42,13 +42,13 @@ pub struct Host<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListHosts<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Defaults to `200`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub limit: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub limit: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -63,27 +63,27 @@ pub struct ListHosts<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListHostsOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cursor: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub cursor: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Sort order is not formally specified. Recommended order is by time host was first seen by the server, with oldest first.
     #[serde(borrow)]
     pub hosts: Vec<crate::com_atproto::sync::list_hosts::Host<'a>>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Host<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Host<'a> {
     fn nsid() -> &'static str {
         "com.atproto.sync.listHosts"
     }
     fn def_name() -> &'static str {
         "host"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_com_atproto_sync_listHosts()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -114,7 +114,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListHostsRequest {
     type Response = ListHostsResponse;
 }
 
-fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_com_atproto_sync_listHosts() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -253,7 +253,7 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> ::jacquard_lexicon::lexicon::Lexi
     }
 }
 
-fn _default_limit() -> std::option::Option<i64> {
+fn _default_limit() -> core::option::Option<i64> {
     Some(200i64)
 }
 

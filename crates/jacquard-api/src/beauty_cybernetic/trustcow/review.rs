@@ -21,19 +21,19 @@ pub struct Review<'a> {
     ///When the review was created
     pub created_at: jacquard_common::types::string::Datetime,
     ///The detailed review text
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub description: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub description: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Rating score from 1 to 5
     pub rating: i64,
     ///Whether this review is from the service provider or consumer
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub reviewer_role: std::option::Option<ReviewReviewerRole<'a>>,
+    pub reviewer_role: core::option::Option<ReviewReviewerRole<'a>>,
     ///The title of the review
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub title: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub title: core::option::Option<jacquard_common::CowStr<'a>>,
     ///AT URI reference to the transaction record (at://did/beauty.cybernetic.trustcow.transaction/rkey)
     #[serde(borrow)]
     pub transaction: jacquard_common::CowStr<'a>,
@@ -140,9 +140,9 @@ impl jacquard_common::IntoStatic for ReviewReviewerRole<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ReviewGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -189,19 +189,19 @@ impl jacquard_common::types::collection::Collection for ReviewRecord {
     type Record = ReviewRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Review<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Review<'a> {
     fn nsid() -> &'static str {
         "beauty.cybernetic.trustcow.review"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_beauty_cybernetic_trustcow_review()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {
@@ -264,51 +264,51 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rating;
-        type CreatedAt;
         type Transaction;
+        type CreatedAt;
+        type Rating;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rating = Unset;
-        type CreatedAt = Unset;
         type Transaction = Unset;
-    }
-    ///State transition - sets the `rating` field to Set
-    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRating<S> {}
-    impl<S: State> State for SetRating<S> {
-        type Rating = Set<members::rating>;
-        type CreatedAt = S::CreatedAt;
-        type Transaction = S::Transaction;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Rating = S::Rating;
-        type CreatedAt = Set<members::created_at>;
-        type Transaction = S::Transaction;
+        type CreatedAt = Unset;
+        type Rating = Unset;
     }
     ///State transition - sets the `transaction` field to Set
     pub struct SetTransaction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTransaction<S> {}
     impl<S: State> State for SetTransaction<S> {
-        type Rating = S::Rating;
-        type CreatedAt = S::CreatedAt;
         type Transaction = Set<members::transaction>;
+        type CreatedAt = S::CreatedAt;
+        type Rating = S::Rating;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Transaction = S::Transaction;
+        type CreatedAt = Set<members::created_at>;
+        type Rating = S::Rating;
+    }
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRating<S> {}
+    impl<S: State> State for SetRating<S> {
+        type Transaction = S::Transaction;
+        type CreatedAt = S::CreatedAt;
+        type Rating = Set<members::rating>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rating` field
-        pub struct rating(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `transaction` field
         pub struct transaction(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `rating` field
+        pub struct rating(());
     }
 }
 
@@ -455,9 +455,9 @@ where
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::Rating: review_state::IsSet,
-    S::CreatedAt: review_state::IsSet,
     S::Transaction: review_state::IsSet,
+    S::CreatedAt: review_state::IsSet,
+    S::Rating: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
@@ -474,7 +474,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -491,7 +491,7 @@ where
     }
 }
 
-fn lexicon_doc_beauty_cybernetic_trustcow_review() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_beauty_cybernetic_trustcow_review() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

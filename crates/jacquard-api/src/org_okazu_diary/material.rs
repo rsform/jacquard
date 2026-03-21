@@ -26,19 +26,19 @@ pub struct Tag<'a> {
     pub value: jacquard_common::CowStr<'a>,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
     fn nsid() -> &'static str {
         "org.okazu-diary.material.defs"
     }
     fn def_name() -> &'static str {
         "tag"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_org_okazu_diary_material_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.value;
             #[allow(unused_comparisons)]
@@ -69,7 +69,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Tag<'a> {
     }
 }
 
-fn lexicon_doc_org_okazu_diary_material_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_org_okazu_diary_material_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

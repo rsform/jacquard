@@ -34,15 +34,15 @@ pub struct DisableRule<'a> {}
 pub struct Postgate<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     ///List of AT-URIs embedding this post that the author has detached from.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub detached_embedding_uris: std::option::Option<
+    pub detached_embedding_uris: core::option::Option<
         Vec<jacquard_common::types::string::AtUri<'a>>,
     >,
     ///List of rules defining who can embed this post. If value is an empty array or is undefined, no particular rules apply and anyone can embed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub embedding_rules: std::option::Option<
+    pub embedding_rules: core::option::Option<
         Vec<crate::app_bsky::feed::postgate::DisableRule<'a>>,
     >,
     ///Reference (AT-URI) to the post record.
@@ -62,9 +62,9 @@ pub struct Postgate<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct PostgateGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -84,19 +84,19 @@ impl<'a> Postgate<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for DisableRule<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for DisableRule<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.postgate"
     }
     fn def_name() -> &'static str {
         "disableRule"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_postgate()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -128,19 +128,19 @@ impl jacquard_common::types::collection::Collection for PostgateRecord {
     type Record = PostgateRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Postgate<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Postgate<'a> {
     fn nsid() -> &'static str {
         "app.bsky.feed.postgate"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_bsky_feed_postgate()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.detached_embedding_uris {
             #[allow(unused_comparisons)]
             if value.len() > 50usize {
@@ -169,7 +169,7 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Postgate<'a> {
     }
 }
 
-fn lexicon_doc_app_bsky_feed_postgate() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_bsky_feed_postgate() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -487,7 +487,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,

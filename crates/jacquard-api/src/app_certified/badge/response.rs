@@ -27,9 +27,9 @@ pub struct Response<'a> {
     #[serde(borrow)]
     pub response: ResponseResponse<'a>,
     ///Optional relative weight for accepted badges, assigned by the recipient.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub weight: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub weight: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// The recipient’s response for the badge (accepted or rejected).
@@ -133,9 +133,9 @@ impl jacquard_common::IntoStatic for ResponseResponse<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResponseGetRecordOutput<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
     #[serde(borrow)]
     pub uri: jacquard_common::types::string::AtUri<'a>,
     #[serde(borrow)]
@@ -182,19 +182,19 @@ impl jacquard_common::types::collection::Collection for ResponseRecord {
     type Record = ResponseRecord;
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Response<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Response<'a> {
     fn nsid() -> &'static str {
         "app.certified.badge.response"
     }
     fn def_name() -> &'static str {
         "main"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_app_certified_badge_response()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.weight {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -221,51 +221,51 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BadgeAward;
-        type Response;
         type CreatedAt;
+        type Response;
+        type BadgeAward;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BadgeAward = Unset;
-        type Response = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `badge_award` field to Set
-    pub struct SetBadgeAward<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadgeAward<S> {}
-    impl<S: State> State for SetBadgeAward<S> {
-        type BadgeAward = Set<members::badge_award>;
-        type Response = S::Response;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `response` field to Set
-    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResponse<S> {}
-    impl<S: State> State for SetResponse<S> {
-        type BadgeAward = S::BadgeAward;
-        type Response = Set<members::response>;
-        type CreatedAt = S::CreatedAt;
+        type Response = Unset;
+        type BadgeAward = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type BadgeAward = S::BadgeAward;
-        type Response = S::Response;
         type CreatedAt = Set<members::created_at>;
+        type Response = S::Response;
+        type BadgeAward = S::BadgeAward;
+    }
+    ///State transition - sets the `response` field to Set
+    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResponse<S> {}
+    impl<S: State> State for SetResponse<S> {
+        type CreatedAt = S::CreatedAt;
+        type Response = Set<members::response>;
+        type BadgeAward = S::BadgeAward;
+    }
+    ///State transition - sets the `badge_award` field to Set
+    pub struct SetBadgeAward<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBadgeAward<S> {}
+    impl<S: State> State for SetBadgeAward<S> {
+        type CreatedAt = S::CreatedAt;
+        type Response = S::Response;
+        type BadgeAward = Set<members::badge_award>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `badge_award` field
-        pub struct badge_award(());
-        ///Marker type for the `response` field
-        pub struct response(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `response` field
+        pub struct response(());
+        ///Marker type for the `badge_award` field
+        pub struct badge_award(());
     }
 }
 
@@ -375,9 +375,9 @@ impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::BadgeAward: response_state::IsSet,
-    S::Response: response_state::IsSet,
     S::CreatedAt: response_state::IsSet,
+    S::Response: response_state::IsSet,
+    S::BadgeAward: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
@@ -392,7 +392,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -407,7 +407,7 @@ where
     }
 }
 
-fn lexicon_doc_app_certified_badge_response() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_app_certified_badge_response() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {

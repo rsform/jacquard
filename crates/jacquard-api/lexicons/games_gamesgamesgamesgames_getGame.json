@@ -8,12 +8,60 @@
       "parameters": {
         "type": "params",
         "properties": {
+          "appleAppStoreId": {
+            "type": "string",
+            "description": "Look up a game by its Apple App Store external ID."
+          },
+          "epicGamesId": {
+            "type": "string",
+            "description": "Look up a game by its Epic Games external ID."
+          },
+          "gogId": {
+            "type": "string",
+            "description": "Look up a game by its GOG external ID."
+          },
+          "googlePlayId": {
+            "type": "string",
+            "description": "Look up a game by its Google Play external ID."
+          },
+          "humbleBundleId": {
+            "type": "string",
+            "description": "Look up a game by its Humble Bundle external ID."
+          },
+          "igdbId": {
+            "type": "string",
+            "description": "Look up a game by its IGDB external ID."
+          },
+          "includeActorCredits": {
+            "type": "boolean",
+            "description": "Include individual actor credits for this game."
+          },
+          "includeOrgCredits": {
+            "type": "boolean",
+            "description": "Include organization credits for this game."
+          },
+          "nintendoEshopId": {
+            "type": "string",
+            "description": "Look up a game by its Nintendo eShop external ID."
+          },
+          "playStationId": {
+            "type": "string",
+            "description": "Look up a game by its PlayStation external ID."
+          },
           "slug": {
             "type": "string"
+          },
+          "steamId": {
+            "type": "string",
+            "description": "Look up a game by its Steam external ID."
           },
           "uri": {
             "type": "string",
             "format": "at-uri"
+          },
+          "xboxId": {
+            "type": "string",
+            "description": "Look up a game by its Xbox external ID."
           }
         }
       },

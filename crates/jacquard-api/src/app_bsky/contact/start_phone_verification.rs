@@ -52,13 +52,13 @@ pub struct StartPhoneVerificationOutput<'a> {}
 #[serde(bound(deserialize = "'de: 'a"))]
 pub enum StartPhoneVerificationError<'a> {
     #[serde(rename = "RateLimitExceeded")]
-    RateLimitExceeded(std::option::Option<jacquard_common::CowStr<'a>>),
+    RateLimitExceeded(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidDid")]
-    InvalidDid(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidDid(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InvalidPhone")]
-    InvalidPhone(std::option::Option<jacquard_common::CowStr<'a>>),
+    InvalidPhone(core::option::Option<jacquard_common::CowStr<'a>>),
     #[serde(rename = "InternalError")]
-    InternalError(std::option::Option<jacquard_common::CowStr<'a>>),
+    InternalError(core::option::Option<jacquard_common::CowStr<'a>>),
 }
 
 impl core::fmt::Display for StartPhoneVerificationError<'_> {

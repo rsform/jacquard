@@ -36,12 +36,12 @@ pub mod search_repos;
 pub struct AccountEvent<'a> {
     ///Indicates that the account has a repository which can be fetched from the host that emitted this event.
     pub active: bool,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<AccountEventStatus<'a>>,
+    pub status: core::option::Option<AccountEventStatus<'a>>,
     pub timestamp: jacquard_common::types::string::Datetime,
 }
 
@@ -166,18 +166,18 @@ impl jacquard_common::IntoStatic for AccountEventStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AccountHosting<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deleted_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub deactivated_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub deleted_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reactivated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub status: AccountHostingStatus<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -300,20 +300,20 @@ impl jacquard_common::IntoStatic for AccountHostingStatus<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct AccountStats<'a> {
     ///Total number of appeals against a moderation action on the account
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub appeal_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub appeal_count: core::option::Option<i64>,
     ///Number of times the account was escalated
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub escalate_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub escalate_count: core::option::Option<i64>,
     ///Total number of reports on the account
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub report_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub report_count: core::option::Option<i64>,
     ///Number of times the account was suspended
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub suspend_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub suspend_count: core::option::Option<i64>,
     ///Number of times the account was taken down
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub takedown_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub takedown_count: core::option::Option<i64>,
 }
 
 /// Strike information for an account
@@ -331,17 +331,17 @@ pub struct AccountStats<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct AccountStrike<'a> {
     ///Current number of active strikes (excluding expired strikes)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub active_strike_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub active_strike_count: core::option::Option<i64>,
     ///Timestamp of the first strike received
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub first_strike_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub first_strike_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Timestamp of the most recent strike received
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_strike_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_strike_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Total number of strikes ever received (including expired strikes)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_strike_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub total_strike_count: core::option::Option<i64>,
 }
 
 /// Age assurance info coming directly from users. Only works on DID subjects.
@@ -357,38 +357,38 @@ pub struct AccountStrike<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceEvent<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub access: std::option::Option<crate::app_bsky::ageassurance::Access<'a>>,
+    pub access: core::option::Option<crate::app_bsky::ageassurance::Access<'a>>,
     ///The unique identifier for this instance of the age assurance flow, in UUID format.
     #[serde(borrow)]
     pub attempt_id: jacquard_common::CowStr<'a>,
     ///The IP address used when completing the AA flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub complete_ip: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub complete_ip: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The user agent used when completing the AA flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub complete_ua: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub complete_ua: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The ISO 3166-1 alpha-2 country code provided when beginning the Age Assurance flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub country_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub country_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The date and time of this write operation.
     pub created_at: jacquard_common::types::string::Datetime,
     ///The IP address used when initiating the AA flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub init_ip: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub init_ip: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The user agent used when initiating the AA flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub init_ua: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub init_ua: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The ISO 3166-2 region code provided when beginning the Age Assurance flow.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub region_code: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub region_code: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The status of the Age Assurance process.
     #[serde(borrow)]
     pub status: AgeAssuranceEventStatus<'a>,
@@ -504,9 +504,9 @@ impl jacquard_common::IntoStatic for AgeAssuranceEventStatus<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct AgeAssuranceOverrideEvent<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub access: std::option::Option<crate::app_bsky::ageassurance::Access<'a>>,
+    pub access: core::option::Option<crate::app_bsky::ageassurance::Access<'a>>,
     ///Comment describing the reason for the override.
     #[serde(borrow)]
     pub comment: jacquard_common::CowStr<'a>,
@@ -651,14 +651,14 @@ pub struct BlobView<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub details: std::option::Option<BlobViewDetails<'a>>,
+    pub details: core::option::Option<BlobViewDetails<'a>>,
     #[serde(borrow)]
     pub mime_type: jacquard_common::CowStr<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub moderation: std::option::Option<crate::tools_ozone::moderation::Moderation<'a>>,
+    pub moderation: core::option::Option<crate::tools_ozone::moderation::Moderation<'a>>,
     pub size: i64,
 }
 
@@ -695,9 +695,9 @@ pub enum BlobViewDetails<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct CancelScheduledTakedownEvent<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Logs identity related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
@@ -713,18 +713,18 @@ pub struct CancelScheduledTakedownEvent<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct IdentityEvent<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub handle: core::option::Option<jacquard_common::types::string::Handle<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub pds_host: std::option::Option<jacquard_common::types::string::UriValue<'a>>,
+    pub pds_host: core::option::Option<jacquard_common::types::string::UriValue<'a>>,
     pub timestamp: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub tombstone: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub tombstone: core::option::Option<bool>,
 }
 
 #[jacquard_derive::lexicon]
@@ -757,11 +757,11 @@ pub struct ImageDetails<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ModEventAcknowledge<'a> {
     ///If true, all other reports on content authored by this account will be resolved (acknowledged).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub acknowledge_account_subjects: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub acknowledge_account_subjects: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Add a comment to a subject. An empty comment will clear any previously set sticky comment.
@@ -778,12 +778,12 @@ pub struct ModEventAcknowledge<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventComment<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Make the comment persistent on the subject
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub sticky: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub sticky: core::option::Option<bool>,
 }
 
 /// Divert a record's blobs to a 3rd party service for further scanning/tagging
@@ -800,9 +800,9 @@ pub struct ModEventComment<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventDivert<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Keep a log of outgoing email to a user
@@ -820,30 +820,32 @@ pub struct ModEventDivert<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ModEventEmail<'a> {
     ///Additional comment about the outgoing comm.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///The content of the email sent to the user.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub content: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub content: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Indicates whether the email was successfully delivered to the user's inbox.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_delivered: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_delivered: core::option::Option<bool>,
     ///Names/Keywords of the policies that necessitated the email.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub policies: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Severity level of the violation. Normally 'sev-1' that adds strike on repeat offense
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub severity_level: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub severity_level: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Number of strikes to assign to the user for this violation. Normally 0 as an indicator of a warning and only added as a strike on a repeat offense.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub strike_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub strike_count: core::option::Option<i64>,
     ///When the strike should expire. If not provided, the strike never expires.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub strike_expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub strike_expires_at: core::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     ///The subject line of the email sent to the user.
     #[serde(borrow)]
     pub subject_line: jacquard_common::CowStr<'a>,
@@ -862,9 +864,9 @@ pub struct ModEventEmail<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventEscalate<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Apply/Negate labels on a subject
@@ -880,14 +882,14 @@ pub struct ModEventEscalate<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventLabel<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub create_label_vals: Vec<jacquard_common::CowStr<'a>>,
     ///Indicates how long the label will remain on the subject. Only applies on labels that are being added.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_in_hours: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration_in_hours: core::option::Option<i64>,
     #[serde(borrow)]
     pub negate_label_vals: Vec<jacquard_common::CowStr<'a>>,
 }
@@ -905,9 +907,9 @@ pub struct ModEventLabel<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventMute<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Indicates how long the subject should remain muted.
     pub duration_in_hours: i64,
 }
@@ -926,12 +928,12 @@ pub struct ModEventMute<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventMuteReporter<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Indicates how long the account should remain muted. Falsy value here means a permanent mute.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_in_hours: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration_in_hours: core::option::Option<i64>,
 }
 
 /// Set priority score of the subject. Higher score means higher priority.
@@ -947,9 +949,9 @@ pub struct ModEventMuteReporter<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventPriorityScore<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     pub score: i64,
 }
 
@@ -966,12 +968,12 @@ pub struct ModEventPriorityScore<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModEventReport<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Set to true if the reporter was muted from reporting at the time of the event. These reports won't impact the reviewState of the subject.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub is_reporter_muted: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub is_reporter_muted: core::option::Option<bool>,
     #[serde(borrow)]
     pub report_type: crate::com_atproto::moderation::ReasonType<'a>,
 }
@@ -991,9 +993,9 @@ pub struct ModEventReport<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ModEventResolveAppeal<'a> {
     ///Describe resolution.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Revert take down action on a subject
@@ -1011,20 +1013,20 @@ pub struct ModEventResolveAppeal<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ModEventReverseTakedown<'a> {
     ///Describe reasoning behind the reversal.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Names/Keywords of the policy infraction for which takedown is being reversed.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub policies: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Severity level of the violation. Usually set from the last policy infraction's severity.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub severity_level: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub severity_level: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Number of strikes to subtract from the user's strike count. Usually set from the last policy infraction's severity.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub strike_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub strike_count: core::option::Option<i64>,
 }
 
 /// Add/Remove a tag on a subject
@@ -1044,9 +1046,9 @@ pub struct ModEventTag<'a> {
     #[serde(borrow)]
     pub add: Vec<jacquard_common::CowStr<'a>>,
     ///Additional comment about added/removed tags.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Tags to be removed to the subject. Ignores a tag If it doesn't exist, won't be duplicated.
     #[serde(borrow)]
     pub remove: Vec<jacquard_common::CowStr<'a>>,
@@ -1067,32 +1069,34 @@ pub struct ModEventTag<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ModEventTakedown<'a> {
     ///If true, all other reports on content authored by this account will be resolved (acknowledged).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub acknowledge_account_subjects: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub acknowledge_account_subjects: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Indicates how long the takedown should be in effect before automatically expiring.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub duration_in_hours: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub duration_in_hours: core::option::Option<i64>,
     ///Names/Keywords of the policies that drove the decision.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub policies: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub policies: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
     ///Severity level of the violation (e.g., 'sev-0', 'sev-1', 'sev-2', etc.).
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub severity_level: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub severity_level: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Number of strikes to assign to the user for this violation.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub strike_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub strike_count: core::option::Option<i64>,
     ///When the strike should expire. If not provided, the strike never expires.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub strike_expires_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub strike_expires_at: core::option::Option<
+        jacquard_common::types::string::Datetime,
+    >,
     ///List of services where the takedown should be applied. If empty or not provided, takedown is applied on all configured services.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub target_services: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    pub target_services: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
 }
 
 /// Unmute action on a subject
@@ -1110,9 +1114,9 @@ pub struct ModEventTakedown<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ModEventUnmute<'a> {
     ///Describe reasoning behind the reversal.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 /// Unmute incoming reports from an account
@@ -1130,9 +1134,9 @@ pub struct ModEventUnmute<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ModEventUnmuteReporter<'a> {
     ///Describe reasoning behind the reversal.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1150,22 +1154,22 @@ pub struct ModEventView<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
     pub created_by: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub creator_handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub creator_handle: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub event: ModEventViewEvent<'a>,
     pub id: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: core::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub subject: ModEventViewSubject<'a>,
     #[serde(borrow)]
     pub subject_blob_cids: Vec<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_handle: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub subject_handle: core::option::Option<jacquard_common::CowStr<'a>>,
 }
 
 #[jacquard_derive::open_union]
@@ -1290,9 +1294,9 @@ pub struct ModEventViewDetail<'a> {
     #[serde(borrow)]
     pub event: ModEventViewDetailEvent<'a>,
     pub id: i64,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub mod_tool: std::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
+    pub mod_tool: core::option::Option<crate::tools_ozone::moderation::ModTool<'a>>,
     #[serde(borrow)]
     pub subject: ModEventViewDetailSubject<'a>,
     #[serde(borrow)]
@@ -1420,9 +1424,9 @@ pub enum ModEventViewDetailSubject<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct ModTool<'a> {
     ///Additional arbitrary metadata about the source
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub meta: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub meta: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///Name/identifier of the source (e.g., 'automod', 'ozone/workspace')
     #[serde(borrow)]
     pub name: jacquard_common::CowStr<'a>,
@@ -1441,9 +1445,9 @@ pub struct ModTool<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct Moderation<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_status: std::option::Option<
+    pub subject_status: core::option::Option<
         crate::tools_ozone::moderation::SubjectStatusView<'a>,
     >,
 }
@@ -1461,9 +1465,9 @@ pub struct Moderation<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ModerationDetail<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_status: std::option::Option<
+    pub subject_status: core::option::Option<
         crate::tools_ozone::moderation::SubjectStatusView<'a>,
     >,
 }
@@ -1481,12 +1485,12 @@ pub struct ModerationDetail<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordEvent<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub cid: std::option::Option<jacquard_common::types::string::Cid<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub cid: core::option::Option<jacquard_common::types::string::Cid<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub op: RecordEventOp<'a>,
     pub timestamp: jacquard_common::types::string::Datetime,
@@ -1598,14 +1602,14 @@ impl jacquard_common::IntoStatic for RecordEventOp<'_> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RecordHosting<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub created_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deleted_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub created_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub deleted_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub status: RecordHostingStatus<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1740,9 +1744,9 @@ pub struct RecordViewDetail<'a> {
     #[serde(borrow)]
     pub cid: jacquard_common::types::string::Cid<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(borrow)]
     pub moderation: crate::tools_ozone::moderation::ModerationDetail<'a>,
     #[serde(borrow)]
@@ -1784,29 +1788,29 @@ pub struct RecordViewNotFound<'a> {
 #[serde(rename_all = "camelCase")]
 pub struct RecordsStats<'a> {
     ///Number of items that were appealed at least once
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub appealed_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub appealed_count: core::option::Option<i64>,
     ///Number of items that were escalated at least once
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub escalated_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub escalated_count: core::option::Option<i64>,
     ///Number of item currently in "reviewOpen" or "reviewEscalated" state
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub pending_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub pending_count: core::option::Option<i64>,
     ///Number of item currently in "reviewNone" or "reviewClosed" state
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub processed_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub processed_count: core::option::Option<i64>,
     ///Number of items that were reported at least once
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub reported_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub reported_count: core::option::Option<i64>,
     ///Total number of item in the set
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub subject_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub subject_count: core::option::Option<i64>,
     ///Number of item currently taken down
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub takendown_count: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub takendown_count: core::option::Option<i64>,
     ///Cumulative sum of the number of reports on the items in the set
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub total_reports: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub total_reports: core::option::Option<i64>,
 }
 
 #[jacquard_derive::lexicon]
@@ -1821,31 +1825,31 @@ pub struct RecordsStats<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub deactivated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub invite_note: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub invites_disabled: std::option::Option<bool>,
+    pub invited_by: core::option::Option<crate::com_atproto::server::InviteCode<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub invites_disabled: core::option::Option<bool>,
     #[serde(borrow)]
     pub moderation: crate::tools_ozone::moderation::Moderation<'a>,
     #[serde(borrow)]
     pub related_records: Vec<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub threat_signatures: std::option::Option<
+    pub threat_signatures: core::option::Option<
         Vec<crate::com_atproto::admin::ThreatSignature<'a>>,
     >,
 }
@@ -1862,41 +1866,41 @@ pub struct RepoView<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct RepoViewDetail<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub deactivated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub deactivated_at: core::option::Option<jacquard_common::types::string::Datetime>,
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub email: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub email_confirmed_at: std::option::Option<
+    pub email: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub email_confirmed_at: core::option::Option<
         jacquard_common::types::string::Datetime,
     >,
     #[serde(borrow)]
     pub handle: jacquard_common::types::string::Handle<'a>,
     pub indexed_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub invite_note: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub invite_note: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub invited_by: std::option::Option<crate::com_atproto::server::InviteCode<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub invited_by: core::option::Option<crate::com_atproto::server::InviteCode<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub invites: std::option::Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub invites_disabled: std::option::Option<bool>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub invites: core::option::Option<Vec<crate::com_atproto::server::InviteCode<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub invites_disabled: core::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub labels: std::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
+    pub labels: core::option::Option<Vec<crate::com_atproto::label::Label<'a>>>,
     #[serde(borrow)]
     pub moderation: crate::tools_ozone::moderation::ModerationDetail<'a>,
     #[serde(borrow)]
     pub related_records: Vec<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub threat_signatures: std::option::Option<
+    pub threat_signatures: core::option::Option<
         Vec<crate::com_atproto::admin::ThreatSignature<'a>>,
     >,
 }
@@ -1957,12 +1961,12 @@ pub struct ReporterStats<'a> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReviewClosed;
-impl std::fmt::Display for ReviewClosed {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReviewClosed {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reviewClosed")
     }
 }
@@ -1975,12 +1979,12 @@ impl std::fmt::Display for ReviewClosed {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReviewEscalated;
-impl std::fmt::Display for ReviewEscalated {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReviewEscalated {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reviewEscalated")
     }
 }
@@ -1993,12 +1997,12 @@ impl std::fmt::Display for ReviewEscalated {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReviewNone;
-impl std::fmt::Display for ReviewNone {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReviewNone {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reviewNone")
     }
 }
@@ -2011,12 +2015,12 @@ impl std::fmt::Display for ReviewNone {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct ReviewOpen;
-impl std::fmt::Display for ReviewOpen {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ReviewOpen {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "reviewOpen")
     }
 }
@@ -2054,15 +2058,15 @@ pub struct RevokeAccountCredentialsEvent<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ScheduleTakedownEvent<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_after: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_until: std::option::Option<jacquard_common::types::string::Datetime>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub execute_after: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub execute_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub execute_until: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// View of a scheduled moderation action
@@ -2090,39 +2094,39 @@ pub struct ScheduledActionView<'a> {
     #[serde(borrow)]
     pub did: jacquard_common::types::string::Did<'a>,
     ///Serialized event object that will be propagated to the event when performed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub event_data: std::option::Option<jacquard_common::types::value::Data<'a>>,
+    pub event_data: core::option::Option<jacquard_common::types::value::Data<'a>>,
     ///Earliest time to execute the action (for randomized scheduling)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_after: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub execute_after: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Exact time to execute the action
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub execute_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Latest time to execute the action (for randomized scheduling)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execute_until: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub execute_until: core::option::Option<jacquard_common::types::string::Datetime>,
     ///ID of the moderation event created when action was successfully executed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub execution_event_id: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub execution_event_id: core::option::Option<i64>,
     ///Auto-incrementing row ID
     pub id: i64,
     ///When the action was last attempted to be executed
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_executed_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_executed_at: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Reason for the last execution failure
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_failure_reason: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub last_failure_reason: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Whether execution time should be randomized within the specified range
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub randomize_execution: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub randomize_execution: core::option::Option<bool>,
     ///Current status of the scheduled action
     #[serde(borrow)]
     pub status: ScheduledActionViewStatus<'a>,
     ///When the scheduled action was last updated
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub updated_at: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub updated_at: core::option::Option<jacquard_common::types::string::Datetime>,
 }
 
 /// Type of action to be executed
@@ -2449,84 +2453,86 @@ impl jacquard_common::IntoStatic for SubjectReviewState<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct SubjectStatusView<'a> {
     ///Statistics related to the account subject
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub account_stats: std::option::Option<
+    pub account_stats: core::option::Option<
         crate::tools_ozone::moderation::AccountStats<'a>,
     >,
     ///Strike information for the account (account-level only)
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub account_strike: std::option::Option<
+    pub account_strike: core::option::Option<
         crate::tools_ozone::moderation::AccountStrike<'a>,
     >,
     ///Current age assurance state of the subject.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub age_assurance_state: std::option::Option<SubjectStatusViewAgeAssuranceState<'a>>,
+    pub age_assurance_state: core::option::Option<
+        SubjectStatusViewAgeAssuranceState<'a>,
+    >,
     ///Whether or not the last successful update to age assurance was made by the user or admin.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub age_assurance_updated_by: std::option::Option<
+    pub age_assurance_updated_by: core::option::Option<
         SubjectStatusViewAgeAssuranceUpdatedBy<'a>,
     >,
     ///True indicates that the a previously taken moderator action was appealed against, by the author of the content. False indicates last appeal was resolved by moderators.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub appealed: std::option::Option<bool>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub appealed: core::option::Option<bool>,
     ///Sticky comment on the subject.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub comment: std::option::Option<jacquard_common::CowStr<'a>>,
+    pub comment: core::option::Option<jacquard_common::CowStr<'a>>,
     ///Timestamp referencing the first moderation status impacting event was emitted on the subject
     pub created_at: jacquard_common::types::string::Datetime,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub hosting: std::option::Option<SubjectStatusViewHosting<'a>>,
+    pub hosting: core::option::Option<SubjectStatusViewHosting<'a>>,
     pub id: i64,
     ///Timestamp referencing when the author of the subject appealed a moderation action
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_appealed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_reported_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub last_reviewed_at: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_appealed_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_reported_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub last_reviewed_at: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub last_reviewed_by: std::option::Option<jacquard_common::types::string::Did<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mute_reporting_until: std::option::Option<
+    pub last_reviewed_by: core::option::Option<jacquard_common::types::string::Did<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mute_reporting_until: core::option::Option<
         jacquard_common::types::string::Datetime,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub mute_until: std::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub mute_until: core::option::Option<jacquard_common::types::string::Datetime>,
     ///Numeric value representing the level of priority. Higher score means higher priority.
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub priority_score: std::option::Option<i64>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub priority_score: core::option::Option<i64>,
     ///Statistics related to the record subjects authored by the subject's account
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub records_stats: std::option::Option<
+    pub records_stats: core::option::Option<
         crate::tools_ozone::moderation::RecordsStats<'a>,
     >,
     #[serde(borrow)]
     pub review_state: crate::tools_ozone::moderation::SubjectReviewState<'a>,
     #[serde(borrow)]
     pub subject: SubjectStatusViewSubject<'a>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_blob_cids: std::option::Option<
+    pub subject_blob_cids: core::option::Option<
         Vec<jacquard_common::types::string::Cid<'a>>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub subject_repo_handle: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub suspend_until: std::option::Option<jacquard_common::types::string::Datetime>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub subject_repo_handle: core::option::Option<jacquard_common::CowStr<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub suspend_until: core::option::Option<jacquard_common::types::string::Datetime>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub tags: std::option::Option<Vec<jacquard_common::CowStr<'a>>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub takendown: std::option::Option<bool>,
+    pub tags: core::option::Option<Vec<jacquard_common::CowStr<'a>>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
+    pub takendown: core::option::Option<bool>,
     ///Timestamp referencing when the last update was made to the moderation status of the subject
     pub updated_at: jacquard_common::types::string::Datetime,
 }
@@ -2795,20 +2801,20 @@ pub enum SubjectStatusViewSubject<'a> {
 )]
 #[serde(rename_all = "camelCase")]
 pub struct SubjectView<'a> {
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub profile: std::option::Option<jacquard_common::types::value::Data<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub profile: core::option::Option<jacquard_common::types::value::Data<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub record: std::option::Option<
+    pub record: core::option::Option<
         crate::tools_ozone::moderation::RecordViewDetail<'a>,
     >,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub repo: std::option::Option<crate::tools_ozone::moderation::RepoViewDetail<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
+    pub repo: core::option::Option<crate::tools_ozone::moderation::RepoViewDetail<'a>>,
+    #[serde(skip_serializing_if = "core::option::Option::is_none")]
     #[serde(borrow)]
-    pub status: std::option::Option<
+    pub status: core::option::Option<
         crate::tools_ozone::moderation::SubjectStatusView<'a>,
     >,
     #[serde(borrow)]
@@ -2825,12 +2831,12 @@ pub struct SubjectView<'a> {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct TimelineEventPlcCreate;
-impl std::fmt::Display for TimelineEventPlcCreate {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for TimelineEventPlcCreate {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "timelineEventPlcCreate")
     }
 }
@@ -2843,12 +2849,12 @@ impl std::fmt::Display for TimelineEventPlcCreate {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct TimelineEventPlcOperation;
-impl std::fmt::Display for TimelineEventPlcOperation {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for TimelineEventPlcOperation {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "timelineEventPlcOperation")
     }
 }
@@ -2861,12 +2867,12 @@ impl std::fmt::Display for TimelineEventPlcOperation {
     Clone,
     PartialEq,
     Eq,
-    Hash,
-    jacquard_derive::IntoStatic
+    jacquard_derive::IntoStatic,
+    Hash
 )]
 pub struct TimelineEventPlcTombstone;
-impl std::fmt::Display for TimelineEventPlcTombstone {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for TimelineEventPlcTombstone {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "timelineEventPlcTombstone")
     }
 }
@@ -2888,104 +2894,104 @@ pub struct VideoDetails<'a> {
     pub width: i64,
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountEvent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AccountEvent<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "accountEvent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountHosting<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AccountHosting<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "accountHosting"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountStats<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AccountStats<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "accountStats"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AccountStrike<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AccountStrike<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "accountStrike"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssuranceEvent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AgeAssuranceEvent<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "ageAssuranceEvent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssuranceOverrideEvent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AgeAssuranceOverrideEvent<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "ageAssuranceOverrideEvent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.comment;
             #[allow(unused_comparisons)]
@@ -3003,19 +3009,19 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssuranceOverrideEvent
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssurancePurgeEvent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for AgeAssurancePurgeEvent<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "ageAssurancePurgeEvent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.comment;
             #[allow(unused_comparisons)]
@@ -3033,138 +3039,138 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for AgeAssurancePurgeEvent<'a
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for BlobView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for BlobView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "blobView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for CancelScheduledTakedownEvent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for CancelScheduledTakedownEvent<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "cancelScheduledTakedownEvent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for IdentityEvent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for IdentityEvent<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "identityEvent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ImageDetails<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ImageDetails<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "imageDetails"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventAcknowledge<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventAcknowledge<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventAcknowledge"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventComment<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventComment<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventComment"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventDivert<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventDivert<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventDivert"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventEmail<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventEmail<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventEmail"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.policies {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
@@ -3181,87 +3187,87 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventEmail<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventEscalate<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventEscalate<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventEscalate"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventLabel<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventLabel<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventLabel"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventMute<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventMute<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventMute"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventMuteReporter<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventMuteReporter<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventMuteReporter"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventPriorityScore<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventPriorityScore<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventPriorityScore"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.score;
             if *value > 100i64 {
@@ -3290,53 +3296,53 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventPriorityScore<'a>
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventReport<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventReport<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventReport"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventResolveAppeal<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventResolveAppeal<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventResolveAppeal"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventReverseTakedown<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventReverseTakedown<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventReverseTakedown"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.policies {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
@@ -3353,36 +3359,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventReverseTakedown<'
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventTag<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventTag<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventTag"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventTakedown<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventTakedown<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventTakedown"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.policies {
             #[allow(unused_comparisons)]
             if value.len() > 5usize {
@@ -3399,309 +3405,308 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventTakedown<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventUnmute<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventUnmute<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventUnmute"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventUnmuteReporter<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventUnmuteReporter<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventUnmuteReporter"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModEventViewDetail<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModEventViewDetail<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modEventViewDetail"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModTool<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModTool<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "modTool"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for Moderation<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for Moderation<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "moderation"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ModerationDetail<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ModerationDetail<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "moderationDetail"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordEvent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RecordEvent<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "recordEvent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordHosting<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RecordHosting<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "recordHosting"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RecordView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "recordView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordViewDetail<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RecordViewDetail<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "recordViewDetail"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordViewNotFound<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RecordViewNotFound<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "recordViewNotFound"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RecordsStats<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RecordsStats<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "recordsStats"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RepoView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "repoView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoViewDetail<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RepoViewDetail<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "repoViewDetail"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for RepoViewNotFound<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RepoViewNotFound<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "repoViewNotFound"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ReporterStats<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ReporterStats<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "reporterStats"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema
-for RevokeAccountCredentialsEvent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for RevokeAccountCredentialsEvent<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "revokeAccountCredentialsEvent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         {
             let value = &self.comment;
             #[allow(unused_comparisons)]
@@ -3719,53 +3724,53 @@ for RevokeAccountCredentialsEvent<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduleTakedownEvent<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduleTakedownEvent<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "scheduleTakedownEvent"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ScheduledActionView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for ScheduledActionView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "scheduledActionView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectStatusView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SubjectStatusView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "subjectStatusView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         if let Some(ref value) = self.priority_score {
             if *value > 100i64 {
                 return Err(::jacquard_lexicon::validation::ConstraintError::Maximum {
@@ -3792,36 +3797,36 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectStatusView<'a> {
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for SubjectView<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for SubjectView<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "subjectView"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
 
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for VideoDetails<'a> {
+impl<'a> jacquard_lexicon::schema::LexiconSchema for VideoDetails<'a> {
     fn nsid() -> &'static str {
         "tools.ozone.moderation.defs"
     }
     fn def_name() -> &'static str {
         "videoDetails"
     }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
+    fn lexicon_doc() -> jacquard_lexicon::lexicon::LexiconDoc<'static> {
         lexicon_doc_tools_ozone_moderation_defs()
     }
     fn validate(
         &self,
-    ) -> ::core::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
+    ) -> ::core::result::Result<(), jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }
@@ -3836,37 +3841,37 @@ pub mod account_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Active;
         type Timestamp;
+        type Active;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Active = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActive<S> {}
-    impl<S: State> State for SetActive<S> {
-        type Active = Set<members::active>;
-        type Timestamp = S::Timestamp;
+        type Active = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type Active = S::Active;
         type Timestamp = Set<members::timestamp>;
+        type Active = S::Active;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActive<S> {}
+    impl<S: State> State for SetActive<S> {
+        type Timestamp = S::Timestamp;
+        type Active = Set<members::active>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `active` field
-        pub struct active(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `active` field
+        pub struct active(());
     }
 }
 
@@ -3970,8 +3975,8 @@ where
 impl<'a, S> AccountEventBuilder<'a, S>
 where
     S: account_event_state::State,
-    S::Active: account_event_state::IsSet,
     S::Timestamp: account_event_state::IsSet,
+    S::Active: account_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AccountEvent<'a> {
@@ -3986,7 +3991,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -4001,7 +4006,7 @@ where
     }
 }
 
-fn lexicon_doc_tools_ozone_moderation_defs() -> ::jacquard_lexicon::lexicon::LexiconDoc<
+fn lexicon_doc_tools_ozone_moderation_defs() -> jacquard_lexicon::lexicon::LexiconDoc<
     'static,
 > {
     ::jacquard_lexicon::lexicon::LexiconDoc {
@@ -8955,51 +8960,51 @@ pub mod age_assurance_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AttemptId;
         type Status;
         type CreatedAt;
+        type AttemptId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AttemptId = Unset;
         type Status = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `attempt_id` field to Set
-    pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAttemptId<S> {}
-    impl<S: State> State for SetAttemptId<S> {
-        type AttemptId = Set<members::attempt_id>;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
+        type AttemptId = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type AttemptId = S::AttemptId;
         type Status = Set<members::status>;
         type CreatedAt = S::CreatedAt;
+        type AttemptId = S::AttemptId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type AttemptId = S::AttemptId;
         type Status = S::Status;
         type CreatedAt = Set<members::created_at>;
+        type AttemptId = S::AttemptId;
+    }
+    ///State transition - sets the `attempt_id` field to Set
+    pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAttemptId<S> {}
+    impl<S: State> State for SetAttemptId<S> {
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+        type AttemptId = Set<members::attempt_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `attempt_id` field
-        pub struct attempt_id(());
         ///Marker type for the `status` field
         pub struct status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `attempt_id` field
+        pub struct attempt_id(());
     }
 }
 
@@ -9237,9 +9242,9 @@ where
 impl<'a, S> AgeAssuranceEventBuilder<'a, S>
 where
     S: age_assurance_event_state::State,
-    S::AttemptId: age_assurance_event_state::IsSet,
     S::Status: age_assurance_event_state::IsSet,
     S::CreatedAt: age_assurance_event_state::IsSet,
+    S::AttemptId: age_assurance_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AgeAssuranceEvent<'a> {
@@ -9260,7 +9265,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -9293,8 +9298,8 @@ pub mod blob_view_state {
     pub trait State: sealed::Sealed {
         type Size;
         type CreatedAt;
-        type MimeType;
         type Cid;
+        type MimeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -9302,8 +9307,8 @@ pub mod blob_view_state {
     impl State for Empty {
         type Size = Unset;
         type CreatedAt = Unset;
-        type MimeType = Unset;
         type Cid = Unset;
+        type MimeType = Unset;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
@@ -9311,8 +9316,8 @@ pub mod blob_view_state {
     impl<S: State> State for SetSize<S> {
         type Size = Set<members::size>;
         type CreatedAt = S::CreatedAt;
-        type MimeType = S::MimeType;
         type Cid = S::Cid;
+        type MimeType = S::MimeType;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -9320,17 +9325,8 @@ pub mod blob_view_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Size = S::Size;
         type CreatedAt = Set<members::created_at>;
+        type Cid = S::Cid;
         type MimeType = S::MimeType;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `mime_type` field to Set
-    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMimeType<S> {}
-    impl<S: State> State for SetMimeType<S> {
-        type Size = S::Size;
-        type CreatedAt = S::CreatedAt;
-        type MimeType = Set<members::mime_type>;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
@@ -9338,8 +9334,17 @@ pub mod blob_view_state {
     impl<S: State> State for SetCid<S> {
         type Size = S::Size;
         type CreatedAt = S::CreatedAt;
-        type MimeType = S::MimeType;
         type Cid = Set<members::cid>;
+        type MimeType = S::MimeType;
+    }
+    ///State transition - sets the `mime_type` field to Set
+    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMimeType<S> {}
+    impl<S: State> State for SetMimeType<S> {
+        type Size = S::Size;
+        type CreatedAt = S::CreatedAt;
+        type Cid = S::Cid;
+        type MimeType = Set<members::mime_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -9348,10 +9353,10 @@ pub mod blob_view_state {
         pub struct size(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `mime_type` field
-        pub struct mime_type(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `mime_type` field
+        pub struct mime_type(());
     }
 }
 
@@ -9500,8 +9505,8 @@ where
     S: blob_view_state::State,
     S::Size: blob_view_state::IsSet,
     S::CreatedAt: blob_view_state::IsSet,
-    S::MimeType: blob_view_state::IsSet,
     S::Cid: blob_view_state::IsSet,
+    S::MimeType: blob_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlobView<'a> {
@@ -9518,7 +9523,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -9703,7 +9708,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -9843,7 +9848,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -9866,37 +9871,37 @@ pub mod mod_event_label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreateLabelVals;
         type NegateLabelVals;
+        type CreateLabelVals;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreateLabelVals = Unset;
         type NegateLabelVals = Unset;
-    }
-    ///State transition - sets the `create_label_vals` field to Set
-    pub struct SetCreateLabelVals<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreateLabelVals<S> {}
-    impl<S: State> State for SetCreateLabelVals<S> {
-        type CreateLabelVals = Set<members::create_label_vals>;
-        type NegateLabelVals = S::NegateLabelVals;
+        type CreateLabelVals = Unset;
     }
     ///State transition - sets the `negate_label_vals` field to Set
     pub struct SetNegateLabelVals<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNegateLabelVals<S> {}
     impl<S: State> State for SetNegateLabelVals<S> {
-        type CreateLabelVals = S::CreateLabelVals;
         type NegateLabelVals = Set<members::negate_label_vals>;
+        type CreateLabelVals = S::CreateLabelVals;
+    }
+    ///State transition - sets the `create_label_vals` field to Set
+    pub struct SetCreateLabelVals<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreateLabelVals<S> {}
+    impl<S: State> State for SetCreateLabelVals<S> {
+        type NegateLabelVals = S::NegateLabelVals;
+        type CreateLabelVals = Set<members::create_label_vals>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `create_label_vals` field
-        pub struct create_label_vals(());
         ///Marker type for the `negate_label_vals` field
         pub struct negate_label_vals(());
+        ///Marker type for the `create_label_vals` field
+        pub struct create_label_vals(());
     }
 }
 
@@ -10000,8 +10005,8 @@ where
 impl<'a, S> ModEventLabelBuilder<'a, S>
 where
     S: mod_event_label_state::State,
-    S::CreateLabelVals: mod_event_label_state::IsSet,
     S::NegateLabelVals: mod_event_label_state::IsSet,
+    S::CreateLabelVals: mod_event_label_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ModEventLabel<'a> {
@@ -10016,7 +10021,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10142,7 +10147,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10269,7 +10274,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10408,7 +10413,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10567,7 +10572,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10591,105 +10596,105 @@ pub mod mod_event_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Event;
-        type Subject;
-        type SubjectBlobCids;
         type CreatedAt;
+        type Event;
         type CreatedBy;
+        type SubjectBlobCids;
         type Id;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Event = Unset;
-        type Subject = Unset;
-        type SubjectBlobCids = Unset;
         type CreatedAt = Unset;
+        type Event = Unset;
         type CreatedBy = Unset;
+        type SubjectBlobCids = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `event` field to Set
-    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvent<S> {}
-    impl<S: State> State for SetEvent<S> {
-        type Event = Set<members::event>;
-        type Subject = S::Subject;
-        type SubjectBlobCids = S::SubjectBlobCids;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = S::CreatedBy;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Event = S::Event;
-        type Subject = Set<members::subject>;
-        type SubjectBlobCids = S::SubjectBlobCids;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = S::CreatedBy;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `subject_blob_cids` field to Set
-    pub struct SetSubjectBlobCids<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubjectBlobCids<S> {}
-    impl<S: State> State for SetSubjectBlobCids<S> {
-        type Event = S::Event;
-        type Subject = S::Subject;
-        type SubjectBlobCids = Set<members::subject_blob_cids>;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = S::CreatedBy;
-        type Id = S::Id;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Event = S::Event;
-        type Subject = S::Subject;
-        type SubjectBlobCids = S::SubjectBlobCids;
         type CreatedAt = Set<members::created_at>;
+        type Event = S::Event;
         type CreatedBy = S::CreatedBy;
+        type SubjectBlobCids = S::SubjectBlobCids;
         type Id = S::Id;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvent<S> {}
+    impl<S: State> State for SetEvent<S> {
+        type CreatedAt = S::CreatedAt;
+        type Event = Set<members::event>;
+        type CreatedBy = S::CreatedBy;
+        type SubjectBlobCids = S::SubjectBlobCids;
+        type Id = S::Id;
+        type Subject = S::Subject;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
-        type Event = S::Event;
-        type Subject = S::Subject;
-        type SubjectBlobCids = S::SubjectBlobCids;
         type CreatedAt = S::CreatedAt;
+        type Event = S::Event;
         type CreatedBy = Set<members::created_by>;
+        type SubjectBlobCids = S::SubjectBlobCids;
         type Id = S::Id;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject_blob_cids` field to Set
+    pub struct SetSubjectBlobCids<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjectBlobCids<S> {}
+    impl<S: State> State for SetSubjectBlobCids<S> {
+        type CreatedAt = S::CreatedAt;
+        type Event = S::Event;
+        type CreatedBy = S::CreatedBy;
+        type SubjectBlobCids = Set<members::subject_blob_cids>;
+        type Id = S::Id;
+        type Subject = S::Subject;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Event = S::Event;
-        type Subject = S::Subject;
-        type SubjectBlobCids = S::SubjectBlobCids;
         type CreatedAt = S::CreatedAt;
+        type Event = S::Event;
         type CreatedBy = S::CreatedBy;
+        type SubjectBlobCids = S::SubjectBlobCids;
         type Id = Set<members::id>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Event = S::Event;
+        type CreatedBy = S::CreatedBy;
+        type SubjectBlobCids = S::SubjectBlobCids;
+        type Id = S::Id;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event` field
-        pub struct event(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `subject_blob_cids` field
-        pub struct subject_blob_cids(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `event` field
+        pub struct event(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
+        ///Marker type for the `subject_blob_cids` field
+        pub struct subject_blob_cids(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -10912,12 +10917,12 @@ impl<'a, S: mod_event_view_state::State> ModEventViewBuilder<'a, S> {
 impl<'a, S> ModEventViewBuilder<'a, S>
 where
     S: mod_event_view_state::State,
-    S::Event: mod_event_view_state::IsSet,
-    S::Subject: mod_event_view_state::IsSet,
-    S::SubjectBlobCids: mod_event_view_state::IsSet,
     S::CreatedAt: mod_event_view_state::IsSet,
+    S::Event: mod_event_view_state::IsSet,
     S::CreatedBy: mod_event_view_state::IsSet,
+    S::SubjectBlobCids: mod_event_view_state::IsSet,
     S::Id: mod_event_view_state::IsSet,
+    S::Subject: mod_event_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ModEventView<'a> {
@@ -10937,7 +10942,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -10967,105 +10972,105 @@ pub mod mod_event_view_detail_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedBy;
-        type Subject;
+        type CreatedAt;
         type Id;
         type SubjectBlobs;
         type Event;
-        type CreatedAt;
+        type Subject;
+        type CreatedBy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedBy = Unset;
-        type Subject = Unset;
+        type CreatedAt = Unset;
         type Id = Unset;
         type SubjectBlobs = Unset;
         type Event = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type CreatedBy = Set<members::created_by>;
-        type Subject = S::Subject;
-        type Id = S::Id;
-        type SubjectBlobs = S::SubjectBlobs;
-        type Event = S::Event;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type CreatedBy = S::CreatedBy;
-        type Subject = Set<members::subject>;
-        type Id = S::Id;
-        type SubjectBlobs = S::SubjectBlobs;
-        type Event = S::Event;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type CreatedBy = S::CreatedBy;
-        type Subject = S::Subject;
-        type Id = Set<members::id>;
-        type SubjectBlobs = S::SubjectBlobs;
-        type Event = S::Event;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `subject_blobs` field to Set
-    pub struct SetSubjectBlobs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubjectBlobs<S> {}
-    impl<S: State> State for SetSubjectBlobs<S> {
-        type CreatedBy = S::CreatedBy;
-        type Subject = S::Subject;
-        type Id = S::Id;
-        type SubjectBlobs = Set<members::subject_blobs>;
-        type Event = S::Event;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `event` field to Set
-    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvent<S> {}
-    impl<S: State> State for SetEvent<S> {
-        type CreatedBy = S::CreatedBy;
-        type Subject = S::Subject;
-        type Id = S::Id;
-        type SubjectBlobs = S::SubjectBlobs;
-        type Event = Set<members::event>;
-        type CreatedAt = S::CreatedAt;
+        type Subject = Unset;
+        type CreatedBy = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type CreatedBy = S::CreatedBy;
-        type Subject = S::Subject;
+        type CreatedAt = Set<members::created_at>;
         type Id = S::Id;
         type SubjectBlobs = S::SubjectBlobs;
         type Event = S::Event;
-        type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type CreatedAt = S::CreatedAt;
+        type Id = Set<members::id>;
+        type SubjectBlobs = S::SubjectBlobs;
+        type Event = S::Event;
+        type Subject = S::Subject;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `subject_blobs` field to Set
+    pub struct SetSubjectBlobs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubjectBlobs<S> {}
+    impl<S: State> State for SetSubjectBlobs<S> {
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type SubjectBlobs = Set<members::subject_blobs>;
+        type Event = S::Event;
+        type Subject = S::Subject;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvent<S> {}
+    impl<S: State> State for SetEvent<S> {
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type SubjectBlobs = S::SubjectBlobs;
+        type Event = Set<members::event>;
+        type Subject = S::Subject;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type SubjectBlobs = S::SubjectBlobs;
+        type Event = S::Event;
+        type Subject = Set<members::subject>;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type SubjectBlobs = S::SubjectBlobs;
+        type Event = S::Event;
+        type Subject = S::Subject;
+        type CreatedBy = Set<members::created_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_by` field
-        pub struct created_by(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `subject_blobs` field
         pub struct subject_blobs(());
         ///Marker type for the `event` field
         pub struct event(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
     }
 }
 
@@ -11238,12 +11243,12 @@ where
 impl<'a, S> ModEventViewDetailBuilder<'a, S>
 where
     S: mod_event_view_detail_state::State,
-    S::CreatedBy: mod_event_view_detail_state::IsSet,
-    S::Subject: mod_event_view_detail_state::IsSet,
+    S::CreatedAt: mod_event_view_detail_state::IsSet,
     S::Id: mod_event_view_detail_state::IsSet,
     S::SubjectBlobs: mod_event_view_detail_state::IsSet,
     S::Event: mod_event_view_detail_state::IsSet,
-    S::CreatedAt: mod_event_view_detail_state::IsSet,
+    S::Subject: mod_event_view_detail_state::IsSet,
+    S::CreatedBy: mod_event_view_detail_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ModEventViewDetail<'a> {
@@ -11261,7 +11266,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -11289,37 +11294,37 @@ pub mod record_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Op;
         type Timestamp;
+        type Op;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Op = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `op` field to Set
-    pub struct SetOp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOp<S> {}
-    impl<S: State> State for SetOp<S> {
-        type Op = Set<members::op>;
-        type Timestamp = S::Timestamp;
+        type Op = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type Op = S::Op;
         type Timestamp = Set<members::timestamp>;
+        type Op = S::Op;
+    }
+    ///State transition - sets the `op` field to Set
+    pub struct SetOp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOp<S> {}
+    impl<S: State> State for SetOp<S> {
+        type Timestamp = S::Timestamp;
+        type Op = Set<members::op>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `op` field
-        pub struct op(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `op` field
+        pub struct op(());
     }
 }
 
@@ -11429,8 +11434,8 @@ where
 impl<'a, S> RecordEventBuilder<'a, S>
 where
     S: record_event_state::State,
-    S::Op: record_event_state::IsSet,
     S::Timestamp: record_event_state::IsSet,
+    S::Op: record_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordEvent<'a> {
@@ -11445,7 +11450,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -11470,127 +11475,127 @@ pub mod record_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Cid;
+        type Value;
+        type BlobCids;
         type Uri;
         type Moderation;
-        type Cid;
-        type BlobCids;
-        type IndexedAt;
         type Repo;
-        type Value;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Cid = Unset;
+        type Value = Unset;
+        type BlobCids = Unset;
         type Uri = Unset;
         type Moderation = Unset;
-        type Cid = Unset;
-        type BlobCids = Unset;
-        type IndexedAt = Unset;
         type Repo = Unset;
-        type Value = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Moderation = S::Moderation;
-        type Cid = S::Cid;
-        type BlobCids = S::BlobCids;
-        type IndexedAt = S::IndexedAt;
-        type Repo = S::Repo;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `moderation` field to Set
-    pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModeration<S> {}
-    impl<S: State> State for SetModeration<S> {
-        type Uri = S::Uri;
-        type Moderation = Set<members::moderation>;
-        type Cid = S::Cid;
-        type BlobCids = S::BlobCids;
-        type IndexedAt = S::IndexedAt;
-        type Repo = S::Repo;
-        type Value = S::Value;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type Moderation = S::Moderation;
         type Cid = Set<members::cid>;
-        type BlobCids = S::BlobCids;
-        type IndexedAt = S::IndexedAt;
-        type Repo = S::Repo;
         type Value = S::Value;
-    }
-    ///State transition - sets the `blob_cids` field to Set
-    pub struct SetBlobCids<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlobCids<S> {}
-    impl<S: State> State for SetBlobCids<S> {
+        type BlobCids = S::BlobCids;
         type Uri = S::Uri;
         type Moderation = S::Moderation;
-        type Cid = S::Cid;
-        type BlobCids = Set<members::blob_cids>;
-        type IndexedAt = S::IndexedAt;
         type Repo = S::Repo;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Uri = S::Uri;
-        type Moderation = S::Moderation;
-        type Cid = S::Cid;
-        type BlobCids = S::BlobCids;
-        type IndexedAt = Set<members::indexed_at>;
-        type Repo = S::Repo;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Uri = S::Uri;
-        type Moderation = S::Moderation;
-        type Cid = S::Cid;
-        type BlobCids = S::BlobCids;
         type IndexedAt = S::IndexedAt;
-        type Repo = Set<members::repo>;
-        type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
+        type Cid = S::Cid;
+        type Value = Set<members::value>;
+        type BlobCids = S::BlobCids;
         type Uri = S::Uri;
         type Moderation = S::Moderation;
-        type Cid = S::Cid;
-        type BlobCids = S::BlobCids;
-        type IndexedAt = S::IndexedAt;
         type Repo = S::Repo;
-        type Value = Set<members::value>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `blob_cids` field to Set
+    pub struct SetBlobCids<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlobCids<S> {}
+    impl<S: State> State for SetBlobCids<S> {
+        type Cid = S::Cid;
+        type Value = S::Value;
+        type BlobCids = Set<members::blob_cids>;
+        type Uri = S::Uri;
+        type Moderation = S::Moderation;
+        type Repo = S::Repo;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Value = S::Value;
+        type BlobCids = S::BlobCids;
+        type Uri = Set<members::uri>;
+        type Moderation = S::Moderation;
+        type Repo = S::Repo;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `moderation` field to Set
+    pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModeration<S> {}
+    impl<S: State> State for SetModeration<S> {
+        type Cid = S::Cid;
+        type Value = S::Value;
+        type BlobCids = S::BlobCids;
+        type Uri = S::Uri;
+        type Moderation = Set<members::moderation>;
+        type Repo = S::Repo;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Cid = S::Cid;
+        type Value = S::Value;
+        type BlobCids = S::BlobCids;
+        type Uri = S::Uri;
+        type Moderation = S::Moderation;
+        type Repo = Set<members::repo>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Cid = S::Cid;
+        type Value = S::Value;
+        type BlobCids = S::BlobCids;
+        type Uri = S::Uri;
+        type Moderation = S::Moderation;
+        type Repo = S::Repo;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `blob_cids` field
+        pub struct blob_cids(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `moderation` field
         pub struct moderation(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `blob_cids` field
-        pub struct blob_cids(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `value` field
-        pub struct value(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
@@ -11763,13 +11768,13 @@ where
 impl<'a, S> RecordViewBuilder<'a, S>
 where
     S: record_view_state::State,
+    S::Cid: record_view_state::IsSet,
+    S::Value: record_view_state::IsSet,
+    S::BlobCids: record_view_state::IsSet,
     S::Uri: record_view_state::IsSet,
     S::Moderation: record_view_state::IsSet,
-    S::Cid: record_view_state::IsSet,
-    S::BlobCids: record_view_state::IsSet,
-    S::IndexedAt: record_view_state::IsSet,
     S::Repo: record_view_state::IsSet,
-    S::Value: record_view_state::IsSet,
+    S::IndexedAt: record_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordView<'a> {
@@ -11787,7 +11792,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -11815,127 +11820,127 @@ pub mod record_view_detail_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type IndexedAt;
+        type Uri;
         type Blobs;
         type Repo;
         type Moderation;
-        type Uri;
         type Cid;
         type Value;
-        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type IndexedAt = Unset;
+        type Uri = Unset;
         type Blobs = Unset;
         type Repo = Unset;
         type Moderation = Unset;
-        type Uri = Unset;
         type Cid = Unset;
         type Value = Unset;
-        type IndexedAt = Unset;
-    }
-    ///State transition - sets the `blobs` field to Set
-    pub struct SetBlobs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlobs<S> {}
-    impl<S: State> State for SetBlobs<S> {
-        type Blobs = Set<members::blobs>;
-        type Repo = S::Repo;
-        type Moderation = S::Moderation;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Blobs = S::Blobs;
-        type Repo = Set<members::repo>;
-        type Moderation = S::Moderation;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `moderation` field to Set
-    pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModeration<S> {}
-    impl<S: State> State for SetModeration<S> {
-        type Blobs = S::Blobs;
-        type Repo = S::Repo;
-        type Moderation = Set<members::moderation>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Blobs = S::Blobs;
-        type Repo = S::Repo;
-        type Moderation = S::Moderation;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Blobs = S::Blobs;
-        type Repo = S::Repo;
-        type Moderation = S::Moderation;
-        type Uri = S::Uri;
-        type Cid = Set<members::cid>;
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Blobs = S::Blobs;
-        type Repo = S::Repo;
-        type Moderation = S::Moderation;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Value = Set<members::value>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
+        type IndexedAt = Set<members::indexed_at>;
+        type Uri = S::Uri;
         type Blobs = S::Blobs;
         type Repo = S::Repo;
         type Moderation = S::Moderation;
-        type Uri = S::Uri;
         type Cid = S::Cid;
         type Value = S::Value;
-        type IndexedAt = Set<members::indexed_at>;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = Set<members::uri>;
+        type Blobs = S::Blobs;
+        type Repo = S::Repo;
+        type Moderation = S::Moderation;
+        type Cid = S::Cid;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `blobs` field to Set
+    pub struct SetBlobs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlobs<S> {}
+    impl<S: State> State for SetBlobs<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Blobs = Set<members::blobs>;
+        type Repo = S::Repo;
+        type Moderation = S::Moderation;
+        type Cid = S::Cid;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Blobs = S::Blobs;
+        type Repo = Set<members::repo>;
+        type Moderation = S::Moderation;
+        type Cid = S::Cid;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `moderation` field to Set
+    pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModeration<S> {}
+    impl<S: State> State for SetModeration<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Blobs = S::Blobs;
+        type Repo = S::Repo;
+        type Moderation = Set<members::moderation>;
+        type Cid = S::Cid;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Blobs = S::Blobs;
+        type Repo = S::Repo;
+        type Moderation = S::Moderation;
+        type Cid = Set<members::cid>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
+        type Blobs = S::Blobs;
+        type Repo = S::Repo;
+        type Moderation = S::Moderation;
+        type Cid = S::Cid;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `blobs` field
         pub struct blobs(());
         ///Marker type for the `repo` field
         pub struct repo(());
         ///Marker type for the `moderation` field
         pub struct moderation(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
     }
 }
 
@@ -12128,13 +12133,13 @@ where
 impl<'a, S> RecordViewDetailBuilder<'a, S>
 where
     S: record_view_detail_state::State,
+    S::IndexedAt: record_view_detail_state::IsSet,
+    S::Uri: record_view_detail_state::IsSet,
     S::Blobs: record_view_detail_state::IsSet,
     S::Repo: record_view_detail_state::IsSet,
     S::Moderation: record_view_detail_state::IsSet,
-    S::Uri: record_view_detail_state::IsSet,
     S::Cid: record_view_detail_state::IsSet,
     S::Value: record_view_detail_state::IsSet,
-    S::IndexedAt: record_view_detail_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordViewDetail<'a> {
@@ -12153,7 +12158,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -12265,7 +12270,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -12287,85 +12292,85 @@ pub mod repo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RelatedRecords;
         type Did;
-        type IndexedAt;
-        type Handle;
+        type RelatedRecords;
         type Moderation;
+        type Handle;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RelatedRecords = Unset;
         type Did = Unset;
-        type IndexedAt = Unset;
-        type Handle = Unset;
+        type RelatedRecords = Unset;
         type Moderation = Unset;
-    }
-    ///State transition - sets the `related_records` field to Set
-    pub struct SetRelatedRecords<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRelatedRecords<S> {}
-    impl<S: State> State for SetRelatedRecords<S> {
-        type RelatedRecords = Set<members::related_records>;
-        type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
-        type Handle = S::Handle;
-        type Moderation = S::Moderation;
+        type Handle = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type RelatedRecords = S::RelatedRecords;
         type Did = Set<members::did>;
-        type IndexedAt = S::IndexedAt;
-        type Handle = S::Handle;
-        type Moderation = S::Moderation;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
         type RelatedRecords = S::RelatedRecords;
-        type Did = S::Did;
-        type IndexedAt = Set<members::indexed_at>;
+        type Moderation = S::Moderation;
         type Handle = S::Handle;
-        type Moderation = S::Moderation;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type RelatedRecords = S::RelatedRecords;
-        type Did = S::Did;
         type IndexedAt = S::IndexedAt;
-        type Handle = Set<members::handle>;
+    }
+    ///State transition - sets the `related_records` field to Set
+    pub struct SetRelatedRecords<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRelatedRecords<S> {}
+    impl<S: State> State for SetRelatedRecords<S> {
+        type Did = S::Did;
+        type RelatedRecords = Set<members::related_records>;
         type Moderation = S::Moderation;
+        type Handle = S::Handle;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `moderation` field to Set
     pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModeration<S> {}
     impl<S: State> State for SetModeration<S> {
-        type RelatedRecords = S::RelatedRecords;
         type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
-        type Handle = S::Handle;
+        type RelatedRecords = S::RelatedRecords;
         type Moderation = Set<members::moderation>;
+        type Handle = S::Handle;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type RelatedRecords = S::RelatedRecords;
+        type Moderation = S::Moderation;
+        type Handle = Set<members::handle>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Did = S::Did;
+        type RelatedRecords = S::RelatedRecords;
+        type Moderation = S::Moderation;
+        type Handle = S::Handle;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `related_records` field
-        pub struct related_records(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `handle` field
-        pub struct handle(());
+        ///Marker type for the `related_records` field
+        pub struct related_records(());
         ///Marker type for the `moderation` field
         pub struct moderation(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
@@ -12621,11 +12626,11 @@ impl<'a, S: repo_view_state::State> RepoViewBuilder<'a, S> {
 impl<'a, S> RepoViewBuilder<'a, S>
 where
     S: repo_view_state::State,
-    S::RelatedRecords: repo_view_state::IsSet,
     S::Did: repo_view_state::IsSet,
-    S::IndexedAt: repo_view_state::IsSet,
-    S::Handle: repo_view_state::IsSet,
+    S::RelatedRecords: repo_view_state::IsSet,
     S::Moderation: repo_view_state::IsSet,
+    S::Handle: repo_view_state::IsSet,
+    S::IndexedAt: repo_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RepoView<'a> {
@@ -12647,7 +12652,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -12680,84 +12685,84 @@ pub mod repo_view_detail_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Handle;
-        type Did;
         type IndexedAt;
-        type RelatedRecords;
         type Moderation;
+        type Did;
+        type RelatedRecords;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Handle = Unset;
-        type Did = Unset;
         type IndexedAt = Unset;
-        type RelatedRecords = Unset;
         type Moderation = Unset;
+        type Did = Unset;
+        type RelatedRecords = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
         type Handle = Set<members::handle>;
+        type IndexedAt = S::IndexedAt;
+        type Moderation = S::Moderation;
         type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
         type RelatedRecords = S::RelatedRecords;
-        type Moderation = S::Moderation;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
-        type Did = Set<members::did>;
-        type IndexedAt = S::IndexedAt;
-        type RelatedRecords = S::RelatedRecords;
-        type Moderation = S::Moderation;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
         type Handle = S::Handle;
-        type Did = S::Did;
         type IndexedAt = Set<members::indexed_at>;
-        type RelatedRecords = S::RelatedRecords;
         type Moderation = S::Moderation;
-    }
-    ///State transition - sets the `related_records` field to Set
-    pub struct SetRelatedRecords<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRelatedRecords<S> {}
-    impl<S: State> State for SetRelatedRecords<S> {
-        type Handle = S::Handle;
         type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
-        type RelatedRecords = Set<members::related_records>;
-        type Moderation = S::Moderation;
+        type RelatedRecords = S::RelatedRecords;
     }
     ///State transition - sets the `moderation` field to Set
     pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModeration<S> {}
     impl<S: State> State for SetModeration<S> {
         type Handle = S::Handle;
-        type Did = S::Did;
         type IndexedAt = S::IndexedAt;
-        type RelatedRecords = S::RelatedRecords;
         type Moderation = Set<members::moderation>;
+        type Did = S::Did;
+        type RelatedRecords = S::RelatedRecords;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type IndexedAt = S::IndexedAt;
+        type Moderation = S::Moderation;
+        type Did = Set<members::did>;
+        type RelatedRecords = S::RelatedRecords;
+    }
+    ///State transition - sets the `related_records` field to Set
+    pub struct SetRelatedRecords<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRelatedRecords<S> {}
+    impl<S: State> State for SetRelatedRecords<S> {
+        type Handle = S::Handle;
+        type IndexedAt = S::IndexedAt;
+        type Moderation = S::Moderation;
+        type Did = S::Did;
+        type RelatedRecords = Set<members::related_records>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `related_records` field
-        pub struct related_records(());
         ///Marker type for the `moderation` field
         pub struct moderation(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `related_records` field
+        pub struct related_records(());
     }
 }
 
@@ -13077,10 +13082,10 @@ impl<'a, S> RepoViewDetailBuilder<'a, S>
 where
     S: repo_view_detail_state::State,
     S::Handle: repo_view_detail_state::IsSet,
-    S::Did: repo_view_detail_state::IsSet,
     S::IndexedAt: repo_view_detail_state::IsSet,
-    S::RelatedRecords: repo_view_detail_state::IsSet,
     S::Moderation: repo_view_detail_state::IsSet,
+    S::Did: repo_view_detail_state::IsSet,
+    S::RelatedRecords: repo_view_detail_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RepoViewDetail<'a> {
@@ -13105,7 +13110,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -13223,7 +13228,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -13245,177 +13250,177 @@ pub mod reporter_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TakendownRecordCount;
-        type TakendownAccountCount;
-        type AccountReportCount;
         type RecordReportCount;
-        type LabeledRecordCount;
         type ReportedAccountCount;
-        type ReportedRecordCount;
+        type TakendownAccountCount;
+        type TakendownRecordCount;
         type Did;
+        type LabeledRecordCount;
+        type AccountReportCount;
         type LabeledAccountCount;
+        type ReportedRecordCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TakendownRecordCount = Unset;
-        type TakendownAccountCount = Unset;
-        type AccountReportCount = Unset;
         type RecordReportCount = Unset;
-        type LabeledRecordCount = Unset;
         type ReportedAccountCount = Unset;
-        type ReportedRecordCount = Unset;
+        type TakendownAccountCount = Unset;
+        type TakendownRecordCount = Unset;
         type Did = Unset;
+        type LabeledRecordCount = Unset;
+        type AccountReportCount = Unset;
         type LabeledAccountCount = Unset;
-    }
-    ///State transition - sets the `takendown_record_count` field to Set
-    pub struct SetTakendownRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTakendownRecordCount<S> {}
-    impl<S: State> State for SetTakendownRecordCount<S> {
-        type TakendownRecordCount = Set<members::takendown_record_count>;
-        type TakendownAccountCount = S::TakendownAccountCount;
-        type AccountReportCount = S::AccountReportCount;
-        type RecordReportCount = S::RecordReportCount;
-        type LabeledRecordCount = S::LabeledRecordCount;
-        type ReportedAccountCount = S::ReportedAccountCount;
-        type ReportedRecordCount = S::ReportedRecordCount;
-        type Did = S::Did;
-        type LabeledAccountCount = S::LabeledAccountCount;
-    }
-    ///State transition - sets the `takendown_account_count` field to Set
-    pub struct SetTakendownAccountCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTakendownAccountCount<S> {}
-    impl<S: State> State for SetTakendownAccountCount<S> {
-        type TakendownRecordCount = S::TakendownRecordCount;
-        type TakendownAccountCount = Set<members::takendown_account_count>;
-        type AccountReportCount = S::AccountReportCount;
-        type RecordReportCount = S::RecordReportCount;
-        type LabeledRecordCount = S::LabeledRecordCount;
-        type ReportedAccountCount = S::ReportedAccountCount;
-        type ReportedRecordCount = S::ReportedRecordCount;
-        type Did = S::Did;
-        type LabeledAccountCount = S::LabeledAccountCount;
-    }
-    ///State transition - sets the `account_report_count` field to Set
-    pub struct SetAccountReportCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccountReportCount<S> {}
-    impl<S: State> State for SetAccountReportCount<S> {
-        type TakendownRecordCount = S::TakendownRecordCount;
-        type TakendownAccountCount = S::TakendownAccountCount;
-        type AccountReportCount = Set<members::account_report_count>;
-        type RecordReportCount = S::RecordReportCount;
-        type LabeledRecordCount = S::LabeledRecordCount;
-        type ReportedAccountCount = S::ReportedAccountCount;
-        type ReportedRecordCount = S::ReportedRecordCount;
-        type Did = S::Did;
-        type LabeledAccountCount = S::LabeledAccountCount;
+        type ReportedRecordCount = Unset;
     }
     ///State transition - sets the `record_report_count` field to Set
     pub struct SetRecordReportCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordReportCount<S> {}
     impl<S: State> State for SetRecordReportCount<S> {
-        type TakendownRecordCount = S::TakendownRecordCount;
-        type TakendownAccountCount = S::TakendownAccountCount;
-        type AccountReportCount = S::AccountReportCount;
         type RecordReportCount = Set<members::record_report_count>;
-        type LabeledRecordCount = S::LabeledRecordCount;
         type ReportedAccountCount = S::ReportedAccountCount;
-        type ReportedRecordCount = S::ReportedRecordCount;
-        type Did = S::Did;
-        type LabeledAccountCount = S::LabeledAccountCount;
-    }
-    ///State transition - sets the `labeled_record_count` field to Set
-    pub struct SetLabeledRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabeledRecordCount<S> {}
-    impl<S: State> State for SetLabeledRecordCount<S> {
-        type TakendownRecordCount = S::TakendownRecordCount;
         type TakendownAccountCount = S::TakendownAccountCount;
-        type AccountReportCount = S::AccountReportCount;
-        type RecordReportCount = S::RecordReportCount;
-        type LabeledRecordCount = Set<members::labeled_record_count>;
-        type ReportedAccountCount = S::ReportedAccountCount;
-        type ReportedRecordCount = S::ReportedRecordCount;
+        type TakendownRecordCount = S::TakendownRecordCount;
         type Did = S::Did;
+        type LabeledRecordCount = S::LabeledRecordCount;
+        type AccountReportCount = S::AccountReportCount;
         type LabeledAccountCount = S::LabeledAccountCount;
+        type ReportedRecordCount = S::ReportedRecordCount;
     }
     ///State transition - sets the `reported_account_count` field to Set
     pub struct SetReportedAccountCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReportedAccountCount<S> {}
     impl<S: State> State for SetReportedAccountCount<S> {
-        type TakendownRecordCount = S::TakendownRecordCount;
-        type TakendownAccountCount = S::TakendownAccountCount;
-        type AccountReportCount = S::AccountReportCount;
         type RecordReportCount = S::RecordReportCount;
-        type LabeledRecordCount = S::LabeledRecordCount;
         type ReportedAccountCount = Set<members::reported_account_count>;
-        type ReportedRecordCount = S::ReportedRecordCount;
-        type Did = S::Did;
-        type LabeledAccountCount = S::LabeledAccountCount;
-    }
-    ///State transition - sets the `reported_record_count` field to Set
-    pub struct SetReportedRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReportedRecordCount<S> {}
-    impl<S: State> State for SetReportedRecordCount<S> {
-        type TakendownRecordCount = S::TakendownRecordCount;
         type TakendownAccountCount = S::TakendownAccountCount;
-        type AccountReportCount = S::AccountReportCount;
-        type RecordReportCount = S::RecordReportCount;
-        type LabeledRecordCount = S::LabeledRecordCount;
-        type ReportedAccountCount = S::ReportedAccountCount;
-        type ReportedRecordCount = Set<members::reported_record_count>;
+        type TakendownRecordCount = S::TakendownRecordCount;
         type Did = S::Did;
+        type LabeledRecordCount = S::LabeledRecordCount;
+        type AccountReportCount = S::AccountReportCount;
         type LabeledAccountCount = S::LabeledAccountCount;
+        type ReportedRecordCount = S::ReportedRecordCount;
+    }
+    ///State transition - sets the `takendown_account_count` field to Set
+    pub struct SetTakendownAccountCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTakendownAccountCount<S> {}
+    impl<S: State> State for SetTakendownAccountCount<S> {
+        type RecordReportCount = S::RecordReportCount;
+        type ReportedAccountCount = S::ReportedAccountCount;
+        type TakendownAccountCount = Set<members::takendown_account_count>;
+        type TakendownRecordCount = S::TakendownRecordCount;
+        type Did = S::Did;
+        type LabeledRecordCount = S::LabeledRecordCount;
+        type AccountReportCount = S::AccountReportCount;
+        type LabeledAccountCount = S::LabeledAccountCount;
+        type ReportedRecordCount = S::ReportedRecordCount;
+    }
+    ///State transition - sets the `takendown_record_count` field to Set
+    pub struct SetTakendownRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTakendownRecordCount<S> {}
+    impl<S: State> State for SetTakendownRecordCount<S> {
+        type RecordReportCount = S::RecordReportCount;
+        type ReportedAccountCount = S::ReportedAccountCount;
+        type TakendownAccountCount = S::TakendownAccountCount;
+        type TakendownRecordCount = Set<members::takendown_record_count>;
+        type Did = S::Did;
+        type LabeledRecordCount = S::LabeledRecordCount;
+        type AccountReportCount = S::AccountReportCount;
+        type LabeledAccountCount = S::LabeledAccountCount;
+        type ReportedRecordCount = S::ReportedRecordCount;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type TakendownRecordCount = S::TakendownRecordCount;
-        type TakendownAccountCount = S::TakendownAccountCount;
-        type AccountReportCount = S::AccountReportCount;
         type RecordReportCount = S::RecordReportCount;
-        type LabeledRecordCount = S::LabeledRecordCount;
         type ReportedAccountCount = S::ReportedAccountCount;
-        type ReportedRecordCount = S::ReportedRecordCount;
+        type TakendownAccountCount = S::TakendownAccountCount;
+        type TakendownRecordCount = S::TakendownRecordCount;
         type Did = Set<members::did>;
+        type LabeledRecordCount = S::LabeledRecordCount;
+        type AccountReportCount = S::AccountReportCount;
         type LabeledAccountCount = S::LabeledAccountCount;
+        type ReportedRecordCount = S::ReportedRecordCount;
+    }
+    ///State transition - sets the `labeled_record_count` field to Set
+    pub struct SetLabeledRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLabeledRecordCount<S> {}
+    impl<S: State> State for SetLabeledRecordCount<S> {
+        type RecordReportCount = S::RecordReportCount;
+        type ReportedAccountCount = S::ReportedAccountCount;
+        type TakendownAccountCount = S::TakendownAccountCount;
+        type TakendownRecordCount = S::TakendownRecordCount;
+        type Did = S::Did;
+        type LabeledRecordCount = Set<members::labeled_record_count>;
+        type AccountReportCount = S::AccountReportCount;
+        type LabeledAccountCount = S::LabeledAccountCount;
+        type ReportedRecordCount = S::ReportedRecordCount;
+    }
+    ///State transition - sets the `account_report_count` field to Set
+    pub struct SetAccountReportCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAccountReportCount<S> {}
+    impl<S: State> State for SetAccountReportCount<S> {
+        type RecordReportCount = S::RecordReportCount;
+        type ReportedAccountCount = S::ReportedAccountCount;
+        type TakendownAccountCount = S::TakendownAccountCount;
+        type TakendownRecordCount = S::TakendownRecordCount;
+        type Did = S::Did;
+        type LabeledRecordCount = S::LabeledRecordCount;
+        type AccountReportCount = Set<members::account_report_count>;
+        type LabeledAccountCount = S::LabeledAccountCount;
+        type ReportedRecordCount = S::ReportedRecordCount;
     }
     ///State transition - sets the `labeled_account_count` field to Set
     pub struct SetLabeledAccountCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLabeledAccountCount<S> {}
     impl<S: State> State for SetLabeledAccountCount<S> {
-        type TakendownRecordCount = S::TakendownRecordCount;
-        type TakendownAccountCount = S::TakendownAccountCount;
-        type AccountReportCount = S::AccountReportCount;
         type RecordReportCount = S::RecordReportCount;
-        type LabeledRecordCount = S::LabeledRecordCount;
         type ReportedAccountCount = S::ReportedAccountCount;
-        type ReportedRecordCount = S::ReportedRecordCount;
+        type TakendownAccountCount = S::TakendownAccountCount;
+        type TakendownRecordCount = S::TakendownRecordCount;
         type Did = S::Did;
+        type LabeledRecordCount = S::LabeledRecordCount;
+        type AccountReportCount = S::AccountReportCount;
         type LabeledAccountCount = Set<members::labeled_account_count>;
+        type ReportedRecordCount = S::ReportedRecordCount;
+    }
+    ///State transition - sets the `reported_record_count` field to Set
+    pub struct SetReportedRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReportedRecordCount<S> {}
+    impl<S: State> State for SetReportedRecordCount<S> {
+        type RecordReportCount = S::RecordReportCount;
+        type ReportedAccountCount = S::ReportedAccountCount;
+        type TakendownAccountCount = S::TakendownAccountCount;
+        type TakendownRecordCount = S::TakendownRecordCount;
+        type Did = S::Did;
+        type LabeledRecordCount = S::LabeledRecordCount;
+        type AccountReportCount = S::AccountReportCount;
+        type LabeledAccountCount = S::LabeledAccountCount;
+        type ReportedRecordCount = Set<members::reported_record_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `takendown_record_count` field
-        pub struct takendown_record_count(());
-        ///Marker type for the `takendown_account_count` field
-        pub struct takendown_account_count(());
-        ///Marker type for the `account_report_count` field
-        pub struct account_report_count(());
         ///Marker type for the `record_report_count` field
         pub struct record_report_count(());
-        ///Marker type for the `labeled_record_count` field
-        pub struct labeled_record_count(());
         ///Marker type for the `reported_account_count` field
         pub struct reported_account_count(());
-        ///Marker type for the `reported_record_count` field
-        pub struct reported_record_count(());
+        ///Marker type for the `takendown_account_count` field
+        pub struct takendown_account_count(());
+        ///Marker type for the `takendown_record_count` field
+        pub struct takendown_record_count(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `labeled_record_count` field
+        pub struct labeled_record_count(());
+        ///Marker type for the `account_report_count` field
+        pub struct account_report_count(());
         ///Marker type for the `labeled_account_count` field
         pub struct labeled_account_count(());
+        ///Marker type for the `reported_record_count` field
+        pub struct reported_record_count(());
     }
 }
 
@@ -13638,15 +13643,15 @@ where
 impl<'a, S> ReporterStatsBuilder<'a, S>
 where
     S: reporter_stats_state::State,
-    S::TakendownRecordCount: reporter_stats_state::IsSet,
-    S::TakendownAccountCount: reporter_stats_state::IsSet,
-    S::AccountReportCount: reporter_stats_state::IsSet,
     S::RecordReportCount: reporter_stats_state::IsSet,
-    S::LabeledRecordCount: reporter_stats_state::IsSet,
     S::ReportedAccountCount: reporter_stats_state::IsSet,
-    S::ReportedRecordCount: reporter_stats_state::IsSet,
+    S::TakendownAccountCount: reporter_stats_state::IsSet,
+    S::TakendownRecordCount: reporter_stats_state::IsSet,
     S::Did: reporter_stats_state::IsSet,
+    S::LabeledRecordCount: reporter_stats_state::IsSet,
+    S::AccountReportCount: reporter_stats_state::IsSet,
     S::LabeledAccountCount: reporter_stats_state::IsSet,
+    S::ReportedRecordCount: reporter_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReporterStats<'a> {
@@ -13666,7 +13671,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -13696,105 +13701,105 @@ pub mod scheduled_action_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
-        type Did;
-        type Id;
+        type CreatedBy;
         type Action;
         type CreatedAt;
-        type CreatedBy;
+        type Status;
+        type Id;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
-        type Did = Unset;
-        type Id = Unset;
+        type CreatedBy = Unset;
         type Action = Unset;
         type CreatedAt = Unset;
-        type CreatedBy = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Did = S::Did;
-        type Id = S::Id;
-        type Action = S::Action;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = S::CreatedBy;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Status = S::Status;
-        type Did = Set<members::did>;
-        type Id = S::Id;
-        type Action = S::Action;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = S::CreatedBy;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Status = S::Status;
-        type Did = S::Did;
-        type Id = Set<members::id>;
-        type Action = S::Action;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = S::CreatedBy;
-    }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAction<S> {}
-    impl<S: State> State for SetAction<S> {
-        type Status = S::Status;
-        type Did = S::Did;
-        type Id = S::Id;
-        type Action = Set<members::action>;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = S::CreatedBy;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
-        type Did = S::Did;
-        type Id = S::Id;
-        type Action = S::Action;
-        type CreatedAt = Set<members::created_at>;
-        type CreatedBy = S::CreatedBy;
+        type Status = Unset;
+        type Id = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `created_by` field to Set
     pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
     impl<S: State> State for SetCreatedBy<S> {
-        type Status = S::Status;
-        type Did = S::Did;
-        type Id = S::Id;
+        type CreatedBy = Set<members::created_by>;
         type Action = S::Action;
         type CreatedAt = S::CreatedAt;
-        type CreatedBy = Set<members::created_by>;
+        type Status = S::Status;
+        type Id = S::Id;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type CreatedBy = S::CreatedBy;
+        type Action = Set<members::action>;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type Id = S::Id;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedBy = S::CreatedBy;
+        type Action = S::Action;
+        type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+        type Id = S::Id;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedBy = S::CreatedBy;
+        type Action = S::Action;
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
+        type Id = S::Id;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type CreatedBy = S::CreatedBy;
+        type Action = S::Action;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type Id = Set<members::id>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type CreatedBy = S::CreatedBy;
+        type Action = S::Action;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type Id = S::Id;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `id` field
-        pub struct id(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
         ///Marker type for the `action` field
         pub struct action(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `created_by` field
-        pub struct created_by(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -14131,12 +14136,12 @@ impl<'a, S: scheduled_action_view_state::State> ScheduledActionViewBuilder<'a, S
 impl<'a, S> ScheduledActionViewBuilder<'a, S>
 where
     S: scheduled_action_view_state::State,
-    S::Status: scheduled_action_view_state::IsSet,
-    S::Did: scheduled_action_view_state::IsSet,
-    S::Id: scheduled_action_view_state::IsSet,
+    S::CreatedBy: scheduled_action_view_state::IsSet,
     S::Action: scheduled_action_view_state::IsSet,
     S::CreatedAt: scheduled_action_view_state::IsSet,
-    S::CreatedBy: scheduled_action_view_state::IsSet,
+    S::Status: scheduled_action_view_state::IsSet,
+    S::Id: scheduled_action_view_state::IsSet,
+    S::Did: scheduled_action_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScheduledActionView<'a> {
@@ -14162,7 +14167,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -14198,85 +14203,85 @@ pub mod subject_status_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
-        type Subject;
-        type Id;
-        type CreatedAt;
         type ReviewState;
+        type CreatedAt;
+        type Id;
+        type Subject;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
-        type Subject = Unset;
-        type Id = Unset;
-        type CreatedAt = Unset;
         type ReviewState = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Subject = S::Subject;
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type ReviewState = S::ReviewState;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Subject = Set<members::subject>;
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type ReviewState = S::ReviewState;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Subject = S::Subject;
-        type Id = Set<members::id>;
-        type CreatedAt = S::CreatedAt;
-        type ReviewState = S::ReviewState;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Subject = S::Subject;
-        type Id = S::Id;
-        type CreatedAt = Set<members::created_at>;
-        type ReviewState = S::ReviewState;
+        type CreatedAt = Unset;
+        type Id = Unset;
+        type Subject = Unset;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `review_state` field to Set
     pub struct SetReviewState<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReviewState<S> {}
     impl<S: State> State for SetReviewState<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Subject = S::Subject;
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
         type ReviewState = Set<members::review_state>;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type Subject = S::Subject;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ReviewState = S::ReviewState;
+        type CreatedAt = Set<members::created_at>;
+        type Id = S::Id;
+        type Subject = S::Subject;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type ReviewState = S::ReviewState;
+        type CreatedAt = S::CreatedAt;
+        type Id = Set<members::id>;
+        type Subject = S::Subject;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type ReviewState = S::ReviewState;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type Subject = Set<members::subject>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type ReviewState = S::ReviewState;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type Subject = S::Subject;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `review_state` field
         pub struct review_state(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -14811,11 +14816,11 @@ where
 impl<'a, S> SubjectStatusViewBuilder<'a, S>
 where
     S: subject_status_view_state::State,
-    S::UpdatedAt: subject_status_view_state::IsSet,
-    S::Subject: subject_status_view_state::IsSet,
-    S::Id: subject_status_view_state::IsSet,
-    S::CreatedAt: subject_status_view_state::IsSet,
     S::ReviewState: subject_status_view_state::IsSet,
+    S::CreatedAt: subject_status_view_state::IsSet,
+    S::Id: subject_status_view_state::IsSet,
+    S::Subject: subject_status_view_state::IsSet,
+    S::UpdatedAt: subject_status_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubjectStatusView<'a> {
@@ -14851,7 +14856,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -14897,37 +14902,37 @@ pub mod subject_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Type;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Type = S::Type;
+        type Subject = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Subject = S::Subject;
         type Type = Set<members::r#type>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Type = S::Type;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -15080,8 +15085,8 @@ where
 impl<'a, S> SubjectViewBuilder<'a, S>
 where
     S: subject_view_state::State,
-    S::Subject: subject_view_state::IsSet,
     S::Type: subject_view_state::IsSet,
+    S::Subject: subject_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubjectView<'a> {
@@ -15098,7 +15103,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
@@ -15125,51 +15130,51 @@ pub mod video_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Length;
         type Width;
         type Height;
-        type Length;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Length = Unset;
         type Width = Unset;
         type Height = Unset;
-        type Length = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Height = S::Height;
-        type Length = S::Length;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
-        type Height = Set<members::height>;
-        type Length = S::Length;
     }
     ///State transition - sets the `length` field to Set
     pub struct SetLength<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLength<S> {}
     impl<S: State> State for SetLength<S> {
+        type Length = Set<members::length>;
         type Width = S::Width;
         type Height = S::Height;
-        type Length = Set<members::length>;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Length = S::Length;
+        type Width = Set<members::width>;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeight<S> {}
+    impl<S: State> State for SetHeight<S> {
+        type Length = S::Length;
+        type Width = S::Width;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `length` field
+        pub struct length(());
         ///Marker type for the `width` field
         pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
-        ///Marker type for the `length` field
-        pub struct length(());
     }
 }
 
@@ -15262,9 +15267,9 @@ where
 impl<'a, S> VideoDetailsBuilder<'a, S>
 where
     S: video_details_state::State,
+    S::Length: video_details_state::IsSet,
     S::Width: video_details_state::IsSet,
     S::Height: video_details_state::IsSet,
-    S::Length: video_details_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VideoDetails<'a> {
@@ -15278,7 +15283,7 @@ where
     /// Build the final struct with custom extra_data
     pub fn build_with_data(
         self,
-        extra_data: std::collections::BTreeMap<
+        extra_data: alloc::collections::BTreeMap<
             jacquard_common::deps::smol_str::SmolStr,
             jacquard_common::types::value::Data<'a>,
         >,
